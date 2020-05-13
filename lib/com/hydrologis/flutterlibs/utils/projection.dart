@@ -1,16 +1,4 @@
-import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
-import 'package:dart_jts/dart_jts.dart' as JTS;
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:proj4dart/proj4dart.dart';
-import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/theme/colors.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/ui/progress.dart';
-import 'dart:io';
-
-import 'package:smash/eu/hydrologis/flutterlibs/utils/preferences.dart';
-import 'package:smash/eu/hydrologis/smash/util/logging.dart';
+part of smashlibs;
 
 class SmashPrj {
   static final Projection EPSG4326 = Projection.WGS84;

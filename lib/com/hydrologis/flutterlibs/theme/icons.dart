@@ -1,18 +1,9 @@
+part of smashlibs;
 /*
  * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
-
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/filesystem/filemanagement.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/ui/ui.dart';
-
-import '../utils/preferences.dart';
-import 'colors.dart';
 
 const List<String> DEFAULT_NOTES_ICONDATA = [
   'mapMarker',
@@ -97,7 +88,7 @@ class SmashIcons {
   }
 }
 
-IconData getIcon(String key) {
+IconData getSmashIcon(String key) {
   var iconData = MdiIcons.fromString(key);
   if (iconData == null) {
     return MdiIcons.mapMarker;

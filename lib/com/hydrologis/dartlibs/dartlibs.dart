@@ -135,7 +135,7 @@ class MercatorUtils {
   /// Equatorial radius of earth is required for distance computation.
   static final double EQUATORIALRADIUS = 6378137.0;
 
-  /// Convert a longitude coordinate (in degrees) to a horizontal distance in meters from the
+  /// Convert a longitude JTS.Coordinate (in degrees) to a horizontal distance in meters from the
   /// zero meridian
   ///
   /// @param longitude in degrees
@@ -164,7 +164,7 @@ class MercatorUtils {
     return (exp(radians) - exp(-radians)) / 2;
   }
 
-  /// Convert a latitude coordinate (in degrees) to a vertical distance in meters from the
+  /// Convert a latitude JTS.Coordinate (in degrees) to a vertical distance in meters from the
   /// equator
   ///
   /// @param latitude in degrees
@@ -173,7 +173,7 @@ class MercatorUtils {
     return EQUATORIALRADIUS * log(tan(pi / 4 + 0.5 * degToRadian(latitude)));
   }
 
-  /// Convert a east-longitude,west-longitude coordinate (in degrees) to distance in meters
+  /// Convert a east-longitude,west-longitude JTS.Coordinate (in degrees) to distance in meters
   ///
   /// @param east_longitude longitude in degrees
   /// @param west_longitude longitude in degrees
@@ -184,7 +184,7 @@ class MercatorUtils {
         longitudeToMetersX(west_longitude);
   }
 
-  /// Convert a north-latitude,south-latitude coordinate (in degrees) to distance in meters
+  /// Convert a north-latitude,south-latitude JTS.Coordinate (in degrees) to distance in meters
   ///
   /// @param north_latitude latitude in degrees
   /// @param south_latitude latitude in degrees
@@ -213,7 +213,7 @@ class MercatorUtils {
   /// @param py       pixel y.
   /// @param zoom     zoomlevel.
   /// @param tileSize tile size.
-  /// @return converted coordinate.
+  /// @return converted JTS.Coordinate.
   static List<double> pixelsToMeters(
       double px, double py, int zoom, int tileSize) {
     double res = getResolution(zoom, tileSize);
@@ -277,48 +277,48 @@ class MercatorUtils {
 
   static double radianToDeg(final double rad) => rad * (180.0 / pi);
 
-  static Coordinate convert3857To4326(Coordinate coordinate3857) {
+  static JTS.Coordinate convert3857To4326(JTS.Coordinate coordinate3857) {
     List<double> latLon = metersToLatLon(coordinate3857.x, coordinate3857.y);
-    return new Coordinate(latLon[1], latLon[0]);
+    return  JTS.Coordinate(latLon[1], latLon[0]);
   }
 
-  static Coordinate convert4326To3857(Coordinate coordinate4326) {
+  static JTS.Coordinate convert4326To3857(JTS.Coordinate coordinate4326) {
     List<double> xy = latLonToMeters(coordinate4326.y, coordinate4326.x);
-    return new Coordinate(xy[0], xy[1]);
+    return  JTS.Coordinate(xy[0], xy[1]);
   }
 
-  static Envelope convert3857To4326Env(Envelope envelope3857) {
-    Coordinate ll3857 =
-        new Coordinate(envelope3857.getMinX(), envelope3857.getMinY());
-    Coordinate ur3857 =
-        new Coordinate(envelope3857.getMaxX(), envelope3857.getMaxY());
+  static JTS.Envelope convert3857To4326Env(JTS.Envelope envelope3857) {
+    JTS.Coordinate ll3857 =
+         JTS.Coordinate(envelope3857.getMinX(), envelope3857.getMinY());
+    JTS.Coordinate ur3857 =
+         JTS.Coordinate(envelope3857.getMaxX(), envelope3857.getMaxY());
 
-    Coordinate ll4326 = convert3857To4326(ll3857);
-    Coordinate ur4326 = convert3857To4326(ur3857);
+    JTS.Coordinate ll4326 = convert3857To4326(ll3857);
+    JTS.Coordinate ur4326 = convert3857To4326(ur3857);
 
-    Envelope env4326 = new Envelope.fromCoordinates(ll4326, ur4326);
+    JTS.Envelope env4326 =  JTS.Envelope.fromCoordinates(ll4326, ur4326);
     return env4326;
   }
 
-  static Envelope convert4326To3857Env(Envelope envelope4326) {
-    Coordinate ll4326 =
-        new Coordinate(envelope4326.getMinX(), envelope4326.getMinY());
-    Coordinate ur4326 =
-        new Coordinate(envelope4326.getMaxX(), envelope4326.getMaxY());
+  static JTS.Envelope convert4326To3857Env(JTS.Envelope envelope4326) {
+    JTS.Coordinate ll4326 =
+         JTS.Coordinate(envelope4326.getMinX(), envelope4326.getMinY());
+    JTS.Coordinate ur4326 =
+         JTS.Coordinate(envelope4326.getMaxX(), envelope4326.getMaxY());
 
-    Coordinate ll3857 = convert4326To3857(ll4326);
-    Coordinate ur3857 = convert4326To3857(ur4326);
+    JTS.Coordinate ll3857 = convert4326To3857(ll4326);
+    JTS.Coordinate ur3857 = convert4326To3857(ur4326);
 
-    Envelope env3857 = new Envelope.fromCoordinates(ll3857, ur3857);
+    JTS.Envelope env3857 =  JTS.Envelope.fromCoordinates(ll3857, ur3857);
     return env3857;
   }
 
-  static List<int> getTileNumberFrom3857Coord(Coordinate coord3857, int zoom) {
-    Coordinate coord4326 = convert3857To4326(coord3857);
+  static List<int> getTileNumberFrom3857Coord(JTS.Coordinate coord3857, int zoom) {
+    JTS.Coordinate coord4326 = convert3857To4326(coord3857);
     return getTileNumber(coord4326.y, coord4326.x, zoom);
   }
 
-  static List<int> getTileNumberFrom4326Coord(Coordinate coord4326, int zoom) {
+  static List<int> getTileNumberFrom4326Coord(JTS.Coordinate coord4326, int zoom) {
     return getTileNumber(coord4326.y, coord4326.x, zoom);
   }
 
@@ -328,15 +328,15 @@ class MercatorUtils {
    * @param tx       tile x.
    * @param ty       tile y.
    * @param zoom     zoomlevel.
-   * @return the Envelope.
+   * @return the JTS.Envelope.
    */
-  static Envelope tileBounds4326(final int x, final int y, final int zoom) {
+  static JTS.Envelope tileBounds4326(final int x, final int y, final int zoom) {
     double north = tile2lat(y, zoom);
     double south = tile2lat(y + 1, zoom);
     double west = tile2lon(x, zoom);
     double east = tile2lon(x + 1, zoom);
-    Envelope envelope = new Envelope(west, east, south, north);
-    return envelope;
+    JTS.Envelope env =  JTS.Envelope(west, east, south, north);
+    return env;
   }
 
   /// Returns bounds of the given tile in EPSG:3857 coordinates
@@ -344,16 +344,16 @@ class MercatorUtils {
   /// @param tx       tile x.
   /// @param ty       tile y.
   /// @param zoom     zoomlevel.
-  /// @return the Envelope.
-  static Envelope tileBounds3857(final int x, final int y, final int zoom) {
-    Envelope env4326 = tileBounds4326(x, y, zoom);
-    Coordinate ll4326 = new Coordinate(env4326.getMinX(), env4326.getMinY());
-    Coordinate ur4326 = new Coordinate(env4326.getMaxX(), env4326.getMaxY());
+  /// @return the JTS.Envelope.
+  static JTS.Envelope tileBounds3857(final int x, final int y, final int zoom) {
+    JTS.Envelope env4326 = tileBounds4326(x, y, zoom);
+    JTS.Coordinate ll4326 =  JTS.Coordinate(env4326.getMinX(), env4326.getMinY());
+    JTS.Coordinate ur4326 =  JTS.Coordinate(env4326.getMaxX(), env4326.getMaxY());
 
-    Coordinate ll3857transf = MercatorUtils.convert4326To3857(ll4326);
-    Coordinate ur3857transf = MercatorUtils.convert4326To3857(ur4326);
+    JTS.Coordinate ll3857transf = MercatorUtils.convert4326To3857(ll4326);
+    JTS.Coordinate ur3857transf = MercatorUtils.convert4326To3857(ur4326);
 
-    return new Envelope.fromCoordinates(ll3857transf, ur3857transf);
+    return  JTS.Envelope.fromCoordinates(ll3857transf, ur3857transf);
   }
 
   /// Get the tiles that fit into a given tile at lower zoomlevel.
@@ -366,7 +366,7 @@ class MercatorUtils {
   /// @return the ordered list of tiles.
   static List<List<int>> getTilesAtHigherZoom(
       int origTx, int origTy, int origZoom, int higherZoom, int tileSize) {
-    Envelope boundsLL = tileBounds4326(origTx, origTy, origZoom);
+    JTS.Envelope boundsLL = tileBounds4326(origTx, origTy, origZoom);
 
     int delta = higherZoom - origZoom;
     int splits = pow(2, delta).toInt();

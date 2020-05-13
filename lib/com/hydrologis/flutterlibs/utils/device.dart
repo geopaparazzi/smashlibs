@@ -1,15 +1,13 @@
+part of smashlibs;
 /*
  * Copyright 2017 The Chromium Authors. All rights reserved.
  *
  * Use of this source code is governed by a BSD-style  license that can be
  * found in the LICENSE file.
  */
-import 'dart:io';
-
-import 'package:device_info/device_info.dart';
 
 class Device {
-  final  UNIQUEID = 'uniqueid';
+  static const  UNIQUEID = 'uniqueid';
   Map<String, dynamic> deviceData;
 
   static final Device _singleton = Device._internal();

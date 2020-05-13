@@ -1,14 +1,11 @@
+part of smashlibs;
 /*
  * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
 
-import 'dart:typed_data';
 
-import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
-import 'package:smash/eu/hydrologis/dartlibs/dartlibs.dart';
-import 'package:sqflite/sqflite.dart';
 
 abstract class QueryObjectBuilder<T> {
   String querySql();

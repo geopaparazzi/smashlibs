@@ -1,12 +1,9 @@
+part of smashlibs;
 /*
  * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
-
-import 'package:smash/eu/hydrologis/smash/util/logging.dart';
 
 enum PERMISSIONS { STORAGE, LOCATION }
 

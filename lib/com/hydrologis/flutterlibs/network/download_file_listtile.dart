@@ -1,18 +1,9 @@
+part of smashlibs;
 /*
  * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
-import 'dart:io';
-
-import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/theme/colors.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/theme/icons.dart' as ICONS;
-import 'package:smash/eu/hydrologis/flutterlibs/ui/dialogs.dart';
-import 'package:smash/eu/hydrologis/smash/util/logging.dart';
 
 class FileDownloadListTileProgressWidget extends StatefulWidget {
   final String _downloadUrl;
@@ -106,7 +97,7 @@ class FileDownloadListTileProgressWidgetState
                   color: SmashColors.mainSelection,
                 )
               : Icon(
-                  ICONS.SmashIcons.forPath(name),
+                  SmashIcons.forPath(name),
                   color: SmashColors.mainDecorations,
                 ),
       title: Text(name),

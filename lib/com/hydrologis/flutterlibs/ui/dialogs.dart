@@ -1,15 +1,10 @@
+part of smashlibs;
 /*
  * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
 
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/theme/colors.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/theme/icons.dart' as ICONS;
-import 'package:smash/eu/hydrologis/flutterlibs/ui/ui.dart';
 
 /// Confirm dialog using custom [title] and [prompt].
 ///
@@ -303,7 +298,7 @@ Future<String> showComboDialog(
                 ? Padding(
                     padding: SmashUI.defaultRigthPadding(),
                     child: Icon(
-                      ICONS.getIcon(iconNames[i]),
+                      getSmashIcon(iconNames[i]),
                       color: SmashColors.mainDecorations,
                     ),
                   )

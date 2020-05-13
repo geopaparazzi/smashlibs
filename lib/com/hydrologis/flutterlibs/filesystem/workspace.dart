@@ -1,15 +1,9 @@
+part of smashlibs;
 /*
  * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
-
-import 'dart:io';
-
-import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path_provider_ex/path_provider_ex.dart';
-import 'package:smash/eu/hydrologis/flutterlibs/utils/preferences.dart';
 
 /// The name of the app, used to handle project folders and similar.
 const APP_NAME = "smash";
