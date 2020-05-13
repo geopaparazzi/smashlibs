@@ -37,8 +37,6 @@ dependencies:
   # MIT
   material_design_icons_flutter: ^4.0.5145
   # MIT
-  provider: ^4.1.1
-  # MIT
   share_extend: ^1.1.2
     # BSD
   path_provider: ^1.6.5
