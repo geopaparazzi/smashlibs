@@ -21,15 +21,4 @@ class ShareHandler {
   }
 
 
-  // TODO Move to SMASH
-  // static Future<void> shareProject(BuildContext context) async {
-  //   ProjectState projectState =
-  //       Provider.of<ProjectState>(context, listen: false);
-  //   if (projectState.projectPath != null) {
-  //     File projectFile = File("${projectState.projectPath}");
-  //     if (projectFile.existsSync()) {
-  //       await ShareExtend.share(projectFile.path, "file");
-  //     }
-  //   }
-  // }
 }

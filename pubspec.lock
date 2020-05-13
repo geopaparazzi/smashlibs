@@ -111,13 +111,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_geopackage:
-    dependency: "direct main"
-    description:
-      name: flutter_geopackage
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.2"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -358,7 +351,7 @@ packages:
     source: hosted
     version: "1.7.0"
   sqflite:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: sqflite
       url: "https://pub.dartlang.org"
