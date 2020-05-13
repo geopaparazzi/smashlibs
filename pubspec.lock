@@ -92,6 +92,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.0"
+  dart_jts:
+    dependency: "direct main"
+    description:
+      name: dart_jts
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.5+3"
   device_info:
     dependency: "direct main"
     description:
@@ -135,6 +142,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  hex:
+    dependency: transitive
+    description:
+      name: hex
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.2"
   http_parser:
     dependency: transitive
     description:
