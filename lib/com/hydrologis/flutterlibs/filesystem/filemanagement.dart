@@ -5,11 +5,11 @@ part of smashlibs;
  * found in the LICENSE file.
  */
 
-
 /// Handler ov everything related to files supported in SMASH.
 class FileManager {
   static const GEOPAPARAZZI_EXT = "gpap";
   static const GPX_EXT = "gpx";
+  static const SHP_EXT = "shp";
   static const TIF_EXT = "tiff";
   static const TIF_WLD_EXT = "tfw";
   static const JPG_EXT = "jpg";
@@ -23,7 +23,7 @@ class FileManager {
   static const MBTILES_EXT = "mbtiles";
 
   static const ALLOWED_PROJECT_EXT = [GEOPAPARAZZI_EXT];
-  static const ALLOWED_VECTOR_DATA_EXT = [GPX_EXT, GEOPACKAGE_EXT];
+  static const ALLOWED_VECTOR_DATA_EXT = [GPX_EXT, SHP_EXT, GEOPACKAGE_EXT];
   static const ALLOWED_RASTER_DATA_EXT = [TIF_EXT, JPG_EXT, PNG_EXT];
   static const ALLOWED_TILE_DATA_EXT = [
     GEOPACKAGE_EXT,
@@ -31,7 +31,6 @@ class FileManager {
     MAPSFORGE_EXT,
     MAPURL_EXT
   ];
-
 
   static bool isProjectFile(String path) {
     return path.toLowerCase().endsWith(ALLOWED_PROJECT_EXT[0]);
@@ -72,6 +71,10 @@ class FileManager {
 
   static bool isGpx(String path) {
     return path != null && path.toLowerCase().endsWith(GPX_EXT);
+  }
+
+  static bool isShp(String path) {
+    return path != null && path.toLowerCase().endsWith(SHP_EXT);
   }
 
   static bool isWorldImage(String path) {
