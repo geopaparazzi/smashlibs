@@ -86,7 +86,31 @@ class SmashIcons {
       return MdiIcons.fileOutline;
     }
   }
+
+  static IconData forSldWkName(String wkName) {
+    if (StringUtilities.equalsIgnoreCase(wkName, "circle")) {
+      return MdiIcons.circle;
+    } else if (StringUtilities.equalsIgnoreCase(wkName, "cross")) {
+      return MdiIcons.plus;
+    } else if (StringUtilities.equalsIgnoreCase(wkName, "triangle")) {
+      return MdiIcons.triangle;
+    } else if (StringUtilities.equalsIgnoreCase(wkName, "star")) {
+      return MdiIcons.star;
+    } else if (StringUtilities.equalsIgnoreCase(wkName, "arrow")) {
+      return MdiIcons.arrowUp;
+    } else if (StringUtilities.equalsIgnoreCase(wkName, "X")) {
+      return MdiIcons.alphaX;
+    } else if (StringUtilities.equalsIgnoreCase(wkName, "hatch")) {
+      return MdiIcons.slashForward;
+    } else if (StringUtilities.equalsIgnoreCase(wkName, "square")) {
+      return MdiIcons.square;
+    } else {
+      return MdiIcons.square;
+    }
+  }
 }
+
+
 
 IconData getSmashIcon(String key) {
   var iconData = MdiIcons.fromString(key);
