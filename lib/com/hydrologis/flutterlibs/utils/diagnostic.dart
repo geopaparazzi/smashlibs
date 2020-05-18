@@ -94,39 +94,6 @@ class DiagnosticWidgetState extends State<DiagnosticWidget> {
       ]);
     }
 
-    // TODO
-    // ProjectState projectState =
-    //     Provider.of<ProjectState>(context, listen: false);
-    // if (projectState.projectPath != null) {
-    //   String project = projectState.projectPath;
-    //   _diagnosticsList.add([
-    //     Text("Smash Project"),
-    //     Text(project),
-    //   ]);
-
-    //   try {
-    //     var db = projectState.projectDb;
-    //     String value = "Is ${db.isOpen() ? '' : 'NOT'} open in path ${db.path}";
-    //     _diagnosticsList.add([
-    //       Text("Smash Database Status"),
-    //       Text(value),
-    //     ]);
-    //   } catch (e) {
-    //     _diagnosticsList.add([
-    //       Text(
-    //         "Smash Db ERROR",
-    //         style: TextStyle(color: Colors.red),
-    //       ),
-    //       Text(e.toString()),
-    //     ]);
-    //   }
-    // } else {
-    //   _diagnosticsList.add([
-    //     Text("Smash Project"),
-    //     Text("No project loaded."),
-    //   ]);
-    // }
-
     try {
       var folder = GpLogger().folder;
       _diagnosticsList.add([
@@ -157,70 +124,6 @@ class DiagnosticWidgetState extends State<DiagnosticWidget> {
         Text(e.toString()),
       ]);
     }
-
-    // TODO
-    // try {
-    //   var gpsHandler = GpsHandler();
-    //   _diagnosticsList.add([
-    //     Text("Get gps handler"),
-    //     Text("OK"),
-    //   ]);
-    //   if (gpsHandler != null) {
-    //     try {
-    //       _diagnosticsList.add([
-    //         Text("GPS enabled"),
-    //         Text("${gpsHandler.isGpsOn()}"),
-    //       ]);
-
-    //       try {
-    //         _diagnosticsList.add([
-    //           Text("GPS has fix"),
-    //           Text('${gpsHandler.hasFix()}'),
-    //         ]);
-    //         try {
-    //           var lastPosition =
-    //               Provider.of<GpsState>(context, listen: false).lastGpsPosition;
-    //           _diagnosticsList.add([
-    //             Text("GPS Last Position"),
-    //             Text("$lastPosition"),
-    //           ]);
-    //         } catch (e) {
-    //           _diagnosticsList.add([
-    //             Text(
-    //               "GPS Last Position ERROR",
-    //               style: TextStyle(color: Colors.red),
-    //             ),
-    //             Text(e.toString()),
-    //           ]);
-    //         }
-    //       } catch (e) {
-    //         _diagnosticsList.add([
-    //           Text(
-    //             "GPS has fix ERROR",
-    //             style: TextStyle(color: Colors.red),
-    //           ),
-    //           Text(e.toString()),
-    //         ]);
-    //       }
-    //     } catch (e) {
-    //       _diagnosticsList.add([
-    //         Text(
-    //           "Geolocator enabled ERROR",
-    //           style: TextStyle(color: Colors.red),
-    //         ),
-    //         Text(e.toString()),
-    //       ]);
-    //     }
-    //   }
-    // } catch (e) {
-    //   _diagnosticsList.add([
-    //     Text(
-    //       "Get gps handler ERROR",
-    //       style: TextStyle(color: Colors.red),
-    //     ),
-    //     Text(e.toString()),
-    //   ]);
-    // }
 
     return true;
   }
