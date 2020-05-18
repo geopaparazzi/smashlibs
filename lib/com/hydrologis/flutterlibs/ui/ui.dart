@@ -24,13 +24,13 @@ class SmashUI {
   /// Create a text widget with size and color for normal text in pages.
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).
-  static Text normalText(String text,
+  static Widget normalText(String text,
       {useColor = false,
       bold = false,
       color,
       textAlign = TextAlign.justify,
       underline = false,
-      overflow}) {
+      overflow = TextOverflow.ellipsis}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -46,7 +46,7 @@ class SmashUI {
     return Text(
       text,
       textAlign: textAlign,
-      overflow: null,
+      overflow: overflow,
       style: TextStyle(
         color: c,
         decoration: textDecoration,
@@ -65,7 +65,7 @@ class SmashUI {
       color,
       textAlign = TextAlign.justify,
       underline = false,
-      overflow}) {
+      overflow = TextOverflow.ellipsis}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -81,7 +81,7 @@ class SmashUI {
     return Text(
       text,
       textAlign: textAlign,
-      overflow: null,
+      overflow: overflow,
       style: TextStyle(
         color: c,
         decoration: textDecoration,
@@ -95,7 +95,11 @@ class SmashUI {
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).
   static Text titleText(String text,
-      {useColor = false, bold = false, color, textAlign = TextAlign.justify}) {
+      {useColor = false,
+      bold = false,
+      color,
+      textAlign = TextAlign.justify,
+      overflow = TextOverflow.ellipsis}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -109,7 +113,7 @@ class SmashUI {
     return Text(
       text,
       textAlign: textAlign,
-      overflow: null,
+      overflow: overflow,
       style: TextStyle(
           color: c,
           fontWeight: bold ? FontWeight.bold : FontWeight.normal,
@@ -124,7 +128,8 @@ class SmashUI {
       {useColor = false,
       bold = true,
       color = Colors.redAccent,
-      textAlign = TextAlign.center}) {
+      textAlign = TextAlign.center,
+      overflow = TextOverflow.ellipsis}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -146,7 +151,7 @@ class SmashUI {
           child: Text(
             text,
             textAlign: textAlign,
-            overflow: null,
+            overflow: overflow,
             style: TextStyle(
                 color: c,
                 fontWeight: bold ? FontWeight.bold : FontWeight.normal,
