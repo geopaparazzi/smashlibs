@@ -72,6 +72,8 @@ class SmashIcons {
       return MdiIcons.checkerboard;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.MAPURL_EXT)) {
       return MdiIcons.checkerboard;
+    } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.SHP_EXT)) {
+      return MdiIcons.vectorPoint;
     } else if (FileManager.isWorldImage(pathOrUrlOrNameOrExtension)) {
       return MdiIcons.checkerboard;
     } else if (pathOrUrlOrNameOrExtension
