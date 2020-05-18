@@ -188,6 +188,10 @@ class GpLogger {
     return true;
   }
 
+  clearLog() async {
+    await _logDb._db.execute("delete from ${LogDb.TABLE_NAME};");
+  }
+
   String get folder => _folder;
 
   String get dbPath => _logDb?.path;
