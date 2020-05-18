@@ -43,18 +43,17 @@ class SmashUI {
     }
     var textDecoration =
         underline ? TextDecoration.underline : TextDecoration.none;
-    return Flexible(
-      child: Container(
-        child: Text(
-          text,
-          textAlign: textAlign,
-          overflow: overflow,
-          style: TextStyle(
-            color: c,
-            decoration: textDecoration,
-            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            fontSize: NORMAL_SIZE,
-          ),
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: Text(
+        text,
+        textAlign: textAlign,
+        overflow: overflow,
+        style: TextStyle(
+          color: c,
+          decoration: textDecoration,
+          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+          fontSize: NORMAL_SIZE,
         ),
       ),
     );
@@ -63,7 +62,7 @@ class SmashUI {
   /// Create a text widget with size and color for small text in pages.
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).
-  static Widget smallText(String text,
+  static Text smallText(String text,
       {useColor = false,
       bold = false,
       color,
@@ -82,19 +81,15 @@ class SmashUI {
     }
     var textDecoration =
         underline ? TextDecoration.underline : TextDecoration.none;
-    return Flexible(
-      child: Container(
-        child: Text(
-          text,
-          textAlign: textAlign,
-          overflow: overflow,
-          style: TextStyle(
-            color: c,
-            decoration: textDecoration,
-            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            fontSize: SMALL_SIZE,
-          ),
-        ),
+    return Text(
+      text,
+      textAlign: textAlign,
+      overflow: overflow,
+      style: TextStyle(
+        color: c,
+        decoration: textDecoration,
+        fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+        fontSize: SMALL_SIZE,
       ),
     );
   }
@@ -102,7 +97,7 @@ class SmashUI {
   /// Create a text widget with size and color for titles in pages.
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).
-  static Widget titleText(String text,
+  static Text titleText(String text,
       {useColor = false,
       bold = false,
       color,
@@ -118,18 +113,14 @@ class SmashUI {
     } else {
       c = SmashColors.mainTextColorNeutral;
     }
-    return Flexible(
-      child: Container(
-        child: Text(
-          text,
-          textAlign: textAlign,
-          overflow: overflow,
-          style: TextStyle(
-              color: c,
-              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-              fontSize: BIG_SIZE),
-        ),
-      ),
+    return Text(
+      text,
+      textAlign: textAlign,
+      overflow: overflow,
+      style: TextStyle(
+          color: c,
+          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+          fontSize: BIG_SIZE),
     );
   }
 
