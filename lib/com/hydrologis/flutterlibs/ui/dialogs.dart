@@ -320,9 +320,11 @@ Future<String> showComboDialog(
       builder: (BuildContext context) {
         return SimpleDialog(
           title: title is String
-              ? SmashUI.normalText(title,
-                  textAlign: TextAlign.center,
-                  color: SmashColors.mainDecorationsDarker)
+              ? Expanded(
+                  child: SmashUI.normalText(title,
+                      textAlign: TextAlign.center,
+                      color: SmashColors.mainDecorationsDarker),
+                )
               : title,
           children:
               ListTile.divideTiles(context: context, tiles: widgets).toList(),
