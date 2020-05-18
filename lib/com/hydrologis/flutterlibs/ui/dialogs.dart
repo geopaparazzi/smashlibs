@@ -5,7 +5,6 @@ part of smashlibs;
  * found in the LICENSE file.
  */
 
-
 /// Confirm dialog using custom [title] and [prompt].
 ///
 /// To be used as:
@@ -303,10 +302,12 @@ Future<String> showComboDialog(
                     ),
                   )
                 : Container(),
-            SmashUI.normalText(items[i],
-                textAlign: TextAlign.center,
-                bold: true,
-                color: SmashColors.mainDecorations)
+            Expanded(
+              child: SmashUI.normalText(items[i],
+                  textAlign: TextAlign.center,
+                  bold: true,
+                  color: SmashColors.mainDecorations),
+            )
           ],
         ),
       ),

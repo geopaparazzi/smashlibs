@@ -24,7 +24,7 @@ class SmashUI {
   /// Create a text widget with size and color for normal text in pages.
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).
-  static Widget normalText(String text,
+  static Text normalText(String text,
       {useColor = false,
       bold = false,
       color,
@@ -43,18 +43,15 @@ class SmashUI {
     }
     var textDecoration =
         underline ? TextDecoration.underline : TextDecoration.none;
-    return FittedBox(
-      fit: BoxFit.contain,
-      child: Text(
-        text,
-        textAlign: textAlign,
-        overflow: overflow,
-        style: TextStyle(
-          color: c,
-          decoration: textDecoration,
-          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-          fontSize: NORMAL_SIZE,
-        ),
+    return Text(
+      text,
+      textAlign: textAlign,
+      overflow: overflow,
+      style: TextStyle(
+        color: c,
+        decoration: textDecoration,
+        fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+        fontSize: NORMAL_SIZE,
       ),
     );
   }
