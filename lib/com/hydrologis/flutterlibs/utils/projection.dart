@@ -24,8 +24,8 @@ class SmashPrj {
         projection.projName.toLowerCase().replaceFirst("epsg:", "");
     try {
       return int.parse(sridStr);
-    } catch (e) {
-      GpLogger().err("Unable to parse projection ${projection.projName}", e);
+    } catch (e, s) {
+      GpLogger().err("Unable to parse projection ${projection.projName}", s);
       return null;
     }
   }
