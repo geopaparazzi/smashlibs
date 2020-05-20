@@ -38,12 +38,7 @@ class SmashPrj {
     }
   }
 
-  /// This method should not exist.
-  ///
-  /// Until proj4dart is not able to get the srid from a WKT,
-  /// we try to guess from wkt toi allow sidecar files.
-  ///
-  /// This will work only for few epsgs.
+  /// Try to get the epsg from the wkt definition.
   static int getSridFromWkt(String wkt) {
     // try the proj way
     wkt_parser.ProjWKT wktObject = wkt_parser.parseWKT(wkt);
@@ -51,8 +46,12 @@ class SmashPrj {
     if (authority != null) {
       var key = authority.keys.toList()[0];
       var srid = authority[key];
-      if (srid != null && srid is int) {
-        return srid;
+      if (srid != null) {
+        if (srid is int) {
+          return srid;
+        } else if (srid is String) {
+          return int.parse(srid);
+        }
       }
     }
 
