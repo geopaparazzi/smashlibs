@@ -21,6 +21,7 @@ class TableUtilities {
   static Table fromMap(Map<String, dynamic> map,
       {bool withBorder = false,
       Color borderColor = Colors.blueAccent,
+      Color backgroundColor = Colors.white,
       bool doSmallText = false,
       List<double> colWidthFlex = const [0.4, 0.6],
       String highlightPattern,
@@ -36,11 +37,13 @@ class TableUtilities {
               key.toLowerCase().contains(highlightPattern.toLowerCase()))) {
         color = highlightColor;
         doBold = true;
+      } else {
+        color = backgroundColor;
       }
 
       var row = TableRow(
         decoration: new BoxDecoration(
-          color: color == null ? Colors.white.withAlpha(255) : color,
+          color: color,
         ),
         children: [
           cellForString(key, doSmallText: doSmallText, doBold: doBold),
