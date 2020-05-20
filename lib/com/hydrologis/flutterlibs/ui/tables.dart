@@ -40,7 +40,7 @@ class TableUtilities {
 
       var row = TableRow(
         decoration: new BoxDecoration(
-          color: color == null ? SmashColors.mainBackground.withAlpha(255) : color,
+          color: color == null ? Colors.white.withAlpha(255) : color,
         ),
         children: [
           cellForString(key, doSmallText: doSmallText, doBold: doBold),
