@@ -123,8 +123,8 @@ class LogDb {
       _dbPath = FileUtilities.joinPaths(folder, DB_NAME);
       _db = SqliteDb(_dbPath);
       await _db.openOrCreate(dbCreateFunction: createLogDatabase);
-    } catch (e) {
-      GpLogger().err("Error initializing LogDb", e);
+    } catch (e, s) {
+      GpLogger().err("Error initializing LogDb", s);
       return false;
     }
     return true;

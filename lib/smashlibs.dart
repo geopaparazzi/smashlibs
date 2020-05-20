@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:stack_trace/stack_trace.dart';
 import 'package:proj4dart/proj4dart.dart';
+import 'package:wkt_parser/wkt_parser.dart' as wkt_parser;
 import 'package:screen/screen.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';

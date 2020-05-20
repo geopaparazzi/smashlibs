@@ -61,8 +61,8 @@ class FileDownloadListTileProgressWidgetState
               : ((rec / total) * 100).toStringAsFixed(0) + "%";
         });
       }, cancelToken: cancelToken, options: options);
-    } catch (e) {
-      GpLogger().err("Error while downloading file ${widget._downloadUrl}", e);
+    } catch (e, s) {
+      GpLogger().err("Error while downloading file ${widget._downloadUrl}", s);
     }
 
     setState(() {
@@ -117,8 +117,8 @@ class FileDownloadListTileProgressWidgetState
             if (dFile.existsSync()) {
               dFile.deleteSync();
             }
-          } catch (e) {
-            GpLogger().err("Error deleting file $dFile", e);
+          } catch (e, s) {
+            GpLogger().err("Error deleting file $dFile", s);
           }
           cancelToken.cancel("cancelled");
         }

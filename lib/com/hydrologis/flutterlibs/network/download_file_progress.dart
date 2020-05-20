@@ -49,10 +49,10 @@ class DownloadCircularProgressWidgetState
 //        TileSource ts = TileSource.Mapsforge(f.path);
 //        LayerManager().addLayer(ts);
 //      }
-    } catch (e) {
+    } catch (e, s) {
       GpLogger().err(
           "An error occurred while downloading from: ${widget._downloadUrl}",
-          e);
+          s);
     }
 
     setState(() {

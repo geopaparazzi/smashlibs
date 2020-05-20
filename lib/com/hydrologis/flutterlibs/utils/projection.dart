@@ -19,13 +19,21 @@ class SmashPrj {
     return Projection.parse(wkt);
   }
 
+  /// Try to get the srid from the projection
   static int getSrid(Projection projection) {
     String sridStr =
         projection.projName.toLowerCase().replaceFirst("epsg:", "");
     try {
-      return int.parse(sridStr);
-    } catch (e, s) {
-      GpLogger().err("Unable to parse projection ${projection.projName}", s);
+      if (sridStr == "merc") {
+        return EPSG3857_INT;
+      } else if (sridStr == "longlat") {
+        return EPSG4326_INT;
+      } else {
+        return int.parse(sridStr);
+      }
+    } catch (e) {
+      //GpLogger().err("Unable to parse projection ${projection.projName}", s);
+      // ignore and let it be handles later
       return null;
     }
   }
@@ -36,7 +44,19 @@ class SmashPrj {
   /// we try to guess from wkt toi allow sidecar files.
   ///
   /// This will work only for few epsgs.
-  static int getSridFromWktTheUglyWay(String wkt) {
+  static int getSridFromWkt(String wkt) {
+    // try the proj way
+    wkt_parser.ProjWKT wktObject = wkt_parser.parseWKT(wkt);
+    var authority = wktObject.AUTHORITY;
+    if (authority != null) {
+      var key = authority.keys.toList()[0];
+      var srid = authority[key];
+      if (srid != null && srid is int) {
+        return srid;
+      }
+    }
+
+    // still try the ugly way
     var lastEpsg = wkt.toUpperCase().lastIndexOf("\"EPSG\"");
     if (lastEpsg != -1) {
       var lastComma = wkt.indexOf(",", lastEpsg + 1);
@@ -48,8 +68,8 @@ class SmashPrj {
             var epsgString = wkt.substring(openEpsgIndex + 1, closeEpsgIndex);
             try {
               return int.parse(epsgString);
-            } catch (e) {
-              GpLogger().err("Error parsing epsg string: $epsgString", e);
+            } catch (e, s) {
+              GpLogger().err("Error parsing epsg string: $epsgString", s);
               return null;
             }
           }
