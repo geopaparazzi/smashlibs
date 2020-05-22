@@ -27,6 +27,9 @@ import 'package:stack_trace/stack_trace.dart';
 import 'package:proj4dart/proj4dart.dart';
 import 'package:wkt_parser/wkt_parser.dart' as wkt_parser;
 import 'package:screen/screen.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_tags/flutter_tags.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -38,6 +41,7 @@ part 'com/hydrologis/flutterlibs/network/download_file_progress.dart';
 part 'com/hydrologis/flutterlibs/theme/colors.dart';
 part 'com/hydrologis/flutterlibs/theme/icons.dart';
 part 'com/hydrologis/flutterlibs/forms/forms.dart';
+part 'com/hydrologis/flutterlibs/forms/forms_widgets.dart';
 part 'com/hydrologis/flutterlibs/theme/theme.dart';
 part 'com/hydrologis/flutterlibs/ui/dialogs.dart';
 part 'com/hydrologis/flutterlibs/ui/progress.dart';
