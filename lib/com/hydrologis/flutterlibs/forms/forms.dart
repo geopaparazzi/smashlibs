@@ -1,14 +1,9 @@
+part of smashlibs;
 /*
  * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
-import 'dart:convert';
-import 'dart:collection';
-import 'dart:io';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
-import 'package:smashlibs/smashlibs.dart';
 
 const String COLON = ":";
 const String UNDERSCORE = "_";

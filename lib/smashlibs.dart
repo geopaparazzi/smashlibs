@@ -4,6 +4,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:collection';
+import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
 import 'package:dart_jts/dart_jts.dart' as JTS;
@@ -34,6 +37,7 @@ part 'com/hydrologis/flutterlibs/network/download_file_listtile.dart';
 part 'com/hydrologis/flutterlibs/network/download_file_progress.dart';
 part 'com/hydrologis/flutterlibs/theme/colors.dart';
 part 'com/hydrologis/flutterlibs/theme/icons.dart';
+part 'com/hydrologis/flutterlibs/forms/forms.dart';
 part 'com/hydrologis/flutterlibs/theme/theme.dart';
 part 'com/hydrologis/flutterlibs/ui/dialogs.dart';
 part 'com/hydrologis/flutterlibs/ui/progress.dart';
