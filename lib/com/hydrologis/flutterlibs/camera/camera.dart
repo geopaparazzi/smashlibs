@@ -36,8 +36,8 @@ class Camera {
 }
 
 class TakePictureWidget extends StatefulWidget {
-  String _text;
-  Function _futureFunction;
+  final String _text;
+  final Function _futureFunction;
 
   TakePictureWidget(this._text, this._futureFunction);
 
@@ -75,21 +75,19 @@ class TakePictureWidgetState extends State<TakePictureWidget> {
       padding: SmashUI.defaultPadding(),
       child: !_isDone
           ? Center(
-              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              SmashUI.normalText(widget._text,
-                  color: SmashColors.mainDecorations, bold: true),
-              Padding(
-                padding: SmashUI.defaultPadding(),
-                child: SmashCircularProgress(),
-              )
-            ]))
+              child: Padding(
+              padding: SmashUI.defaultPadding(),
+              child: SmashCircularProgress(
+                label: widget._text,
+              ),
+            ))
           : Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                 SmashUI.normalText(widget._text,
                     color: SmashColors.mainDecorations, bold: true),
                 Padding(
                   padding: SmashUI.defaultPadding(),
-                  child: CircularProgressIndicator(),
+                  child: SmashCircularProgress(),
                 )
               ]),
             ),
