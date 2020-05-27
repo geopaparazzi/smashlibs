@@ -243,7 +243,7 @@ class GpPreferences {
     var list = _preferences.getStringList(KEY_RECENTSPROJECTS_LIST);
     if (list == null) list = [];
     // remove non existing files
-    list.removeWhere((p) => !new File(p).existsSync());
+    list.removeWhere((p) => p == null || !new File(p).existsSync());
     return list;
   }
 
@@ -251,7 +251,7 @@ class GpPreferences {
     await _checkPreferences();
     var list = _preferences.getStringList(KEY_RECENTSPROJECTS_LIST);
     if (list == null) list = [];
-    list.removeWhere((p) => p == projectPath);
+    list.removeWhere((p) => p == null || p == projectPath);
     if (list.length >= 10) {
       list.removeLast();
     }
