@@ -270,7 +270,7 @@ class GpPreferences {
   }
 
   /// Save last position to preferences.
-  setLastPosition(double lon, double lat, double zoom) async {
+  Future<void> setLastPosition(double lon, double lat, double zoom) async {
     await _checkPreferences();
     await _preferences.setDouble(KEY_LAST_LAT, lat);
     await _preferences.setDouble(KEY_LAST_LON, lon);
