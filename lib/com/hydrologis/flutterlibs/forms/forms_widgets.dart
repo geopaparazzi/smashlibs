@@ -62,6 +62,7 @@ class FormDetailWidget extends StatefulWidget {
   Map<String, dynamic> sectionMap;
   Function _getThumbNailsFunction;
   Function _takePictureFunction;
+  var doScaffold;
 
   FormDetailWidget(
     this._noteId,
@@ -72,8 +73,9 @@ class FormDetailWidget extends StatefulWidget {
     this.onlyDetail,
     this._position,
     this._getThumbNailsFunction,
-    this._takePictureFunction,
-  );
+    this._takePictureFunction, {
+    this.doScaffold = true,
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -115,28 +117,31 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
       }
     }
 
-    return Scaffold(
-      appBar: !widget.isLargeScreen && !widget.onlyDetail
-          ? AppBar(
-              title: Text(widget.formName),
-            )
+    var bodyContainer = Container(
+      color: widget.isLargeScreen && !widget.onlyDetail
+          ? SmashColors.mainDecorationsMc[50]
           : null,
-      body: Container(
-        color: widget.isLargeScreen && !widget.onlyDetail
-            ? SmashColors.mainDecorationsMc[50]
-            : null,
-        child: ListView.builder(
-          itemCount: widgetsList.length,
-          itemBuilder: (context, index) {
-            return Container(
-              padding: EdgeInsets.only(top: 10.0),
-              child: widgetsList[index],
-            );
-          },
-          padding: EdgeInsets.only(bottom: 10.0),
-        ),
+      child: ListView.builder(
+        itemCount: widgetsList.length,
+        itemBuilder: (context, index) {
+          return Container(
+            padding: EdgeInsets.only(top: 10.0),
+            child: widgetsList[index],
+          );
+        },
+        padding: EdgeInsets.only(bottom: 10.0),
       ),
     );
+    return widget.doScaffold
+        ? Scaffold(
+            appBar: !widget.isLargeScreen && !widget.onlyDetail
+                ? AppBar(
+                    title: Text(widget.formName),
+                  )
+                : null,
+            body: bodyContainer,
+          )
+        : bodyContainer;
   }
 }
 
@@ -149,6 +154,7 @@ class MasterDetailPage extends StatefulWidget {
   Function _onWillPopFunction;
   Function _getThumbNailsFunction;
   Function _takePictureFunction;
+  var doScaffold;
 
   MasterDetailPage(
     this.sectionMap,
@@ -158,8 +164,9 @@ class MasterDetailPage extends StatefulWidget {
     this._noteId,
     this._onWillPopFunction,
     this._getThumbNailsFunction,
-    this._takePictureFunction,
-  );
+    this._takePictureFunction, {
+    this.doScaffold = true,
+  });
 
   @override
   _MasterDetailPageState createState() => _MasterDetailPageState();
@@ -176,6 +183,57 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
     // in case of single tab, display detail directly
     bool onlyDetail = formNames.length == 1;
 
+    var bodyContainer = OrientationBuilder(builder: (context, orientation) {
+      isLargeScreen = ScreenUtilities.isLargeScreen(context);
+
+      return Row(children: <Widget>[
+        !onlyDetail
+            ? Expanded(
+                flex: isLargeScreen ? 4 : 1,
+                child: FormSectionsWidget(
+                    widget.sectionMap, widget.sectionName, isLargeScreen,
+                    (formName) {
+                  if (isLargeScreen) {
+                    selectedForm = formName;
+                    setState(() {});
+                  } else {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return FormDetailWidget(
+                          widget._noteId,
+                          widget.sectionMap,
+                          widget.sectionName,
+                          formName,
+                          isLargeScreen,
+                          onlyDetail,
+                          widget._position,
+                          widget._getThumbNailsFunction,
+                          widget._takePictureFunction,
+                        );
+                      },
+                    ));
+                  }
+                }),
+              )
+            : Container(),
+        isLargeScreen || onlyDetail
+            ? Expanded(
+                flex: 6,
+                child: FormDetailWidget(
+                  widget._noteId,
+                  widget.sectionMap,
+                  widget.sectionName,
+                  selectedForm,
+                  isLargeScreen,
+                  onlyDetail,
+                  widget._position,
+                  widget._getThumbNailsFunction,
+                  widget._takePictureFunction,
+                  doScaffold: widget.doScaffold,
+                ))
+            : Container(),
+      ]);
+    });
     return WillPopScope(
       onWillPop: () async {
         if (widget._onWillPopFunction != null) {
@@ -184,61 +242,14 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
         }
         return true;
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: widget.title,
-        ),
-        body: OrientationBuilder(builder: (context, orientation) {
-          isLargeScreen = ScreenUtilities.isLargeScreen(context);
-
-          return Row(children: <Widget>[
-            !onlyDetail
-                ? Expanded(
-                    flex: isLargeScreen ? 4 : 1,
-                    child: FormSectionsWidget(
-                        widget.sectionMap, widget.sectionName, isLargeScreen,
-                        (formName) {
-                      if (isLargeScreen) {
-                        selectedForm = formName;
-                        setState(() {});
-                      } else {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) {
-                            return FormDetailWidget(
-                              widget._noteId,
-                              widget.sectionMap,
-                              widget.sectionName,
-                              formName,
-                              isLargeScreen,
-                              onlyDetail,
-                              widget._position,
-                              widget._getThumbNailsFunction,
-                              widget._takePictureFunction,
-                            );
-                          },
-                        ));
-                      }
-                    }),
-                  )
-                : Container(),
-            isLargeScreen || onlyDetail
-                ? Expanded(
-                    flex: 6,
-                    child: FormDetailWidget(
-                      widget._noteId,
-                      widget.sectionMap,
-                      widget.sectionName,
-                      selectedForm,
-                      isLargeScreen,
-                      onlyDetail,
-                      widget._position,
-                      widget._getThumbNailsFunction,
-                      widget._takePictureFunction,
-                    ))
-                : Container(),
-          ]);
-        }),
-      ),
+      child: widget.doScaffold
+          ? Scaffold(
+              appBar: AppBar(
+                title: widget.title,
+              ),
+              body: bodyContainer,
+            )
+          : bodyContainer,
     );
   }
 }
