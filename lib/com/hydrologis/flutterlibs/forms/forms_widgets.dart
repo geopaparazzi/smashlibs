@@ -54,15 +54,16 @@ class FormSectionsWidgetState extends State<FormSectionsWidget> {
 
 class FormDetailWidget extends StatefulWidget {
   final String sectionName;
-  String formName;
-  bool isLargeScreen;
-  bool onlyDetail;
-  dynamic _position;
-  int _noteId;
-  Map<String, dynamic> sectionMap;
-  Function _getThumbNailsFunction;
-  Function _takePictureFunction;
-  var doScaffold;
+  final String formName;
+  final bool isLargeScreen;
+  final bool onlyDetail;
+  final dynamic _position;
+  final int _noteId;
+  final Map<String, dynamic> sectionMap;
+  final Function _getThumbNailsFunction;
+  final Function _takePictureFunction;
+  final bool doScaffold;
+  final bool isReadOnly;
 
   FormDetailWidget(
     this._noteId,
@@ -74,6 +75,7 @@ class FormDetailWidget extends StatefulWidget {
     this._position,
     this._getThumbNailsFunction,
     this._takePictureFunction, {
+    this.isReadOnly = false,
     this.doScaffold = true,
   });
 
@@ -96,12 +98,12 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
   @override
   Widget build(BuildContext context) {
     List<ListTile> widgetsList = [];
-    if (widget.formName == null) {
+    var formName = widget.formName;
+    if (formName == null) {
       // pick the first of the section
-      widget.formName = formNames[0];
+      formName = formNames[0];
     }
-    var form4name =
-        TagsManager.getForm4Name(widget.formName, widget.sectionMap);
+    var form4name = TagsManager.getForm4Name(formName, widget.sectionMap);
     List<dynamic> formItems = TagsManager.getFormItems(form4name);
 
     for (int i = 0; i < formItems.length; i++) {
@@ -110,6 +112,7 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
           widget._noteId,
           formItems[i],
           widget._position,
+          widget.isReadOnly,
           widget._getThumbNailsFunction,
           widget._takePictureFunction);
       if (w != null) {
@@ -136,7 +139,7 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
         ? Scaffold(
             appBar: !widget.isLargeScreen && !widget.onlyDetail
                 ? AppBar(
-                    title: Text(widget.formName),
+                    title: Text(formName),
                   )
                 : null,
             body: bodyContainer,
@@ -146,15 +149,16 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 }
 
 class MasterDetailPage extends StatefulWidget {
-  Widget title;
-  String sectionName;
-  dynamic _position;
-  int _noteId;
-  Map<String, dynamic> sectionMap;
-  Function _onWillPopFunction;
-  Function _getThumbNailsFunction;
-  Function _takePictureFunction;
-  var doScaffold;
+  final Widget title;
+  final String sectionName;
+  final dynamic _position;
+  final int _noteId;
+  final Map<String, dynamic> sectionMap;
+  final Function _onWillPopFunction;
+  final Function _getThumbNailsFunction;
+  final Function _takePictureFunction;
+  final bool doScaffold;
+  final bool isReadOnly;
 
   MasterDetailPage(
     this.sectionMap,
@@ -166,6 +170,7 @@ class MasterDetailPage extends StatefulWidget {
     this._getThumbNailsFunction,
     this._takePictureFunction, {
     this.doScaffold = true,
+    this.isReadOnly = false,
   });
 
   @override
@@ -209,6 +214,8 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
                           widget._position,
                           widget._getThumbNailsFunction,
                           widget._takePictureFunction,
+                          doScaffold: widget.doScaffold,
+                          isReadOnly: widget.isReadOnly,
                         );
                       },
                     ));
@@ -230,6 +237,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
                   widget._getThumbNailsFunction,
                   widget._takePictureFunction,
                   doScaffold: widget.doScaffold,
+                  isReadOnly: widget.isReadOnly,
                 ))
             : Container(),
       ]);
@@ -259,6 +267,7 @@ ListTile getWidget(
     int noteId,
     final Map<String, dynamic> itemMap,
     dynamic position,
+    bool isReadOnly,
     Function getThumbNailsFunction,
     Function takePictureFunction) {
   String key = "-"; //$NON-NLS-1$
@@ -289,16 +298,21 @@ ListTile getWidget(
     );
   }
 
-  bool readonly = false;
+  bool itemReadonly = false;
   if (itemMap.containsKey(TAG_READONLY)) {
     var readonlyObj = itemMap[TAG_READONLY].trim();
     if (readonlyObj is String) {
-      readonly = readonlyObj == 'true';
+      itemReadonly = readonlyObj == 'true';
     } else if (readonlyObj is bool) {
-      readonly = readonlyObj;
+      itemReadonly = readonlyObj;
     } else if (readonlyObj is num) {
-      readonly = readonlyObj.toDouble() == 1.0;
+      itemReadonly = readonlyObj.toDouble() == 1.0;
     }
+  }
+
+  if (isReadOnly) {
+    // global readonly overrides the item one
+    itemReadonly = true;
   }
 
   Constraints constraints = new Constraints();
@@ -351,7 +365,7 @@ ListTile getWidget(
             labelText: "$label ${constraints.getDescription()}",
           ),
           controller: stringController,
-          enabled: !readonly,
+          enabled: !itemReadonly,
           minLines: minLines,
           maxLines: maxLines,
           keyboardType: keyboardType,
@@ -417,7 +431,7 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: DynamicStringWidget(itemMap, label),
+          title: DynamicStringWidget(itemMap, label, itemReadonly),
         );
         break;
       }
@@ -425,7 +439,7 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: DatePickerWidget(itemMap, label),
+          title: DatePickerWidget(itemMap, label, itemReadonly),
         );
         break;
       }
@@ -433,7 +447,7 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: TimePickerWidget(itemMap, label),
+          title: TimePickerWidget(itemMap, label, itemReadonly),
         );
         break;
       }
@@ -441,14 +455,14 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: CheckboxWidget(itemMap, label),
+          title: CheckboxWidget(itemMap, label, itemReadonly),
         );
       }
     case TYPE_STRINGCOMBO:
       {
         return ListTile(
           leading: icon,
-          title: ComboboxWidget(itemMap, label),
+          title: ComboboxWidget(itemMap, label, itemReadonly),
         );
       }
 //      case TYPE_AUTOCOMPLETESTRINGCOMBO: {
@@ -486,7 +500,7 @@ ListTile getWidget(
         return ListTile(
           leading: icon,
           title: PicturesWidget(noteId, itemMap, label, position,
-              getThumbNailsFunction, takePictureFunction),
+              getThumbNailsFunction, takePictureFunction, itemReadonly),
         );
         break;
       }
@@ -495,7 +509,7 @@ ListTile getWidget(
         return ListTile(
           leading: icon,
           title: PicturesWidget(noteId, itemMap, label, position,
-              getThumbNailsFunction, takePictureFunction,
+              getThumbNailsFunction, takePictureFunction, itemReadonly,
               fromGallery: true),
         );
         break;
@@ -534,10 +548,11 @@ ListTile getWidget(
 }
 
 class CheckboxWidget extends StatefulWidget {
-  var _itemMap;
+  final _itemMap;
   final String _label;
+  final bool _isReadOnly;
 
-  CheckboxWidget(this._itemMap, this._label);
+  CheckboxWidget(this._itemMap, this._label, this._isReadOnly);
 
   @override
   _CheckboxWidgetState createState() => _CheckboxWidgetState();
@@ -557,9 +572,11 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
           color: SmashColors.mainDecorationsDarker),
       value: selected,
       onChanged: (value) {
-        setState(() {
-          widget._itemMap[TAG_VALUE] = "$value";
-        });
+        if (!widget._isReadOnly) {
+          setState(() {
+            widget._itemMap[TAG_VALUE] = "$value";
+          });
+        }
       },
       controlAffinity:
           ListTileControlAffinity.trailing, //  <-- leading Checkbox
@@ -568,10 +585,11 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
 }
 
 class ComboboxWidget extends StatefulWidget {
-  var _itemMap;
+  final _itemMap;
   final String _label;
+  final bool _isReadOnly;
 
-  ComboboxWidget(this._itemMap, this._label);
+  ComboboxWidget(this._itemMap, this._label, this._isReadOnly);
 
   @override
   ComboboxWidgetState createState() => ComboboxWidgetState();
@@ -623,9 +641,11 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
               isExpanded: true,
               items: items,
               onChanged: (selected) {
-                setState(() {
-                  widget._itemMap[TAG_VALUE] = selected;
-                });
+                if (!widget._isReadOnly) {
+                  setState(() {
+                    widget._itemMap[TAG_VALUE] = selected;
+                  });
+                }
               },
             ),
           ),
@@ -638,8 +658,9 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
 class DynamicStringWidget extends StatefulWidget {
   var _itemMap;
   final String _label;
+  final bool _isReadonly;
 
-  DynamicStringWidget(this._itemMap, this._label);
+  DynamicStringWidget(this._itemMap, this._label, this._isReadonly);
 
   @override
   DynamicStringWidgetState createState() => DynamicStringWidgetState();
@@ -656,17 +677,19 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
     valuesSplit.removeWhere((s) => s.trim().isEmpty);
 
     return Tags(
-      textField: TagsTextField(
-        width: 1000,
-        hintText: "add new string",
-        textStyle: TextStyle(fontSize: SmashUI.NORMAL_SIZE),
-        onSubmitted: (String str) {
-          valuesSplit.add(str);
-          setState(() {
-            widget._itemMap[TAG_VALUE] = valuesSplit.join(";");
-          });
-        },
-      ),
+      textField: widget._isReadonly
+          ? null
+          : TagsTextField(
+              width: 1000,
+              hintText: "add new string",
+              textStyle: TextStyle(fontSize: SmashUI.NORMAL_SIZE),
+              onSubmitted: (String str) {
+                valuesSplit.add(str);
+                setState(() {
+                  widget._itemMap[TAG_VALUE] = valuesSplit.join(";");
+                });
+              },
+            ),
       verticalDirection: VerticalDirection.up,
       // text box before the tags
       alignment: WrapAlignment.start,
@@ -696,12 +719,14 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
           textColor: SmashColors.mainBackground,
           removeButton: ItemTagsRemoveButton(
             onRemoved: () {
-              // Remove the item from the data source.
-              setState(() {
-                valuesSplit.removeAt(index);
-                String saveValue = valuesSplit.join(";");
-                widget._itemMap[TAG_VALUE] = saveValue;
-              });
+              if (!widget._isReadonly) {
+                // Remove the item from the data source.
+                setState(() {
+                  valuesSplit.removeAt(index);
+                  String saveValue = valuesSplit.join(";");
+                  widget._itemMap[TAG_VALUE] = saveValue;
+                });
+              }
               return true;
             },
           ),
@@ -721,10 +746,11 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
 }
 
 class DatePickerWidget extends StatefulWidget {
-  var _itemMap;
+  final _itemMap;
   final String _label;
+  final bool _isReadOnly;
 
-  DatePickerWidget(this._itemMap, this._label);
+  DatePickerWidget(this._itemMap, this._label, this._isReadOnly);
 
   @override
   DatePickerWidgetState createState() => DatePickerWidgetState();
@@ -752,19 +778,21 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
     return Center(
       child: FlatButton(
           onPressed: () {
-            DatePicker.showDatePicker(
-              context,
-              showTitleActions: true,
-              onChanged: (date) {},
-              onConfirm: (date) {
-                String day =
-                    TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(date);
-                setState(() {
-                  widget._itemMap[TAG_VALUE] = day;
-                });
-              },
-              currentTime: dateTime,
-            );
+            if (!widget._isReadOnly) {
+              DatePicker.showDatePicker(
+                context,
+                showTitleActions: true,
+                onChanged: (date) {},
+                onConfirm: (date) {
+                  String day =
+                      TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(date);
+                  setState(() {
+                    widget._itemMap[TAG_VALUE] = day;
+                  });
+                },
+                currentTime: dateTime,
+              );
+            }
           },
           child: Center(
             child: Padding(
@@ -799,10 +827,11 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
 }
 
 class TimePickerWidget extends StatefulWidget {
-  var _itemMap;
+  final _itemMap;
   final String _label;
+  final bool _isReadOnly;
 
-  TimePickerWidget(this._itemMap, this._label);
+  TimePickerWidget(this._itemMap, this._label, this._isReadOnly);
 
   @override
   TimePickerWidgetState createState() => TimePickerWidgetState();
@@ -830,19 +859,21 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
     return Center(
       child: FlatButton(
           onPressed: () {
-            DatePicker.showTimePicker(
-              context,
-              showTitleActions: true,
-              onChanged: (date) {},
-              onConfirm: (date) {
-                String time =
-                    TimeUtilities.ISO8601_TS_TIME_FORMATTER.format(date);
-                setState(() {
-                  widget._itemMap[TAG_VALUE] = time;
-                });
-              },
-              currentTime: dateTime,
-            );
+            if (!widget._isReadOnly) {
+              DatePicker.showTimePicker(
+                context,
+                showTitleActions: true,
+                onChanged: (date) {},
+                onConfirm: (date) {
+                  String time =
+                      TimeUtilities.ISO8601_TS_TIME_FORMATTER.format(date);
+                  setState(() {
+                    widget._itemMap[TAG_VALUE] = time;
+                  });
+                },
+                currentTime: dateTime,
+              );
+            }
           },
           child: Center(
             child: Padding(
@@ -872,16 +903,17 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
 }
 
 class PicturesWidget extends StatefulWidget {
-  var _itemMap;
+  final _itemMap;
   final String _label;
-  dynamic _position;
-  int _noteId;
-  bool fromGallery;
-  Function _getThumbNailsFunction;
-  Function _takePictureFunction;
+  final dynamic _position;
+  final int _noteId;
+  final bool fromGallery;
+  final Function _getThumbNailsFunction;
+  final Function _takePictureFunction;
+  final bool _isReadOnly;
 
   PicturesWidget(this._noteId, this._itemMap, this._label, this._position,
-      this._getThumbNailsFunction, this._takePictureFunction,
+      this._getThumbNailsFunction, this._takePictureFunction, this._isReadOnly,
       {this.fromGallery = false});
 
   @override
@@ -919,62 +951,60 @@ class PicturesWidgetState extends State<PicturesWidget> {
                     fontWeight: FontWeight.bold),
               );
             } else {
-              return widget._takePictureFunction == null
-                  ? Container()
-                  : Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          FlatButton(
-                              onPressed: () async {
-                                String value =
-                                    await widget._takePictureFunction(
-                                        context,
-                                        widget._noteId,
-                                        widget._position,
-                                        widget.fromGallery,
-                                        imageSplit);
-                                if (value != null) {
-                                  setState(() {
-                                    widget._itemMap[TAG_VALUE] = value;
-                                  });
-                                }
-                              },
-                              child: Center(
-                                child: Padding(
-                                  padding: SmashUI.defaultPadding(),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: SmashUI.defaultRigthPadding(),
-                                        child: Icon(
-                                          Icons.camera_alt,
-                                          color: SmashColors.mainDecorations,
-                                        ),
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    widget._isReadOnly
+                        ? Container()
+                        : FlatButton(
+                            onPressed: () async {
+                              String value = await widget._takePictureFunction(
+                                  context,
+                                  widget._noteId,
+                                  widget._position,
+                                  widget.fromGallery,
+                                  imageSplit);
+                              if (value != null) {
+                                setState(() {
+                                  widget._itemMap[TAG_VALUE] = value;
+                                });
+                              }
+                            },
+                            child: Center(
+                              child: Padding(
+                                padding: SmashUI.defaultPadding(),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: SmashUI.defaultRigthPadding(),
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: SmashColors.mainDecorations,
                                       ),
-                                      SmashUI.normalText(
-                                          widget.fromGallery
-                                              ? "Load image"
-                                              : "Take a picture",
-                                          color: SmashColors.mainDecorations,
-                                          bold: true),
-                                    ],
-                                  ),
+                                    ),
+                                    SmashUI.normalText(
+                                        widget.fromGallery
+                                            ? "Load image"
+                                            : "Take a picture",
+                                        color: SmashColors.mainDecorations,
+                                        bold: true),
+                                  ],
                                 ),
-                              )),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children:
-                                  snapshot.data != null ? snapshot.data : [],
-                            ),
-                          ),
-                        ],
+                              ),
+                            )),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: snapshot.data != null ? snapshot.data : [],
                       ),
-                    );
+                    ),
+                  ],
+                ),
+              );
             }
         }
       },
