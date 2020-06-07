@@ -188,3 +188,110 @@ class SmashUI {
     return Icon(Icons.clear, color: Colors.white.withAlpha(0));
   }
 }
+
+/// A textfield that switches between editable and non editable state.
+///
+/// The input parameters are:
+///  - a [label] to show the user the meaning
+///  - a default [value]
+///  - an [onSave] function that gets the newly text as parameter
+///  - an optional [validationFunction] to check on the text
+///  - an optional boolean if it [isPassword]
+class EditableTextField extends StatefulWidget {
+  final String value;
+  final String label;
+  final bool isPassword;
+  final bool doBold;
+  final Function onSave;
+  final Function validationFunction;
+
+  EditableTextField(this.label, this.value, this.onSave,
+      {this.validationFunction, this.isPassword = false, this.doBold = false});
+
+  @override
+  _EditableTextFieldState createState() => _EditableTextFieldState();
+}
+
+class _EditableTextFieldState extends State<EditableTextField> {
+  bool editMode = false;
+  String _currentValue = "";
+  TextEditingController _controller;
+  bool _canSave = true;
+
+  @override
+  void initState() {
+    _currentValue = widget.value;
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (editMode) {
+      _controller.text = _currentValue;
+      return Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: _controller,
+              autovalidate: true,
+              validator: (inputText) {
+                String errorText;
+                if (widget.validationFunction != null) {
+                  errorText = widget.validationFunction(inputText);
+                }
+                _canSave = errorText == null;
+                return errorText;
+              },
+              obscureText: widget.isPassword,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: widget.label,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              MdiIcons.contentSave,
+              size: SmashUI.MEDIUM_ICON_SIZE,
+              color: SmashColors.mainDecorationsDarker,
+            ),
+            onPressed: () {
+              if (_canSave) {
+                _currentValue = _controller.text;
+                widget.onSave(_controller.text);
+                setState(() {
+                  editMode = false;
+                });
+              }
+            },
+          )
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            child: SmashUI.normalText(_currentValue, bold: widget.doBold),
+          ),
+          IconButton(
+            icon: Icon(
+              MdiIcons.pencil,
+              color: SmashColors.mainDecorationsDarker,
+            ),
+            onPressed: () {
+              setState(() {
+                editMode = true;
+              });
+            },
+          )
+        ],
+      );
+    }
+  }
+}

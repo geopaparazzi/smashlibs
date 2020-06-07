@@ -213,6 +213,7 @@ Future<String> showInputDialog(BuildContext context, String title, String label,
     hintText: '',
     okText: 'Ok',
     cancelText: 'Cancel',
+    isPassword: false,
     Function validationFunction}) async {
   String userInput = defaultText;
   String errorText;
@@ -225,6 +226,7 @@ Future<String> showInputDialog(BuildContext context, String title, String label,
     autofocus: true,
     autovalidate: true,
     decoration: inputDecoration,
+    obscureText: isPassword,
     validator: (inputText) {
       userInput = inputText;
       if (validationFunction != null) {
