@@ -843,41 +843,27 @@ class TagsManager {
     return itemsArray;
   }
 
-  ///**
-// * Extract the combo values map.
-// *
-// * @param formItem the json object.
-// * @return the map of combo items.
-// * @ if something goes wrong.
-// */
-//public static LinkedHashMap<String, List<String>> extractComboValuesMap(JSONObject formItem)  {
-//LinkedHashMap<String, List<String>> valuesMap = new LinkedHashMap<>();
-//if (formItem.has(TAG_VALUES)) {
-//JSONObject valuesObj = formItem.getJSONObject(TAG_VALUES);
-//
-//JSONArray names = valuesObj.names();
-//int length = names.length;
-//for (int i = 0; i < length; i++) {
-//String name = names.getString(i);
-//
-//List<String> valuesList = new ArrayList<String>();
-//JSONArray itemsArray = valuesObj.getJSONArray(name);
-//int length2 = itemsArray.length;
-//for (int j = 0; j < length2; j++) {
-//JSONObject itemObj = itemsArray.getJSONObject(j);
-//if (itemObj.has(TAG_ITEM)) {
-//valuesList.add(itemObj.getString(TAG_ITEM).trim());
-//} else {
-//valuesList.add(" - ");
-//}
-//}
-//valuesMap.put(name, valuesList);
-//}
-//}
-//return valuesMap;
-//
-//}
-//
+  /// Extract the combo values map.
+  ///
+  /// @param formItem the json object.
+  /// @return the map of combo items.
+  static Map<String, List<String>> extractComboValuesMap(
+      Map<String, dynamic> formItem) {
+    Map<String, List<String>> valuesMap = {};
+    if (formItem.containsKey(TAG_VALUES)) {
+      Map<String, dynamic> valuesObj = formItem[TAG_VALUES];
+      valuesObj.forEach((key, value) {
+        List<String> connectedValues = [];
+        value.forEach((elem) {
+          dynamic item = elem[TAG_ITEM] ?? " - ";
+          connectedValues.add(item.toString());
+        });
+        valuesMap[key] = connectedValues;
+      });
+    }
+    return valuesMap;
+  }
+
   ///**
 // * Extract the combo values map.
 // *

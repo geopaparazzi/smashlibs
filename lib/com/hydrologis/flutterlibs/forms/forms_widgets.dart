@@ -405,13 +405,14 @@ ListTile getWidget(
           textAlign: TextAlign.start,
         );
 
+        ListTile tile;
         if (url == null) {
-          return ListTile(
+          tile = ListTile(
             leading: icon,
             title: text,
           );
         } else {
-          return ListTile(
+          tile = ListTile(
             leading: icon,
             title: GestureDetector(
               onTap: () async {
@@ -425,7 +426,7 @@ ListTile getWidget(
             ),
           );
         }
-        break;
+        return tile;
       }
     case TYPE_DYNAMICSTRING:
       {
@@ -433,7 +434,6 @@ ListTile getWidget(
           leading: icon,
           title: DynamicStringWidget(itemMap, label, itemReadonly),
         );
-        break;
       }
     case TYPE_DATE:
       {
@@ -441,7 +441,6 @@ ListTile getWidget(
           leading: icon,
           title: DatePickerWidget(itemMap, label, itemReadonly),
         );
-        break;
       }
     case TYPE_TIME:
       {
@@ -449,7 +448,6 @@ ListTile getWidget(
           leading: icon,
           title: TimePickerWidget(itemMap, label, itemReadonly),
         );
-        break;
       }
     case TYPE_BOOLEAN:
       {
@@ -465,18 +463,24 @@ ListTile getWidget(
           title: ComboboxWidget(itemMap, label, itemReadonly),
         );
       }
-//      case TYPE_AUTOCOMPLETESTRINGCOMBO: {
+    // case TYPE_AUTOCOMPLETESTRINGCOMBO:
+    // {
 //        JSONArray comboItems = TagsManager.getComboItems(jsonObject);
 //        String[] itemsArray = TagsManager.comboItems2StringArray(comboItems);
 //        addedView = FormUtilities.addAutocompleteComboView(activity, mainView, label, value, itemsArray, constraintDescription);
 //        break;
-//      }
-//      case TYPE_CONNECTEDSTRINGCOMBO: {
+    // }
+    case TYPE_CONNECTEDSTRINGCOMBO:
+      {
+        return ListTile(
+          leading: icon,
+          title: ConnectedComboboxWidget(itemMap, label, itemReadonly),
+        );
 //        LinkedHashMap<String, List<String>> valuesMap = TagsManager.extractComboValuesMap(jsonObject);
 //        addedView = FormUtilities.addConnectedComboView(activity, mainView, label, value, valuesMap,
 //            constraintDescription);
 //        break;
-//      }
+      }
 //      case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO: {
 //        LinkedHashMap<String, List<String>> valuesMap = TagsManager.extractComboValuesMap(jsonObject);
 //        addedView = FormUtilities.addAutoCompleteConnectedComboView(activity, mainView, label, value, valuesMap,
@@ -502,7 +506,6 @@ ListTile getWidget(
           title: PicturesWidget(noteId, itemMap, label, position,
               getThumbNailsFunction, takePictureFunction, itemReadonly),
         );
-        break;
       }
     case TYPE_IMAGELIB:
       {
@@ -512,7 +515,6 @@ ListTile getWidget(
               getThumbNailsFunction, takePictureFunction, itemReadonly,
               fromGallery: true),
         );
-        break;
       }
 //      case TYPE_SKETCH:
 //        addedView = FormUtilities.addSketchView(noteId, this, requestCode, mainView, label, value, constraintDescription);
@@ -647,6 +649,183 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
                   });
                 }
               },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ConnectedComboboxWidget extends StatefulWidget {
+  final _itemMap;
+  final String _label;
+  final bool _isReadOnly;
+
+  ConnectedComboboxWidget(this._itemMap, this._label, this._isReadOnly);
+
+  @override
+  ConnectedComboboxWidgetState createState() => ConnectedComboboxWidgetState();
+}
+
+class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
+  String currentMain = "";
+  String currentSec = "";
+
+  List<DropdownMenuItem<String>> mainComboItems = [];
+  Map<String, List<DropdownMenuItem<String>>> secondaryCombos = {};
+
+  @override
+  void initState() {
+    if (widget._itemMap.containsKey(TAG_VALUES)) {
+      Map<String, dynamic> valuesObj = widget._itemMap[TAG_VALUES];
+
+      bool hasEmpty = false;
+      valuesObj.forEach((key, value) {
+        if (key.trim().isEmpty) {
+          hasEmpty = true;
+        }
+        var mainComboItem = DropdownMenuItem<String>(
+          child: Text(key),
+          value: key,
+        );
+        mainComboItems.add(mainComboItem);
+
+        List<DropdownMenuItem<String>> sec = [];
+        secondaryCombos[key] = sec;
+        bool subHasEmpty = false;
+        value.forEach((elem) {
+          dynamic item = elem[TAG_ITEM] ?? "";
+          if (item.toString().trim().isEmpty) {
+            subHasEmpty = true;
+          }
+          var secComboItem = DropdownMenuItem<String>(
+            child: Text(item.toString()),
+            value: item.toString(),
+          );
+          sec.add(secComboItem);
+        });
+        if (!subHasEmpty) {
+          var empty = DropdownMenuItem<String>(
+            child: Text(""),
+            value: "",
+          );
+          sec.insert(0, empty);
+        }
+      });
+
+      if (!hasEmpty) {
+        var empty = DropdownMenuItem<String>(
+          child: Text(""),
+          value: "",
+        );
+        mainComboItems.insert(0, empty);
+      }
+    }
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var formItem = widget._itemMap;
+
+    if (formItem.containsKey(TAG_VALUE)) {
+      String value = formItem[TAG_VALUE].trim();
+      var split = value.split(SEP);
+      if (split.length == 2) {
+        currentMain = split[0];
+        currentSec = split[1];
+      }
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
+          child: SmashUI.normalText(widget._label,
+              color: SmashColors.mainDecorationsDarker),
+        ),
+        Container(
+          decoration: currentMain.trim().isNotEmpty
+              ? BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  border: Border.all(
+                    color: SmashColors.mainDecorations,
+                  ),
+                )
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: SmashUI.DEFAULT_PADDING * 2,
+                      bottom: SmashUI.DEFAULT_PADDING),
+                  child: Container(
+                    padding: EdgeInsets.only(
+                        left: SmashUI.DEFAULT_PADDING,
+                        right: SmashUI.DEFAULT_PADDING),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      border: Border.all(
+                        color: SmashColors.mainDecorations,
+                      ),
+                    ),
+                    child: DropdownButton<String>(
+                      value: currentMain,
+                      isExpanded: true,
+                      items: mainComboItems,
+                      onChanged: (selected) {
+                        if (!widget._isReadOnly) {
+                          setState(() {
+                            formItem[TAG_VALUE] = selected + SEP;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                currentMain.trim().isEmpty
+                    ? Container()
+                    : Padding(
+                        padding: const EdgeInsets.only(
+                          left: SmashUI.DEFAULT_PADDING * 2,
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: SmashUI.DEFAULT_PADDING,
+                              right: SmashUI.DEFAULT_PADDING),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: SmashColors.mainDecorations,
+                            ),
+                          ),
+                          child: DropdownButton<String>(
+                            value: currentSec,
+                            isExpanded: true,
+                            items: secondaryCombos[currentMain],
+                            onChanged: (selected) {
+                              if (!widget._isReadOnly) {
+                                setState(() {
+                                  setState(() {
+                                    var str = widget._itemMap[TAG_VALUE];
+                                    widget._itemMap[TAG_VALUE] =
+                                        str.split("#")[0] + SEP + selected;
+                                  });
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+              ],
             ),
           ),
         ),
