@@ -330,6 +330,37 @@ class FormUtilities {
     return false;
   }
 
+  static String getFormItemLabel(String form, String defaultValue) {
+    if (form != null) {
+      var formObj = jsonDecode(form);
+      if (formObj.containsKey(TAG_FORMS)) {
+        List<dynamic> formsArray = formObj[TAG_FORMS];
+        for (var f in formsArray) {
+          if (f.containsKey(TAG_FORMITEMS)) {
+            var formItems = f[TAG_FORMITEMS];
+            for (var formItem in formItems) {
+              if (formItem.containsKey(TAG_IS_RENDER_LABEL)) {
+                var isLabel = formItem[TAG_IS_RENDER_LABEL];
+                if ((isLabel is bool && isLabel) ||
+                    (isLabel is String &&
+                        (isLabel.toLowerCase() == "true" ||
+                            isLabel.toLowerCase() == "yes"))) {
+                  var v = formItem[TAG_VALUE];
+                  if (v != null && v.length > 0) {
+                    return v;
+                  } else {
+                    return defaultValue;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return defaultValue;
+  }
+
   /// Check an {@link JSONObject object} for constraints and collect them.
   ///
   /// @param jsonObject  the object to check.
