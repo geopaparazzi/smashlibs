@@ -6,6 +6,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:collection';
+import 'package:dio/adapter.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
@@ -42,6 +43,7 @@ part 'com/hydrologis/flutterlibs/theme/colors.dart';
 part 'com/hydrologis/flutterlibs/theme/icons.dart';
 part 'com/hydrologis/flutterlibs/forms/forms.dart';
 part 'com/hydrologis/flutterlibs/forms/forms_widgets.dart';
+part 'com/hydrologis/flutterlibs/network/network_helper.dart';
 part 'com/hydrologis/flutterlibs/theme/theme.dart';
 part 'com/hydrologis/flutterlibs/ui/dialogs.dart';
 part 'com/hydrologis/flutterlibs/ui/progress.dart';

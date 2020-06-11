@@ -82,6 +82,8 @@ class SmashIcons {
     } else if (pathOrUrlOrNameOrExtension
         .endsWith(FileManager.GEOPAPARAZZI_EXT)) {
       return MdiIcons.database;
+    } else if (pathOrUrlOrNameOrExtension.endsWith("tags.json")) {
+      return formNotesIcon;
     } else if (FileSystemEntity.isDirectorySync(pathOrUrlOrNameOrExtension)) {
       return MdiIcons.folderOutline;
     } else {

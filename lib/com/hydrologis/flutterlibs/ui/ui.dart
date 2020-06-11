@@ -30,7 +30,7 @@ class SmashUI {
       color,
       textAlign = TextAlign.justify,
       underline = false,
-      overflow = TextOverflow.ellipsis}) {
+      overflow}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -65,7 +65,7 @@ class SmashUI {
       color,
       textAlign = TextAlign.justify,
       underline = false,
-      overflow = TextOverflow.ellipsis}) {
+      overflow}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -99,7 +99,7 @@ class SmashUI {
       bold = false,
       color,
       textAlign = TextAlign.justify,
-      overflow = TextOverflow.ellipsis}) {
+      overflow}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -129,7 +129,7 @@ class SmashUI {
       bold = true,
       color = Colors.redAccent,
       textAlign = TextAlign.center,
-      overflow = TextOverflow.ellipsis}) {
+      overflow}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -216,6 +216,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
   bool editMode = false;
   String _currentValue = "";
   TextEditingController _controller;
+  TextEditingController _controller2;
   bool _canSave = true;
 
   @override
@@ -223,10 +224,12 @@ class _EditableTextFieldState extends State<EditableTextField> {
     _currentValue = widget.value;
     super.initState();
     _controller = TextEditingController();
+    _controller2 = TextEditingController();
   }
 
   void dispose() {
     _controller.dispose();
+    _controller2.dispose();
     super.dispose();
   }
 
@@ -274,10 +277,20 @@ class _EditableTextFieldState extends State<EditableTextField> {
         ],
       );
     } else {
+      _controller2.text = _currentValue;
       return Row(
         children: [
           Expanded(
-            child: SmashUI.normalText(_currentValue, bold: widget.doBold),
+            child: TextFormField(
+              controller: _controller2,
+              obscureText: widget.isPassword,
+              readOnly: true,
+              style: TextStyle(
+                color: SmashColors.mainTextColor,
+                fontWeight: FontWeight.bold,
+                fontSize: SmashUI.NORMAL_SIZE,
+              ),
+            ),
           ),
           IconButton(
             icon: Icon(
