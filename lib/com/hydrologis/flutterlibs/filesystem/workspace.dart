@@ -45,7 +45,7 @@ class Workspace {
   /// On Android this will be the internal sdcard storage,
   /// while on IOS that will be the Documents folder.
   static Future<Directory> getRootFolder() async {
-    if (Platform.isIOS) {
+    if (Platform.isIOS || Platform.isMacOS) {
       var dir = await getApplicationDocumentsDirectory();
       return dir;
     } else if (Platform.isAndroid) {

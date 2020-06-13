@@ -8,6 +8,12 @@ part of smashlibs;
 const double SIMPLE_DIALOGS_HEIGHT = 150;
 const double SIMPLE_DIALOGS_ICONSIZE = 80;
 
+class SmashPlatform {
+  static bool isDesktop() {
+    return Platform.isWindows || Platform.isLinux | Platform.isMacOS;
+  }
+}
+
 /// Helper class to keep UI always the same.
 class SmashUI {
   static const double SMALL_SIZE = 14;

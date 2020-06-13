@@ -27,6 +27,8 @@ class ScreenUtilities {
   }
 
   static void keepScreenOn(bool keepOn) {
-    Screen.keepOn(keepOn);
+    if (!SmashPlatform.isDesktop()) {
+      Screen.keepOn(keepOn);
+    }
   }
 }
