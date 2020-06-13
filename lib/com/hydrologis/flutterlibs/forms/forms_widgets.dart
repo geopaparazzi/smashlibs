@@ -10,8 +10,8 @@ typedef Null ItemSelectedCallback(String selectedFormName);
 class FormSectionsWidget extends StatefulWidget {
   final ItemSelectedCallback onItemSelected;
   final String sectionName;
-  bool isLargeScreen;
-  Map<String, dynamic> sectionMap;
+  final bool isLargeScreen;
+  final Map<String, dynamic> sectionMap;
 
   FormSectionsWidget(this.sectionMap, this.sectionName, this.isLargeScreen,
       this.onItemSelected);
@@ -60,8 +60,7 @@ class FormDetailWidget extends StatefulWidget {
   final dynamic _position;
   final int _noteId;
   final Map<String, dynamic> sectionMap;
-  final Function _getThumbNailsFunction;
-  final Function _takePictureFunction;
+  final AFormhelper formHelper;
   final bool doScaffold;
   final bool isReadOnly;
 
@@ -73,8 +72,7 @@ class FormDetailWidget extends StatefulWidget {
     this.isLargeScreen,
     this.onlyDetail,
     this._position,
-    this._getThumbNailsFunction,
-    this._takePictureFunction, {
+    this.formHelper, {
     this.isReadOnly = false,
     this.doScaffold = true,
   });
@@ -107,14 +105,8 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
     List<dynamic> formItems = TagsManager.getFormItems(form4name);
 
     for (int i = 0; i < formItems.length; i++) {
-      Widget w = getWidget(
-          context,
-          widget._noteId,
-          formItems[i],
-          widget._position,
-          widget.isReadOnly,
-          widget._getThumbNailsFunction,
-          widget._takePictureFunction);
+      Widget w = getWidget(context, widget._noteId, formItems[i],
+          widget._position, widget.isReadOnly, widget.formHelper);
       if (w != null) {
         widgetsList.add(w);
       }
@@ -154,9 +146,7 @@ class MasterDetailPage extends StatefulWidget {
   final dynamic _position;
   final int _noteId;
   final Map<String, dynamic> sectionMap;
-  final Function _onWillPopFunction;
-  final Function _getThumbNailsFunction;
-  final Function _takePictureFunction;
+  final AFormhelper formHelper;
   final bool doScaffold;
   final bool isReadOnly;
 
@@ -166,9 +156,7 @@ class MasterDetailPage extends StatefulWidget {
     this.sectionName,
     this._position,
     this._noteId,
-    this._onWillPopFunction,
-    this._getThumbNailsFunction,
-    this._takePictureFunction, {
+    this.formHelper, {
     this.doScaffold = true,
     this.isReadOnly = false,
   });
@@ -212,8 +200,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
                           isLargeScreen,
                           onlyDetail,
                           widget._position,
-                          widget._getThumbNailsFunction,
-                          widget._takePictureFunction,
+                          widget.formHelper,
                           doScaffold: widget.doScaffold,
                           isReadOnly: widget.isReadOnly,
                         );
@@ -234,8 +221,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
                   isLargeScreen,
                   onlyDetail,
                   widget._position,
-                  widget._getThumbNailsFunction,
-                  widget._takePictureFunction,
+                  widget.formHelper,
                   doScaffold: widget.doScaffold,
                   isReadOnly: widget.isReadOnly,
                 ))
@@ -244,10 +230,9 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
     });
     return WillPopScope(
       onWillPop: () async {
-        if (widget._onWillPopFunction != null) {
-          await widget._onWillPopFunction(context, widget._noteId,
-              widget.sectionName, widget.sectionMap, widget._position);
-        }
+        // TODO check if something cheanged would be really good
+        await widget.formHelper.onSaveFunction(context, widget._noteId,
+            widget.sectionName, widget.sectionMap, widget._position);
         return true;
       },
       child: widget.doScaffold
@@ -263,13 +248,13 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 }
 
 ListTile getWidget(
-    BuildContext context,
-    int noteId,
-    final Map<String, dynamic> itemMap,
-    dynamic position,
-    bool isReadOnly,
-    Function getThumbNailsFunction,
-    Function takePictureFunction) {
+  BuildContext context,
+  int noteId,
+  final Map<String, dynamic> itemMap,
+  dynamic position,
+  bool isReadOnly,
+  AFormhelper formHelper,
+) {
   String key = "-"; //$NON-NLS-1$
   if (itemMap.containsKey(TAG_KEY)) {
     key = itemMap[TAG_KEY].trim();
@@ -503,16 +488,16 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: PicturesWidget(noteId, itemMap, label, position,
-              getThumbNailsFunction, takePictureFunction, itemReadonly),
+          title: PicturesWidget(
+              noteId, itemMap, label, position, formHelper, itemReadonly),
         );
       }
     case TYPE_IMAGELIB:
       {
         return ListTile(
           leading: icon,
-          title: PicturesWidget(noteId, itemMap, label, position,
-              getThumbNailsFunction, takePictureFunction, itemReadonly,
+          title: PicturesWidget(
+              noteId, itemMap, label, position, formHelper, itemReadonly,
               fromGallery: true),
         );
       }
@@ -1087,12 +1072,11 @@ class PicturesWidget extends StatefulWidget {
   final dynamic _position;
   final int _noteId;
   final bool fromGallery;
-  final Function _getThumbNailsFunction;
-  final Function _takePictureFunction;
+  final AFormhelper formHelper;
   final bool _isReadOnly;
 
   PicturesWidget(this._noteId, this._itemMap, this._label, this._position,
-      this._getThumbNailsFunction, this._takePictureFunction, this._isReadOnly,
+      this.formHelper, this._isReadOnly,
       {this.fromGallery = false});
 
   @override
@@ -1103,12 +1087,8 @@ class PicturesWidgetState extends State<PicturesWidget> {
   List<String> imageSplit = [];
 
   Future<List<Widget>> getThumbnails(BuildContext context) async {
-    if (widget._getThumbNailsFunction != null) {
-      return await widget._getThumbNailsFunction(
-          context, widget._itemMap, imageSplit);
-    } else {
-      return <Widget>[];
-    }
+    return await widget.formHelper
+        .getThumbnailsFromDb(context, widget._itemMap, imageSplit);
   }
 
   @override
@@ -1138,12 +1118,13 @@ class PicturesWidgetState extends State<PicturesWidget> {
                         ? Container()
                         : FlatButton(
                             onPressed: () async {
-                              String value = await widget._takePictureFunction(
-                                  context,
-                                  widget._noteId,
-                                  widget._position,
-                                  widget.fromGallery,
-                                  imageSplit);
+                              String value = await widget.formHelper
+                                  .takePictureForForms(
+                                      context,
+                                      widget._noteId,
+                                      widget._position,
+                                      widget.fromGallery,
+                                      imageSplit);
                               if (value != null) {
                                 setState(() {
                                   widget._itemMap[TAG_VALUE] = value;

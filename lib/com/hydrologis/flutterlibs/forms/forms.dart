@@ -124,6 +124,31 @@ const String TAG_URL = "url";
 /// Separator for multiple items in the form results.
 const String SEP = "#";
 
+/// A class to help out on the abstract web, desktop, mobiles parts.
+abstract class AFormhelper {
+  /// Get the images from the source and return them as widgets.
+  ///
+  /// The form map [itemMap] is searched for image ids
+  /// and the ids also need to be placed in [imageSplit]
+  /// in case of further use.
+  /// 
+  /// This should return an empty widgets list if it is not supported.
+  Future<List<Widget>> getThumbnailsFromDb(
+      BuildContext context, var itemMap, List<String> imageSplit);
+
+  /// Take a picture for a given form identified by the [noteId].
+  ///
+  /// The [position] is set as the image position. The newly created image
+  /// id is then inserted in [imagesSplit].
+  /// If [fromGallery] is true, then the system image selector should open.
+  Future<String> takePictureForForms(BuildContext context, var noteId,
+      var position, bool fromGallery, List<String> imageSplit);
+
+  /// Save the form on exit from the form view.
+  Future<void> onSaveFunction(BuildContext context, var noteId, var sectionName,
+      var sectionMap, var _position);
+}
+
 /// An interface for constraints.
 ///
 /// @author Andrea Antonello (www.hydrologis.com)
