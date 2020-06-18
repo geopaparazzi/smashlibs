@@ -139,120 +139,120 @@ class FileBrowserState extends State<FileBrowser> {
     );
 
     return Scaffold(
-      appBar: new AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(onlyFiles
-                ? MdiIcons.folderMultipleOutline
-                : MdiIcons.fileOutline),
-            tooltip: onlyFiles ? "View only Files" : "View everything",
-            onPressed: () {
-              setState(() {
-                onlyFiles = !onlyFiles;
-              });
-            },
-          )
-        ],
-      ),
-      body: FutureBuilder<List<List<dynamic>>>(
-        future: getFiles(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<List<dynamic>> data = snapshot.data;
-            if (onlyFiles) {
-              data = data.where((pathName) {
-                bool isDir = pathName[2];
-                return !isDir;
-              }).toList();
-            }
-            return ListView(
-              children: data.map((pathName) {
-                String parentPath = pathName[0];
-                String labelParentPath = parentPath;
-                if (Platform.isIOS) {
-                  labelParentPath =
-                      IOS_DOCUMENTSFOLDER + Workspace.makeRelative(parentPath);
-                }
-                String name = pathName[1];
-                bool isDir = pathName[2];
-                var fullPath = FileUtilities.joinPaths(parentPath, name);
+        appBar: new AppBar(
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(onlyFiles
+                  ? MdiIcons.folderMultipleOutline
+                  : MdiIcons.fileOutline),
+              tooltip: onlyFiles ? "View only Files" : "View everything",
+              onPressed: () {
+                setState(() {
+                  onlyFiles = !onlyFiles;
+                });
+              },
+            )
+          ],
+        ),
+        body: FutureBuilder<List<List<dynamic>>>(
+          future: getFiles(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              List<List<dynamic>> data = snapshot.data;
+              if (onlyFiles) {
+                data = data.where((pathName) {
+                  bool isDir = pathName[2];
+                  return !isDir;
+                }).toList();
+              }
+              return ListView(
+                children: data.map((pathName) {
+                  String parentPath = pathName[0];
+                  String labelParentPath = parentPath;
+                  if (Platform.isIOS) {
+                    labelParentPath = IOS_DOCUMENTSFOLDER +
+                        Workspace.makeRelative(parentPath);
+                  }
+                  String name = pathName[1];
+                  bool isDir = pathName[2];
+                  var fullPath = FileUtilities.joinPaths(parentPath, name);
 
-                IconData iconData = SmashIcons.forPath(fullPath);
-                Widget trailingWidget;
-                if (isDir) {
-                  if (widget._doFolderMode) {
-                    // if folder you can enter or select it
-                    trailingWidget = Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(MdiIcons.checkCircleOutline,
-                              color: SmashColors.mainDecorations),
-                          tooltip: "Select folder",
-                          onPressed: () async {
-                            await Workspace.setLastUsedFolder(parentPath);
-                            var resultPath =
-                                FileUtilities.joinPaths(parentPath, name);
-                            Navigator.pop(context, resultPath);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.arrow_right),
-                          tooltip: "Enter folder",
-                          onPressed: () {
-                            setState(() {
-                              currentPath =
+                  IconData iconData = SmashIcons.forPath(fullPath);
+                  Widget trailingWidget;
+                  if (isDir) {
+                    if (widget._doFolderMode) {
+                      // if folder you can enter or select it
+                      trailingWidget = Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(MdiIcons.checkCircleOutline,
+                                color: SmashColors.mainDecorations),
+                            tooltip: "Select folder",
+                            onPressed: () async {
+                              await Workspace.setLastUsedFolder(parentPath);
+                              var resultPath =
                                   FileUtilities.joinPaths(parentPath, name);
-                            });
-                          },
-                        )
-                      ],
-                    );
+                              Navigator.pop(context, resultPath);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.arrow_right),
+                            tooltip: "Enter folder",
+                            onPressed: () {
+                              setState(() {
+                                currentPath =
+                                    FileUtilities.joinPaths(parentPath, name);
+                              });
+                            },
+                          )
+                        ],
+                      );
+                    } else {
+                      trailingWidget = IconButton(
+                        icon: Icon(Icons.arrow_right),
+                        tooltip: "Enter folder",
+                        onPressed: () {
+                          setState(() {
+                            currentPath =
+                                FileUtilities.joinPaths(parentPath, name);
+                          });
+                        },
+                      );
+                    }
                   } else {
+                    // if it gets here, then it is sure no folder mode
                     trailingWidget = IconButton(
-                      icon: Icon(Icons.arrow_right),
-                      tooltip: "Enter folder",
-                      onPressed: () {
-                        setState(() {
-                          currentPath =
-                              FileUtilities.joinPaths(parentPath, name);
-                        });
+                      icon: Icon(MdiIcons.checkCircleOutline,
+                          color: SmashColors.mainDecorations),
+                      tooltip: "Select file",
+                      onPressed: () async {
+                        await Workspace.setLastUsedFolder(parentPath);
+                        var resultPath =
+                            FileUtilities.joinPaths(parentPath, name);
+                        Navigator.pop(context, resultPath);
                       },
                     );
                   }
-                } else {
-                  // if it gets here, then it is sure no folder mode
-                  trailingWidget = IconButton(
-                    icon: Icon(MdiIcons.checkCircleOutline,
-                        color: SmashColors.mainDecorations),
-                    tooltip: "Select file",
-                    onPressed: () async {
-                      await Workspace.setLastUsedFolder(parentPath);
-                      var resultPath =
-                          FileUtilities.joinPaths(parentPath, name);
-                      Navigator.pop(context, resultPath);
-                    },
-                  );
-                }
 
-                return ListTile(
-                  leading: Icon(
-                    iconData,
-                    color: SmashColors.mainDecorations,
-                  ),
-                  title: Text(name),
-                  subtitle: Text(labelParentPath),
-                  trailing: trailingWidget,
-                );
-              }).toList(),
-            );
-          } else {
-            return Center(
-                child: SmashCircularProgress(label: "Loading files list..."));
-          }
-        },
-      ),
-      floatingActionButton: upButton,
-    );
+                  return ListTile(
+                    leading: Icon(
+                      iconData,
+                      color: SmashColors.mainDecorations,
+                    ),
+                    title: Text(name),
+                    subtitle: Text(labelParentPath),
+                    trailing: trailingWidget,
+                  );
+                }).toList(),
+              );
+            } else {
+              return Center(
+                  child: SmashCircularProgress(label: "Loading files list..."));
+            }
+          },
+        ),
+        floatingActionButton: upButton,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat);
   }
 }
