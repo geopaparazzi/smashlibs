@@ -31,6 +31,7 @@ const KEY_GPS_TESTLOG = 'KEY_GPS_TESTLOG';
 const KEY_GPS_SHOW_ALL_POINTS = 'KEY_GPS_SHOW_ALL_POINTS';
 const KEY_GPS_SHOW_VALID_POINTS = 'KEY_GPS_SHOW_VALID_POINTS';
 const KEY_GPS_LOG_VIEW_MODE = 'KEY_GPS_LOG_VIEW_MODE';
+const KEY_NOTES_VIEW_MODE = 'KEY_NOTES_VIEW_MODE';
 
 const KEY_VECTOR_MAX_FEATURES = 'KEY_VECTOR_MAX_FEATURES';
 const KEY_VECTOR_LOAD_ONLY_VISIBLE = 'KEY_VECTOR_LOAD_ONLY_VISIBLE';
@@ -61,7 +62,8 @@ const TIMEINTERVALS = [0, 1, 3, 5, 10, 15, 20, 30, 60];
 const MINDISTANCES = [0, 1, 3, 5, 10, 15, 20, 50, 100];
 const MAXFEATURESTOLOAD = [50, 100, 200, 500, 1000, 5000, 10000, -1];
 const TAPAREASIZES = [10, 20, 30, 40, 50, 100, 200, 500];
-const List<String> LOGVIEWMODES = ["hide", "solid", "dashed"];
+const List<String> LOGVIEWMODES = ["hide", "solid", "transparent"];
+const List<String> NOTESVIEWMODES = ["icon+label", "icon", "hide"];
 
 class CameraResolutions {
   static const HIGH = "high";
