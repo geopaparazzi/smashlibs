@@ -18,6 +18,7 @@ class SmashPlatform {
 class SmashUI {
   static const double SMALL_SIZE = 14;
   static const double NORMAL_SIZE = 18;
+  static const double MEDIUM_SIZE = 22;
   static const double BIG_SIZE = 26;
 
   static const double DEFAULT_PADDING = 10.0;
@@ -192,6 +193,58 @@ class SmashUI {
 
   static getTransparentIcon() {
     return Icon(Icons.clear, color: Colors.white.withAlpha(0));
+  }
+
+  static defaultButtonBar(
+      {String okLabel,
+      Function okFunction,
+      String cancelLabel,
+      Function cancelFunction,
+      String dangerLabel,
+      Function dangerFunction}) {
+    List<Widget> buttons = [];
+
+    if (dangerLabel != null && dangerFunction != null) {
+      buttons.add(
+        FlatButton(
+          child: Text(
+            dangerLabel,
+            style: TextStyle(color: SmashColors.mainDanger),
+          ),
+          onPressed: () async {
+            await dangerFunction();
+          },
+        ),
+      );
+    }
+    if (cancelLabel != null && cancelFunction != null) {
+      buttons.add(
+        FlatButton(
+          child: Text(
+            cancelLabel,
+          ),
+          onPressed: () async {
+            await cancelFunction();
+          },
+        ),
+      );
+    }
+    if (okLabel != null && okFunction != null) {
+      buttons.add(
+        FlatButton(
+          child: Text(
+            okLabel,
+          ),
+          onPressed: () async {
+            await okFunction();
+          },
+        ),
+      );
+    }
+
+    return ButtonBar(
+      children: buttons,
+    );
   }
 }
 
