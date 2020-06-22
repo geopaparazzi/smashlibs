@@ -44,7 +44,7 @@ class GpLogItemQueryBuilder extends QueryObjectBuilder<GpLogItem> {
   var limit;
 
   @override
-  GpLogItem fromMap(Map<String, dynamic> map) {
+  GpLogItem fromMap(dynamic map) {
     GpLogItem l = new GpLogItem()
       ..level = map[LogDb.level_NAME]
       ..message = map[LogDb.message_NAME]
@@ -108,12 +108,12 @@ class LogDb {
   SqliteDb _db;
   String _dbPath;
 
-  Future<List<GpLogItem>> getLogItems({int limit}) async {
+  List<GpLogItem> getLogItems({int limit}) {
     var queryObj = GpLogItemQueryBuilder();
     if (limit != null) {
       queryObj.limit = limit;
     }
-    List<GpLogItem> result = await _db.getQueryObjectsList(queryObj);
+    List<GpLogItem> result = _db.getQueryObjectsList(queryObj);
     return result;
   }
 
@@ -132,8 +132,8 @@ class LogDb {
 
   String get path => _dbPath;
 
-  createLogDatabase(Database db) async {
-    await db.execute(CREATE_STATEMENT);
+  createLogDatabase(DB.Database db) {
+    db.execute(CREATE_STATEMENT);
   }
 
   void put(Level level, String message) async {

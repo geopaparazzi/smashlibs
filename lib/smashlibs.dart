@@ -23,7 +23,7 @@ import 'package:path_provider_ex/path_provider_ex.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:moor_ffi/database.dart' as DB;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:proj4dart/proj4dart.dart';
 import 'package:wkt_parser/wkt_parser.dart' as wkt_parser;

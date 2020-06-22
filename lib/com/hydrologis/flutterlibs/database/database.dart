@@ -5,8 +5,6 @@ part of smashlibs;
  * found in the LICENSE file.
  */
 
-
-
 abstract class QueryObjectBuilder<T> {
   String querySql();
 
@@ -14,90 +12,130 @@ abstract class QueryObjectBuilder<T> {
 
   Map<String, dynamic> toMap(T item);
 
-  T fromMap(Map<String, dynamic> map);
+  /// Extract the item from a [key, value] object.
+  T fromMap(dynamic map);
 }
 
+/// The Sqlite database used for project and datasets as mbtiles.
 class SqliteDb {
-  Database _db;
+  DB.Database _db;
   String _dbPath;
+  bool _isClosed = false;
 
   SqliteDb(this._dbPath);
 
-  Future<void> openOrCreate({Function dbCreateFunction}) async {
-    _db = await openDatabase(
-      _dbPath,
-      version: 1,
-      onCreate: (Database db, int version) async {
-        if (dbCreateFunction != null) {
-          await dbCreateFunction(db);
-        }
-      },
-    );
+  void openOrCreate({Function dbCreateFunction}) {
+    var dbFile = File(_dbPath);
+    bool existsAlready = dbFile.existsSync();
+    _db = DB.Database.openFile(dbFile);
+    if (!existsAlready) {
+      dbCreateFunction(_db);
+    }
   }
 
   String get path => _dbPath;
 
   bool isOpen() {
     if (_db == null) return false;
-    return _db.isOpen;
+    return !_isClosed;
   }
 
-  Future<void> close() async {
-    return await _db.close();
+  void close() {
+    _isClosed = true;
+    return _db?.close();
+  }
+
+  /// This should only be used when a custom function is necessary,
+  /// which forces to use the method from the moor database.
+  DB.Database getInternalDb() {
+    return _db;
   }
 
   /// Get a list of items defined by the [queryObj].
   ///
   /// Optionally a custom [whereString] piece can be passed in. This needs to start with the word where.
-  Future<List<T>> getQueryObjectsList<T>(QueryObjectBuilder<T> queryObj,
-      {whereString: ""}) async {
+  List<T> getQueryObjectsList<T>(QueryObjectBuilder<T> queryObj,
+      {whereString: ""}) {
     String querySql = "${queryObj.querySql()} $whereString";
-    var res = await query(querySql);
+
     List<T> items = [];
-    for (int i = 0; i < res.length; i++) {
-      var map = res[i];
-      var obj = queryObj.fromMap(map);
+    var res = select(querySql);
+    res.forEach((row) {
+      var obj = queryObj.fromMap(row);
       items.add(obj);
-    }
+    });
     return items;
   }
 
-  Future<void> execute(String insertSql, [List<dynamic> arguments]) async {
-    return _db.execute(insertSql, arguments);
+  /// Execute a insert, update or delete using [sqlToExecute] in normal
+  /// or prepared mode using [arguments].
+  int execute(String sqlToExecute, [List<dynamic> arguments]) {
+    DB.PreparedStatement stmt;
+    try {
+      stmt = _db.prepare(sqlToExecute);
+      stmt.execute(arguments);
+
+      return _db.getUpdatedRows();
+    } finally {
+      stmt?.close();
+    }
   }
 
-  Future<List<Map<String, dynamic>>> query(String querySql,
-      [List<dynamic> arguments]) async {
-    return _db.rawQuery(querySql, arguments);
+  /// The standard query method.
+  Iterable<DB.Row> select(String sql, [List<dynamic> arguments]) {
+    DB.PreparedStatement selectStmt;
+    try {
+      selectStmt = _db.prepare(sql);
+      final DB.Result result = selectStmt.select(arguments);
+      return result;
+    } finally {
+      selectStmt?.close();
+    }
   }
 
-  Future<int> insert(String insertSql, [List<dynamic> arguments]) async {
-    return _db.rawInsert(insertSql, arguments);
+  /// Insert a new record using a map.
+  int insertMap(String table, Map<String, dynamic> values) {
+    List<dynamic> args = [];
+    var keys;
+    var questions;
+    values.forEach((key, value) {
+      if (keys == null) {
+        keys = key;
+        questions = "?";
+      } else {
+        keys = keys + "," + key;
+        questions = questions + ",?";
+      }
+      args.add(value);
+    });
+
+    var sql = "insert into $table ( $keys ) values ( $questions );";
+    return execute(sql, args);
   }
 
-  Future<int> insertMap(String table, Map<String, dynamic> values) async {
-    return _db.insert(table, values);
+  /// Update a new record using a map and a where condition.
+  int updateMap(String table, Map<String, dynamic> values, String where) {
+    List<dynamic> args = [];
+    var keysVal;
+    values.forEach((key, value) {
+      if (keysVal == null) {
+        keysVal = "$key=?";
+      } else {
+        keysVal = ",$key=?";
+      }
+      args.add(value);
+    });
+
+    var sql = "update $table set $keysVal where $where;";
+    return execute(sql, args);
   }
 
-  Future<int> update(String updateSql) async {
-    return _db.rawUpdate(updateSql);
-  }
+  // void transaction(Function transactionOperations) async {
+  //   // return await _db.transaction(action, exclusive: exclusive);
+  // }
 
-  Future<int> updateMap(
-      String table, Map<String, dynamic> values, String where) async {
-    return _db.update(table, values, where: where);
-  }
-
-  Future<int> delete(String deleteSql) async {
-    return _db.rawDelete(deleteSql);
-  }
-
-  Future<T> transaction<T>(Future<T> action(Transaction txn),
-      {bool exclusive}) async {
-    return await _db.transaction(action, exclusive: exclusive);
-  }
-
-  Future<List<String>> getTables(bool doOrder) async {
+  /// Get the list of table names, if necessary [doOrder].
+  List<String> getTables({bool doOrder = false}) {
     List<String> tableNames = [];
     String orderBy = " ORDER BY name";
     if (!doOrder) {
@@ -106,42 +144,41 @@ class SqliteDb {
     String sql =
         "SELECT name FROM sqlite_master WHERE type='table' or type='view'" +
             orderBy;
-    var res = await query(sql);
-    for (int i = 0; i < res.length; i++) {
-      var name = res[i]['name'];
+    var res = select(sql);
+    res.forEach((row) {
+      var name = row['name'];
       tableNames.add(name);
-    }
+    });
     return tableNames;
   }
 
-  Future<bool> hasTable(String tableName) async {
+  /// Check is a given [tableName] exists.
+  bool hasTable(String tableName) {
     String sql = "SELECT name FROM sqlite_master WHERE type='table'";
-    var res = await query(sql);
     tableName = tableName.toLowerCase();
-    for (int i = 0; i < res.length; i++) {
-      String name = res[i]['name'];
-      if (name.toLowerCase() == tableName) return true;
-    }
+
+    var res = select(sql);
+    res.forEach((row) {
+      var name = row['name'];
+      if (name.toLowerCase() == tableName) {
+        return true;
+      }
+    });
     return false;
   }
 
-  /// Get the table columns from a non spatial db.
-  ///
-  /// @param db the db.
-  /// @param tableName the name of the table to get the columns for.
-  /// @return the list of table column information.
-  /// @throws Exception
-  Future<List<List<dynamic>>> getTableColumns(String tableName) async {
+  /// Get the [tableName] columns as array of name, type and isPrimaryKey.
+  List<List<dynamic>> getTableColumns(String tableName) {
     String sql = "PRAGMA table_info(" + tableName + ")";
     List<List<dynamic>> columnsList = [];
-    var res = await query(sql);
-    for (int i = 0; i < res.length; i++) {
-      var map = res[i];
-      String colName = map['name'];
-      String colType = map['type'];
-      int isPk = map['pk'];
+
+    var res = select(sql);
+    res.forEach((row) {
+      String colName = row['name'];
+      String colType = row['type'];
+      int isPk = row['pk'];
       columnsList.add([colName, colType, isPk]);
-    }
+    });
     return columnsList;
   }
 }
@@ -196,13 +233,13 @@ class MBTilesDb {
     this.databasePath = databasePath;
   }
 
-  Future<void> open() async {
+  void open() {
     database = SqliteDb(databasePath);
-    await database.openOrCreate(dbCreateFunction: (db) async {
-      await db.execute(CREATE_TILES);
-      await db.execute(CREATE_METADATA);
-      await db.execute(INDEX_TILES);
-      await db.execute(INDEX_METADATA);
+    database.openOrCreate(dbCreateFunction: (DB.Database db) {
+      db.execute(CREATE_TILES);
+      db.execute(CREATE_METADATA);
+      db.execute(INDEX_TILES);
+      db.execute(INDEX_METADATA);
     });
   }
 
@@ -224,27 +261,27 @@ class MBTilesDb {
   /// @param minZoom lowest zoomlevel.
   /// @param maxZoom highest zoomlevel.
   /// @throws Exception
-  Future fillMetadata(double n, double s, double w, double e, String name,
-      String format, int minZoom, int maxZoom) async {
-    await database.delete("delete from $TABLE_METADATA");
-
+  void fillMetadata(double n, double s, double w, double e, String name,
+      String format, int minZoom, int maxZoom) {
+    // TODO do in transaction, if possible.
+    database.execute("delete from $TABLE_METADATA");
     String query = toMetadataQuery("name", name);
-    await database.execute(query);
+    database.execute(query);
     query = toMetadataQuery("description", name);
-    await database.execute(query);
+    database.execute(query);
     query = toMetadataQuery("format", format);
-    await database.execute(query);
+    database.execute(query);
     query = toMetadataQuery("minZoom", minZoom.toString());
-    await database.execute(query);
+    database.execute(query);
     query = toMetadataQuery("maxZoom", maxZoom.toString());
-    await database.execute(query);
+    database.execute(query);
     query = toMetadataQuery("type", "baselayer");
-    await database.execute(query);
+    database.execute(query);
     query = toMetadataQuery("version", "1.1");
-    await database.execute(query);
+    database.execute(query);
     // left, bottom, right, top
     query = toMetadataQuery("bounds", "$w,$s,$e,$n");
-    await database.execute(query);
+    database.execute(query);
   }
 
   String toMetadataQuery(String key, String value) {
@@ -258,8 +295,8 @@ class MBTilesDb {
   /// @param z the zoom level.
   /// @return the tile image bytes.
   /// @throws Exception
-  void addTile(int x, int y, int z, Uint8List imageBytes) async {
-    await database.insert(insertTileSql, [z, x, y, imageBytes]);
+  void addTile(int x, int y, int z, Uint8List imageBytes) {
+    database.execute(insertTileSql, [z, x, y, imageBytes]);
   }
 
   ///**
@@ -296,17 +333,16 @@ class MBTilesDb {
   /// @param zoom the zoom level.
   /// @return the tile image bytes.
   /// @throws Exception
-  Future<Uint8List> getTile(int tx, int tyOsm, int zoom) async {
+  Uint8List getTile(int tx, int tyOsm, int zoom) {
     int ty = tyOsm;
     if (tileRowType == "tms") {
       var tmsTileXY = MercatorUtils.osmTile2TmsTile(tx, tyOsm, zoom);
       ty = tmsTileXY[1];
     }
 
-    List<Map<String, dynamic>> result =
-        await database.query(SELECTQUERY, [zoom, tx, ty]);
+    Iterable<DB.Row> result = database.select(SELECTQUERY, [zoom, tx, ty]);
     if (result.length == 1) {
-      return result[0][COL_TILES_TILE_DATA];
+      return result.first[COL_TILES_TILE_DATA];
     }
     return null;
   }
@@ -314,8 +350,8 @@ class MBTilesDb {
   /// Get the db envelope.
   ///
   /// @return the array [w, e, s, n] of the dataset.
-  Future<List<double>> getBounds() async {
-    await checkMetadata();
+  List<double> getBounds() {
+    checkMetadata();
     String boundsWSEN = metadataMap["bounds"];
     if (boundsWSEN == null) {
       return [-180, 180, -90, 90];
@@ -416,13 +452,14 @@ class MBTilesDb {
 //return -1;
 //}
 //
-  Future checkMetadata() async {
+  void checkMetadata() {
     if (metadataMap == null) {
       metadataMap = Map();
-      List<Map<String, String>> result = await database.query(SELECT_METADATA);
-      result.forEach((map) {
-        metadataMap[map[COL_METADATA_NAME].toLowerCase()] =
-            map[COL_METADATA_VALUE];
+
+      var res = database.select(SELECT_METADATA);
+      res.forEach((row) {
+        metadataMap[row[COL_METADATA_NAME].toLowerCase()] =
+            row[COL_METADATA_VALUE];
       });
     }
   }
