@@ -88,9 +88,9 @@ packages:
   dart_hydrologis_utils:
     dependency: "direct main"
     description:
-      name: dart_hydrologis_utils
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../dart_hydrologis_utils"
+      relative: true
+    source: path
     version: "0.4.0"
   dart_jts:
     dependency: "direct main"
@@ -205,13 +205,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
-  io:
-    dependency: transitive
-    description:
-      name: io
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.4"
   lists:
     dependency: transitive
     description:
@@ -219,13 +212,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.6"
-  logger:
-    dependency: transitive
-    description:
-      name: logger
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.8.3"
   matcher:
     dependency: transitive
     description:
