@@ -9,6 +9,7 @@ import 'dart:collection';
 import 'package:dio/adapter.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
 import 'package:dart_jts/dart_jts.dart' as JTS;
 import 'package:device_info/device_info.dart';
@@ -23,7 +24,6 @@ import 'package:path_provider_ex/path_provider_ex.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:moor_ffi/database.dart' as DB;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:proj4dart/proj4dart.dart';
 import 'package:wkt_parser/wkt_parser.dart' as wkt_parser;
@@ -34,7 +34,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
-part 'com/hydrologis/flutterlibs/database/database.dart';
+part 'com/hydrologis/flutterlibs/database/mbtiles.dart';
 part 'com/hydrologis/flutterlibs/filesystem/filemanagement.dart';
 part 'com/hydrologis/flutterlibs/filesystem/workspace.dart';
 part 'com/hydrologis/flutterlibs/network/download_file_listtile.dart';

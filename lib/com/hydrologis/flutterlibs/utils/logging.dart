@@ -45,7 +45,7 @@ class GpLogItemQueryBuilder extends QueryObjectBuilder<GpLogItem> {
 
   @override
   GpLogItem fromMap(dynamic map) {
-    GpLogItem l = new GpLogItem()
+    GpLogItem l = GpLogItem()
       ..level = map[LogDb.level_NAME]
       ..message = map[LogDb.message_NAME]
       ..ts = map[LogDb.TimeStamp_NAME];
@@ -117,12 +117,12 @@ class LogDb {
     return result;
   }
 
-  Future<bool> init(String folder) async {
+  bool init(String folder) {
     try {
       GpLogger().i("Init LogDb with folder: $folder and app name: $DB_NAME");
       _dbPath = FileUtilities.joinPaths(folder, DB_NAME);
       _db = SqliteDb(_dbPath);
-      await _db.openOrCreate(dbCreateFunction: createLogDatabase);
+      _db.open(dbCreateFunction: createLogDatabase);
     } catch (e, s) {
       GpLogger().err("Error initializing LogDb", s);
       return false;
@@ -132,15 +132,15 @@ class LogDb {
 
   String get path => _dbPath;
 
-  createLogDatabase(DB.Database db) {
+  createLogDatabase(var db) {
     db.execute(CREATE_STATEMENT);
   }
 
-  void put(Level level, String message) async {
+  void put(Level level, String message) {
     var item = GpLogItem()
       ..level = level.toString()
       ..message = message;
-    await _db.insertMap(TABLE_NAME, item.toMap());
+    _db.insertMap(TABLE_NAME, item.toMap());
   }
 }
 
@@ -158,38 +158,38 @@ class GpLogger {
 
   GpLogger._internal();
 
-  Future<bool> init(String folder) async {
+  bool init(String folder) {
     if (internalLogger != null) return false;
     _folder = folder;
     i("Initializing GpLogger with folder: $_folder");
 
     _logDb = LogDb();
-    await _logDb.init(_folder).then((ok) {
-      if (ok) {
-        internalLogger = Logger(
-          printer: PrettyPrinter(
-              methodCount: 2,
-              // number of method calls to be displayed
-              errorMethodCount: 8,
-              // number of method calls if stacktrace is provided
-              lineLength: 120,
-              // width of the output
-              colors: true,
-              // Colorful log messages
-              printEmojis: true,
-              // Print an emoji for each log message
-              printTime: false // Should each log print contain a timestamp
-              ),
-          filter: GpLogFilter(),
-          output: DbOutput(_logDb),
-        );
-      }
-    });
+    bool init = _logDb.init(_folder);
+    if (init) {
+      internalLogger = Logger(
+        printer: PrettyPrinter(
+            methodCount: 2,
+            // number of method calls to be displayed
+            errorMethodCount: 8,
+            // number of method calls if stacktrace is provided
+            lineLength: 120,
+            // width of the output
+            colors: true,
+            // Colorful log messages
+            printEmojis: true,
+            // Print an emoji for each log message
+            printTime: false // Should each log print contain a timestamp
+            ),
+        filter: GpLogFilter(),
+        output: DbOutput(_logDb),
+      );
+    }
+
     return true;
   }
 
-  clearLog() async {
-    await _logDb._db.execute("delete from ${LogDb.TABLE_NAME};");
+  clearLog() {
+    _logDb._db.execute("delete from ${LogDb.TABLE_NAME};");
   }
 
   String get folder => _folder;
@@ -284,7 +284,7 @@ class GpLogger {
     }
   }
 
-  Future<List<GpLogItem>> getLogItems({int limit}) async {
+  List<GpLogItem> getLogItems({int limit}) {
     return _logDb.getLogItems(limit: limit);
   }
 }

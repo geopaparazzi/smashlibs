@@ -1,187 +1,4 @@
 part of smashlibs;
-/*
- * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
- * Use of this source code is governed by a GPL3 license that can be
- * found in the LICENSE file.
- */
-
-abstract class QueryObjectBuilder<T> {
-  String querySql();
-
-  String insertSql();
-
-  Map<String, dynamic> toMap(T item);
-
-  /// Extract the item from a [key, value] object.
-  T fromMap(dynamic map);
-}
-
-/// The Sqlite database used for project and datasets as mbtiles.
-class SqliteDb {
-  DB.Database _db;
-  String _dbPath;
-  bool _isClosed = false;
-
-  SqliteDb(this._dbPath);
-
-  void openOrCreate({Function dbCreateFunction}) {
-    var dbFile = File(_dbPath);
-    bool existsAlready = dbFile.existsSync();
-    _db = DB.Database.openFile(dbFile);
-    if (!existsAlready) {
-      dbCreateFunction(_db);
-    }
-  }
-
-  String get path => _dbPath;
-
-  bool isOpen() {
-    if (_db == null) return false;
-    return !_isClosed;
-  }
-
-  void close() {
-    _isClosed = true;
-    return _db?.close();
-  }
-
-  /// This should only be used when a custom function is necessary,
-  /// which forces to use the method from the moor database.
-  DB.Database getInternalDb() {
-    return _db;
-  }
-
-  /// Get a list of items defined by the [queryObj].
-  ///
-  /// Optionally a custom [whereString] piece can be passed in. This needs to start with the word where.
-  List<T> getQueryObjectsList<T>(QueryObjectBuilder<T> queryObj,
-      {whereString: ""}) {
-    String querySql = "${queryObj.querySql()} $whereString";
-
-    List<T> items = [];
-    var res = select(querySql);
-    res.forEach((row) {
-      var obj = queryObj.fromMap(row);
-      items.add(obj);
-    });
-    return items;
-  }
-
-  /// Execute a insert, update or delete using [sqlToExecute] in normal
-  /// or prepared mode using [arguments].
-  int execute(String sqlToExecute, [List<dynamic> arguments]) {
-    DB.PreparedStatement stmt;
-    try {
-      stmt = _db.prepare(sqlToExecute);
-      stmt.execute(arguments);
-
-      return _db.getUpdatedRows();
-    } finally {
-      stmt?.close();
-    }
-  }
-
-  /// The standard query method.
-  Iterable<DB.Row> select(String sql, [List<dynamic> arguments]) {
-    DB.PreparedStatement selectStmt;
-    try {
-      selectStmt = _db.prepare(sql);
-      final DB.Result result = selectStmt.select(arguments);
-      return result;
-    } finally {
-      selectStmt?.close();
-    }
-  }
-
-  /// Insert a new record using a map.
-  int insertMap(String table, Map<String, dynamic> values) {
-    List<dynamic> args = [];
-    var keys;
-    var questions;
-    values.forEach((key, value) {
-      if (keys == null) {
-        keys = key;
-        questions = "?";
-      } else {
-        keys = keys + "," + key;
-        questions = questions + ",?";
-      }
-      args.add(value);
-    });
-
-    var sql = "insert into $table ( $keys ) values ( $questions );";
-    return execute(sql, args);
-  }
-
-  /// Update a new record using a map and a where condition.
-  int updateMap(String table, Map<String, dynamic> values, String where) {
-    List<dynamic> args = [];
-    var keysVal;
-    values.forEach((key, value) {
-      if (keysVal == null) {
-        keysVal = "$key=?";
-      } else {
-        keysVal = ",$key=?";
-      }
-      args.add(value);
-    });
-
-    var sql = "update $table set $keysVal where $where;";
-    return execute(sql, args);
-  }
-
-  // void transaction(Function transactionOperations) async {
-  //   // return await _db.transaction(action, exclusive: exclusive);
-  // }
-
-  /// Get the list of table names, if necessary [doOrder].
-  List<String> getTables({bool doOrder = false}) {
-    List<String> tableNames = [];
-    String orderBy = " ORDER BY name";
-    if (!doOrder) {
-      orderBy = "";
-    }
-    String sql =
-        "SELECT name FROM sqlite_master WHERE type='table' or type='view'" +
-            orderBy;
-    var res = select(sql);
-    res.forEach((row) {
-      var name = row['name'];
-      tableNames.add(name);
-    });
-    return tableNames;
-  }
-
-  /// Check is a given [tableName] exists.
-  bool hasTable(String tableName) {
-    String sql = "SELECT name FROM sqlite_master WHERE type='table'";
-    tableName = tableName.toLowerCase();
-
-    var res = select(sql);
-    res.forEach((row) {
-      var name = row['name'];
-      if (name.toLowerCase() == tableName) {
-        return true;
-      }
-    });
-    return false;
-  }
-
-  /// Get the [tableName] columns as array of name, type and isPrimaryKey.
-  List<List<dynamic>> getTableColumns(String tableName) {
-    String sql = "PRAGMA table_info(" + tableName + ")";
-    List<List<dynamic>> columnsList = [];
-
-    var res = select(sql);
-    res.forEach((row) {
-      String colName = row['name'];
-      String colType = row['type'];
-      int isPk = row['pk'];
-      columnsList.add([colName, colType, isPk]);
-    });
-    return columnsList;
-  }
-}
 
 /// An mbtiles wrapper class to read and write mbtiles databases.
 class MBTilesDb {
@@ -235,7 +52,7 @@ class MBTilesDb {
 
   void open() {
     database = SqliteDb(databasePath);
-    database.openOrCreate(dbCreateFunction: (DB.Database db) {
+    database.open(dbCreateFunction: (var db) {
       db.execute(CREATE_TILES);
       db.execute(CREATE_METADATA);
       db.execute(INDEX_TILES);
@@ -263,25 +80,26 @@ class MBTilesDb {
   /// @throws Exception
   void fillMetadata(double n, double s, double w, double e, String name,
       String format, int minZoom, int maxZoom) {
-    // TODO do in transaction, if possible.
-    database.execute("delete from $TABLE_METADATA");
-    String query = toMetadataQuery("name", name);
-    database.execute(query);
-    query = toMetadataQuery("description", name);
-    database.execute(query);
-    query = toMetadataQuery("format", format);
-    database.execute(query);
-    query = toMetadataQuery("minZoom", minZoom.toString());
-    database.execute(query);
-    query = toMetadataQuery("maxZoom", maxZoom.toString());
-    database.execute(query);
-    query = toMetadataQuery("type", "baselayer");
-    database.execute(query);
-    query = toMetadataQuery("version", "1.1");
-    database.execute(query);
-    // left, bottom, right, top
-    query = toMetadataQuery("bounds", "$w,$s,$e,$n");
-    database.execute(query);
+    Transaction(database).runInTransaction(() {
+      database.execute("delete from $TABLE_METADATA");
+      String query = toMetadataQuery("name", name);
+      database.execute(query);
+      query = toMetadataQuery("description", name);
+      database.execute(query);
+      query = toMetadataQuery("format", format);
+      database.execute(query);
+      query = toMetadataQuery("minZoom", minZoom.toString());
+      database.execute(query);
+      query = toMetadataQuery("maxZoom", maxZoom.toString());
+      database.execute(query);
+      query = toMetadataQuery("type", "baselayer");
+      database.execute(query);
+      query = toMetadataQuery("version", "1.1");
+      database.execute(query);
+      // left, bottom, right, top
+      query = toMetadataQuery("bounds", "$w,$s,$e,$n");
+      database.execute(query);
+    });
   }
 
   String toMetadataQuery(String key, String value) {
@@ -340,7 +158,7 @@ class MBTilesDb {
       ty = tmsTileXY[1];
     }
 
-    Iterable<DB.Row> result = database.select(SELECTQUERY, [zoom, tx, ty]);
+    var result = database.select(SELECTQUERY, [zoom, tx, ty]);
     if (result.length == 1) {
       return result.first[COL_TILES_TILE_DATA];
     }
@@ -465,9 +283,7 @@ class MBTilesDb {
   }
 
   void close() {
-    if (database != null) {
-      database.close();
-    }
+    database?.close();
   }
 
   ///**
