@@ -68,7 +68,7 @@ class SmashPrj {
             try {
               return int.parse(epsgString);
             } catch (e, s) {
-              GpLogger().err("Error parsing epsg string: $epsgString", s);
+              Logger().e("Error parsing epsg string: $epsgString", s);
               return null;
             }
           }

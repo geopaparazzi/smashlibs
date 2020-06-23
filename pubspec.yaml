@@ -50,8 +50,6 @@ dependencies:
   permission_handler: ^4.4.0+hotfix.2
   # BSD
   device_info: ^0.4.2+1
-  # MIT
-  logger: ^0.8.3
 
   # BSD
   url_launcher: ^5.4.2

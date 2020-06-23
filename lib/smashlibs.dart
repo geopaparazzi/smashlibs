@@ -50,8 +50,6 @@ part 'com/hydrologis/flutterlibs/ui/progress.dart';
 part 'com/hydrologis/flutterlibs/ui/tables.dart';
 part 'com/hydrologis/flutterlibs/ui/ui.dart';
 part 'com/hydrologis/flutterlibs/utils/device.dart';
-part 'com/hydrologis/flutterlibs/utils/diagnostic.dart';
-part 'com/hydrologis/flutterlibs/utils/logging.dart';
 part 'com/hydrologis/flutterlibs/utils/permissions.dart';
 part 'com/hydrologis/flutterlibs/utils/preferences.dart';
 part 'com/hydrologis/flutterlibs/utils/projection.dart';
