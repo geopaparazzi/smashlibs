@@ -83,25 +83,26 @@ class MBTilesDb {
   /// @throws Exception
   void fillMetadata(double n, double s, double w, double e, String name,
       String format, int minZoom, int maxZoom) {
-    Transaction(database).runInTransaction(() {
-      database.execute("delete from $TABLE_METADATA");
+        
+    Transaction(database).runInTransaction((db) {
+      db.execute("delete from $TABLE_METADATA");
       String query = toMetadataQuery("name", name);
-      database.execute(query);
+      db.execute(query);
       query = toMetadataQuery("description", name);
-      database.execute(query);
+      db.execute(query);
       query = toMetadataQuery("format", format);
-      database.execute(query);
+      db.execute(query);
       query = toMetadataQuery("minZoom", minZoom.toString());
-      database.execute(query);
+      db.execute(query);
       query = toMetadataQuery("maxZoom", maxZoom.toString());
-      database.execute(query);
+      db.execute(query);
       query = toMetadataQuery("type", "baselayer");
-      database.execute(query);
+      db.execute(query);
       query = toMetadataQuery("version", "1.1");
-      database.execute(query);
+      db.execute(query);
       // left, bottom, right, top
       query = toMetadataQuery("bounds", "$w,$s,$e,$n");
-      database.execute(query);
+      db.execute(query);
     });
   }
 
