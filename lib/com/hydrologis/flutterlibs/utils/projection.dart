@@ -32,7 +32,7 @@ class SmashPrj {
         return int.parse(sridStr);
       }
     } catch (e) {
-      //GpLogger().err("Unable to parse projection ${projection.projName}", s);
+      //GpSLogger().err("Unable to parse projection ${projection.projName}", s);
       // ignore and let it be handles later
       return null;
     }
@@ -68,7 +68,7 @@ class SmashPrj {
             try {
               return int.parse(epsgString);
             } catch (e, s) {
-              Logger().e("Error parsing epsg string: $epsgString", s);
+              SLogger().e("Error parsing epsg string: $epsgString", s);
               return null;
             }
           }

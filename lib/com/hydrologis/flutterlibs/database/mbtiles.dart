@@ -52,11 +52,14 @@ class MBTilesDb {
 
   void open() {
     database = SqliteDb(databasePath);
-    database.open(dbCreateFunction: (var db) {
-      db.execute(CREATE_TILES);
-      db.execute(CREATE_METADATA);
-      db.execute(INDEX_TILES);
-      db.execute(INDEX_METADATA);
+
+    database.open(dbCreateFunction: (SqliteDb db) {
+      if (!db.hasTable(TABLE_TILES)) {
+        db.execute(CREATE_TILES);
+        db.execute(CREATE_METADATA);
+        db.execute(INDEX_TILES);
+        db.execute(INDEX_METADATA);
+      }
     });
   }
 

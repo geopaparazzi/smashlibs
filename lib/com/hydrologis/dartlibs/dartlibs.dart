@@ -9,7 +9,7 @@ part of smashlibs;
 /// A simple websocket service client class
 ///
 // abstract class HyServerSocketService {
-//   Logger log = Logger();
+//   Logger log = SLogger();
 //   bool _isConnected = false;
 
 //   WebSocket webSocket;
