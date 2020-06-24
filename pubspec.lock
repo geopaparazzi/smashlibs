@@ -81,17 +81,17 @@ packages:
   dart_hydrologis_db:
     dependency: "direct main"
     description:
-      path: "../dart_hydrologis_db"
-      relative: true
-    source: path
+      name: dart_hydrologis_db
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.1.0"
   dart_hydrologis_utils:
     dependency: "direct main"
     description:
-      path: "../dart_hydrologis_utils"
-      relative: true
-    source: path
-    version: "0.4.0"
+      name: dart_hydrologis_utils
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.1"
   dart_jts:
     dependency: "direct main"
     description:
