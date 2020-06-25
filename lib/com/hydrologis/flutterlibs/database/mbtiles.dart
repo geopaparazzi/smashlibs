@@ -83,7 +83,6 @@ class MBTilesDb {
   /// @throws Exception
   void fillMetadata(double n, double s, double w, double e, String name,
       String format, int minZoom, int maxZoom) {
-        
     Transaction(database).runInTransaction((db) {
       db.execute("delete from $TABLE_METADATA");
       String query = toMetadataQuery("name", name);
@@ -118,7 +117,7 @@ class MBTilesDb {
   /// @return the tile image bytes.
   /// @throws Exception
   void addTile(int x, int y, int z, Uint8List imageBytes) {
-    database.execute(insertTileSql, [z, x, y, imageBytes]);
+    database.execute(insertTileSql, arguments: [z, x, y, imageBytes]);
   }
 
   ///**
