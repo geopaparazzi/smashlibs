@@ -38,16 +38,16 @@ class PermissionManager {
     PermissionStatus permission = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.storage);
     if (permission != PermissionStatus.granted) {
-      SLogger().w("Storage permission is not granted.");
+      SMLogger().w("Storage permission is not granted.");
       Map<PermissionGroup, PermissionStatus> permissionsMap =
           await PermissionHandler()
               .requestPermissions([PermissionGroup.storage]);
       if (permissionsMap[PermissionGroup.storage] != PermissionStatus.granted) {
-        SLogger().w("Unable to grant permission: ${PermissionGroup.storage}");
+        SMLogger().w("Unable to grant permission: ${PermissionGroup.storage}");
         return false;
       }
     }
-    SLogger().i("Storage permission granted.");
+    SMLogger().i("Storage permission granted.");
     return true;
   }
 
@@ -55,17 +55,17 @@ class PermissionManager {
     PermissionStatus permission = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.location);
     if (permission != PermissionStatus.granted) {
-      SLogger().w("Location permission is not granted.");
+      SMLogger().w("Location permission is not granted.");
       Map<PermissionGroup, PermissionStatus> permissionsMap =
           await PermissionHandler()
               .requestPermissions([PermissionGroup.location]);
       if (permissionsMap[PermissionGroup.location] !=
           PermissionStatus.granted) {
-        SLogger().w("Unable to grant permission: ${PermissionGroup.location}");
+        SMLogger().w("Unable to grant permission: ${PermissionGroup.location}");
         return false;
       }
     }
-    SLogger().i("Location permission granted.");
+    SMLogger().i("Location permission granted.");
     return true;
   }
 }

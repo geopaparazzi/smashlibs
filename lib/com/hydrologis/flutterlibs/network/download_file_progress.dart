@@ -50,7 +50,7 @@ class DownloadCircularProgressWidgetState
 //        LayerManager().addLayer(ts);
 //      }
     } catch (e, s) {
-      SLogger().e(
+      SMLogger().e(
           "An error occurred while downloading from: ${widget._downloadUrl}",
           s);
     }
