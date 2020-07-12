@@ -1083,91 +1083,81 @@ class PicturesWidget extends StatefulWidget {
   PicturesWidgetState createState() => PicturesWidgetState();
 }
 
-class PicturesWidgetState extends State<PicturesWidget> {
+class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
   List<String> imageSplit = [];
+  List<Widget> images = [];
+  bool _loading = true;
 
-  Future<List<Widget>> getThumbnails(BuildContext context) async {
-    return await widget.formHelper
+  Future<void> getThumbnails(BuildContext context) async {
+    images = await widget.formHelper
         .getThumbnailsFromDb(context, widget._itemMap, imageSplit);
   }
 
   @override
+  void afterFirstLayout(BuildContext context) async {
+    await getThumbnails(context);
+    _loading = false;
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: getThumbnails(context),
-      builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return Center(
-                child: SmashCircularProgress(label: "Loading pictures..."));
-          default:
-            if (snapshot.hasError) {
-              return new Text(
-                'Error: ${snapshot.error}',
-                style: TextStyle(
-                    color: SmashColors.mainSelection,
-                    fontWeight: FontWeight.bold),
-              );
-            } else {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    widget._isReadOnly
-                        ? Container()
-                        : FlatButton(
-                            onPressed: () async {
-                              String value = await widget.formHelper
-                                  .takePictureForForms(
-                                      context,
-                                      widget._noteId,
-                                      widget._position,
-                                      widget.fromGallery,
-                                      imageSplit);
-                              if (value != null) {
-                                setState(() {
-                                  widget._itemMap[TAG_VALUE] = value;
-                                });
-                              }
-                            },
-                            child: Center(
-                              child: Padding(
-                                padding: SmashUI.defaultPadding(),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: SmashUI.defaultRigthPadding(),
-                                      child: Icon(
-                                        Icons.camera_alt,
-                                        color: SmashColors.mainDecorations,
-                                      ),
-                                    ),
-                                    SmashUI.normalText(
-                                        widget.fromGallery
-                                            ? "Load image"
-                                            : "Take a picture",
-                                        color: SmashColors.mainDecorations,
-                                        bold: true),
-                                  ],
+    return _loading
+        ? SmashCircularProgress(label: "Loading pictures...")
+        : Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                widget._isReadOnly
+                    ? Container()
+                    : FlatButton(
+                        onPressed: () async {
+                          String value = await widget.formHelper
+                              .takePictureForForms(
+                                  context,
+                                  widget._noteId,
+                                  widget._position,
+                                  widget.fromGallery,
+                                  imageSplit);
+                          if (value != null) {
+                            setState(() {
+                              widget._itemMap[TAG_VALUE] = value;
+                            });
+                          }
+                        },
+                        child: Center(
+                          child: Padding(
+                            padding: SmashUI.defaultPadding(),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Padding(
+                                  padding: SmashUI.defaultRigthPadding(),
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    color: SmashColors.mainDecorations,
+                                  ),
                                 ),
-                              ),
-                            )),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: snapshot.data != null ? snapshot.data : [],
-                      ),
-                    ),
-                  ],
+                                SmashUI.normalText(
+                                    widget.fromGallery
+                                        ? "Load image"
+                                        : "Take a picture",
+                                    color: SmashColors.mainDecorations,
+                                    bold: true),
+                              ],
+                            ),
+                          ),
+                        )),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: images,
+                  ),
                 ),
-              );
-            }
-        }
-      },
-    );
+              ],
+            ),
+          );
   }
 }
