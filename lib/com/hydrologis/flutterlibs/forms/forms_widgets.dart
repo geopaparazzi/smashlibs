@@ -1120,6 +1120,7 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
                                   widget.fromGallery,
                                   imageSplit);
                           if (value != null) {
+                            await getThumbnails(context);
                             setState(() {
                               widget._itemMap[TAG_VALUE] = value;
                             });
