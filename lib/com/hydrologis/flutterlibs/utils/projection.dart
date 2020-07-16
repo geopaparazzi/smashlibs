@@ -97,14 +97,14 @@ class SmashPrj {
       Projection from, Projection to, JTS.Geometry geom) {
     GeometryReprojectionFilter filter = GeometryReprojectionFilter(from, to);
     geom.applyCF(filter);
-    geom.geometryChangedAction();
+    geom.geometryChanged();
   }
 
   static void transformGeometryToWgs84(Projection from, JTS.Geometry geom) {
     GeometryReprojectionFilter filter =
         GeometryReprojectionFilter(EPSG4326, null);
     geom.applyCF(filter);
-    geom.geometryChangedAction();
+    geom.geometryChanged();
   }
 
   /// Reproject a list of [JTS.Geometries] to epsg:4326.
@@ -115,7 +115,7 @@ class SmashPrj {
     GeometryReprojectionFilter filter = GeometryReprojectionFilter(from, null);
     for (JTS.Geometry geom in geometries) {
       geom.applyCF(filter);
-      geom.geometryChangedAction();
+      geom.geometryChanged();
     }
   }
 
