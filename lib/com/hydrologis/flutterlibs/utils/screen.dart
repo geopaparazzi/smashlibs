@@ -5,8 +5,34 @@ part of smashlibs;
  * found in the LICENSE file.
  */
 
+/// The screentypes by name/size.
+///
+/// Taken from Bootstrap docs.
+enum ScreenType {
+  XS_MOBILE_PORTRAIT,
+  SM_MOBILE_LANDSCAPE,
+  MD_TABLET_PORTRAIT,
+  LG_TABLET_LANDSCAPE,
+  XL_MONITOR,
+}
+
 /// Class to handle screen issues, like size and orientation
 class ScreenUtilities {
+  ScreenType getScreenType(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    if (width < 567) {
+      return ScreenType.XS_MOBILE_PORTRAIT;
+    } else if (width < 768) {
+      return ScreenType.SM_MOBILE_LANDSCAPE;
+    } else if (width < 992) {
+      return ScreenType.MD_TABLET_PORTRAIT;
+    } else if (width < 1200) {
+      return ScreenType.LG_TABLET_LANDSCAPE;
+    } else {
+      return ScreenType.XL_MONITOR;
+    }
+  }
+
   /// Check if the screen is in large width mode, i.e. tablet or phone landscape
   static bool isLargeScreen(BuildContext context) {
     return MediaQuery.of(context).size.width > 600;
