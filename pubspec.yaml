@@ -22,7 +22,8 @@ dependencies:
   #    git:
   #      url: https://github.com/moovida/dart_jts.git
 
-  dart_hydrologis_utils: ^0.4.1
+  dart_hydrologis_utils:
+    ^0.5.0
     # path: ../dart_hydrologis_utils/
 
   ####################
@@ -31,7 +32,7 @@ dependencies:
   # BSD
   charset_converter: ^1.0.3
   # MIT
-  material_design_icons_flutter: ^4.0.5145
+  material_design_icons_flutter: ^4.0.5345
   # MIT
   share_extend: ^1.1.2
   # BSD
@@ -45,8 +46,7 @@ dependencies:
   # MIT
   permission_handler: ^4.4.0+hotfix.2
   # BSD
-  device_info:
-    ^0.4.2+1
+  device_info: ^0.4.2+1
   # MIT
   after_layout: ^1.0.7+2
 
