@@ -930,7 +930,7 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
     DateTime dateTime;
     if (value.isNotEmpty) {
       try {
-        dateTime = TimeUtilities.ISO8601_TS_DAY_FORMATTER.parse(value);
+        dateTime = HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.parse(value);
       } catch (e) {
         // ignor eand set to now
       }
@@ -949,7 +949,7 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
                 onChanged: (date) {},
                 onConfirm: (date) {
                   String day =
-                      TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(date);
+                      HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(date);
                   setState(() {
                     widget._itemMap[TAG_VALUE] = day;
                   });
@@ -1011,7 +1011,7 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
     DateTime dateTime;
     if (value.isNotEmpty) {
       try {
-        dateTime = TimeUtilities.ISO8601_TS_TIME_FORMATTER.parse(value);
+        dateTime = HU.TimeUtilities.ISO8601_TS_TIME_FORMATTER.parse(value);
       } catch (e) {
         // ignore and set to now
       }
@@ -1030,7 +1030,7 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
                 onChanged: (date) {},
                 onConfirm: (date) {
                   String time =
-                      TimeUtilities.ISO8601_TS_TIME_FORMATTER.format(date);
+                      HU.TimeUtilities.ISO8601_TS_TIME_FORMATTER.format(date);
                   setState(() {
                     widget._itemMap[TAG_VALUE] = time;
                   });

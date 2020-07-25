@@ -113,7 +113,7 @@ class FileBrowserState extends State<FileBrowser> {
       currentPath = widget._startFolder;
     }
 
-    List<List<dynamic>> files = FileUtilities.listFiles(currentPath,
+    List<List<dynamic>> files = HU.FileUtilities.listFiles(currentPath,
         doOnlyFolder: widget._doFolderMode,
         allowedExtensions: widget._allowedExtensions);
     return files;
@@ -132,7 +132,7 @@ class FileBrowserState extends State<FileBrowser> {
               context, "The top level folder has already been reached.");
         } else {
           setState(() {
-            currentPath = FileUtilities.parentFolderFromFile(currentPath);
+            currentPath = HU.FileUtilities.parentFolderFromFile(currentPath);
           });
         }
       },
@@ -175,7 +175,7 @@ class FileBrowserState extends State<FileBrowser> {
                   }
                   String name = pathName[1];
                   bool isDir = pathName[2];
-                  var fullPath = FileUtilities.joinPaths(parentPath, name);
+                  var fullPath = HU.FileUtilities.joinPaths(parentPath, name);
 
                   IconData iconData = SmashIcons.forPath(fullPath);
                   Widget trailingWidget;
@@ -192,7 +192,7 @@ class FileBrowserState extends State<FileBrowser> {
                             onPressed: () async {
                               await Workspace.setLastUsedFolder(parentPath);
                               var resultPath =
-                                  FileUtilities.joinPaths(parentPath, name);
+                                  HU.FileUtilities.joinPaths(parentPath, name);
                               Navigator.pop(context, resultPath);
                             },
                           ),
@@ -201,8 +201,8 @@ class FileBrowserState extends State<FileBrowser> {
                             tooltip: "Enter folder",
                             onPressed: () {
                               setState(() {
-                                currentPath =
-                                    FileUtilities.joinPaths(parentPath, name);
+                                currentPath = HU.FileUtilities.joinPaths(
+                                    parentPath, name);
                               });
                             },
                           )
@@ -215,7 +215,7 @@ class FileBrowserState extends State<FileBrowser> {
                         onPressed: () {
                           setState(() {
                             currentPath =
-                                FileUtilities.joinPaths(parentPath, name);
+                                HU.FileUtilities.joinPaths(parentPath, name);
                           });
                         },
                       );
@@ -229,7 +229,7 @@ class FileBrowserState extends State<FileBrowser> {
                       onPressed: () async {
                         await Workspace.setLastUsedFolder(parentPath);
                         var resultPath =
-                            FileUtilities.joinPaths(parentPath, name);
+                            HU.FileUtilities.joinPaths(parentPath, name);
                         Navigator.pop(context, resultPath);
                       },
                     );

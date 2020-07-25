@@ -92,21 +92,21 @@ class SmashIcons {
   }
 
   static IconData forSldWkName(String wkName) {
-    if (StringUtilities.equalsIgnoreCase(wkName, "circle")) {
+    if (HU.StringUtilities.equalsIgnoreCase(wkName, "circle")) {
       return MdiIcons.circle;
-    } else if (StringUtilities.equalsIgnoreCase(wkName, "cross")) {
+    } else if (HU.StringUtilities.equalsIgnoreCase(wkName, "cross")) {
       return MdiIcons.plus;
-    } else if (StringUtilities.equalsIgnoreCase(wkName, "triangle")) {
+    } else if (HU.StringUtilities.equalsIgnoreCase(wkName, "triangle")) {
       return MdiIcons.triangle;
-    } else if (StringUtilities.equalsIgnoreCase(wkName, "star")) {
+    } else if (HU.StringUtilities.equalsIgnoreCase(wkName, "star")) {
       return MdiIcons.star;
-    } else if (StringUtilities.equalsIgnoreCase(wkName, "arrow")) {
+    } else if (HU.StringUtilities.equalsIgnoreCase(wkName, "arrow")) {
       return MdiIcons.arrowUp;
-    } else if (StringUtilities.equalsIgnoreCase(wkName, "X")) {
+    } else if (HU.StringUtilities.equalsIgnoreCase(wkName, "X")) {
       return MdiIcons.alphaX;
-    } else if (StringUtilities.equalsIgnoreCase(wkName, "hatch")) {
+    } else if (HU.StringUtilities.equalsIgnoreCase(wkName, "hatch")) {
       return MdiIcons.slashForward;
-    } else if (StringUtilities.equalsIgnoreCase(wkName, "square")) {
+    } else if (HU.StringUtilities.equalsIgnoreCase(wkName, "square")) {
       return MdiIcons.square;
     } else {
       return MdiIcons.square;

@@ -33,7 +33,7 @@ class Workspace {
   /// Make a [relativePath] absolute using to the current rootfolder.
   static String makeAbsolute(String relativePath) {
     if (relativePath.startsWith(_rootFolder)) return relativePath;
-    var absolutePath = FileUtilities.joinPaths(_rootFolder, relativePath);
+    var absolutePath = HU.FileUtilities.joinPaths(_rootFolder, relativePath);
     return absolutePath;
   }
 
@@ -72,7 +72,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getApplicationFolder() async {
     var rootFolder = await getRootFolder();
-    var applicationFolderPath = FileUtilities.joinPaths(rootFolder.path, APP_NAME);
+    var applicationFolderPath =
+        HU.FileUtilities.joinPaths(rootFolder.path, APP_NAME);
     Directory configFolder = Directory(applicationFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
@@ -85,7 +86,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getProjectsFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var projectsFolderPath = FileUtilities.joinPaths(applicationFolder.path, PROJECTS_FOLDER);
+    var projectsFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, PROJECTS_FOLDER);
     Directory configFolder = Directory(projectsFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
@@ -98,7 +100,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getConfigFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var configFolderPath = FileUtilities.joinPaths(applicationFolder.path, CONFIG_FOLDER);
+    var configFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, CONFIG_FOLDER);
     Directory configFolder = Directory(configFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
@@ -111,7 +114,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getFormsFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var formsFolderPath = FileUtilities.joinPaths(applicationFolder.path, FORMS_FOLDER);
+    var formsFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, FORMS_FOLDER);
     Directory formsFolder = Directory(formsFolderPath);
     if (!formsFolder.existsSync()) {
       formsFolder.createSync();
@@ -124,7 +128,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getMapsFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var mapsFolderPath = FileUtilities.joinPaths(applicationFolder.path, MAPS_FOLDER);
+    var mapsFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, MAPS_FOLDER);
     Directory mapsFolder = Directory(mapsFolderPath);
     if (!mapsFolder.existsSync()) {
       mapsFolder.createSync();
@@ -137,7 +142,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getExportsFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var mapsFolderPath = FileUtilities.joinPaths(applicationFolder.path, EXPORT_FOLDER);
+    var mapsFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, EXPORT_FOLDER);
     Directory mapsFolder = Directory(mapsFolderPath);
     if (!mapsFolder.existsSync()) {
       mapsFolder.createSync();
@@ -163,7 +169,8 @@ class Workspace {
     }
   }
 
-  static List<String> _getAndroidInternalStorage(List<StorageInfo> storageInfo) {
+  static List<String> _getAndroidInternalStorage(
+      List<StorageInfo> storageInfo) {
     String rootDir;
     String appFilesDir;
     if (storageInfo.isNotEmpty) {
@@ -188,7 +195,7 @@ class Workspace {
       lastFolder = rootPath;
     } else {
       // add the root folder
-      lastFolder = FileUtilities.joinPaths(rootPath, lastFolder);
+      lastFolder = HU.FileUtilities.joinPaths(rootPath, lastFolder);
     }
     return lastFolder;
   }

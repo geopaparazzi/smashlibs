@@ -131,7 +131,7 @@ abstract class AFormhelper {
   /// The form map [itemMap] is searched for image ids
   /// and the ids also need to be placed in [imageSplit]
   /// in case of further use.
-  /// 
+  ///
   /// This should return an empty widgets list if it is not supported.
   Future<List<Widget>> getThumbnailsFromDb(
       BuildContext context, var itemMap, List<String> imageSplit);
@@ -533,7 +533,7 @@ class FormUtilities {
           List<String> imageSplit = value.split(";");
           for (int i = 0; i < imageSplit.length; i++) {
             String image = imageSplit[i];
-            String imgName = FileUtilities.nameFromFile(image, true);
+            String imgName = HU.FileUtilities.nameFromFile(image, true);
             sB.writeln("$label: $imgName");
           }
         } else {
@@ -705,17 +705,17 @@ class TagsManager {
       _tagsFileArray.add(tagsFilePath);
     } else {
       Directory formsFolder = await Workspace.getFormsFolder();
-      List<String> fileNames = FileUtilities.getFilesInPathByExt(
+      List<String> fileNames = HU.FileUtilities.getFilesInPathByExt(
           formsFolder.path, TAGSFILENAME_ENDPATTERN);
       _tagsFileArray = fileNames
-          .map((fn) => FileUtilities.joinPaths(formsFolder.path, fn))
+          .map((fn) => HU.FileUtilities.joinPaths(formsFolder.path, fn))
           .toList();
       if (_tagsFileArray == null || _tagsFileArray.isEmpty) {
         String tagsFile =
-            FileUtilities.joinPaths(formsFolder.path, "tags.json");
+            HU.FileUtilities.joinPaths(formsFolder.path, "tags.json");
         if (!File(tagsFile).existsSync()) {
           var tagsString = await rootBundle.loadString("assets/tags.json");
-          FileUtilities.writeStringToFile(tagsFile, tagsString);
+          HU.FileUtilities.writeStringToFile(tagsFile, tagsString);
         }
         _tagsFileArray = [tagsFile];
       }
@@ -724,7 +724,7 @@ class TagsManager {
     for (int j = 0; j < _tagsFileArray.length; j++) {
       String tagsFile = _tagsFileArray[j];
       if (!File(tagsFile).existsSync()) continue;
-      String tagsFileString = FileUtilities.readFile(tagsFile);
+      String tagsFileString = HU.FileUtilities.readFile(tagsFile);
       _tagsFileArrayStrings.add(tagsFileString);
     }
   }

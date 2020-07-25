@@ -8,7 +8,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:after_layout/after_layout.dart';
-import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
+import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart' as HU;
 import 'package:dart_jts/dart_jts.dart' as JTS;
 import 'package:device_info/device_info.dart';
 import 'package:dio/adapter.dart';

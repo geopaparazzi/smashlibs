@@ -12,13 +12,11 @@ class ShareHandler {
 
   static Future<void> shareImage(String text, var imageData) async {
     Directory cacheFolder = await Workspace.getCacheFolder();
-    var outPath = FileUtilities.joinPaths(cacheFolder.path,
-        "smash_tmp_share_${TimeUtilities.DATE_TS_FORMATTER}.jpg");
+    var outPath = HU.FileUtilities.joinPaths(cacheFolder.path,
+        "smash_tmp_share_${HU.TimeUtilities.DATE_TS_FORMATTER}.jpg");
 
-    FileUtilities.writeBytesToFile(outPath, imageData);
+    HU.FileUtilities.writeBytesToFile(outPath, imageData);
 
     await ShareExtend.share(outPath, "image");
   }
-
-
 }

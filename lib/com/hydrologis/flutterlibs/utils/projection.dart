@@ -122,7 +122,7 @@ class SmashPrj {
   static Projection fromFile(String prjFilePath) {
     var prjFile = File(prjFilePath);
     if (prjFile.existsSync()) {
-      var wktPrj = FileUtilities.readFile(prjFilePath);
+      var wktPrj = HU.FileUtilities.readFile(prjFilePath);
       return fromWkt(wktPrj);
     }
     return null;
@@ -134,9 +134,9 @@ class SmashPrj {
   }
 
   static String getPrjForImage(String imageFilePath) {
-    String folder = FileUtilities.parentFolderFromFile(imageFilePath);
-    var name = FileUtilities.nameFromFile(imageFilePath, false);
-    var prjPath = FileUtilities.joinPaths(folder, name + ".prj");
+    String folder = HU.FileUtilities.parentFolderFromFile(imageFilePath);
+    var name = HU.FileUtilities.nameFromFile(imageFilePath, false);
+    var prjPath = HU.FileUtilities.joinPaths(folder, name + ".prj");
     return prjPath;
   }
 }

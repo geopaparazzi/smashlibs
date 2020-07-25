@@ -77,7 +77,7 @@ class FileDownloadListTileProgressWidgetState
   Widget build(BuildContext context) {
     var name = widget._name;
     if (name == null) {
-      name = FileUtilities.nameFromFile(widget._destinationFilePath, true);
+      name = HU.FileUtilities.nameFromFile(widget._destinationFilePath, true);
     }
     if (!_downloading && !_downloadFinished) {
       _progressString = widget._downloadUrl;
