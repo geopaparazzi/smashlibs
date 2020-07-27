@@ -1031,7 +1031,7 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
                   var minute = value.minute;
                   String day = HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER
                       .format(DateTime.now());
-                  var iso = "$day $hour:$minute:00";
+                  var iso = "$hour:$minute:00";
                   setState(() {
                     widget._itemMap[TAG_VALUE] = iso;
                   });

@@ -191,6 +191,12 @@ class SmashUI {
     );
   }
 
+  static BoxDecoration defaultRoundedBorderDeco() {
+    return BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        border: Border.all(color: SmashColors.mainDecorations, width: 5));
+  }
+
   static getTransparentIcon() {
     return Icon(Icons.clear, color: Colors.white.withAlpha(0));
   }

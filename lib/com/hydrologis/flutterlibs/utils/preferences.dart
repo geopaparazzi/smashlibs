@@ -72,6 +72,14 @@ class CameraResolutions {
   static const LOW = "low";
 }
 
+const KEY_COLORPICKER_TYPE = 'KEY_COLORPICKER_TYPE';
+
+class ColorPickers {
+  static const COLOR_PICKER = "Color picker";
+  static const PALETTE_PICKER = "Palette picker";
+  static const SWATCH_PICKER = "Swatch picker";
+}
+
 /// Geopaparazzi Preferences singleton.
 class GpPreferences {
   static final GpPreferences _instance = GpPreferences._internal();

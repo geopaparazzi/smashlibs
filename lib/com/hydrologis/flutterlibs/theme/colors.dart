@@ -236,3 +236,77 @@ class ColorExt extends Color {
     return hex;
   }
 }
+
+/// A button that opens a colorpicker dialog.
+///
+/// On confirm, the selected color is passed to the [colorChangedFunction(color)] function.
+class ColorPickerButton extends StatefulWidget {
+  final Color initialColor;
+  final Function colorChangedFunction;
+
+  ColorPickerButton(this.initialColor, this.colorChangedFunction);
+
+  @override
+  _ColorPickerButtonState createState() => _ColorPickerButtonState();
+}
+
+class _ColorPickerButtonState extends State<ColorPickerButton> {
+  Color color;
+  @override
+  void initState() {
+    color = widget.initialColor;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: FlatButton(
+        shape: SmashUI.defaultShapeBorder(),
+        onPressed: () {
+          var picker = GpPreferences()
+              .getStringSync(KEY_COLORPICKER_TYPE, ColorPickers.SWATCH_PICKER);
+          if (picker == ColorPickers.COLOR_PICKER) {
+            showMaterialColorPicker(
+              context: context,
+              selectedColor: color,
+              onChanged: (value) {
+                color = value;
+              },
+              onConfirmed: () {
+                widget.colorChangedFunction(color);
+                setState(() {});
+              },
+            );
+          } else if (picker == ColorPickers.PALETTE_PICKER) {
+            showMaterialPalettePicker(
+              context: context,
+              selectedColor: color,
+              onChanged: (value) {
+                color = value;
+              },
+              onConfirmed: () {
+                widget.colorChangedFunction(color);
+                setState(() {});
+              },
+            );
+          } else {
+            showMaterialSwatchPicker(
+              context: context,
+              selectedColor: color,
+              onChanged: (value) {
+                color = value;
+              },
+              onConfirmed: () {
+                widget.colorChangedFunction(color);
+                setState(() {});
+              },
+            );
+          }
+        },
+        color: color,
+        child: Container(),
+      ),
+    );
+  }
+}
