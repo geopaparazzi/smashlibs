@@ -57,9 +57,7 @@ dependencies:
   flutter_tags: ^0.4.8
 
   # MIT
-  flutter_datetime_picker: #^1.3.8
-    git:
-      url: https://github.com/moovida/flutter_datetime_picker.git
+  flutter_material_pickers: ^1.7.1
 
   # BSD
   shared_preferences: ^0.5.6+3

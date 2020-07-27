@@ -943,18 +943,16 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
       child: FlatButton(
           onPressed: () {
             if (!widget._isReadOnly) {
-              DatePicker.showDatePicker(
-                context,
-                showTitleActions: true,
-                onChanged: (date) {},
-                onConfirm: (date) {
+              showMaterialDatePicker(
+                context: context,
+                selectedDate: dateTime,
+                onChanged: (value) {
                   String day =
-                      HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(date);
+                      HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(value);
                   setState(() {
                     widget._itemMap[TAG_VALUE] = day;
                   });
                 },
-                currentTime: dateTime,
               );
             }
           },
@@ -1019,23 +1017,25 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
     if (dateTime == null) {
       dateTime = DateTime.now();
     }
+    var timeOfDay = TimeOfDay.fromDateTime(dateTime);
 
     return Center(
       child: FlatButton(
           onPressed: () {
             if (!widget._isReadOnly) {
-              DatePicker.showTimePicker(
-                context,
-                showTitleActions: true,
-                onChanged: (date) {},
-                onConfirm: (date) {
-                  String time =
-                      HU.TimeUtilities.ISO8601_TS_TIME_FORMATTER.format(date);
+              showMaterialTimePicker(
+                context: context,
+                selectedTime: timeOfDay,
+                onChanged: (value) {
+                  var hour = value.hour;
+                  var minute = value.minute;
+                  String day = HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER
+                      .format(DateTime.now());
+                  var iso = "$day $hour:$minute:00";
                   setState(() {
-                    widget._itemMap[TAG_VALUE] = time;
+                    widget._itemMap[TAG_VALUE] = iso;
                   });
                 },
-                currentTime: dateTime,
               );
             }
           },
