@@ -55,6 +55,8 @@ class SmashIcons {
   static IconData upload = MdiIcons.upload;
   static IconData download = MdiIcons.download;
 
+  static IconData menuRightArrow = MdiIcons.menuRight;
+
   static IconData locationIcon = MdiIcons.crosshairsGps;
 
   static IconData finishedOk = MdiIcons.checkBold;

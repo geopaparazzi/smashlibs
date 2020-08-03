@@ -18,12 +18,12 @@ dependencies:
   #################
 
   #BSD
-  dart_jts: ^0.0.5+4
+  dart_jts: ^0.0.5+6
   #    git:
   #      url: https://github.com/moovida/dart_jts.git
 
   dart_hydrologis_utils:
-    ^0.5.0
+    ^0.5.2
     # path: ../dart_hydrologis_utils/
 
   ####################

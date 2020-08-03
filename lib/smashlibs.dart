@@ -46,6 +46,7 @@ part 'com/hydrologis/flutterlibs/theme/theme.dart';
 part 'com/hydrologis/flutterlibs/ui/dialogs.dart';
 part 'com/hydrologis/flutterlibs/ui/progress.dart';
 part 'com/hydrologis/flutterlibs/ui/tables.dart';
+part 'com/hydrologis/flutterlibs/ui/sld.dart';
 part 'com/hydrologis/flutterlibs/ui/ui.dart';
 part 'com/hydrologis/flutterlibs/utils/device.dart';
 part 'com/hydrologis/flutterlibs/utils/permissions.dart';

@@ -28,6 +28,9 @@ class SmashUI {
   static const double MEDIUM_ICON_SIZE = 36;
   static const double LARGE_ICON_SIZE = 48;
 
+  static const double MAX_FONT_SIZE = 100;
+  static const double MIN_FONT_SIZE = 5;
+
   /// Create a text widget with size and color for normal text in pages.
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).

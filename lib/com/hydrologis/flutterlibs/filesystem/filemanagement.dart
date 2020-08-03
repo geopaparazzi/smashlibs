@@ -197,7 +197,7 @@ class FileBrowserState extends State<FileBrowser> {
                             },
                           ),
                           IconButton(
-                            icon: Icon(Icons.arrow_right),
+                            icon: Icon(SmashIcons.menuRightArrow),
                             tooltip: "Enter folder",
                             onPressed: () {
                               setState(() {
