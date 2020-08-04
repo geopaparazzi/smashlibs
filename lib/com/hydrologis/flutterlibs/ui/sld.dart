@@ -256,115 +256,9 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
   Widget build(BuildContext context) {
     List<Widget> widgets = [];
     if (rule != null) {
-      if (doLabels && alphaFields != null && alphaFields.isNotEmpty) {
-        if (rule.textSymbolizers.isEmpty) {
-          //  create a default to present and set the label to empty
-          rule.addTextStyle(HU.TextStyle());
-        }
-
-        // DO LABELS
-        HU.TextStyle textStyle = rule.textSymbolizers[0].style;
-        Color textColor = ColorExt(textStyle.textColor);
-        double textSize = textStyle.size;
-        String textLabel = textStyle.labelName;
-
-        List<DropdownMenuItem<String>> alphaItems = alphaFields
-            .map((e) => DropdownMenuItem<String>(
-                value: e, child: SmashUI.normalText(e)))
-            .toList();
-
-        widgets.add(
-          Padding(
-            padding: SmashUI.defaultPadding(),
-            child: Card(
-              elevation: SmashUI.DEFAULT_ELEVATION,
-              shape: SmashUI.defaultShapeBorder(),
-              child: Padding(
-                padding: SmashUI.defaultPadding(),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SmashUI.titleText("Labelling"),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: SmashUI.normalText("Label"),
-                        ),
-                        Flexible(
-                            flex: 1,
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: SmashUI.DEFAULT_PADDING,
-                                  right: SmashUI.DEFAULT_PADDING),
-                              child: DropdownButton<String>(
-                                  items: alphaItems,
-                                  value: textLabel,
-                                  onChanged: (newLabel) {
-                                    setState(() {
-                                      textStyle.labelName = newLabel;
-                                    });
-                                  }),
-                            )),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: SmashUI.normalText("Size"),
-                        ),
-                        Flexible(
-                            flex: 1,
-                            child: Slider(
-                              activeColor: SmashColors.mainSelection,
-                              min: SmashUI.MIN_FONT_SIZE,
-                              max: SmashUI.MAX_FONT_SIZE,
-                              divisions: 19,
-                              onChanged: (newSize) {
-                                setState(() {
-                                  textStyle.size = newSize;
-                                });
-                              },
-                              value: textSize,
-                            )),
-                        Container(
-                          width: 50.0,
-                          alignment: Alignment.center,
-                          child: SmashUI.normalText(
-                            '${textStyle.size.toInt()}',
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: SmashUI.normalText("Color"),
-                        ),
-                        Flexible(
-                            flex: 1,
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: SmashUI.DEFAULT_PADDING,
-                                  right: SmashUI.DEFAULT_PADDING),
-                              child: ColorPickerButton(textColor, (newColor) {
-                                textStyle.textColor = ColorExt.asHex(newColor);
-                              }),
-                            )),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
+      doLabelSection(widgets);
+      doShapeSection(widgets);
+      doStrokeSection(widgets);
     }
 
     return Padding(
@@ -375,5 +269,337 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
         ),
       ),
     );
+  }
+
+  void doStrokeSection(List<Widget> widgets) {
+    if (doStroke) {
+      dynamic strokeStyle;
+      if (geometryType.isPoint()) {
+        if (rule.pointSymbolizers.isEmpty) {
+          strokeStyle = HU.PointStyle();
+          rule.addPointStyle(strokeStyle);
+        } else {
+          strokeStyle = rule.pointSymbolizers.first.style;
+        }
+      } else if (geometryType.isLine()) {
+        strokeStyle = HU.LineStyle();
+        if (rule.lineSymbolizers.isEmpty) {
+          rule.addLineStyle(strokeStyle);
+        } else {
+          strokeStyle = rule.lineSymbolizers.first.style;
+        }
+      } else if (geometryType.isPolygon()) {
+        strokeStyle = HU.PolygonStyle();
+        if (rule.polygonSymbolizers.isEmpty) {
+          rule.addPolygonStyle(strokeStyle);
+        } else {
+          strokeStyle = rule.polygonSymbolizers.first.style;
+        }
+      }
+      String strokeColorHex = strokeStyle.strokeColorHex;
+      double strokeWidth = strokeStyle.strokeWidth;
+      double strokeOpacity = strokeStyle.strokeOpacity;
+
+      widgets.add(
+        Padding(
+          padding: SmashUI.defaultPadding(),
+          child: Card(
+            elevation: SmashUI.DEFAULT_ELEVATION,
+            shape: SmashUI.defaultShapeBorder(),
+            child: Padding(
+              padding: SmashUI.defaultPadding(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SmashUI.titleText("Stroke Properties"),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Width"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Slider(
+                            activeColor: SmashColors.mainSelection,
+                            min: SmashUI.MIN_STROKE_SIZE,
+                            max: SmashUI.MAX_STROKE_SIZE,
+                            divisions: 19,
+                            onChanged: (newWidth) {
+                              setState(() {
+                                strokeStyle.strokeWidth = newWidth;
+                              });
+                            },
+                            value: strokeWidth,
+                          )),
+                      Container(
+                        width: 50.0,
+                        alignment: Alignment.center,
+                        child: SmashUI.normalText(
+                          '${strokeWidth.toInt()}',
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Opacity"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Slider(
+                            activeColor: SmashColors.mainSelection,
+                            min: 0,
+                            max: 100,
+                            divisions: 10,
+                            onChanged: (newAlpha) {
+                              setState(() {
+                                strokeStyle.strokeOpacity = newAlpha / 100;
+                              });
+                            },
+                            value: strokeOpacity * 100,
+                          )),
+                      Container(
+                        width: 50.0,
+                        alignment: Alignment.center,
+                        child: SmashUI.normalText(
+                          '${(strokeOpacity * 100).toInt()}',
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Color"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: SmashUI.DEFAULT_PADDING,
+                                right: SmashUI.DEFAULT_PADDING),
+                            child: ColorPickerButton(ColorExt(strokeColorHex),
+                                (newColor) {
+                              strokeStyle.strokeColorHex =
+                                  ColorExt.asHex(newColor);
+                            }),
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  void doShapeSection(List<Widget> widgets) {
+    if (doShape && geometryType.isPoint()) {
+      if (rule.pointSymbolizers.isEmpty) {
+        //  create a default to present
+        rule.addPointStyle(HU.PointStyle());
+      }
+      var style = rule.pointSymbolizers.first.style;
+      var wktName = style.markerName ??= HU.WktMarkers.CIRCLE.name;
+      var shapeSize = style.markerSize;
+
+      List<DropdownMenuItem<String>> shapeItems = HU.WktMarkers.values
+          .map((e) => DropdownMenuItem<String>(
+              value: e.name, child: SmashUI.normalText(e.name)))
+          .toList();
+      widgets.add(
+        Padding(
+          padding: SmashUI.defaultPadding(),
+          child: Card(
+            elevation: SmashUI.DEFAULT_ELEVATION,
+            shape: SmashUI.defaultShapeBorder(),
+            child: Padding(
+              padding: SmashUI.defaultPadding(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SmashUI.titleText("Shape Properties"),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Shape"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: SmashUI.DEFAULT_PADDING,
+                                right: SmashUI.DEFAULT_PADDING),
+                            child: DropdownButton<String>(
+                                items: shapeItems,
+                                value: wktName,
+                                onChanged: (newLabel) {
+                                  setState(() {
+                                    style.markerName = newLabel;
+                                  });
+                                }),
+                          )),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Size"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Slider(
+                            activeColor: SmashColors.mainSelection,
+                            min: SmashUI.MIN_MARKER_SIZE,
+                            max: SmashUI.MAX_MARKER_SIZE,
+                            divisions: 19,
+                            onChanged: (newSize) {
+                              setState(() {
+                                style.markerSize = newSize;
+                              });
+                            },
+                            value: shapeSize,
+                          )),
+                      Container(
+                        width: 50.0,
+                        alignment: Alignment.center,
+                        child: SmashUI.normalText(
+                          '${shapeSize.toInt()}',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  void doLabelSection(List<Widget> widgets) {
+    if (doLabels && alphaFields != null && alphaFields.isNotEmpty) {
+      if (rule.textSymbolizers.isEmpty) {
+        //  create a default to present and set the label to empty
+        rule.addTextStyle(HU.TextStyle());
+      }
+
+      // DO LABELS
+      HU.TextStyle textStyle = rule.textSymbolizers[0].style;
+      Color textColor = ColorExt(textStyle.textColor);
+      double textSize = textStyle.size;
+      String textLabel = textStyle.labelName;
+
+      List<DropdownMenuItem<String>> alphaItems = alphaFields
+          .map((e) =>
+              DropdownMenuItem<String>(value: e, child: SmashUI.normalText(e)))
+          .toList();
+
+      widgets.add(
+        Padding(
+          padding: SmashUI.defaultPadding(),
+          child: Card(
+            elevation: SmashUI.DEFAULT_ELEVATION,
+            shape: SmashUI.defaultShapeBorder(),
+            child: Padding(
+              padding: SmashUI.defaultPadding(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SmashUI.titleText("Labelling"),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Label"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: SmashUI.DEFAULT_PADDING,
+                                right: SmashUI.DEFAULT_PADDING),
+                            child: DropdownButton<String>(
+                                items: alphaItems,
+                                value: textLabel,
+                                onChanged: (newLabel) {
+                                  setState(() {
+                                    textStyle.labelName = newLabel;
+                                  });
+                                }),
+                          )),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Size"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Slider(
+                            activeColor: SmashColors.mainSelection,
+                            min: SmashUI.MIN_FONT_SIZE,
+                            max: SmashUI.MAX_FONT_SIZE,
+                            divisions: 19,
+                            onChanged: (newSize) {
+                              setState(() {
+                                textStyle.size = newSize;
+                              });
+                            },
+                            value: textSize,
+                          )),
+                      Container(
+                        width: 50.0,
+                        alignment: Alignment.center,
+                        child: SmashUI.normalText(
+                          '${textStyle.size.toInt()}',
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Color"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: SmashUI.DEFAULT_PADDING,
+                                right: SmashUI.DEFAULT_PADDING),
+                            child: ColorPickerButton(textColor, (newColor) {
+                              textStyle.textColor = ColorExt.asHex(newColor);
+                            }),
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

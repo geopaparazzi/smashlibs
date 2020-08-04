@@ -31,6 +31,12 @@ class SmashUI {
   static const double MAX_FONT_SIZE = 100;
   static const double MIN_FONT_SIZE = 5;
 
+  static const double MAX_STROKE_SIZE = 20;
+  static const double MIN_STROKE_SIZE = 1;
+
+  static const double MAX_MARKER_SIZE = 100;
+  static const double MIN_MARKER_SIZE = 5;
+
   /// Create a text widget with size and color for normal text in pages.
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).
