@@ -104,12 +104,17 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
                 showMaterialScrollPicker(
                   context: context,
                   title: "Select the Featuretype Style",
-                  items: featureTypeStyles.map((e) => e.name).toList(),
+                  items: featureTypeStyles
+                      .map((e) => "${e.index}) ${e.name}")
+                      .toList(),
                   selectedItem: currentFeatureTypeStyle.name,
                   onChanged: (value) {
                     setState(() {
-                      currentFeatureTypeStyle = featureTypeStyles
-                          .firstWhere((element) => element.name == value);
+                      currentFeatureTypeStyle = featureTypeStyles.firstWhere(
+                          (element) =>
+                              "${element.index}) ${element.name}" == value);
+                      rules = currentFeatureTypeStyle.rules;
+                      currentRule = null;
                     });
                   },
                 );
@@ -192,7 +197,11 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(MdiIcons.contentSave),
-        onPressed: () {},
+        onPressed: () {
+          String sldString =
+              HU.SldObjectBuilder.buildFromFeatureTypeStyles(featureTypeStyles);
+          Navigator.pop(context, sldString);
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
@@ -259,6 +268,7 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
       doLabelSection(widgets);
       doShapeSection(widgets);
       doStrokeSection(widgets);
+      doFillSection(widgets);
     }
 
     return Padding(
@@ -271,26 +281,127 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
     );
   }
 
-  void doStrokeSection(List<Widget> widgets) {
-    if (doStroke) {
-      dynamic strokeStyle;
+  void doFillSection(List<Widget> widgets) {
+    if (doFill && (geometryType.isPoint() || geometryType.isPolygon())) {
+      dynamic fillStyle;
       if (geometryType.isPoint()) {
         if (rule.pointSymbolizers.isEmpty) {
-          strokeStyle = HU.PointStyle();
-          rule.addPointStyle(strokeStyle);
+          fillStyle = HU.PointStyle()
+            ..fillOpacity = 0
+            ..strokeOpacity = 0
+            ..markerSize = 0;
+          rule.addPointStyle(fillStyle);
         } else {
-          strokeStyle = rule.pointSymbolizers.first.style;
+          fillStyle = rule.pointSymbolizers.first.style;
         }
-      } else if (geometryType.isLine()) {
-        strokeStyle = HU.LineStyle();
+      } else if (geometryType.isPolygon()) {
+        if (rule.polygonSymbolizers.isEmpty) {
+          fillStyle = HU.PolygonStyle()
+            ..fillOpacity = 0
+            ..strokeOpacity = 0;
+          rule.addPolygonStyle(fillStyle);
+        } else {
+          fillStyle = rule.polygonSymbolizers.first.style;
+        }
+      }
+      String fillColorHex = fillStyle.fillColorHex;
+      double fillOpacity = fillStyle.fillOpacity;
+
+      widgets.add(
+        Padding(
+          padding: SmashUI.defaultPadding(),
+          child: Card(
+            elevation: SmashUI.DEFAULT_ELEVATION,
+            shape: SmashUI.defaultShapeBorder(),
+            child: Padding(
+              padding: SmashUI.defaultPadding(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SmashUI.titleText("Fill Properties"),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Opacity"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Slider(
+                            activeColor: SmashColors.mainSelection,
+                            min: 0,
+                            max: 100,
+                            divisions: 10,
+                            onChanged: (newAlpha) {
+                              setState(() {
+                                fillStyle.fillOpacity = newAlpha / 100;
+                              });
+                            },
+                            value: fillOpacity * 100,
+                          )),
+                      Container(
+                        width: 50.0,
+                        alignment: Alignment.center,
+                        child: SmashUI.normalText(
+                          '${(fillOpacity * 100).toInt()}',
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SmashUI.normalText("Color"),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: SmashUI.DEFAULT_PADDING,
+                                right: SmashUI.DEFAULT_PADDING),
+                            child: ColorPickerButton(ColorExt(fillColorHex),
+                                (newColor) {
+                              fillStyle.fillColorHex = ColorExt.asHex(newColor);
+                            }),
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  void doStrokeSection(List<Widget> widgets) {
+    if (doStroke && (geometryType.isLine() || geometryType.isPolygon())) {
+      dynamic strokeStyle;
+      // TODO Enable only once points can have borders
+      // if (geometryType.isPoint()) {
+      //   if (rule.pointSymbolizers.isEmpty) {
+      //     strokeStyle = HU.PointStyle();
+      //     rule.addPointStyle(strokeStyle);
+      //   } else {
+      //     strokeStyle = rule.pointSymbolizers.first.style;
+      //   }
+      // } else
+      if (geometryType.isLine()) {
         if (rule.lineSymbolizers.isEmpty) {
+          strokeStyle = HU.LineStyle()..strokeOpacity = 0;
           rule.addLineStyle(strokeStyle);
         } else {
           strokeStyle = rule.lineSymbolizers.first.style;
         }
       } else if (geometryType.isPolygon()) {
-        strokeStyle = HU.PolygonStyle();
         if (rule.polygonSymbolizers.isEmpty) {
+          strokeStyle = HU.PolygonStyle()
+            ..strokeOpacity = 0
+            ..fillOpacity = 0;
           rule.addPolygonStyle(strokeStyle);
         } else {
           strokeStyle = rule.polygonSymbolizers.first.style;
@@ -405,8 +516,11 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
   void doShapeSection(List<Widget> widgets) {
     if (doShape && geometryType.isPoint()) {
       if (rule.pointSymbolizers.isEmpty) {
-        //  create a default to present
-        rule.addPointStyle(HU.PointStyle());
+        var pointStyle = HU.PointStyle()
+          ..markerSize = 0
+          ..strokeOpacity = 0
+          ..fillOpacity = 0;
+        rule.addPointStyle(pointStyle);
       }
       var style = rule.pointSymbolizers.first.style;
       var wktName = style.markerName ??= HU.WktMarkers.CIRCLE.name;
@@ -492,16 +606,18 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
   }
 
   void doLabelSection(List<Widget> widgets) {
-    if (doLabels && alphaFields != null && alphaFields.isNotEmpty) {
+    if (doLabels &&
+        geometryType.isPoint() &&
+        alphaFields != null &&
+        alphaFields.isNotEmpty) {
       if (rule.textSymbolizers.isEmpty) {
-        //  create a default to present and set the label to empty
-        rule.addTextStyle(HU.TextStyle());
+        var textStyle = HU.TextStyle()..size = 0;
+        rule.addTextStyle(textStyle);
       }
 
       // DO LABELS
       HU.TextStyle textStyle = rule.textSymbolizers[0].style;
       Color textColor = ColorExt(textStyle.textColor);
-      double textSize = textStyle.size;
       String textLabel = textStyle.labelName;
 
       List<DropdownMenuItem<String>> alphaItems = alphaFields
@@ -545,36 +661,37 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
                           )),
                     ],
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: SmashUI.normalText("Size"),
-                      ),
-                      Flexible(
-                          flex: 1,
-                          child: Slider(
-                            activeColor: SmashColors.mainSelection,
-                            min: SmashUI.MIN_FONT_SIZE,
-                            max: SmashUI.MAX_FONT_SIZE,
-                            divisions: 19,
-                            onChanged: (newSize) {
-                              setState(() {
-                                textStyle.size = newSize;
-                              });
-                            },
-                            value: textSize,
-                          )),
-                      Container(
-                        width: 50.0,
-                        alignment: Alignment.center,
-                        child: SmashUI.normalText(
-                          '${textStyle.size.toInt()}',
-                        ),
-                      ),
-                    ],
-                  ),
+                  // TODO enable only once the label text can have an own size
+                  // Row(
+                  //   mainAxisSize: MainAxisSize.max,
+                  //   children: <Widget>[
+                  //     Padding(
+                  //       padding: const EdgeInsets.only(right: 8.0),
+                  //       child: SmashUI.normalText("Size"),
+                  //     ),
+                  //     Flexible(
+                  //         flex: 1,
+                  //         child: Slider(
+                  //           activeColor: SmashColors.mainSelection,
+                  //           min: SmashUI.MIN_FONT_SIZE,
+                  //           max: SmashUI.MAX_FONT_SIZE,
+                  //           divisions: 19,
+                  //           onChanged: (newSize) {
+                  //             setState(() {
+                  //               textStyle.size = newSize;
+                  //             });
+                  //           },
+                  //           value: textSize,
+                  //         )),
+                  //     Container(
+                  //       width: 50.0,
+                  //       alignment: Alignment.center,
+                  //       child: SmashUI.normalText(
+                  //         '${textStyle.size.toInt()}',
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[

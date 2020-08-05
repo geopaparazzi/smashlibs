@@ -276,7 +276,7 @@ Future<String> showInputDialog(BuildContext context, String title, String label,
   );
 }
 
-/// Show a multiselection dialog, adding a [title] and a list of [items] to propose.
+/// Show a selection dialog, adding a [title] and a list of [items] to propose.
 ///
 /// [title] can be either a String or a Widget.
 ///
@@ -335,6 +335,109 @@ Future<String> showComboDialog(
         );
       });
   return selection;
+}
+
+/// Show a multiselection dialog, adding a [title] and a list of [items] to propose.
+///
+/// [title] can be either a String or a Widget.
+///
+/// Returns the selected item.
+Future<List<String>> showMultiSelectionComboDialog(
+    BuildContext context, dynamic title, List<String> items,
+    {okText: 'Ok', cancelText: 'Cancel'}) async {
+  List<Widget> widgets = [];
+  List<String> selected = [];
+  for (var i = 0; i < items.length; ++i) {
+    widgets.add(DialogCheckBoxTile(false, items[i], (isSelected, item) {
+      if (isSelected) {
+        selected.add(item);
+      } else {
+        selected.remove(item);
+      }
+    }));
+  }
+
+  List<String> selection = await showDialog<List<String>>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: title is String
+              ? SmashUI.normalText(title,
+                  textAlign: TextAlign.center,
+                  color: SmashColors.mainDecorationsDarker)
+              : title,
+          content: Builder(builder: (context) {
+            var width = MediaQuery.of(context).size.width;
+            return Container(
+              width: width,
+              child: ListView(
+                shrinkWrap: true,
+                children: ListTile.divideTiles(context: context, tiles: widgets)
+                    .toList(),
+              ),
+            );
+          }),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(cancelText),
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+            ),
+            FlatButton(
+              child: Text(okText),
+              onPressed: () {
+                Navigator.of(context).pop(selected);
+              },
+            ),
+          ],
+        );
+      });
+  return selection;
+}
+
+class DialogCheckBoxTile extends StatefulWidget {
+  final bool selected;
+  final String item;
+  final onSelection;
+
+  DialogCheckBoxTile(this.selected, this.item, this.onSelection);
+
+  @override
+  _DialogCheckBoxTileState createState() => _DialogCheckBoxTileState();
+}
+
+class _DialogCheckBoxTileState extends State<DialogCheckBoxTile> {
+  bool selected;
+
+  @override
+  void initState() {
+    selected = widget.selected;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile(
+      onChanged: (value) {
+        setState(() {
+          selected = value;
+          widget.onSelection(value, widget.item);
+        });
+      },
+      value: selected,
+      title: Container(
+        padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+        child: SmashUI.normalText(widget.item,
+            textAlign: TextAlign.center,
+            bold: true,
+            color: SmashColors.mainDecorations),
+      ),
+    );
+  }
 }
 
 /// Show a warning dialog about the need of a GPS fix to proceed with the action.

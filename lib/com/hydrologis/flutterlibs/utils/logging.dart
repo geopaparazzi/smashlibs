@@ -65,7 +65,7 @@ class SMLogger {
 
   void e(dynamic message, StackTrace stackTrace) {
     if (_subLogger != null) {
-      _subLogger.e(message);
+      _subLogger.e(message, stackTrace);
     } else {
       print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       print("e: ${message.toString()}");

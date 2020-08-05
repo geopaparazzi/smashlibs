@@ -30,12 +30,15 @@ class SmashUI {
 
   static const double MAX_FONT_SIZE = 100;
   static const double MIN_FONT_SIZE = 5;
+  static const int MINMAX_FONT_DIVISIONS = 19;
 
   static const double MAX_STROKE_SIZE = 20;
   static const double MIN_STROKE_SIZE = 1;
+  static const int MINMAX_STROKE_DIVISIONS = 19;
 
   static const double MAX_MARKER_SIZE = 100;
   static const double MIN_MARKER_SIZE = 5;
+  static const int MINMAX_MARKER_DIVISIONS = 19;
 
   /// Create a text widget with size and color for normal text in pages.
   ///
