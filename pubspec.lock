@@ -91,7 +91,7 @@ packages:
       name: dart_hydrologis_utils
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.2+4"
+    version: "0.5.2+7"
   dart_jts:
     dependency: "direct main"
     description:
@@ -112,7 +112,7 @@ packages:
       name: dio
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.9"
+    version: "3.0.10"
   fake_async:
     dependency: transitive
     description:
@@ -133,7 +133,7 @@ packages:
       name: file_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.13.0+1"
+    version: "1.13.2"
   file_picker_platform_interface:
     dependency: transitive
     description:
@@ -147,7 +147,7 @@ packages:
       name: file_picker_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1+2"
+    version: "1.0.2+1"
   flutter:
     dependency: "direct main"
     description: flutter

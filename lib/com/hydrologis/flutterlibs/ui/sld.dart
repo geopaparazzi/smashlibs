@@ -14,21 +14,21 @@ class SldPropertiesEditor extends StatefulWidget {
   final bool doStroke;
   final List<String> alphaFields;
 
-  SldPropertiesEditor(
-    this.sldString,
-    this.geometryType, {
-    this.doLabels = true,
-    this.doShape = true,
-    this.doStroke = true,
-    this.doFill = true,
-    this.alphaFields,
-  });
+  SldPropertiesEditor(this.sldString, this.geometryType,
+      {this.doLabels = true,
+      this.doShape = true,
+      this.doStroke = true,
+      this.doFill = true,
+      this.alphaFields,
+      Key key})
+      : super(key: key);
 
   @override
   _SldPropertiesEditorState createState() => _SldPropertiesEditorState();
 }
 
 class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
+  int editorKeyCount = 0;
   String sldString;
   JTS.EGeometryType geometryType;
   bool doLabels;
@@ -38,11 +38,10 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
   List<String> alphaFields;
   HU.SldObjectParser sldParser;
 
-  List<HU.FeatureTypeStyle> featureTypeStyles;
-  HU.FeatureTypeStyle currentFeatureTypeStyle;
+  List<HU.FeatureTypeStyle> widgetFeatureTypeStyles = [];
+  List<HU.Rule> widgetRules = [];
 
-  List<HU.Rule> rules;
-  HU.Rule currentRule;
+  int currentIndex = 0;
 
   @override
   void initState() {
@@ -61,150 +60,183 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
 
     sldParser = HU.SldObjectParser.fromString(sldString);
     sldParser.parse();
-
-    featureTypeStyles = sldParser.featureTypeStyles;
-    if (featureTypeStyles.isEmpty || featureTypeStyles[0] == null) {
-      // create a default style to present
-      if (geometryType.isPoint()) {
-        sldString = HU.DefaultSlds.simplePointSld();
-      } else if (geometryType.isLine()) {
-        sldString = HU.DefaultSlds.simpleLineSld();
-      } else if (geometryType.isPolygon()) {
-        sldString = HU.DefaultSlds.simplePolygonSld();
-      }
-      sldParser = HU.SldObjectParser.fromString(sldString);
-      sldParser.parse();
-      featureTypeStyles = sldParser.featureTypeStyles;
-    }
-    currentFeatureTypeStyle = featureTypeStyles.first;
-    rules = currentFeatureTypeStyle.rules;
-    if (rules.isNotEmpty) {
-      currentRule = rules.first;
-    }
+    sldParser.applyForEachRule((fts, rule) {
+      widgetFeatureTypeStyles.add(fts);
+      widgetRules.add(rule);
+    });
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> headerRowButtons = [];
-    if (currentFeatureTypeStyle != null) {
-      headerRowButtons.add(
-        Padding(
-          padding: SmashUI.defaultPadding(),
-          child: Tooltip(
-            message: "Tap for Featuretype Style Selection",
-            child: FlatButton(
+    Widget widget;
+    if (widgetRules.isEmpty) {
+      widget = Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SmashUI.errorWidget("No style found."),
+            FlatButton(
               onPressed: () {
-                if (featureTypeStyles.length == 1) {
-                  showInfoDialog(
-                      context, "No other featuretype styles available.");
-                  return;
-                }
-                showMaterialScrollPicker(
-                  context: context,
-                  title: "Select the Featuretype Style",
-                  items: featureTypeStyles
-                      .map((e) => "${e.index}) ${e.name}")
-                      .toList(),
-                  selectedItem: currentFeatureTypeStyle.name,
-                  onChanged: (value) {
-                    setState(() {
-                      currentFeatureTypeStyle = featureTypeStyles.firstWhere(
-                          (element) =>
-                              "${element.index}) ${element.name}" == value);
-                      rules = currentFeatureTypeStyle.rules;
-                      currentRule = null;
-                    });
-                  },
-                );
+                setState(() {
+                  createDefaultSLDString();
+                });
               },
-              child:
-                  SmashUI.normalText(currentFeatureTypeStyle.name, bold: true),
+              child: SmashUI.normalText("CREATE DEFAULT"),
             ),
+          ],
+        ),
+      );
+    } else {
+      List<Widget> headerTiles = [];
+
+      var fts = widgetFeatureTypeStyles[currentIndex];
+      var rule = widgetRules[currentIndex];
+
+      headerTiles.add(
+        ListTile(
+          leading: getFtsSelectionButton(context),
+          title: SmashUI.normalText("FeatureTypeStyle: ${fts.name}"),
+          // subtitle: SmashUI.smallText("FeatureTypeStyle"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(MdiIcons.plusOutline),
+                color: SmashColors.mainDecorations,
+                onPressed: () {
+                  // add new fts
+                },
+                tooltip: "Add new featuretype style.",
+              ),
+              IconButton(
+                icon: Icon(MdiIcons.trashCan),
+                color: SmashColors.mainDanger,
+                onPressed: () {
+                  // delete fts
+                },
+                tooltip: "Delete current featuretype style.",
+              ),
+            ],
           ),
         ),
       );
-      if (currentRule == null && currentFeatureTypeStyle.rules.isNotEmpty) {
-        currentRule = currentFeatureTypeStyle.rules.first;
-      }
-      if (currentRule != null) {
-        headerRowButtons.add(
-          Padding(
-            padding: SmashUI.defaultPadding(),
-            child: Icon(SmashIcons.menuRightArrow),
-          ),
-        );
-        headerRowButtons.add(
-          Padding(
-            padding: SmashUI.defaultPadding(),
-            child: Tooltip(
-              message: "Tap for Rules Selection",
-              child: FlatButton(
+      headerTiles.add(
+        ListTile(
+          leading: getFtsSelectionButton(context),
+          title: SmashUI.normalText("Rule: ${rule.name}"),
+          // subtitle: SmashUI.smallText("Rule"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(MdiIcons.plusOutline),
+                color: SmashColors.mainDecorations,
                 onPressed: () {
-                  if (rules.length == 1) {
-                    showInfoDialog(context, "No other rules available.");
-                    return;
-                  }
-                  showMaterialScrollPicker(
-                    context: context,
-                    title: "Select the Rule",
-                    items: rules.map((e) => e.name).toList(),
-                    selectedItem: currentRule.name,
-                    onChanged: (value) {
-                      setState(() {
-                        currentRule = rules
-                            .firstWhere((element) => element.name == value);
-                      });
-                    },
-                  );
+                  // add new rule
                 },
-                child: SmashUI.normalText(currentRule.name, bold: true),
+                tooltip: "Add new rule.",
               ),
-            ),
+              IconButton(
+                icon: Icon(MdiIcons.trashCan),
+                color: SmashColors.mainDanger,
+                onPressed: () {
+                  // delete rule
+                },
+                tooltip: "Delete current rule.",
+              ),
+            ],
           ),
-        );
-      }
-    }
+        ),
+      );
 
+      widget = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: []
+          ..addAll(headerTiles)
+          ..add(Expanded(
+            flex: 1,
+            child: RulePropertiesEditor(fts, rule, geometryType,
+                doLabels: doLabels,
+                doShape: doShape,
+                doStroke: doStroke,
+                doFill: doFill,
+                alphaFields: alphaFields,
+                key: Key("${editorKeyCount++}")),
+          )),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text("Style editor"),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: headerRowButtons,
-          ),
-          Expanded(
-            flex: 1,
-            child: RulePropertiesEditor(
-              currentFeatureTypeStyle,
-              currentRule,
-              geometryType,
-              doLabels: doLabels,
-              doShape: doShape,
-              doStroke: doStroke,
-              doFill: doFill,
-              alphaFields: alphaFields,
-            ),
-          )
-        ],
-      ),
+      body: widget,
       floatingActionButton: FloatingActionButton(
         child: Icon(MdiIcons.contentSave),
         onPressed: () {
-          String sldString =
-              HU.SldObjectBuilder.buildFromFeatureTypeStyles(featureTypeStyles);
+          String sldString = HU.SldObjectBuilder.buildFromFeatureTypeStyles(
+              sldParser.featureTypeStyles);
           Navigator.pop(context, sldString);
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+
+  IconButton getFtsSelectionButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(MdiIcons.formSelect),
+      onPressed: () {
+        if (widgetFeatureTypeStyles.length == 1) {
+          showInfoDialog(context, "No other featuretype styles available.");
+          return;
+        }
+
+        List<String> items = [];
+        Map<String, int> item2IndexMap = {};
+        for (var i = 0; i < widgetFeatureTypeStyles.length; i++) {
+          var itemString =
+              "${i + 1}) ${widgetFeatureTypeStyles[i].name} - ${widgetRules[i].name}";
+          item2IndexMap[itemString] = i;
+          items.add(itemString);
+        }
+        var selectedItemString =
+            "${currentIndex + 1}) ${widgetFeatureTypeStyles[currentIndex].name} - ${widgetRules[currentIndex].name}";
+
+        showMaterialScrollPicker(
+          context: context,
+          title: "Select the Featuretype and Rule",
+          items: items,
+          selectedItem: selectedItemString,
+          onChanged: (value) {
+            setState(() {
+              currentIndex = item2IndexMap[value];
+            });
+          },
+        );
+      },
+    );
+  }
+
+  void createDefaultSLDString() {
+    if (geometryType.isPoint()) {
+      sldString = HU.DefaultSlds.simplePointSld();
+    } else if (geometryType.isLine()) {
+      sldString = HU.DefaultSlds.simpleLineSld();
+    } else if (geometryType.isPolygon()) {
+      sldString = HU.DefaultSlds.simplePolygonSld();
+    }
+    sldParser = HU.SldObjectParser.fromString(sldString);
+    sldParser.parse();
+    widgetFeatureTypeStyles = [];
+    widgetRules = [];
+    sldParser.applyForEachRule((ft, r) {
+      widgetFeatureTypeStyles.add(ft);
+      widgetRules.add(r);
+    });
+    currentIndex = 0;
   }
 }
 
@@ -217,54 +249,26 @@ class RulePropertiesEditor extends StatefulWidget {
   final bool doShape;
   final bool doStroke;
   final List<String> alphaFields;
-  RulePropertiesEditor(
-    this.fts,
-    this.rule,
-    this.geometryType, {
-    this.doLabels = true,
-    this.doShape = true,
-    this.doStroke = true,
-    this.doFill = true,
-    this.alphaFields,
-  });
+  RulePropertiesEditor(this.fts, this.rule, this.geometryType,
+      {this.doLabels = true,
+      this.doShape = true,
+      this.doStroke = true,
+      this.doFill = true,
+      this.alphaFields,
+      Key key})
+      : super(key: key);
   @override
-  _RulePropertiesEditorState createState() => _RulePropertiesEditorState(
-        fts,
-        rule,
-        geometryType,
-        doLabels: doLabels,
-        doShape: doShape,
-        doStroke: doStroke,
-        doFill: doFill,
-        alphaFields: alphaFields,
-      );
+  _RulePropertiesEditorState createState() => _RulePropertiesEditorState();
 }
 
 class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
-  HU.FeatureTypeStyle fts;
-  HU.Rule rule;
-  final JTS.EGeometryType geometryType;
-  final bool doLabels;
-  final bool doFill;
-  final bool doShape;
-  final bool doStroke;
-  final List<String> alphaFields;
-
-  _RulePropertiesEditorState(
-    this.fts,
-    this.rule,
-    this.geometryType, {
-    this.doLabels = true,
-    this.doShape = true,
-    this.doStroke = true,
-    this.doFill = true,
-    this.alphaFields,
-  });
+  int keyCount = 0;
 
   @override
   Widget build(BuildContext context) {
     List<Widget> widgets = [];
-    if (rule != null) {
+    if (widget.rule != null) {
+      doFilterSection(widgets);
       doLabelSection(widgets);
       doShapeSection(widgets);
       doStrokeSection(widgets);
@@ -282,27 +286,19 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
   }
 
   void doFillSection(List<Widget> widgets) {
-    if (doFill && (geometryType.isPoint() || geometryType.isPolygon())) {
+    if (widget.doFill &&
+        (widget.geometryType.isPoint() || widget.geometryType.isPolygon())) {
       dynamic fillStyle;
-      if (geometryType.isPoint()) {
-        if (rule.pointSymbolizers.isEmpty) {
-          fillStyle = HU.PointStyle()
-            ..fillOpacity = 0
-            ..strokeOpacity = 0
-            ..markerSize = 0;
-          rule.addPointStyle(fillStyle);
-        } else {
-          fillStyle = rule.pointSymbolizers.first.style;
+      if (widget.geometryType.isPoint()) {
+        if (widget.rule.pointSymbolizers.isEmpty) {
+          return;
         }
-      } else if (geometryType.isPolygon()) {
-        if (rule.polygonSymbolizers.isEmpty) {
-          fillStyle = HU.PolygonStyle()
-            ..fillOpacity = 0
-            ..strokeOpacity = 0;
-          rule.addPolygonStyle(fillStyle);
-        } else {
-          fillStyle = rule.polygonSymbolizers.first.style;
+        fillStyle = widget.rule.pointSymbolizers.first.style;
+      } else if (widget.geometryType.isPolygon()) {
+        if (widget.rule.polygonSymbolizers.isEmpty) {
+          return;
         }
+        fillStyle = widget.rule.polygonSymbolizers.first.style;
       }
       String fillColorHex = fillStyle.fillColorHex;
       double fillOpacity = fillStyle.fillOpacity;
@@ -365,7 +361,7 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
                             child: ColorPickerButton(ColorExt(fillColorHex),
                                 (newColor) {
                               fillStyle.fillColorHex = ColorExt.asHex(newColor);
-                            }),
+                            }, key: Key("${keyCount++}")),
                           )),
                     ],
                   ),
@@ -379,7 +375,8 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
   }
 
   void doStrokeSection(List<Widget> widgets) {
-    if (doStroke && (geometryType.isLine() || geometryType.isPolygon())) {
+    if (widget.doStroke &&
+        (widget.geometryType.isLine() || widget.geometryType.isPolygon())) {
       dynamic strokeStyle;
       // TODO Enable only once points can have borders
       // if (geometryType.isPoint()) {
@@ -390,22 +387,16 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
       //     strokeStyle = rule.pointSymbolizers.first.style;
       //   }
       // } else
-      if (geometryType.isLine()) {
-        if (rule.lineSymbolizers.isEmpty) {
-          strokeStyle = HU.LineStyle()..strokeOpacity = 0;
-          rule.addLineStyle(strokeStyle);
-        } else {
-          strokeStyle = rule.lineSymbolizers.first.style;
+      if (widget.geometryType.isLine()) {
+        if (widget.rule.lineSymbolizers.isEmpty) {
+          return;
         }
-      } else if (geometryType.isPolygon()) {
-        if (rule.polygonSymbolizers.isEmpty) {
-          strokeStyle = HU.PolygonStyle()
-            ..strokeOpacity = 0
-            ..fillOpacity = 0;
-          rule.addPolygonStyle(strokeStyle);
-        } else {
-          strokeStyle = rule.polygonSymbolizers.first.style;
+        strokeStyle = widget.rule.lineSymbolizers.first.style;
+      } else if (widget.geometryType.isPolygon()) {
+        if (widget.rule.polygonSymbolizers.isEmpty) {
+          return;
         }
+        strokeStyle = widget.rule.polygonSymbolizers.first.style;
       }
       String strokeColorHex = strokeStyle.strokeColorHex;
       double strokeWidth = strokeStyle.strokeWidth;
@@ -500,7 +491,7 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
                                 (newColor) {
                               strokeStyle.strokeColorHex =
                                   ColorExt.asHex(newColor);
-                            }),
+                            }, key: Key("${keyCount++}")),
                           )),
                     ],
                   ),
@@ -514,15 +505,11 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
   }
 
   void doShapeSection(List<Widget> widgets) {
-    if (doShape && geometryType.isPoint()) {
-      if (rule.pointSymbolizers.isEmpty) {
-        var pointStyle = HU.PointStyle()
-          ..markerSize = 0
-          ..strokeOpacity = 0
-          ..fillOpacity = 0;
-        rule.addPointStyle(pointStyle);
+    if (widget.doShape && widget.geometryType.isPoint()) {
+      if (widget.rule.pointSymbolizers.isEmpty) {
+        return;
       }
-      var style = rule.pointSymbolizers.first.style;
+      var style = widget.rule.pointSymbolizers.first.style;
       var wktName = style.markerName ??= HU.WktMarkers.CIRCLE.name;
       var shapeSize = style.markerSize;
 
@@ -606,21 +593,20 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
   }
 
   void doLabelSection(List<Widget> widgets) {
-    if (doLabels &&
-        geometryType.isPoint() &&
-        alphaFields != null &&
-        alphaFields.isNotEmpty) {
-      if (rule.textSymbolizers.isEmpty) {
-        var textStyle = HU.TextStyle()..size = 0;
-        rule.addTextStyle(textStyle);
+    if (widget.doLabels &&
+        widget.geometryType.isPoint() &&
+        widget.alphaFields != null &&
+        widget.alphaFields.isNotEmpty) {
+      if (widget.rule.textSymbolizers.isEmpty) {
+        return;
       }
 
       // DO LABELS
-      HU.TextStyle textStyle = rule.textSymbolizers[0].style;
+      HU.TextStyle textStyle = widget.rule.textSymbolizers[0].style;
       Color textColor = ColorExt(textStyle.textColor);
       String textLabel = textStyle.labelName;
 
-      List<DropdownMenuItem<String>> alphaItems = alphaFields
+      List<DropdownMenuItem<String>> alphaItems = widget.alphaFields
           .map((e) =>
               DropdownMenuItem<String>(value: e, child: SmashUI.normalText(e)))
           .toList();
@@ -707,8 +693,91 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
                                 right: SmashUI.DEFAULT_PADDING),
                             child: ColorPickerButton(textColor, (newColor) {
                               textStyle.textColor = ColorExt.asHex(newColor);
-                            }),
+                            }, key: Key("${keyCount++}")),
                           )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  void doFilterSection(List<Widget> widgets) {
+    var filter = widget.rule.filter;
+    if (widget.alphaFields != null &&
+        widget.alphaFields.isNotEmpty &&
+        filter != null) {
+      List<DropdownMenuItem<String>> alphaItems = widget.alphaFields
+          .map((e) =>
+              DropdownMenuItem<String>(value: e, child: SmashUI.normalText(e)))
+          .toList();
+
+      widgets.add(
+        Padding(
+          padding: SmashUI.defaultPadding(),
+          child: Card(
+            elevation: SmashUI.DEFAULT_ELEVATION,
+            shape: SmashUI.defaultShapeBorder(),
+            child: Padding(
+              padding: SmashUI.defaultPadding(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SmashUI.titleText("Rule Filter"),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Flexible(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: SmashUI.DEFAULT_PADDING,
+                              right: SmashUI.DEFAULT_PADDING),
+                          child: DropdownButton<String>(
+                              items: alphaItems,
+                              value: filter.uniqueValueKey,
+                              onChanged: (newField) {
+                                setState(() {
+                                  filter.uniqueValueKey = newField;
+                                });
+                              }),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0, left: 8.0),
+                        child: SmashUI.normalText(" = "),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: SmashUI.DEFAULT_PADDING,
+                              right: SmashUI.DEFAULT_PADDING),
+                          child: EditableTextField("filter value",
+                              filter.uniqueValueValue.toString(),
+                              (newValueString) {
+                            if (filter.uniqueValueValue is String) {
+                              filter.uniqueValueValue = newValueString;
+                            } else if (filter.uniqueValueValue is double) {
+                              filter.uniqueValueValue =
+                                  double.parse(newValueString);
+                            } else if (filter.uniqueValueValue is int) {
+                              filter.uniqueValueValue =
+                                  double.parse(newValueString).toInt();
+                            } else {
+                              SMLogger().e(
+                                  "Unable to find type for key: ${filter.uniqueValueKey} and value: ${filter.uniqueValueValue}",
+                                  null);
+                            }
+                          }, key: Key("${keyCount++}")),
+                        ),
+                      ),
                     ],
                   ),
                 ],

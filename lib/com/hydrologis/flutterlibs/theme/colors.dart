@@ -244,7 +244,8 @@ class ColorPickerButton extends StatefulWidget {
   final Color initialColor;
   final Function colorChangedFunction;
 
-  ColorPickerButton(this.initialColor, this.colorChangedFunction);
+  ColorPickerButton(this.initialColor, this.colorChangedFunction, {Key key})
+      : super(key: key);
 
   @override
   _ColorPickerButtonState createState() => _ColorPickerButtonState();

@@ -283,7 +283,11 @@ class EditableTextField extends StatefulWidget {
   final Function validationFunction;
 
   EditableTextField(this.label, this.value, this.onSave,
-      {this.validationFunction, this.isPassword = false, this.doBold = false});
+      {this.validationFunction,
+      this.isPassword = false,
+      this.doBold = false,
+      Key key})
+      : super(key: key);
 
   @override
   _EditableTextFieldState createState() => _EditableTextFieldState();
