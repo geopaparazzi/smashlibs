@@ -39,12 +39,17 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
   HU.SldObjectParser sldParser;
 
   List<HU.FeatureTypeStyle> widgetFeatureTypeStyles = [];
-  List<HU.Rule> widgetRules = [];
+  Map<int, List<HU.Rule>> widgetRules = {};
+  List<HU.Rule> currentRulesList;
+  int currentFtsIndex = 0;
+  int currentRuleIndex = 0;
 
-  int currentIndex = 0;
+  bool hasTextStyle = false;
 
   @override
   void initState() {
+    super.initState();
+
     sldString = widget.sldString;
     geometryType = widget.geometryType;
     doLabels = widget.doLabels ?? true;
@@ -60,12 +65,22 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
 
     sldParser = HU.SldObjectParser.fromString(sldString);
     sldParser.parse();
-    sldParser.applyForEachRule((fts, rule) {
+    int index = 0;
+    sldParser.featureTypeStyles.forEach((fts) {
       widgetFeatureTypeStyles.add(fts);
-      widgetRules.add(rule);
+      var rulesList = <HU.Rule>[];
+      fts.rules.forEach((rule) {
+        rulesList.add(rule);
+      });
+      widgetRules[index] = rulesList;
+      index++;
     });
+    currentRulesList = widgetRules[0];
+    currentRuleIndex = 0;
+    currentFtsIndex = 0;
 
-    super.initState();
+    var firstTextStyle = sldParser.getFirstTextStyle(false);
+    hasTextStyle = firstTextStyle != null;
   }
 
   @override
@@ -91,66 +106,70 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
     } else {
       List<Widget> headerTiles = [];
 
-      var fts = widgetFeatureTypeStyles[currentIndex];
-      var rule = widgetRules[currentIndex];
+      var fts = widgetFeatureTypeStyles[currentFtsIndex];
+      var rules = widgetRules[currentFtsIndex];
+      var rule = rules[currentRuleIndex];
 
-      headerTiles.add(
-        ListTile(
-          leading: getFtsSelectionButton(context),
-          title: SmashUI.normalText("FeatureTypeStyle: ${fts.name}"),
-          // subtitle: SmashUI.smallText("FeatureTypeStyle"),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: Icon(MdiIcons.plusOutline),
-                color: SmashColors.mainDecorations,
-                onPressed: () {
-                  // add new fts
-                },
-                tooltip: "Add new featuretype style.",
-              ),
-              IconButton(
-                icon: Icon(MdiIcons.trashCan),
-                color: SmashColors.mainDanger,
-                onPressed: () {
-                  // delete fts
-                },
-                tooltip: "Delete current featuretype style.",
-              ),
-            ],
+      if (widgetFeatureTypeStyles.length > 1) {
+        headerTiles.add(
+          ListTile(
+            leading: getFtsSelectionButton(context),
+            title: SmashUI.normalText("FeatureTypeStyle: ${fts.name}"),
+            // TODO enable once editing is possible
+            // trailing: Row(
+            //   mainAxisSize: MainAxisSize.min,
+            //   children: [
+            //     IconButton(
+            //       icon: Icon(MdiIcons.plusOutline),
+            //       color: SmashColors.mainDecorations,
+            //       onPressed: () {
+            //         // add new fts
+            //       },
+            //       tooltip: "Add new featuretype style.",
+            //     ),
+            //     IconButton(
+            //       icon: Icon(MdiIcons.trashCan),
+            //       color: SmashColors.mainDanger,
+            //       onPressed: () {
+            //         // delete fts
+            //       },
+            //       tooltip: "Delete current featuretype style.",
+            //     ),
+            //   ],
+            // ),
           ),
-        ),
-      );
-      headerTiles.add(
-        ListTile(
-          leading: getFtsSelectionButton(context),
-          title: SmashUI.normalText("Rule: ${rule.name}"),
-          // subtitle: SmashUI.smallText("Rule"),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: Icon(MdiIcons.plusOutline),
-                color: SmashColors.mainDecorations,
-                onPressed: () {
-                  // add new rule
-                },
-                tooltip: "Add new rule.",
-              ),
-              IconButton(
-                icon: Icon(MdiIcons.trashCan),
-                color: SmashColors.mainDanger,
-                onPressed: () {
-                  // delete rule
-                },
-                tooltip: "Delete current rule.",
-              ),
-            ],
+        );
+      }
+      if (widgetRules[currentFtsIndex].length > 1) {
+        headerTiles.add(
+          ListTile(
+            leading: getRuleSelectionButton(context),
+            title: SmashUI.normalText("Rule: ${rule.name}"),
+            // subtitle: SmashUI.smallText("Rule"),
+            // trailing: Row(
+            //   mainAxisSize: MainAxisSize.min,
+            //   children: [
+            //     IconButton(
+            //       icon: Icon(MdiIcons.plusOutline),
+            //       color: SmashColors.mainDecorations,
+            //       onPressed: () {
+            //         // add new rule
+            //       },
+            //       tooltip: "Add new rule.",
+            //     ),
+            //     IconButton(
+            //       icon: Icon(MdiIcons.trashCan),
+            //       color: SmashColors.mainDanger,
+            //       onPressed: () {
+            //         // delete rule
+            //       },
+            //       tooltip: "Delete current rule.",
+            //     ),
+            //   ],
+            // ),
           ),
-        ),
-      );
-
+        );
+      }
       widget = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -171,6 +190,21 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Style editor"),
+        actions: [
+          !hasTextStyle && geometryType.isPoint()
+              ? IconButton(
+                  icon: Icon(
+                    MdiIcons.label,
+                  ),
+                  tooltip: "Add text symbolizer",
+                  onPressed: () {
+                    var firstRulesList = sldParser.getAllRules().first;
+                    firstRulesList.first.addTextStyle(HU.TextStyle());
+                    setState(() {});
+                  },
+                )
+              : Container(),
+        ],
       ),
       body: widget,
       floatingActionButton: FloatingActionButton(
@@ -187,7 +221,10 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
 
   IconButton getFtsSelectionButton(BuildContext context) {
     return IconButton(
-      icon: Icon(MdiIcons.formSelect),
+      icon: Icon(
+        MdiIcons.formSelect,
+        color: SmashColors.mainDecorations,
+      ),
       onPressed: () {
         if (widgetFeatureTypeStyles.length == 1) {
           showInfoDialog(context, "No other featuretype styles available.");
@@ -197,22 +234,60 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
         List<String> items = [];
         Map<String, int> item2IndexMap = {};
         for (var i = 0; i < widgetFeatureTypeStyles.length; i++) {
-          var itemString =
-              "${i + 1}) ${widgetFeatureTypeStyles[i].name} - ${widgetRules[i].name}";
+          var itemString = "${i + 1}) ${widgetFeatureTypeStyles[i].name}";
           item2IndexMap[itemString] = i;
           items.add(itemString);
         }
         var selectedItemString =
-            "${currentIndex + 1}) ${widgetFeatureTypeStyles[currentIndex].name} - ${widgetRules[currentIndex].name}";
+            "${currentFtsIndex + 1}) ${widgetFeatureTypeStyles[currentFtsIndex].name}";
 
         showMaterialScrollPicker(
           context: context,
-          title: "Select the Featuretype and Rule",
+          title: "Select Featuretype Style",
           items: items,
           selectedItem: selectedItemString,
           onChanged: (value) {
             setState(() {
-              currentIndex = item2IndexMap[value];
+              currentFtsIndex = item2IndexMap[value];
+              currentRuleIndex = 0;
+              currentRulesList = widgetRules[currentFtsIndex];
+            });
+          },
+        );
+      },
+    );
+  }
+
+  IconButton getRuleSelectionButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(
+        MdiIcons.formSelect,
+        color: SmashColors.mainDecorations,
+      ),
+      onPressed: () {
+        if (currentRulesList.length == 1) {
+          showInfoDialog(context, "No other rule styles available.");
+          return;
+        }
+
+        List<String> items = [];
+        Map<String, int> item2IndexMap = {};
+        for (var i = 0; i < currentRulesList.length; i++) {
+          var itemString = "${i + 1}) ${currentRulesList[i].name}";
+          item2IndexMap[itemString] = i;
+          items.add(itemString);
+        }
+        var selectedItemString =
+            "${currentRuleIndex + 1}) ${currentRulesList[currentRuleIndex].name}";
+
+        showMaterialScrollPicker(
+          context: context,
+          title: "Select Rule",
+          items: items,
+          selectedItem: selectedItemString,
+          onChanged: (value) {
+            setState(() {
+              currentRuleIndex = item2IndexMap[value];
             });
           },
         );
@@ -228,15 +303,24 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
     } else if (geometryType.isPolygon()) {
       sldString = HU.DefaultSlds.simplePolygonSld();
     }
+    widgetRules = {};
+    widgetFeatureTypeStyles = [];
+
     sldParser = HU.SldObjectParser.fromString(sldString);
     sldParser.parse();
-    widgetFeatureTypeStyles = [];
-    widgetRules = [];
-    sldParser.applyForEachRule((ft, r) {
-      widgetFeatureTypeStyles.add(ft);
-      widgetRules.add(r);
+    int index = 0;
+    sldParser.featureTypeStyles.forEach((fts) {
+      widgetFeatureTypeStyles.add(fts);
+      var rulesList = <HU.Rule>[];
+      fts.rules.forEach((rule) {
+        rulesList.add(rule);
+      });
+      widgetRules[index] = rulesList;
+      index++;
     });
-    currentIndex = 0;
+    currentRulesList = widgetRules[0];
+    currentRuleIndex = 0;
+    currentFtsIndex = 0;
   }
 }
 
