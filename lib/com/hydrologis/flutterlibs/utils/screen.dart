@@ -42,6 +42,10 @@ class ScreenUtilities {
     return MediaQuery.of(context).size.width;
   }
 
+  static double getHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height;
+  }
+
   /// Check if the device is in landscape mode
   static bool isLandscape(BuildContext context) {
     return MediaQuery.of(context).orientation == Orientation.landscape;
