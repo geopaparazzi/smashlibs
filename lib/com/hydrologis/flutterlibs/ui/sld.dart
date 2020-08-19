@@ -140,7 +140,7 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
           ),
         );
       }
-      if (widgetRules[currentFtsIndex].length > 1) {
+      if (rules.length > 1) {
         headerTiles.add(
           ListTile(
             leading: getRuleSelectionButton(context),
@@ -243,6 +243,7 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
 
         showMaterialScrollPicker(
           context: context,
+          showDivider: true,
           title: "Select Featuretype Style",
           items: items,
           selectedItem: selectedItemString,
@@ -283,6 +284,7 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
         showMaterialScrollPicker(
           context: context,
           title: "Select Rule",
+          showDivider: true,
           items: items,
           selectedItem: selectedItemString,
           onChanged: (value) {
