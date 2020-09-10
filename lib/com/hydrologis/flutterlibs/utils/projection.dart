@@ -173,17 +173,17 @@ class ProjectionsSettings extends StatefulWidget {
   }
 }
 
-class ProjectionsSettingsState extends State<ProjectionsSettings> {
+class ProjectionsSettingsState extends State<ProjectionsSettings>
+    with AfterLayoutMixin {
   static final title = "CRS";
   static final subtitle = "Projections & CO";
   static final iconData = MdiIcons.earthBox;
 
-  List<int> _projList;
+  List<int> _sridList;
+  bool doLoad = false;
 
   @override
-  void initState() {
-    super.initState();
-
+  void afterFirstLayout(BuildContext context) {
     init();
   }
 
@@ -194,10 +194,12 @@ class ProjectionsSettingsState extends State<ProjectionsSettings> {
       await downloadAndRegisterEpsg();
     }
 
-    setState(() {});
+    setState(() {
+      doLoad = true;
+    });
   }
 
-  downloadAndRegisterEpsg() async {
+  Future<void> downloadAndRegisterEpsg() async {
     String url = "https://epsg.io/${widget.epsgToDownload}.proj4";
     Response response = await Dio().get(url);
     var prjData = response.data;
@@ -210,25 +212,26 @@ class ProjectionsSettingsState extends State<ProjectionsSettings> {
         projList.add(projDefinition);
       }
       await GpPreferences().setProjections(projList);
+      _sridList.add(widget.epsgToDownload);
     }
   }
 
   Future<void> getData() async {
     List<String> projList = await GpPreferences().getProjections();
     projList = projList.toSet().toList();
-    _projList = projList.map((prj) {
+    _sridList = projList.map((prj) {
       var firstColon = prj.indexOf(":");
       var epsgStr = prj.substring(0, firstColon);
       return int.parse(epsgStr);
     }).toList();
 
-    _projList.sort();
+    _sridList.sort();
 
-    if (!_projList.contains(SmashPrj.EPSG3857_INT)) {
-      _projList.insert(0, SmashPrj.EPSG3857_INT);
+    if (!_sridList.contains(SmashPrj.EPSG3857_INT)) {
+      _sridList.insert(0, SmashPrj.EPSG3857_INT);
     }
-    if (!_projList.contains(SmashPrj.EPSG4326_INT)) {
-      _projList.insert(0, SmashPrj.EPSG4326_INT);
+    if (!_sridList.contains(SmashPrj.EPSG4326_INT)) {
+      _sridList.insert(0, SmashPrj.EPSG4326_INT);
     }
   }
 
@@ -238,7 +241,7 @@ class ProjectionsSettingsState extends State<ProjectionsSettings> {
       appBar: new AppBar(
         title: Text("Registered Projections"),
       ),
-      body: _projList == null
+      body: !doLoad
           ? Center(
               child: SmashCircularProgress(
                 label:
@@ -246,11 +249,11 @@ class ProjectionsSettingsState extends State<ProjectionsSettings> {
               ),
             )
           : ListView.builder(
-              itemCount: _projList.length,
+              itemCount: _sridList.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   leading: Icon(MdiIcons.earthBox),
-                  title: Text("EPSG:${_projList[index]}"),
+                  title: Text("EPSG:${_sridList[index]}"),
                 );
               },
             ),
