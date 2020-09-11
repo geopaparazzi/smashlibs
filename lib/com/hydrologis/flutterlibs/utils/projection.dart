@@ -257,8 +257,8 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     await getData();
 
     if (widget.epsgToDownload != null) {
-      var existing =
-          _infoList.firstWhere((pi) => pi.epsg == widget.epsgToDownload);
+      var existing = _infoList
+          .firstWhere((pi) => pi.epsg == widget.epsgToDownload, orElse: null);
       if (existing != null) {
         return;
       }
@@ -326,7 +326,8 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
         onPressed: () async {
           int epsg = await SmashDialogs.showEpsgInputDialog(context);
           if (epsg != null) {
-            var existing = _infoList.firstWhere((pi) => pi.epsg == epsg);
+            var existing =
+                _infoList.firstWhere((pi) => pi.epsg == epsg, orElse: null);
             if (existing == null) {
               await downloadAndRegisterEpsg(epsg);
               await getData();
