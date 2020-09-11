@@ -404,7 +404,8 @@ ListTile getWidget(
                 if (await canLaunch(url)) {
                   await launch(url);
                 } else {
-                  showErrorDialog(context, "Unable to open url: $url");
+                  SmashDialogs.showErrorDialog(
+                      context, "Unable to open url: $url");
                 }
               },
               child: text,

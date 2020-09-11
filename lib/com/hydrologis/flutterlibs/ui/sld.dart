@@ -227,7 +227,8 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
       ),
       onPressed: () {
         if (widgetFeatureTypeStyles.length == 1) {
-          showInfoDialog(context, "No other featuretype styles available.");
+          SmashDialogs.showInfoDialog(
+              context, "No other featuretype styles available.");
           return;
         }
 
@@ -267,7 +268,8 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
       ),
       onPressed: () {
         if (currentRulesList.length == 1) {
-          showInfoDialog(context, "No other rule styles available.");
+          SmashDialogs.showInfoDialog(
+              context, "No other rule styles available.");
           return;
         }
 

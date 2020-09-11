@@ -128,7 +128,7 @@ class FileBrowserState extends State<FileBrowser> {
       onPressed: () async {
         var rootDir = await Workspace.getRootFolder();
         if (currentPath == rootDir.path) {
-          showWarningDialog(
+          SmashDialogs.showWarningDialog(
               context, "The top level folder has already been reached.");
         } else {
           setState(() {

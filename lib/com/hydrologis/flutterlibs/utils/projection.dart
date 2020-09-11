@@ -163,7 +163,7 @@ class GeometryReprojectionFilter implements JTS.CoordinateFilter {
 }
 
 class ProjectionsSettings extends StatefulWidget {
-  var epsgToDownload;
+  final int epsgToDownload;
 
   ProjectionsSettings({this.epsgToDownload});
 
@@ -173,13 +173,23 @@ class ProjectionsSettings extends StatefulWidget {
   }
 }
 
+class PrjInfo {
+  int epsg;
+  String prjData;
+  PrjInfo([this.epsg, this.prjData]);
+  @override
+  String toString() {
+    return "$epsg:$prjData";
+  }
+}
+
 class ProjectionsSettingsState extends State<ProjectionsSettings>
     with AfterLayoutMixin {
   static final title = "CRS";
   static final subtitle = "Projections & CO";
   static final iconData = MdiIcons.earthBox;
 
-  List<int> _sridList;
+  List<PrjInfo> _infoList;
   bool doLoad = false;
 
   @override
@@ -191,7 +201,7 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     await getData();
 
     if (widget.epsgToDownload != null) {
-      await downloadAndRegisterEpsg();
+      await downloadAndRegisterEpsg(widget.epsgToDownload);
     }
 
     setState(() {
@@ -199,39 +209,64 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     });
   }
 
-  Future<void> downloadAndRegisterEpsg() async {
-    String url = "https://epsg.io/${widget.epsgToDownload}.proj4";
+  Future<void> downloadAndRegisterEpsg(int srid) async {
+    String url = "https://epsg.io/$srid.proj4";
     Response response = await Dio().get(url);
     var prjData = response.data;
     if (prjData != null && prjData is String && prjData.startsWith("+")) {
-      Projection.add('EPSG:${widget.epsgToDownload}', prjData);
-      String projDefinition = "${widget.epsgToDownload}:$prjData";
+      Projection.add('EPSG:$srid', prjData);
+      String projDefinition = "$srid:$prjData";
 
       List<String> projList = await GpPreferences().getProjections();
       if (!projList.contains(projDefinition)) {
         projList.add(projDefinition);
       }
       await GpPreferences().setProjections(projList);
-      _sridList.add(widget.epsgToDownload);
+      _infoList.add(PrjInfo(srid, prjData));
     }
   }
 
   Future<void> getData() async {
-    List<String> projList = await GpPreferences().getProjections();
-    projList = projList.toSet().toList();
-    _sridList = projList.map((prj) {
-      var firstColon = prj.indexOf(":");
-      var epsgStr = prj.substring(0, firstColon);
-      return int.parse(epsgStr);
+    List<String> projStringList = await GpPreferences().getProjections();
+    projStringList = projStringList.toSet().toList();
+
+    bool has3857 = false;
+    bool has4326 = false;
+    _infoList = projStringList.map((prjStr) {
+      var firstColon = prjStr.indexOf(":");
+      var epsgStr = prjStr.substring(0, firstColon);
+      var prjData = prjStr.substring(firstColon + 1);
+
+      PrjInfo pi = PrjInfo();
+      pi.epsg = int.parse(epsgStr);
+      pi.prjData = prjData;
+
+      if (pi.epsg == SmashPrj.EPSG3857_INT) {
+        has3857 = true;
+      }
+      if (pi.epsg == SmashPrj.EPSG4326_INT) {
+        has4326 = true;
+      }
+      return pi;
     }).toList();
 
-    _sridList.sort();
+    _infoList.sort((pi1, pi2) {
+      if (pi1.epsg < pi2.epsg) return -1;
+      if (pi1.epsg > pi2.epsg) return 1;
+      return 0;
+    });
 
-    if (!_sridList.contains(SmashPrj.EPSG3857_INT)) {
-      _sridList.insert(0, SmashPrj.EPSG3857_INT);
+    if (!has3857) {
+      _infoList.insert(
+          0,
+          PrjInfo(SmashPrj.EPSG3857_INT,
+              "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"));
     }
-    if (!_sridList.contains(SmashPrj.EPSG4326_INT)) {
-      _sridList.insert(0, SmashPrj.EPSG4326_INT);
+    if (!has4326) {
+      _infoList.insert(
+          0,
+          PrjInfo(
+              SmashPrj.EPSG4326_INT, "+proj=longlat +datum=WGS84 +no_defs "));
     }
   }
 
@@ -249,14 +284,33 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
               ),
             )
           : ListView.builder(
-              itemCount: _sridList.length,
+              itemCount: _infoList.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   leading: Icon(MdiIcons.earthBox),
-                  title: Text("EPSG:${_sridList[index]}"),
+                  title: Text("EPSG:${_infoList[index].epsg}"),
+                  subtitle: Text(_infoList[index].prjData),
                 );
               },
             ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(MdiIcons.plus),
+        tooltip: "Add projection by epsg code.",
+        onPressed: () async {
+          int epsg = await SmashDialogs.showEpsgInputDialog(context);
+          if (epsg != null) {
+            var existing = _infoList.firstWhere((pi) => pi.epsg == epsg);
+            if (existing == null) {
+              await downloadAndRegisterEpsg(epsg);
+              await getData();
+              setState(() {});
+            } else {
+              SmashDialogs.showWarningDialog(
+                  context, "Projection definition already exists locally.");
+            }
+          }
+        },
+      ),
     );
   }
 }
