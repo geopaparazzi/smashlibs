@@ -130,15 +130,71 @@ class SmashPrj {
   }
 
   static Projection fromImageFile(String imageFilePath) {
-    String prjPath = getPrjForImage(imageFilePath);
+    String prjPath = getPrjPath(imageFilePath);
     return fromFile(prjPath);
   }
 
-  static String getPrjForImage(String imageFilePath) {
-    String folder = HU.FileUtilities.parentFolderFromFile(imageFilePath);
-    var name = HU.FileUtilities.nameFromFile(imageFilePath, false);
+  static String getPrjPath(String mainDataFilePath) {
+    String folder = HU.FileUtilities.parentFolderFromFile(mainDataFilePath);
+    var name = HU.FileUtilities.nameFromFile(mainDataFilePath, false);
     var prjPath = HU.FileUtilities.joinPaths(folder, name + ".prj");
     return prjPath;
+  }
+
+  static Future<List<PrjInfo>> getPrjInfoFromPreferences() async {
+    List<String> projStringList = await GpPreferences().getProjections();
+    projStringList = projStringList.toSet().toList();
+
+    bool has3857 = false;
+    bool has4326 = false;
+    var list = projStringList.map((prjStr) {
+      var firstColon = prjStr.indexOf(":");
+      var epsgStr = prjStr.substring(0, firstColon);
+      var prjData = prjStr.substring(firstColon + 1);
+
+      PrjInfo pi = PrjInfo();
+      pi.epsg = int.parse(epsgStr);
+      pi.prjData = prjData;
+
+      if (pi.epsg == SmashPrj.EPSG3857_INT) {
+        has3857 = true;
+      }
+      if (pi.epsg == SmashPrj.EPSG4326_INT) {
+        has4326 = true;
+      }
+      return pi;
+    }).toList();
+
+    if (!has3857) {
+      list.insert(
+          0,
+          PrjInfo(SmashPrj.EPSG3857_INT,
+              "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"));
+    }
+    if (!has4326) {
+      list.insert(
+          0,
+          PrjInfo(
+              SmashPrj.EPSG4326_INT, "+proj=longlat +datum=WGS84 +no_defs "));
+    }
+    return list;
+  }
+
+  static bool areEqual(Projection p1, Projection p2) {
+    if (p1.runtimeType == p2.runtimeType &&
+            p1.ellps == p2.ellps && //
+            p1.k0 == p2.k0 && //
+            p1.axis == p2.axis && //
+            p1.a == p2.a && //
+            p1.b == p2.b && //
+            p1.rf == p2.rf && //
+            p1.es == p2.es && //
+            p1.e == p2.e && //
+            p1.ep2 == p2.ep2 //
+        ) {
+      return true;
+    }
+    return false;
   }
 }
 
@@ -201,6 +257,11 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     await getData();
 
     if (widget.epsgToDownload != null) {
+      var existing =
+          _infoList.firstWhere((pi) => pi.epsg == widget.epsgToDownload);
+      if (existing != null) {
+        return;
+      }
       await downloadAndRegisterEpsg(widget.epsgToDownload);
     }
 
@@ -227,47 +288,13 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
   }
 
   Future<void> getData() async {
-    List<String> projStringList = await GpPreferences().getProjections();
-    projStringList = projStringList.toSet().toList();
-
-    bool has3857 = false;
-    bool has4326 = false;
-    _infoList = projStringList.map((prjStr) {
-      var firstColon = prjStr.indexOf(":");
-      var epsgStr = prjStr.substring(0, firstColon);
-      var prjData = prjStr.substring(firstColon + 1);
-
-      PrjInfo pi = PrjInfo();
-      pi.epsg = int.parse(epsgStr);
-      pi.prjData = prjData;
-
-      if (pi.epsg == SmashPrj.EPSG3857_INT) {
-        has3857 = true;
-      }
-      if (pi.epsg == SmashPrj.EPSG4326_INT) {
-        has4326 = true;
-      }
-      return pi;
-    }).toList();
+    _infoList = await SmashPrj.getPrjInfoFromPreferences();
 
     _infoList.sort((pi1, pi2) {
       if (pi1.epsg < pi2.epsg) return -1;
       if (pi1.epsg > pi2.epsg) return 1;
       return 0;
     });
-
-    if (!has3857) {
-      _infoList.insert(
-          0,
-          PrjInfo(SmashPrj.EPSG3857_INT,
-              "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"));
-    }
-    if (!has4326) {
-      _infoList.insert(
-          0,
-          PrjInfo(
-              SmashPrj.EPSG4326_INT, "+proj=longlat +datum=WGS84 +no_defs "));
-    }
   }
 
   @override
