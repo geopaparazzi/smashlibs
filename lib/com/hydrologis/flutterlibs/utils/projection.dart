@@ -46,7 +46,7 @@ class SmashPrj {
 
   /// Try to get the srid from the [projection] object.
   ///
-  /// If the sird is not recognized, null is returned.
+  /// If the srid is not recognized, null is returned.
   static int getSrid(Projection projection) {
     String sridStr =
         projection.projName.toLowerCase().replaceFirst("epsg:", "");
@@ -63,6 +63,14 @@ class SmashPrj {
       // ignore and let it be handles later
       return null;
     }
+  }
+
+  /// Try to get the epsg from a data file with prj sidecar file..
+  static int getSridFromDataFile(String dataFilePath) {
+    var prjPath = SmashPrj.getPrjPath(dataFilePath);
+    var wktPrj = HU.FileUtilities.readFile(prjPath);
+    int srid = SmashPrj.getSridFromWkt(wktPrj);
+    return srid;
   }
 
   /// Try to get the epsg from the [wkt] definition.
@@ -103,6 +111,20 @@ class SmashPrj {
       }
     }
     return null;
+  }
+
+  /// Try to get the srid by comparing [checkProj] with [PrjInfo] objects saved in preferences.
+  static Future<int> getSridFromMatchingInPreferences(
+      Projection checkProj) async {
+    var prjList = await SmashPrj.getPrjInfoFromPreferences();
+    var matchingPi = prjList.firstWhere(
+      (pi) {
+        var p = Projection.parse(pi.prjData);
+        return SmashPrj.areEqual(p, checkProj);
+      },
+      orElse: () => null,
+    );
+    return matchingPi?.epsg;
   }
 
   static Point transform(Projection from, Projection to, Point point) {
