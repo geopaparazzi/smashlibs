@@ -6,8 +6,15 @@ class SmashPrj {
   static final int EPSG3857_INT = 3857;
   static final Projection EPSG3857 = Projection('EPSG:$EPSG3857_INT');
 
-  SmashPrj();
+  /// Create a [Projection] object from a given [srid].
+  static Projection fromSrid(int srid) {
+    if (srid == EPSG3857_INT) return EPSG3857;
+    if (srid == EPSG4326_INT) return EPSG4326;
+    var prj = Projection("EPSG:$srid");
+    return prj;
+  }
 
+  /// Create a [Projection] object from its [wkt] representation.
   static Projection fromWkt(String wkt) {
     if (wkt
         .replaceAll(" ", "")
@@ -19,7 +26,27 @@ class SmashPrj {
     return Projection.parse(wkt);
   }
 
-  /// Try to get the srid from the projection
+  /// Read a [Projection] from a prj file.
+  static Projection fromFile(String prjFilePath) {
+    var prjFile = File(prjFilePath);
+    if (prjFile.existsSync()) {
+      var wktPrj = HU.FileUtilities.readFile(prjFilePath);
+      return fromWkt(wktPrj);
+    }
+    return null;
+  }
+
+  /// Read a [Projection] from the prj file of a given data file.
+  ///
+  /// Ex. from the prj file, given a shapefile path.
+  static Projection fromDataFile(String dataFilePath) {
+    String prjPath = getPrjPath(dataFilePath);
+    return fromFile(prjPath);
+  }
+
+  /// Try to get the srid from the [projection] object.
+  ///
+  /// If the sird is not recognized, null is returned.
   static int getSrid(Projection projection) {
     String sridStr =
         projection.projName.toLowerCase().replaceFirst("epsg:", "");
@@ -38,7 +65,7 @@ class SmashPrj {
     }
   }
 
-  /// Try to get the epsg from the wkt definition.
+  /// Try to get the epsg from the [wkt] definition.
   static int getSridFromWkt(String wkt) {
     // try the proj way
     wkt_parser.ProjWKT wktObject = wkt_parser.parseWKT(wkt);
@@ -78,13 +105,6 @@ class SmashPrj {
     return null;
   }
 
-  static Projection fromSrid(int srid) {
-    if (srid == EPSG3857_INT) return EPSG3857;
-    if (srid == EPSG4326_INT) return EPSG4326;
-    var prj = Projection("EPSG:$srid");
-    return prj;
-  }
-
   static Point transform(Projection from, Projection to, Point point) {
     return from.transform(to, point);
   }
@@ -93,6 +113,9 @@ class SmashPrj {
     return from.transform(EPSG4326, point);
   }
 
+  /// Reproject a [JTS.Geometry].
+  ///
+  /// The coordinates of the supplied geometry are modified. No copy is done.
   static void transformGeometry(
       Projection from, Projection to, JTS.Geometry geom) {
     GeometryReprojectionFilter filter = GeometryReprojectionFilter(from, to);
@@ -100,6 +123,9 @@ class SmashPrj {
     geom.geometryChanged();
   }
 
+  /// Reproject a [JTS.Geometry] to epsg:4326.
+  ///
+  /// The coordinates of the supplied geometry are modified. No copy is done.
   static void transformGeometryToWgs84(Projection from, JTS.Geometry geom) {
     GeometryReprojectionFilter filter =
         GeometryReprojectionFilter(from, EPSG4326);
@@ -107,7 +133,7 @@ class SmashPrj {
     geom.geometryChanged();
   }
 
-  /// Reproject a list of [JTS.Geometries] to epsg:4326.
+  /// Reproject a list of [JTS.Geometry] to epsg:4326.
   ///
   /// The coordinates of the supplied geometries are modified. No copy is done.
   static void transformListToWgs84(
@@ -120,20 +146,7 @@ class SmashPrj {
     }
   }
 
-  static Projection fromFile(String prjFilePath) {
-    var prjFile = File(prjFilePath);
-    if (prjFile.existsSync()) {
-      var wktPrj = HU.FileUtilities.readFile(prjFilePath);
-      return fromWkt(wktPrj);
-    }
-    return null;
-  }
-
-  static Projection fromImageFile(String imageFilePath) {
-    String prjPath = getPrjPath(imageFilePath);
-    return fromFile(prjPath);
-  }
-
+  /// Get the sidecar prj file from a data file (ex. shp or tiff).
   static String getPrjPath(String mainDataFilePath) {
     String folder = HU.FileUtilities.parentFolderFromFile(mainDataFilePath);
     var name = HU.FileUtilities.nameFromFile(mainDataFilePath, false);
@@ -141,6 +154,7 @@ class SmashPrj {
     return prjPath;
   }
 
+  /// Extract the list of projection information from the preferences.
   static Future<List<PrjInfo>> getPrjInfoFromPreferences() async {
     List<String> projStringList = await GpPreferences().getProjections();
     projStringList = projStringList.toSet().toList();
@@ -180,6 +194,7 @@ class SmashPrj {
     return list;
   }
 
+  /// Check if two [Projection]s are the samer based on some of its parameters.
   static bool areEqual(Projection p1, Projection p2) {
     if (p1.runtimeType == p2.runtimeType &&
             p1.ellps == p2.ellps && //
