@@ -48,6 +48,9 @@ class Workspace {
     if (Platform.isIOS || Platform.isMacOS) {
       var dir = await getApplicationDocumentsDirectory();
       return dir;
+    } else if (Platform.isLinux) {
+      var dir = await getApplicationDocumentsDirectory();
+      return dir;
     } else if (Platform.isAndroid) {
       var dir = await _getAndroidStorageFolder();
       return dir;
