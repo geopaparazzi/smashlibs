@@ -127,7 +127,7 @@ class FileBrowserState extends State<FileBrowser> {
       child: Icon(MdiIcons.folderUpload),
       onPressed: () async {
         var rootDir = await Workspace.getRootFolder();
-        if (currentPath == rootDir.path) {
+        if (currentPath == rootDir.path && !Workspace.isDesktop()) {
           SmashDialogs.showWarningDialog(
               context, "The top level folder has already been reached.");
         } else {

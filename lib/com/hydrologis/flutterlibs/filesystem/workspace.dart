@@ -19,19 +19,28 @@ const IOS_DOCUMENTSFOLDER = "Documents";
 class Workspace {
   static String _rootFolder;
 
+  static bool _isDesktop;
+
   static Future<void> init() async {
     var rootDir = await getRootFolder();
     _rootFolder = rootDir.path;
+    _isDesktop = isDesktop();
   }
 
   /// Make an [absolutePath] relative to the current rootfolder.
   static String makeRelative(String absolutePath) {
+    if (_isDesktop) {
+      return absolutePath;
+    }
     var relativePath = absolutePath.replaceFirst(_rootFolder, "");
     return relativePath;
   }
 
   /// Make a [relativePath] absolute using to the current rootfolder.
   static String makeAbsolute(String relativePath) {
+    if (_isDesktop) {
+      return relativePath;
+    }
     if (relativePath.startsWith(_rootFolder)) return relativePath;
     var absolutePath = HU.FileUtilities.joinPaths(_rootFolder, relativePath);
     return absolutePath;
@@ -197,8 +206,10 @@ class Workspace {
     if (lastFolder.length == 0) {
       lastFolder = rootPath;
     } else {
-      // add the root folder
-      lastFolder = HU.FileUtilities.joinPaths(rootPath, lastFolder);
+      if (!_isDesktop) {
+        // add the root folder if we are on mobile (IOS needs that)
+        lastFolder = HU.FileUtilities.joinPaths(rootPath, lastFolder);
+      }
     }
     return lastFolder;
   }
@@ -208,6 +219,17 @@ class Workspace {
     var rootPath = rootDir.path;
     String relativePath = absolutePath.replaceFirst(rootPath, "");
     await GpPreferences().setString(KEY_LAST_USED_FOLDER, relativePath);
+  }
+
+  static bool isDesktop() {
+    if (_isDesktop == null) {
+      _isDesktop = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+    }
+    return _isDesktop;
+  }
+
+  static bool isMobile() {
+    return Platform.isAndroid || Platform.isIOS;
   }
 
   /// Get the folder into which the app can create data, which are
