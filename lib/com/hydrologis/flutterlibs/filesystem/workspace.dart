@@ -206,10 +206,13 @@ class Workspace {
     if (lastFolder.length == 0) {
       lastFolder = rootPath;
     } else {
-      if (!_isDesktop) {
+      if (!_isDesktop || !Directory(lastFolder).existsSync()) {
         // add the root folder if we are on mobile (IOS needs that)
         lastFolder = HU.FileUtilities.joinPaths(rootPath, lastFolder);
       }
+    }
+    if (!Directory(lastFolder).existsSync()) {
+      return rootPath;
     }
     return lastFolder;
   }
