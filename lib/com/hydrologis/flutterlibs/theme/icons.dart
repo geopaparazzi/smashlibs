@@ -66,6 +66,8 @@ class SmashIcons {
   static IconData forPath(String pathOrUrlOrNameOrExtension) {
     if (pathOrUrlOrNameOrExtension.toLowerCase().startsWith("http")) {
       return MdiIcons.earth;
+    } else if (FileSystemEntity.isDirectorySync(pathOrUrlOrNameOrExtension)) {
+      return MdiIcons.folderOutline;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.MAPSFORGE_EXT)) {
       return MdiIcons.map;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.GPX_EXT)) {
@@ -86,8 +88,6 @@ class SmashIcons {
       return MdiIcons.database;
     } else if (pathOrUrlOrNameOrExtension.endsWith("tags.json")) {
       return formNotesIcon;
-    } else if (FileSystemEntity.isDirectorySync(pathOrUrlOrNameOrExtension)) {
-      return MdiIcons.folderOutline;
     } else {
       return MdiIcons.fileOutline;
     }
