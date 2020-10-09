@@ -284,10 +284,21 @@ class SmashDialogs {
   ///
   /// Returns the selected item.
   static Future<String> showComboDialog(
-      BuildContext context, dynamic title, List<String> items,
-      [List<String> iconNames]) async {
+    BuildContext context,
+    dynamic title,
+    List<String> items, {
+    List<String> iconNames,
+    bool allowCancel = false,
+    String cancelText = 'Cancel',
+  }) async {
     List<ListTile> widgets = [];
     for (var i = 0; i < items.length; ++i) {
+      Widget txt = Expanded(
+        child: SmashUI.normalText(items[i],
+            textAlign: TextAlign.center,
+            bold: true,
+            color: SmashColors.mainDecorations),
+      );
       widgets.add(ListTile(
         onTap: () {
           Navigator.pop(context, items[i]);
@@ -306,12 +317,7 @@ class SmashDialogs {
                       ),
                     )
                   : Container(),
-              Expanded(
-                child: SmashUI.normalText(items[i],
-                    textAlign: TextAlign.center,
-                    bold: true,
-                    color: SmashColors.mainDecorations),
-              )
+              txt
             ],
           ),
         ),
@@ -322,18 +328,35 @@ class SmashDialogs {
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
-          return SimpleDialog(
+          return AlertDialog(
             title: title is String
-                ? Expanded(
-                    child: SmashUI.normalText(title,
-                        textAlign: TextAlign.center,
-                        color: SmashColors.mainDecorationsDarker),
-                  )
+                ? SmashUI.normalText(title,
+                    textAlign: TextAlign.center,
+                    color: SmashColors.mainDecorationsDarker)
                 : title,
-            children:
-                ListTile.divideTiles(context: context, tiles: widgets).toList(),
+            content: Builder(builder: (context) {
+              var width = MediaQuery.of(context).size.width;
+              return Container(
+                width: width,
+                child: ListView(
+                  shrinkWrap: true,
+                  children:
+                      ListTile.divideTiles(context: context, tiles: widgets)
+                          .toList(),
+                ),
+              );
+            }),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            actions: [
+              if (allowCancel)
+                FlatButton(
+                  child: Text(cancelText),
+                  onPressed: () {
+                    Navigator.of(context).pop(null);
+                  },
+                ),
+            ],
           );
         });
     return selection;
