@@ -30,7 +30,7 @@ dependencies:
   # OTHERS
   ####################
   # BSD
-  charset_converter: ^1.0.3
+  # charset_converter: ^1.0.3
   # MIT
   material_design_icons_flutter: ^4.0.5345
   # MIT
