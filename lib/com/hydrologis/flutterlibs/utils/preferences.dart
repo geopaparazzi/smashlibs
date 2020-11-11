@@ -130,7 +130,7 @@ class GpPreferences {
   }
 
   /// Save a string [value] to the preferences using a preferences [key].
-  setString(String key, String value) async {
+  Future<void> setString(String key, String value) async {
     await _checkPreferences();
     await _preferences.setString(key, value);
   }
@@ -150,7 +150,7 @@ class GpPreferences {
     return prefValue;
   }
 
-  setStringList(String key, List<String> value) async {
+  Future<void> setStringList(String key, List<String> value) async {
     await _checkPreferences();
     await _preferences.setStringList(key, value);
   }
@@ -195,7 +195,7 @@ class GpPreferences {
   }
 
   /// Save a double [value] to the preferences using a preferences [key].
-  setDouble(String key, double value) async {
+  Future<void> setDouble(String key, double value) async {
     await _checkPreferences();
     await _preferences.setDouble(key, value);
   }
@@ -212,7 +212,7 @@ class GpPreferences {
   }
 
   /// Save an int [value] to the preferences using a preferences [key].
-  setInt(String key, int value) async {
+  Future<void> setInt(String key, int value) async {
     await _checkPreferences();
     await _preferences.setInt(key, value);
   }
@@ -223,11 +223,11 @@ class GpPreferences {
     return list;
   }
 
-  Future setTmsList(List<String> list) async {
+  Future<void> setTmsList(List<String> list) async {
     await _preferences.setStringList(KEY_SAVED_TMS_LIST, list);
   }
 
-  Future addNewTms(String jsonDefinition) async {
+  Future<void> addNewTms(String jsonDefinition) async {
     var tmsList = getTmsListSync();
     if (!tmsList.contains(jsonDefinition)) {
       tmsList.add(jsonDefinition);
@@ -241,11 +241,11 @@ class GpPreferences {
     return list;
   }
 
-  Future setWmsList(List<String> list) async {
+  Future<void> setWmsList(List<String> list) async {
     await _preferences.setStringList(KEY_SAVED_WMS_LIST, list);
   }
 
-  Future addNewWms(String jsonDefinition) async {
+  Future<void> addNewWms(String jsonDefinition) async {
     var wmsList = getWmsListSync();
     if (!wmsList.contains(jsonDefinition)) {
       wmsList.add(jsonDefinition);
@@ -261,7 +261,7 @@ class GpPreferences {
     return list;
   }
 
-  Future addRecentProject(String projectPath) async {
+  Future<void> addRecentProject(String projectPath) async {
     await _checkPreferences();
     var list = _preferences.getStringList(KEY_RECENTSPROJECTS_LIST);
     if (list == null) list = [];
@@ -325,7 +325,7 @@ class GpPreferences {
     return list;
   }
 
-  void setLayerInfoList(List<String> layerInfoList) async {
+  Future<void> setLayerInfoList(List<String> layerInfoList) async {
     await _checkPreferences();
     if (layerInfoList == null) layerInfoList = [];
     await _preferences.setStringList(KEY_LAYERINFO_LIST, layerInfoList);
