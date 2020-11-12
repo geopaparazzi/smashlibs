@@ -226,7 +226,6 @@ class SmashDialogs {
     var _textWidget = new TextFormField(
       controller: textEditingController,
       autofocus: true,
-      autovalidate: true,
       decoration: inputDecoration,
       obscureText: isPassword,
       validator: (inputText) {

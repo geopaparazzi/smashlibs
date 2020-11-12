@@ -35,37 +35,42 @@ class PermissionManager {
   }
 
   Future<bool> _checkStoragePermissions() async {
-    PermissionStatus permission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.storage);
-    if (permission != PermissionStatus.granted) {
+    if (await Permission.storage.request().isGranted) {
+      SMLogger().i("Storage permission granted.");
+      return true;
+    } else {
       SMLogger().w("Storage permission is not granted.");
-      Map<PermissionGroup, PermissionStatus> permissionsMap =
-          await PermissionHandler()
-              .requestPermissions([PermissionGroup.storage]);
-      if (permissionsMap[PermissionGroup.storage] != PermissionStatus.granted) {
-        SMLogger().w("Unable to grant permission: ${PermissionGroup.storage}");
-        return false;
-      }
+      // Map<PermissionGroup, PermissionStatus> permissionsMap =
+      //     await PermissionHandler()
+      //         .requestPermissions([PermissionGroup.storage]);
+      // if (permissionsMap[PermissionGroup.storage] != PermissionStatus.granted) {
+      //   SMLogger().w("Unable to grant permission: ${PermissionGroup.storage}");
+      //   return false;
+      // }
+      return false;
     }
-    SMLogger().i("Storage permission granted.");
-    return true;
   }
 
   Future<bool> _checkLocationPermissions() async {
-    PermissionStatus permission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.location);
-    if (permission != PermissionStatus.granted) {
-      SMLogger().w("Location permission is not granted.");
-      Map<PermissionGroup, PermissionStatus> permissionsMap =
-          await PermissionHandler()
-              .requestPermissions([PermissionGroup.location]);
-      if (permissionsMap[PermissionGroup.location] !=
-          PermissionStatus.granted) {
-        SMLogger().w("Unable to grant permission: ${PermissionGroup.location}");
+    var status = await Permission.location.status;
+    if (status != PermissionStatus.granted) {
+      if (await Permission.location.request().isGranted) {
+        SMLogger().i("Location permission granted.");
+        return true;
+      } else {
+        SMLogger().w("Location permission is not granted.");
+        // Map<PermissionGroup, PermissionStatus> permissionsMap =
+        //     await PermissionHandler()
+        //         .requestPermissions([PermissionGroup.location]);
+        // if (permissionsMap[PermissionGroup.location] !=
+        //     PermissionStatus.granted) {
+        //   SMLogger()
+        //       .w("Unable to grant permission: ${PermissionGroup.location}");
+        //   return false;
+        // }
         return false;
       }
     }
-    SMLogger().i("Location permission granted.");
     return true;
   }
 }
