@@ -10,7 +10,8 @@ class FileManager {
   static const GEOPAPARAZZI_EXT = "gpap";
   static const GPX_EXT = "gpx";
   static const SHP_EXT = "shp";
-  static const TIF_EXT = "tiff";
+  static const TIF_EXT = "tif";
+  static const TIFF_EXT = "tiff";
   static const TIF_WLD_EXT = "tfw";
   static const JPG_EXT = "jpg";
   static const JPG_WLD_EXT = "jgw";
@@ -24,7 +25,7 @@ class FileManager {
 
   static const ALLOWED_PROJECT_EXT = [GEOPAPARAZZI_EXT];
   static const ALLOWED_VECTOR_DATA_EXT = [GPX_EXT, SHP_EXT, GEOPACKAGE_EXT];
-  static const ALLOWED_RASTER_DATA_EXT = [TIF_EXT, JPG_EXT, PNG_EXT];
+  static const ALLOWED_RASTER_DATA_EXT = [TIF_EXT, TIFF_EXT, JPG_EXT, PNG_EXT];
   static const ALLOWED_TILE_DATA_EXT = [
     GEOPACKAGE_EXT,
     MBTILES_EXT,
@@ -80,6 +81,7 @@ class FileManager {
   static bool isWorldImage(String path) {
     return path != null &&
         (path.toLowerCase().endsWith(TIF_EXT) ||
+            path.toLowerCase().endsWith(TIFF_EXT) ||
             path.toLowerCase().endsWith(JPG_EXT) ||
             path.toLowerCase().endsWith(PNG_EXT));
   }
