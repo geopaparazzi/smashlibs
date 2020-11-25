@@ -90,11 +90,11 @@ class FileManager {
 }
 
 class FileBrowser extends StatefulWidget {
-  bool _doFolderMode;
+  final bool _doFolderMode;
 
-  List<String> _allowedExtensions;
+  final List<String> _allowedExtensions;
 
-  String _startFolder;
+  final String _startFolder;
 
   FileBrowser(this._doFolderMode, this._allowedExtensions, this._startFolder);
 
