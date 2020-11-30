@@ -217,7 +217,6 @@ class SmashDialogs {
       cancelText: 'Cancel',
       isPassword: false,
       Function validationFunction}) async {
-    String userInput = defaultText;
     String errorText;
 
     var textEditingController = new TextEditingController(text: defaultText);
@@ -229,7 +228,6 @@ class SmashDialogs {
       decoration: inputDecoration,
       obscureText: isPassword,
       validator: (inputText) {
-        userInput = inputText;
         if (validationFunction != null) {
           errorText = validationFunction(inputText);
         } else {
@@ -267,7 +265,7 @@ class SmashDialogs {
               child: Text(okText),
               onPressed: () {
                 if (errorText == null) {
-                  Navigator.of(context).pop(userInput);
+                  Navigator.of(context).pop(textEditingController.text);
                 }
               },
             ),
@@ -368,8 +366,7 @@ class SmashDialogs {
       "Add Projection",
       "Enter EPSG code of the projection to download.",
       validationFunction: (String value) {
-        if (value.isNotEmpty &&
-            int.parse(value, onError: (e) => null) == null) {
+        if (value.isNotEmpty && int.tryParse(value) == null) {
           return "The epsg code has to be an integer code.";
         }
         return null;
