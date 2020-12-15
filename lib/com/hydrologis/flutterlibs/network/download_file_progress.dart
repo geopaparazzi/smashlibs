@@ -49,7 +49,7 @@ class DownloadCircularProgressWidgetState
 //        TileSource ts = TileSource.Mapsforge(f.path);
 //        LayerManager().addLayer(ts);
 //      }
-    } catch (e, s) {
+    } on Exception catch (e, s) {
       SMLogger().e(
           "An error occurred while downloading from: ${widget._downloadUrl}",
           e,

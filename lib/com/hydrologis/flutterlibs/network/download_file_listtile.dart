@@ -61,7 +61,7 @@ class FileDownloadListTileProgressWidgetState
               : ((rec / total) * 100).toStringAsFixed(0) + "%";
         });
       }, cancelToken: cancelToken, options: options);
-    } catch (e, s) {
+    } on Exception catch (e, s) {
       SMLogger().e("Error while downloading file ${widget._downloadUrl}", e, s);
     }
 
@@ -117,7 +117,7 @@ class FileDownloadListTileProgressWidgetState
             if (dFile.existsSync()) {
               dFile.deleteSync();
             }
-          } catch (e, s) {
+          } on Exception catch (e, s) {
             SMLogger().e("Error deleting file $dFile", e, s);
           }
           cancelToken.cancel("cancelled");
