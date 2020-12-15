@@ -64,7 +64,9 @@ class SmashIcons {
 
   /// Get the right icon for a given path or url or file name  or extension.
   static IconData forPath(String pathOrUrlOrNameOrExtension) {
-    if (pathOrUrlOrNameOrExtension.toLowerCase().startsWith("http")) {
+    if (pathOrUrlOrNameOrExtension.toLowerCase().startsWith("postgis")) {
+      return MdiIcons.database;
+    } else if (pathOrUrlOrNameOrExtension.toLowerCase().startsWith("http")) {
       return MdiIcons.earth;
     } else if (FileSystemEntity.isDirectorySync(pathOrUrlOrNameOrExtension)) {
       return MdiIcons.folderOutline;
