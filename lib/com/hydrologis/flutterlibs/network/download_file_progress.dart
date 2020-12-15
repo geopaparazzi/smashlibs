@@ -52,6 +52,7 @@ class DownloadCircularProgressWidgetState
     } catch (e, s) {
       SMLogger().e(
           "An error occurred while downloading from: ${widget._downloadUrl}",
+          e,
           s);
     }
 

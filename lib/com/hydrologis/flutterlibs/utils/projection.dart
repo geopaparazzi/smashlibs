@@ -103,7 +103,7 @@ class SmashPrj {
             try {
               return int.parse(epsgString);
             } catch (e, s) {
-              SMLogger().e("Error parsing epsg string: $epsgString", s);
+              SMLogger().e("Error parsing epsg string: $epsgString", e, s);
               return null;
             }
           }

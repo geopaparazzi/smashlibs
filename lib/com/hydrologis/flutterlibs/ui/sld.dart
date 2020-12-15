@@ -861,6 +861,7 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
                             } else {
                               SMLogger().e(
                                   "Unable to find type for key: ${filter.uniqueValueKey} and value: ${filter.uniqueValueValue}",
+                                  null,
                                   null);
                             }
                           }, key: Key("${keyCount++}")),

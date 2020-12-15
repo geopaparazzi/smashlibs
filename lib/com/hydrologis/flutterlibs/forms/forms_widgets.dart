@@ -933,7 +933,7 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
       try {
         dateTime = HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.parse(value);
       } catch (e) {
-        // ignor eand set to now
+        // ignore and set to now
       }
     }
     if (dateTime == null) {

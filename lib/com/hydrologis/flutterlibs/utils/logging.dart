@@ -63,12 +63,15 @@ class SMLogger {
     }
   }
 
-  void e(dynamic message, StackTrace stackTrace) {
+  void e(dynamic message, Exception exception, StackTrace stackTrace) {
     if (_subLogger != null) {
-      _subLogger.e(message, stackTrace);
+      _subLogger.e(message, exception, stackTrace);
     } else {
       print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       print("e: ${message.toString()}");
+      if (exception != null) {
+        print(exception);
+      }
       if (stackTrace != null) {
         print(stackTrace);
       }
