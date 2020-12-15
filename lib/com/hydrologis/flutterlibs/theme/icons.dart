@@ -52,46 +52,61 @@ class SmashIcons {
   static IconData importIcon = MdiIcons.import;
   static IconData exportIcon = MdiIcons.export;
 
+  static IconData editIcon = MdiIcons.pencil;
+  static IconData deleteIcon = MdiIcons.delete;
+
   static IconData upload = MdiIcons.upload;
   static IconData download = MdiIcons.download;
 
   static IconData menuRightArrow = MdiIcons.menuRight;
+
+  static IconData folder = MdiIcons.folderOutline;
+  static IconData file = MdiIcons.fileOutline;
 
   static IconData locationIcon = MdiIcons.crosshairsGps;
 
   static IconData finishedOk = MdiIcons.checkBold;
   static IconData finishedError = MdiIcons.closeCircle;
 
+  static IconData iconTypePostgis = MdiIcons.elephant;
+  static IconData iconTypeHttp = MdiIcons.earth;
+  static IconData iconTypeMapsforge = MdiIcons.map;
+  static IconData iconTypeGpx = MdiIcons.mapMarker;
+  static IconData iconTypeRaster = MdiIcons.checkerboard;
+  static IconData iconTypeShp = MdiIcons.vectorPoint;
+  static IconData iconTypeGeopackage = MdiIcons.packageVariant;
+  static IconData iconTypeGeopaparazzi = MdiIcons.database;
+
   /// Get the right icon for a given path or url or file name  or extension.
   static IconData forPath(String pathOrUrlOrNameOrExtension) {
     if (pathOrUrlOrNameOrExtension.toLowerCase().startsWith("postgis")) {
-      return MdiIcons.database;
+      return iconTypePostgis;
     } else if (pathOrUrlOrNameOrExtension.toLowerCase().startsWith("http")) {
-      return MdiIcons.earth;
+      return iconTypeHttp;
     } else if (FileSystemEntity.isDirectorySync(pathOrUrlOrNameOrExtension)) {
-      return MdiIcons.folderOutline;
+      return folder;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.MAPSFORGE_EXT)) {
-      return MdiIcons.map;
+      return iconTypeMapsforge;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.GPX_EXT)) {
-      return MdiIcons.mapMarker;
+      return iconTypeGpx;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.MBTILES_EXT)) {
-      return MdiIcons.checkerboard;
+      return iconTypeRaster;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.MAPURL_EXT)) {
-      return MdiIcons.checkerboard;
+      return iconTypeRaster;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.SHP_EXT)) {
-      return MdiIcons.vectorPoint;
+      return iconTypeShp;
     } else if (FileManager.isWorldImage(pathOrUrlOrNameOrExtension)) {
-      return MdiIcons.checkerboard;
+      return iconTypeRaster;
     } else if (pathOrUrlOrNameOrExtension
         .endsWith(FileManager.GEOPACKAGE_EXT)) {
-      return MdiIcons.packageVariant;
+      return iconTypeGeopackage;
     } else if (pathOrUrlOrNameOrExtension
         .endsWith(FileManager.GEOPAPARAZZI_EXT)) {
-      return MdiIcons.database;
+      return iconTypeGeopaparazzi;
     } else if (pathOrUrlOrNameOrExtension.endsWith("tags.json")) {
       return formNotesIcon;
     } else {
-      return MdiIcons.fileOutline;
+      return file;
     }
   }
 
