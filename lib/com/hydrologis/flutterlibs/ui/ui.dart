@@ -404,3 +404,45 @@ class _EditableTextFieldState extends State<EditableTextField> {
     }
   }
 }
+
+/// A string combo class that shows [_items] and sets a default [_selected] value if supplied.
+///
+/// The selection changes can be tracked from outside through the [_onChange(String newValue)] function.
+class StringCombo extends StatefulWidget {
+  final List<String> _items;
+  final String _selected;
+  final Function _onChange;
+  StringCombo(this._items, this._selected, this._onChange, {Key key})
+      : super(key: key);
+
+  @override
+  _StringComboState createState() =>
+      _StringComboState(this._items, this._selected, this._onChange);
+}
+
+class _StringComboState extends State<StringCombo> {
+  List<String> _items;
+  String _selected;
+  Function _onChange;
+
+  _StringComboState(this._items, this._selected, this._onChange);
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: _selected,
+      onChanged: (newSelection) {
+        _onChange(newSelection);
+        setState(() {
+          _selected = newSelection;
+        });
+      },
+      items: _items.map((f) {
+        return DropdownMenuItem(
+          child: Text(f),
+          value: f,
+        );
+      }).toList(),
+    );
+  }
+}

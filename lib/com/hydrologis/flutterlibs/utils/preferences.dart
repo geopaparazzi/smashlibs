@@ -283,6 +283,15 @@ class GpPreferences {
     return [lon, lat, zoom];
   }
 
+  /// Return last saved position in synch mode as [lon, lat, zoom] or null.
+  List<double> getLastPositionSync() {
+    var lat = _preferences.getDouble(KEY_LAST_LAT);
+    var lon = _preferences.getDouble(KEY_LAST_LON);
+    var zoom = _preferences.getDouble(KEY_LAST_ZOOM);
+    if (lat == null) return null;
+    return [lon, lat, zoom];
+  }
+
   /// Save last position to preferences.
   Future<void> setLastPosition(double lon, double lat, double zoom) async {
     await _checkPreferences();
