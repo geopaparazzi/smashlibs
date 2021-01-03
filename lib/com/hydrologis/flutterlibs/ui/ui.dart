@@ -277,6 +277,7 @@ class SmashUI {
 class EditableTextField extends StatefulWidget {
   final String value;
   final String label;
+  final String hintText;
   final bool isPassword;
   final bool doBold;
   final Function onSave;
@@ -286,6 +287,7 @@ class EditableTextField extends StatefulWidget {
       {this.validationFunction,
       this.isPassword = false,
       this.doBold = false,
+      this.hintText,
       Key key})
       : super(key: key);
 
@@ -317,8 +319,15 @@ class _EditableTextFieldState extends State<EditableTextField> {
   @override
   Widget build(BuildContext context) {
     if (editMode) {
-      _controller.text = _currentValue;
+      if (_currentValue != widget.hintText) {
+        _controller.text = _currentValue;
+        _controller.selection = TextSelection.fromPosition(
+            TextPosition(offset: _controller.text.length));
+      } else {
+        _controller.text = null;
+      }
       return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: TextFormField(
@@ -336,6 +345,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: widget.label,
+                hintText: widget.hintText,
               ),
             ),
           ),
@@ -371,6 +381,11 @@ class _EditableTextFieldState extends State<EditableTextField> {
                 fontWeight: FontWeight.bold,
                 fontSize: SmashUI.NORMAL_SIZE,
               ),
+              onTap: () {
+                setState(() {
+                  editMode = true;
+                });
+              },
             ),
           ),
           IconButton(
