@@ -48,6 +48,12 @@ class PermissionManager {
     var status = await Permission.locationAlways.status;
     if (status != PermissionStatus.granted) {
       if (await Permission.locationAlways.request().isGranted) {
+        SMLogger().i("Background location permission granted.");
+        return true;
+      } else if (await Permission.locationWhenInUse.request().isGranted) {
+        SMLogger().i("Location when in use permission granted.");
+        return true;
+      } else if (await Permission.location.request().isGranted) {
         SMLogger().i("Location permission granted.");
         return true;
       } else {
