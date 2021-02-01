@@ -45,7 +45,7 @@ class PermissionManager {
   }
 
   Future<bool> _checkLocationPermissions() async {
-    var status = await Permission.locationAlways.status;
+    var status = await Permission.location.status;
     if (status != PermissionStatus.granted) {
       if (await Permission.locationAlways.request().isGranted) {
         SMLogger().i("Background location permission granted.");
