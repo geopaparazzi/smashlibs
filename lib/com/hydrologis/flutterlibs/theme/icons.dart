@@ -97,11 +97,9 @@ class SmashIcons {
       return iconTypeShp;
     } else if (FileManager.isWorldImage(pathOrUrlOrNameOrExtension)) {
       return iconTypeRaster;
-    } else if (pathOrUrlOrNameOrExtension
-        .endsWith(FileManager.GEOPACKAGE_EXT)) {
+    } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.GEOPACKAGE_EXT)) {
       return iconTypeGeopackage;
-    } else if (pathOrUrlOrNameOrExtension
-        .endsWith(FileManager.GEOPAPARAZZI_EXT)) {
+    } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.GEOPAPARAZZI_EXT)) {
       return iconTypeGeopaparazzi;
     } else if (pathOrUrlOrNameOrExtension.endsWith("tags.json")) {
       return formNotesIcon;
@@ -158,8 +156,7 @@ class IconsWidgetState extends State<IconsWidget> {
 
   @override
   void initState() {
-    chosenIconsList.addAll(GpPreferences()
-        .getStringListSync(KEY_ICONS_LIST, DEFAULT_NOTES_ICONDATA));
+    chosenIconsList.addAll(GpPreferences().getStringListSync(SmashPreferencesKeys.KEY_ICONS_LIST, DEFAULT_NOTES_ICONDATA));
 
     MdiIcons.getIconsName().forEach((name) {
       _completeList.add([name, MdiIcons.fromString(name)]);
@@ -172,7 +169,7 @@ class IconsWidgetState extends State<IconsWidget> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        GpPreferences().setStringList(KEY_ICONS_LIST, chosenIconsList);
+        GpPreferences().setStringList(SmashPreferencesKeys.KEY_ICONS_LIST, chosenIconsList);
         return true;
       },
       child: Scaffold(
@@ -226,8 +223,7 @@ class IconsWidgetState extends State<IconsWidget> {
                     labelText: "Search icon by name",
                     hintText: "Search icon by name",
                     prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(25.0)))),
               ),
             ),
             Expanded(
@@ -343,8 +339,7 @@ class MarkerIcon extends StatelessWidget {
                       padding: const EdgeInsets.all(3.0),
                       child: Text(
                         labelText,
-                        style: TextStyle(
-                            color: labelColor, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: labelColor, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
