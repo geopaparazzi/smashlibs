@@ -21,46 +21,67 @@ class PermissionManager {
     return this;
   }
 
-  Future<bool> check() async {
+  Future<bool> check(BuildContext context) async {
     bool granted = true;
     for (int i = 0; i < _permissionsToCheck.length; i++) {
       if (_permissionsToCheck[i] == PERMISSIONS.STORAGE && !Platform.isIOS) {
-        granted = await _checkStoragePermissions();
+        granted = await _checkStoragePermissions(context);
       } else if (_permissionsToCheck[i] == PERMISSIONS.LOCATION) {
-        granted = await _checkLocationPermissions();
+        granted = await _checkLocationPermissions(context);
       }
     }
 
     return granted;
   }
 
-  Future<bool> _checkStoragePermissions() async {
-    if (await Permission.storage.request().isGranted) {
-      SMLogger().i("Storage permission granted.");
-      return true;
-    } else {
-      SMLogger().w("Storage permission is not granted.");
-      return false;
-    }
-  }
-
-  Future<bool> _checkLocationPermissions() async {
-    var status = await Permission.location.status;
+  Future<bool> _checkStoragePermissions(BuildContext context) async {
+    var status = await Permission.storage.status;
     if (status != PermissionStatus.granted) {
-      if (await Permission.locationAlways.request().isGranted) {
-        SMLogger().i("Background location permission granted.");
-        return true;
-      } else if (await Permission.locationWhenInUse.request().isGranted) {
-        SMLogger().i("Location when in use permission granted.");
-        return true;
-      } else if (await Permission.location.request().isGranted) {
-        SMLogger().i("Location permission granted.");
+      var permissionStatus = await Permission.storage.request();
+      if (permissionStatus.isGranted) {
+        SMLogger().i("Storage permission granted.");
         return true;
       } else {
-        SMLogger().w("Location permission is not granted.");
+        SMLogger().w("Storage permission is not granted.");
         return false;
       }
     }
     return true;
+  }
+
+  Future<bool> _checkLocationPermissions(BuildContext context) async {
+    var status = await Permission.location.status;
+    if (status != PermissionStatus.granted) {
+      bool granted = false;
+      if (await Permission.locationAlways.request().isGranted) {
+        SMLogger().i("Background location permission granted.");
+        granted = true;
+      } else if (await Permission.locationWhenInUse.request().isGranted) {
+        SMLogger().i("Location when in use permission granted.");
+        granted = true;
+      } else if (await Permission.location.request().isGranted) {
+        SMLogger().i("Location permission granted.");
+        granted = true;
+      } else {
+        SMLogger().w("Location permission is not granted.");
+      }
+      if (!granted) {
+        var status = await Permission.location.status;
+        if (status == PermissionStatus.undetermined) {
+          // this is a library bug, since it has been asked for sure.
+          var openSettings = await SmashDialogs.showConfirmDialog(context, "Location permission",
+              "The device could not set the location permission automatically. Open settings to set permission (recomended)?");
+          if (openSettings) {
+            if (await openAppSettings()) {
+              status = await Permission.location.status;
+              if (status == PermissionStatus.granted) {
+                granted = true;
+              }
+            }
+          }
+        }
+      }
+      return granted;
+    }
   }
 }

@@ -44,7 +44,10 @@ dependencies:
   # MIT
   dio: ^3.0.9
   # MIT
-  permission_handler: ^5.0.1+1
+  permission_handler: ^5.1.0
+    # git: 
+    #   url: https://github.com/Baseflow/flutter-permission-handler.git
+    #   path: permission_handler
 
   # BSD
   device_info: ^0.4.2+1
