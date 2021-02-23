@@ -18,12 +18,12 @@ dependencies:
   #################
 
   #BSD
-  dart_jts: ^0.0.5+6
+  dart_jts: ^0.0.7
+    # path: ../dart_jts/
   #    git:
   #      url: https://github.com/moovida/dart_jts.git
 
-  dart_hydrologis_utils:
-    ^0.5.2
+  dart_hydrologis_utils: ^0.5.4
     # path: ../dart_hydrologis_utils/
 
   ####################
@@ -61,7 +61,10 @@ dependencies:
   flutter_tags: ^0.4.8
 
   # MIT
-  flutter_material_pickers: ^1.7.1
+  flutter_material_pickers: #^1.9.2
+    git:
+      url: https://github.com/moovida/flutter_material_pickers.git
+      ref: 74bf310
 
   # BSD
   shared_preferences: ^0.5.6+3
