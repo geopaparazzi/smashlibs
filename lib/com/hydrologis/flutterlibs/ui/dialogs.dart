@@ -396,17 +396,24 @@ class SmashDialogs {
   /// Returns the selected item.
   static Future<List<String>> showMultiSelectionComboDialog(
       BuildContext context, dynamic title, List<String> items,
-      {okText: 'Ok', cancelText: 'Cancel'}) async {
+      {String okText: 'Ok',
+      String cancelText: 'Cancel',
+      List<IconData> iconDataList}) async {
     List<Widget> widgets = [];
     List<String> selected = [];
     for (var i = 0; i < items.length; ++i) {
-      widgets.add(DialogCheckBoxTile(false, items[i], (isSelected, item) {
-        if (isSelected) {
-          selected.add(item);
-        } else {
-          selected.remove(item);
-        }
-      }));
+      widgets.add(DialogCheckBoxTile(
+        false,
+        items[i],
+        (isSelected, item) {
+          if (isSelected) {
+            selected.add(item);
+          } else {
+            selected.remove(item);
+          }
+        },
+        iconData: iconDataList[i],
+      ));
     }
 
     List<String> selection = await showDialog<List<String>>(
@@ -457,8 +464,10 @@ class DialogCheckBoxTile extends StatefulWidget {
   final bool selected;
   final String item;
   final onSelection;
+  final IconData iconData;
 
-  DialogCheckBoxTile(this.selected, this.item, this.onSelection);
+  DialogCheckBoxTile(this.selected, this.item, this.onSelection,
+      {this.iconData});
 
   @override
   _DialogCheckBoxTileState createState() => _DialogCheckBoxTileState();
@@ -475,6 +484,15 @@ class _DialogCheckBoxTileState extends State<DialogCheckBoxTile> {
 
   @override
   Widget build(BuildContext context) {
+    var icd = widget.iconData;
+    var normalText = SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SmashUI.normalText(
+          widget.item,
+          textAlign: TextAlign.left,
+          bold: true,
+          color: SmashColors.mainDecorations,
+        ));
     return CheckboxListTile(
       onChanged: (value) {
         setState(() {
@@ -483,12 +501,15 @@ class _DialogCheckBoxTileState extends State<DialogCheckBoxTile> {
         });
       },
       value: selected,
+      secondary: icd != null
+          ? Icon(
+              icd,
+              color: SmashColors.mainDecorations,
+            )
+          : null,
       title: Container(
         padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-        child: SmashUI.normalText(widget.item,
-            textAlign: TextAlign.center,
-            bold: true,
-            color: SmashColors.mainDecorations),
+        child: normalText,
       ),
     );
   }
