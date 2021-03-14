@@ -592,15 +592,18 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
     }
 
     var comboItems = TagsManager.getComboItems(widget._itemMap);
-    List<String> itemsArray = TagsManager.comboItems2StringArray(comboItems);
-    if (!itemsArray.contains(value)) {
+    List<ItemObject> itemsArray =
+        TagsManager.comboItems2ObjectArray(comboItems);
+    ItemObject found = itemsArray.firstWhere((item) => item.value == value,
+        orElse: () => null);
+    if (found == null) {
       value = null;
     }
     var items = itemsArray
         .map(
-          (itemName) => new DropdownMenuItem(
-            value: itemName,
-            child: new Text(itemName),
+          (itemObj) => new DropdownMenuItem(
+            value: itemObj.value,
+            child: new Text(itemObj.label),
           ),
         )
         .toList();
