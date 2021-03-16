@@ -883,17 +883,27 @@ class TagsManager {
   }
 
   /// @param comboItems combo items object.
-  /// @return the string names.
+  /// @return the item object (which has label and value) list.
   /// @ if something goes wrong.
-  static List<String> comboItems2StringArray(List<dynamic> comboItems) {
+  static List<ItemObject> comboItems2ObjectArray(List<dynamic> comboItems) {
     int length = comboItems.length;
-    List<String> itemsArray = [];
+    List<ItemObject> itemsArray = [];
     for (int i = 0; i < length; i++) {
       var itemObj = comboItems[i];
       if (itemObj.containsKey(TAG_ITEM)) {
-        itemsArray.add(itemObj[TAG_ITEM].trim());
+        var tagItem = itemObj[TAG_ITEM];
+        if (tagItem is String) {
+          var item = tagItem.trim();
+          itemsArray.add(ItemObject(item, item));
+        } else if (tagItem.containsKey(TAG_LABEL) &&
+            tagItem.containsKey(TAG_VALUE)) {
+          var label = tagItem[TAG_LABEL].trim();
+          var value = tagItem[TAG_VALUE].trim();
+          itemsArray.add(ItemObject(label, value));
+        }
       } else {
-        itemsArray.add(" - ");
+        var item = " - ";
+        itemsArray.add(ItemObject(item, item));
       }
     }
     return itemsArray;
@@ -972,4 +982,14 @@ class TagObject {
   String longName;
   bool hasForm;
   String jsonString;
+}
+
+/// The combo item object.
+class ItemObject {
+  String label;
+  String value;
+  ItemObject(String label, String value) {
+    this.label = label;
+    this.value = value;
+  }
 }
