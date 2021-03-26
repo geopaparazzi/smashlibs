@@ -331,12 +331,6 @@ ListTile getWidget(
     TYPE_STRING:
     case TYPE_STRING:
       {
-        TextEditingController stringController =
-            new TextEditingController(text: value);
-
-        stringController.addListener(() {
-          itemMap[TAG_VALUE] = stringController.text;
-        });
         TextFormField field = TextFormField(
           validator: (value) {
             if (!constraints.isValid(value)) {
@@ -349,7 +343,10 @@ ListTile getWidget(
 //            icon: icon,
             labelText: "$label ${constraints.getDescription()}",
           ),
-          controller: stringController,
+          initialValue: value,
+          onChanged: (text) {
+            itemMap[TAG_VALUE] = text;
+          },
           enabled: !itemReadonly,
           minLines: minLines,
           maxLines: maxLines,
