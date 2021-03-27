@@ -126,27 +126,47 @@ const String SEP = "#";
 
 /// A class to help out on the abstract web, desktop, mobiles parts.
 abstract class AFormhelper {
+  Future<bool> init();
+
+  bool hasForm();
+
+  /// Get the id, being it of the edited note or pk of the edited db record.
+  int getId();
+
+  /// The name of the section to be edited.
+  String getSectionName();
+
+  /// The section form.
+  Map<String, dynamic> getSectionMap();
+
+  /// A title widget for the form view.
+  Widget getFormTitleWidget();
+
+  /// The geo-position for the note/record.
+  ///
+  /// This can be used if additional images need to be geolocalized, too.
+  dynamic getPosition();
+
   /// Get the images from the source and return them as widgets.
   ///
-  /// The form map [itemMap] is searched for image ids
+  /// The form map is searched for image ids
   /// and the ids also need to be placed in [imageSplit]
   /// in case of further use.
   ///
   /// This should return an empty widgets list if it is not supported.
   Future<List<Widget>> getThumbnailsFromDb(
-      BuildContext context, var itemMap, List<String> imageSplit);
+      BuildContext context, List<String> imageSplit);
 
-  /// Take a picture for a given form identified by the [noteId].
+  /// Take a picture for a given form identified by the helper's [getId()].
   ///
-  /// The [position] is set as the image position. The newly created image
+  /// The newly created image
   /// id is then inserted in [imagesSplit].
   /// If [fromGallery] is true, then the system image selector should open.
-  Future<String> takePictureForForms(BuildContext context, var noteId,
-      var position, bool fromGallery, List<String> imageSplit);
+  Future<String> takePictureForForms(
+      BuildContext context, bool fromGallery, List<String> imageSplit);
 
   /// Save the form on exit from the form view.
-  Future<void> onSaveFunction(BuildContext context, var noteId, var sectionName,
-      var sectionMap, var _position);
+  Future<void> onSaveFunction(BuildContext context);
 }
 
 /// An interface for constraints.
@@ -426,7 +446,7 @@ class FormUtilities {
   /// @param value          the new value to use.
   /// @ if something goes wrong.
   static void update(
-      List<Map<String, dynamic>> formItemsArray, String key, String value) {
+      List<Map<String, dynamic>> formItemsArray, String key, dynamic value) {
     int length = formItemsArray.length;
 
     for (int i = 0; i < length; i++) {
@@ -671,7 +691,7 @@ class TagsManager {
 
   factory TagsManager() => _instance;
 
-  TagsManager._internal() {}
+  TagsManager._internal();
 
   /// Creates a new sectionsmap from the tags file
   LinkedHashMap<String, Map<String, dynamic>> getSectionsMap() {
@@ -836,14 +856,14 @@ class TagsManager {
   /// @return the array of items of the contained form or <code>null</code> if
   /// no form is contained.
   /// @ if something goes wrong.
-  static List<dynamic> getFormItems(Map<String, dynamic> formObj) {
+  static List<Map<String, dynamic>> getFormItems(Map<String, dynamic> formObj) {
     if (formObj.containsKey(TAG_FORMITEMS)) {
       List<dynamic> formItemsArray = formObj[TAG_FORMITEMS];
       int emptyIndex = -1;
       while ((emptyIndex = hasEmpty(formItemsArray)) >= 0) {
         formItemsArray.remove(emptyIndex);
       }
-      return formItemsArray;
+      return formItemsArray.map((e) => e as Map<String, dynamic>).toList();
     }
     return [];
   }

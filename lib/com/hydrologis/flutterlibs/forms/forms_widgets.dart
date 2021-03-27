@@ -9,12 +9,10 @@ typedef Null ItemSelectedCallback(String selectedFormName);
 
 class FormSectionsWidget extends StatefulWidget {
   final ItemSelectedCallback onItemSelected;
-  final String sectionName;
   final bool isLargeScreen;
-  final Map<String, dynamic> sectionMap;
+  final AFormhelper _formHelper;
 
-  FormSectionsWidget(this.sectionMap, this.sectionName, this.isLargeScreen,
-      this.onItemSelected);
+  FormSectionsWidget(this._formHelper, this.isLargeScreen, this.onItemSelected);
 
   @override
   State<StatefulWidget> createState() {
@@ -27,7 +25,8 @@ class FormSectionsWidgetState extends State<FormSectionsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var formNames4Section = TagsManager.getFormNames4Section(widget.sectionMap);
+    var formNames4Section =
+        TagsManager.getFormNames4Section(widget._formHelper.getSectionMap());
 
     return ListView.builder(
       itemCount: formNames4Section.length,
@@ -53,25 +52,17 @@ class FormSectionsWidgetState extends State<FormSectionsWidget> {
 }
 
 class FormDetailWidget extends StatefulWidget {
-  final String sectionName;
   final String formName;
   final bool isLargeScreen;
   final bool onlyDetail;
-  final dynamic _position;
-  final int _noteId;
-  final Map<String, dynamic> sectionMap;
   final AFormhelper formHelper;
   final bool doScaffold;
   final bool isReadOnly;
 
   FormDetailWidget(
-    this._noteId,
-    this.sectionMap,
-    this.sectionName,
     this.formName,
     this.isLargeScreen,
     this.onlyDetail,
-    this._position,
     this.formHelper, {
     this.isReadOnly = false,
     this.doScaffold = true,
@@ -88,7 +79,8 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 
   @override
   void initState() {
-    formNames = TagsManager.getFormNames4Section(widget.sectionMap);
+    formNames =
+        TagsManager.getFormNames4Section(widget.formHelper.getSectionMap());
 
     super.initState();
   }
@@ -101,12 +93,13 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
       // pick the first of the section
       formName = formNames[0];
     }
-    var form4name = TagsManager.getForm4Name(formName, widget.sectionMap);
+    var form4name =
+        TagsManager.getForm4Name(formName, widget.formHelper.getSectionMap());
     List<dynamic> formItems = TagsManager.getFormItems(form4name);
 
     for (int i = 0; i < formItems.length; i++) {
-      Widget w = getWidget(context, widget._noteId, formItems[i],
-          widget._position, widget.isReadOnly, widget.formHelper);
+      Widget w = getWidget(
+          context, formItems[i], widget.isReadOnly, widget.formHelper);
       if (w != null) {
         widgetsList.add(w);
       }
@@ -141,37 +134,32 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 }
 
 class MasterDetailPage extends StatefulWidget {
-  final Widget title;
-  final String sectionName;
-  final dynamic _position;
-  final int _noteId;
-  final Map<String, dynamic> sectionMap;
   final AFormhelper formHelper;
   final bool doScaffold;
   final bool isReadOnly;
 
   MasterDetailPage(
-    this.sectionMap,
-    this.title,
-    this.sectionName,
-    this._position,
-    this._noteId,
     this.formHelper, {
     this.doScaffold = true,
     this.isReadOnly = false,
   });
 
   @override
-  _MasterDetailPageState createState() => _MasterDetailPageState();
+  _MasterDetailPageState createState() => _MasterDetailPageState(formHelper);
 }
 
 class _MasterDetailPageState extends State<MasterDetailPage> {
+  final AFormhelper _formHelper;
+
+  _MasterDetailPageState(this._formHelper);
+
   String selectedForm;
   var isLargeScreen = false;
 
   @override
   Widget build(BuildContext context) {
-    var formNames = TagsManager.getFormNames4Section(widget.sectionMap);
+    var formNames =
+        TagsManager.getFormNames4Section(_formHelper.getSectionMap());
 
     // in case of single tab, display detail directly
     bool onlyDetail = formNames.length == 1;
@@ -183,9 +171,8 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
         !onlyDetail
             ? Expanded(
                 flex: isLargeScreen ? 4 : 1,
-                child: FormSectionsWidget(
-                    widget.sectionMap, widget.sectionName, isLargeScreen,
-                    (formName) {
+                child:
+                    FormSectionsWidget(_formHelper, isLargeScreen, (formName) {
                   if (isLargeScreen) {
                     selectedForm = formName;
                     setState(() {});
@@ -193,13 +180,9 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
                     Navigator.push(context, MaterialPageRoute(
                       builder: (context) {
                         return FormDetailWidget(
-                          widget._noteId,
-                          widget.sectionMap,
-                          widget.sectionName,
                           formName,
                           isLargeScreen,
                           onlyDetail,
-                          widget._position,
                           widget.formHelper,
                           doScaffold: widget.doScaffold,
                           isReadOnly: widget.isReadOnly,
@@ -214,13 +197,9 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
             ? Expanded(
                 flex: 6,
                 child: FormDetailWidget(
-                  widget._noteId,
-                  widget.sectionMap,
-                  widget.sectionName,
                   selectedForm,
                   isLargeScreen,
                   onlyDetail,
-                  widget._position,
                   widget.formHelper,
                   doScaffold: widget.doScaffold,
                   isReadOnly: widget.isReadOnly,
@@ -230,15 +209,14 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
     });
     return WillPopScope(
       onWillPop: () async {
-        // TODO check if something cheanged would be really good
-        await widget.formHelper.onSaveFunction(context, widget._noteId,
-            widget.sectionName, widget.sectionMap, widget._position);
+        // TODO check if something changed would be really good
+        await widget.formHelper.onSaveFunction(context);
         return true;
       },
       child: widget.doScaffold
           ? Scaffold(
               appBar: AppBar(
-                title: widget.title,
+                title: widget.formHelper.getFormTitleWidget(),
               ),
               body: bodyContainer,
             )
@@ -249,9 +227,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 
 ListTile getWidget(
   BuildContext context,
-  int noteId,
   final Map<String, dynamic> itemMap,
-  dynamic position,
   bool isReadOnly,
   AFormhelper formHelper,
 ) {
@@ -263,7 +239,7 @@ ListTile getWidget(
 
   dynamic value = ""; //$NON-NLS-1$
   if (itemMap.containsKey(TAG_VALUE)) {
-    value = itemMap[TAG_VALUE].trim();
+    value = itemMap[TAG_VALUE].toString().trim();
   }
   String type = TYPE_STRING;
   if (itemMap.containsKey(TAG_TYPE)) {
@@ -486,16 +462,14 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: PicturesWidget(
-              noteId, itemMap, label, position, formHelper, itemReadonly),
+          title: PicturesWidget(label, formHelper, itemReadonly),
         );
       }
     case TYPE_IMAGELIB:
       {
         return ListTile(
           leading: icon,
-          title: PicturesWidget(
-              noteId, itemMap, label, position, formHelper, itemReadonly,
+          title: PicturesWidget(label, formHelper, itemReadonly,
               fromGallery: true),
         );
       }
@@ -941,7 +915,7 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
     }
 
     return Center(
-      child: FlatButton(
+      child: TextButton(
           onPressed: () {
             if (!widget._isReadOnly) {
               showMaterialDatePicker(
@@ -1021,7 +995,7 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
     var timeOfDay = TimeOfDay.fromDateTime(dateTime);
 
     return Center(
-      child: FlatButton(
+      child: TextButton(
           onPressed: () {
             if (!widget._isReadOnly) {
               showMaterialTimePicker(
@@ -1030,8 +1004,6 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
                 onChanged: (value) {
                   var hour = value.hour;
                   var minute = value.minute;
-                  String day = HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER
-                      .format(DateTime.now());
                   var iso = "$hour:$minute:00";
                   setState(() {
                     widget._itemMap[TAG_VALUE] = iso;
@@ -1068,16 +1040,12 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
 }
 
 class PicturesWidget extends StatefulWidget {
-  final _itemMap;
   final String _label;
-  final dynamic _position;
-  final int _noteId;
   final bool fromGallery;
   final AFormhelper formHelper;
   final bool _isReadOnly;
 
-  PicturesWidget(this._noteId, this._itemMap, this._label, this._position,
-      this.formHelper, this._isReadOnly,
+  PicturesWidget(this._label, this.formHelper, this._isReadOnly,
       {this.fromGallery = false});
 
   @override
@@ -1090,8 +1058,7 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
   bool _loading = true;
 
   Future<void> getThumbnails(BuildContext context) async {
-    images = await widget.formHelper
-        .getThumbnailsFromDb(context, widget._itemMap, imageSplit);
+    images = await widget.formHelper.getThumbnailsFromDb(context, imageSplit);
   }
 
   @override
@@ -1111,19 +1078,16 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
               children: <Widget>[
                 widget._isReadOnly
                     ? Container()
-                    : FlatButton(
+                    : TextButton(
                         onPressed: () async {
                           String value = await widget.formHelper
                               .takePictureForForms(
-                                  context,
-                                  widget._noteId,
-                                  widget._position,
-                                  widget.fromGallery,
-                                  imageSplit);
+                                  context, widget.fromGallery, imageSplit);
                           if (value != null) {
                             await getThumbnails(context);
                             setState(() {
-                              widget._itemMap[TAG_VALUE] = value;
+                              widget.formHelper.getSectionMap()[TAG_VALUE] =
+                                  value;
                             });
                           }
                         },
