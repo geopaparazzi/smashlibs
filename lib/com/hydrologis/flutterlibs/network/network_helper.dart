@@ -9,7 +9,7 @@ class NetworkHelper {
           SmashPreferencesKeys.KEY_GSS_SERVER_ALLOW_SELFCERTIFICATE, true);
     }
     Dio dio = Dio();
-    if (allowSelfCert) {
+    if (allowSelfCert && dio.httpClientAdapter is DefaultHttpClientAdapter) {
       (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
           (HttpClient client) {
         client.badCertificateCallback =
