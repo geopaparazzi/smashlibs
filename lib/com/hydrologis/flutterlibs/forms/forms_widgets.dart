@@ -97,9 +97,12 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
         TagsManager.getForm4Name(formName, widget.formHelper.getSectionMap());
     List<dynamic> formItems = TagsManager.getFormItems(form4name);
 
+    var noteId = widget.formHelper.getId();
+
     for (int i = 0; i < formItems.length; i++) {
+      String key = "form${formName}_note${noteId}_item$i";
       Widget w = getWidget(
-          context, formItems[i], widget.isReadOnly, widget.formHelper);
+          context, key, formItems[i], widget.isReadOnly, widget.formHelper);
       if (w != null) {
         widgetsList.add(w);
       }
@@ -227,6 +230,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 
 ListTile getWidget(
   BuildContext context,
+  String widgetKey,
   final Map<String, dynamic> itemMap,
   bool isReadOnly,
   AFormhelper formHelper,
@@ -308,6 +312,7 @@ ListTile getWidget(
     case TYPE_STRING:
       {
         TextFormField field = TextFormField(
+          key: ValueKey(widgetKey),
           validator: (value) {
             if (!constraints.isValid(value)) {
               return constraints.getDescription();
@@ -356,6 +361,7 @@ ListTile getWidget(
 
         var text = Text(
           value.toString(),
+          key: ValueKey(widgetKey),
           style: TextStyle(
               fontSize: size,
               decoration: textDecoration,
@@ -391,35 +397,35 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: DynamicStringWidget(itemMap, label, itemReadonly),
+          title: DynamicStringWidget(widgetKey, itemMap, label, itemReadonly),
         );
       }
     case TYPE_DATE:
       {
         return ListTile(
           leading: icon,
-          title: DatePickerWidget(itemMap, label, itemReadonly),
+          title: DatePickerWidget(widgetKey, itemMap, label, itemReadonly),
         );
       }
     case TYPE_TIME:
       {
         return ListTile(
           leading: icon,
-          title: TimePickerWidget(itemMap, label, itemReadonly),
+          title: TimePickerWidget(widgetKey, itemMap, label, itemReadonly),
         );
       }
     case TYPE_BOOLEAN:
       {
         return ListTile(
           leading: icon,
-          title: CheckboxWidget(itemMap, label, itemReadonly),
+          title: CheckboxWidget(widgetKey, itemMap, label, itemReadonly),
         );
       }
     case TYPE_STRINGCOMBO:
       {
         return ListTile(
           leading: icon,
-          title: ComboboxWidget(itemMap, label, itemReadonly),
+          title: ComboboxWidget(widgetKey, itemMap, label, itemReadonly),
         );
       }
     // case TYPE_AUTOCOMPLETESTRINGCOMBO:
@@ -433,7 +439,8 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: ConnectedComboboxWidget(itemMap, label, itemReadonly),
+          title:
+              ConnectedComboboxWidget(widgetKey, itemMap, label, itemReadonly),
         );
 //        LinkedHashMap<String, List<String>> valuesMap = TagsManager.extractComboValuesMap(jsonObject);
 //        addedView = FormUtilities.addConnectedComboView(activity, mainView, label, value, valuesMap,
@@ -462,14 +469,16 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: PicturesWidget(label, formHelper, itemMap, itemReadonly),
+          title: PicturesWidget(
+              label, widgetKey, formHelper, itemMap, itemReadonly),
         );
       }
     case TYPE_IMAGELIB:
       {
         return ListTile(
           leading: icon,
-          title: PicturesWidget(label, formHelper, itemMap, itemReadonly,
+          title: PicturesWidget(
+              label, widgetKey, formHelper, itemMap, itemReadonly,
               fromGallery: true),
         );
       }
@@ -511,7 +520,11 @@ class CheckboxWidget extends StatefulWidget {
   final String _label;
   final bool _isReadOnly;
 
-  CheckboxWidget(this._itemMap, this._label, this._isReadOnly);
+  CheckboxWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey),
+        );
 
   @override
   _CheckboxWidgetState createState() => _CheckboxWidgetState();
@@ -548,7 +561,11 @@ class ComboboxWidget extends StatefulWidget {
   final String _label;
   final bool _isReadOnly;
 
-  ComboboxWidget(this._itemMap, this._label, this._isReadOnly);
+  ComboboxWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey),
+        );
 
   @override
   ComboboxWidgetState createState() => ComboboxWidgetState();
@@ -622,7 +639,11 @@ class ConnectedComboboxWidget extends StatefulWidget {
   final String _label;
   final bool _isReadOnly;
 
-  ConnectedComboboxWidget(this._itemMap, this._label, this._isReadOnly);
+  ConnectedComboboxWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey),
+        );
 
   @override
   ConnectedComboboxWidgetState createState() => ConnectedComboboxWidgetState();
@@ -797,9 +818,13 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
 class DynamicStringWidget extends StatefulWidget {
   var _itemMap;
   final String _label;
-  final bool _isReadonly;
+  final bool _isReadOnly;
 
-  DynamicStringWidget(this._itemMap, this._label, this._isReadonly);
+  DynamicStringWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey),
+        );
 
   @override
   DynamicStringWidgetState createState() => DynamicStringWidgetState();
@@ -816,7 +841,7 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
     valuesSplit.removeWhere((s) => s.trim().isEmpty);
 
     return Tags(
-      textField: widget._isReadonly
+      textField: widget._isReadOnly
           ? null
           : TagsTextField(
               width: 1000,
@@ -858,7 +883,7 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
           textColor: SmashColors.mainBackground,
           removeButton: ItemTagsRemoveButton(
             onRemoved: () {
-              if (!widget._isReadonly) {
+              if (!widget._isReadOnly) {
                 // Remove the item from the data source.
                 setState(() {
                   valuesSplit.removeAt(index);
@@ -889,7 +914,11 @@ class DatePickerWidget extends StatefulWidget {
   final String _label;
   final bool _isReadOnly;
 
-  DatePickerWidget(this._itemMap, this._label, this._isReadOnly);
+  DatePickerWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey),
+        );
 
   @override
   DatePickerWidgetState createState() => DatePickerWidgetState();
@@ -968,7 +997,11 @@ class TimePickerWidget extends StatefulWidget {
   final String _label;
   final bool _isReadOnly;
 
-  TimePickerWidget(this._itemMap, this._label, this._isReadOnly);
+  TimePickerWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey),
+        );
 
   @override
   TimePickerWidgetState createState() => TimePickerWidgetState();
@@ -1046,8 +1079,10 @@ class PicturesWidget extends StatefulWidget {
   final bool _isReadOnly;
   final _itemMap;
 
-  PicturesWidget(this._label, this.formHelper, this._itemMap, this._isReadOnly,
-      {this.fromGallery = false});
+  PicturesWidget(this._label, String widgetKey, this.formHelper, this._itemMap,
+      this._isReadOnly,
+      {this.fromGallery = false})
+      : super(key: ValueKey(widgetKey));
 
   @override
   PicturesWidgetState createState() => PicturesWidgetState();
