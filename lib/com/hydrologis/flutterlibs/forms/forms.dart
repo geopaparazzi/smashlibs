@@ -149,13 +149,13 @@ abstract class AFormhelper {
 
   /// Get the images from the source and return them as widgets.
   ///
-  /// The form map is searched for image ids
+  /// The form map [itemsMap] is searched for image ids
   /// and the ids also need to be placed in [imageSplit]
   /// in case of further use.
   ///
   /// This should return an empty widgets list if it is not supported.
-  Future<List<Widget>> getThumbnailsFromDb(
-      BuildContext context, List<String> imageSplit);
+  Future<List<Widget>> getThumbnailsFromDb(BuildContext context,
+      Map<String, dynamic> itemsMap, List<String> imageSplit);
 
   /// Take a picture for a given form identified by the helper's [getId()].
   ///

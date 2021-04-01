@@ -462,14 +462,14 @@ ListTile getWidget(
       {
         return ListTile(
           leading: icon,
-          title: PicturesWidget(label, formHelper, itemReadonly),
+          title: PicturesWidget(label, formHelper, itemMap, itemReadonly),
         );
       }
     case TYPE_IMAGELIB:
       {
         return ListTile(
           leading: icon,
-          title: PicturesWidget(label, formHelper, itemReadonly,
+          title: PicturesWidget(label, formHelper, itemMap, itemReadonly,
               fromGallery: true),
         );
       }
@@ -1044,8 +1044,9 @@ class PicturesWidget extends StatefulWidget {
   final bool fromGallery;
   final AFormhelper formHelper;
   final bool _isReadOnly;
+  final _itemMap;
 
-  PicturesWidget(this._label, this.formHelper, this._isReadOnly,
+  PicturesWidget(this._label, this.formHelper, this._itemMap, this._isReadOnly,
       {this.fromGallery = false});
 
   @override
@@ -1058,7 +1059,8 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
   bool _loading = true;
 
   Future<void> getThumbnails(BuildContext context) async {
-    images = await widget.formHelper.getThumbnailsFromDb(context, imageSplit);
+    images = await widget.formHelper
+        .getThumbnailsFromDb(context, widget._itemMap, imageSplit);
   }
 
   @override
@@ -1086,8 +1088,7 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
                           if (value != null) {
                             await getThumbnails(context);
                             setState(() {
-                              widget.formHelper.getSectionMap()[TAG_VALUE] =
-                                  value;
+                              widget._itemMap[TAG_VALUE] = value;
                             });
                           }
                         },
