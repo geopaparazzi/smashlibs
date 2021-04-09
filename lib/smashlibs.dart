@@ -12,6 +12,7 @@ import 'package:dart_jts/dart_jts.dart' as JTS;
 import 'package:device_info/device_info.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_material_pickers/flutter_material_pickers.dart';
