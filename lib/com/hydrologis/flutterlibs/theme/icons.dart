@@ -86,7 +86,8 @@ class SmashIcons {
       return iconTypePostgis;
     } else if (pathOrUrlOrNameOrExtension.toLowerCase().startsWith("http")) {
       return iconTypeHttp;
-    } else if (FileSystemEntity.isDirectorySync(pathOrUrlOrNameOrExtension)) {
+    } else if (!SmashPlatform.isWeb() &&
+        FileSystemEntity.isDirectorySync(pathOrUrlOrNameOrExtension)) {
       return folder;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.MAPSFORGE_EXT)) {
       return iconTypeMapsforge;

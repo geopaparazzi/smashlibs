@@ -12,6 +12,10 @@ class SmashPlatform {
   static bool isDesktop() {
     return Platform.isWindows || Platform.isLinux | Platform.isMacOS;
   }
+
+  static bool isWeb() {
+    return kIsWeb;
+  }
 }
 
 /// Helper class to keep UI always the same.
