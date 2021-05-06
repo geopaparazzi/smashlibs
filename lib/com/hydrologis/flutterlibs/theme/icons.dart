@@ -80,6 +80,15 @@ class SmashIcons {
   static IconData iconInMapCenter = MdiIcons.imageFilterCenterFocus;
   static IconData iconInGps = MdiIcons.crosshairsGps;
 
+  static IconData iconTime = MdiIcons.clockOutline;
+  static IconData iconDistance = MdiIcons.ruler;
+  static IconData iconSpeed = MdiIcons.speedometer;
+  static IconData iconUphill = MdiIcons.arrowTopRightThick;
+  static IconData iconDownhill = MdiIcons.arrowBottomRightThick;
+  static IconData iconFlat = MdiIcons.arrowRightThick;
+
+  static IconData iconFilter = MdiIcons.filter;
+
   /// Get the right icon for a given path or url or file name  or extension.
   static IconData forPath(String pathOrUrlOrNameOrExtension) {
     if (pathOrUrlOrNameOrExtension.toLowerCase().startsWith("postgis")) {
