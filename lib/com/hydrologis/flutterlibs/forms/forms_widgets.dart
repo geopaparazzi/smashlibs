@@ -428,13 +428,14 @@ ListTile getWidget(
           title: ComboboxWidget(widgetKey, itemMap, label, itemReadonly),
         );
       }
-    // case TYPE_AUTOCOMPLETESTRINGCOMBO:
-    // {
-//        JSONArray comboItems = TagsManager.getComboItems(jsonObject);
-//        String[] itemsArray = TagsManager.comboItems2StringArray(comboItems);
-//        addedView = FormUtilities.addAutocompleteComboView(activity, mainView, label, value, itemsArray, constraintDescription);
-//        break;
-    // }
+    case TYPE_AUTOCOMPLETESTRINGCOMBO:
+      {
+        return ListTile(
+          leading: icon,
+          title: AutocompleteStringComboWidget(
+              widgetKey, itemMap, label, itemReadonly),
+        );
+      }
     case TYPE_CONNECTEDSTRINGCOMBO:
       {
         return ListTile(
@@ -442,17 +443,15 @@ ListTile getWidget(
           title:
               ConnectedComboboxWidget(widgetKey, itemMap, label, itemReadonly),
         );
-//        LinkedHashMap<String, List<String>> valuesMap = TagsManager.extractComboValuesMap(jsonObject);
-//        addedView = FormUtilities.addConnectedComboView(activity, mainView, label, value, valuesMap,
-//            constraintDescription);
-//        break;
       }
-//      case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO: {
-//        LinkedHashMap<String, List<String>> valuesMap = TagsManager.extractComboValuesMap(jsonObject);
-//        addedView = FormUtilities.addAutoCompleteConnectedComboView(activity, mainView, label, value, valuesMap,
-//            constraintDescription);
-//        break;
-//      }
+    case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO:
+      {
+        return ListTile(
+          leading: icon,
+          title: AutocompleteStringConnectedComboboxWidget(
+              widgetKey, itemMap, label, itemReadonly),
+        );
+      }
 //      case TYPE_ONETOMANYSTRINGCOMBO:
 //        LinkedHashMap<String, List<NamedList<String>>> oneToManyValuesMap = TagsManager.extractOneToManyComboValuesMap(jsonObject);
 //        addedView = FormUtilities.addOneToManyConnectedComboView(activity, mainView, label, value, oneToManyValuesMap,
@@ -552,6 +551,95 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
       },
       controlAffinity:
           ListTileControlAffinity.trailing, //  <-- leading Checkbox
+    );
+  }
+}
+
+class AutocompleteStringComboWidget extends StatelessWidget {
+  final _itemMap;
+  final String _label;
+  final bool _isReadOnly;
+  bool _init = true;
+
+  AutocompleteStringComboWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey),
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    String value = ""; //$NON-NLS-1$
+    if (_itemMap.containsKey(TAG_VALUE)) {
+      value = _itemMap[TAG_VALUE].trim();
+    }
+
+    var comboItems = TagsManager.getComboItems(_itemMap);
+    List<ItemObject> itemsArray =
+        TagsManager.comboItems2ObjectArray(comboItems);
+    ItemObject found = itemsArray.firstWhere((item) => item.value == value,
+        orElse: () => null);
+    if (found == null) {
+      value = "";
+    }
+    var items = itemsArray
+        .map(
+          (itemObj) => itemObj.value,
+        )
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
+          child: SmashUI.normalText(_label,
+              color: SmashColors.mainDecorationsDarker),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: SmashUI.DEFAULT_PADDING * 2),
+          child: Container(
+            padding: EdgeInsets.only(
+                left: SmashUI.DEFAULT_PADDING, right: SmashUI.DEFAULT_PADDING),
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              border: Border.all(
+                color: SmashColors.mainDecorations,
+              ),
+            ),
+            child: Autocomplete<String>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text == '') {
+                  return const Iterable<String>.empty();
+                }
+                return items.where((String option) {
+                  return option.contains(textEditingValue.text.toLowerCase());
+                });
+              },
+              fieldViewBuilder: (context, textEditingController, focusNode,
+                  onFieldSubmitted) {
+                if (_init) {
+                  _init = true;
+                  return TextFormField(
+                    controller: textEditingController..text = value,
+                    focusNode: focusNode,
+                  );
+                } else {
+                  return TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                  );
+                }
+              },
+              onSelected: (String selection) {
+                if (!_isReadOnly) {
+                  _itemMap[TAG_VALUE] = selection;
+                }
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -795,12 +883,220 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                             onChanged: (selected) {
                               if (!widget._isReadOnly) {
                                 setState(() {
-                                  setState(() {
-                                    var str = widget._itemMap[TAG_VALUE];
-                                    widget._itemMap[TAG_VALUE] =
-                                        str.split("#")[0] + SEP + selected;
-                                  });
+                                  var str = widget._itemMap[TAG_VALUE];
+                                  widget._itemMap[TAG_VALUE] =
+                                      str.split("#")[0] + SEP + selected;
                                 });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class AutocompleteStringConnectedComboboxWidget extends StatefulWidget {
+  final _itemMap;
+  final String _label;
+  final bool _isReadOnly;
+
+  AutocompleteStringConnectedComboboxWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey),
+        );
+
+  @override
+  AutocompleteStringConnectedComboboxWidgetState createState() =>
+      AutocompleteStringConnectedComboboxWidgetState();
+}
+
+class AutocompleteStringConnectedComboboxWidgetState
+    extends State<AutocompleteStringConnectedComboboxWidget> {
+  String currentMain = "";
+  String currentSec = "";
+
+  List<String> mainComboItems = [];
+  Map<String, List<String>> secondaryCombos = {};
+  bool _init = true;
+
+  @override
+  void initState() {
+    if (widget._itemMap.containsKey(TAG_VALUES)) {
+      Map<String, dynamic> valuesObj = widget._itemMap[TAG_VALUES];
+
+      bool hasEmpty = false;
+      valuesObj.forEach((key, value) {
+        if (key.trim().isEmpty) {
+          hasEmpty = true;
+        }
+        mainComboItems.add(key);
+
+        List<String> sec = [];
+        secondaryCombos[key] = sec;
+        bool subHasEmpty = false;
+        value.forEach((elem) {
+          dynamic item = elem[TAG_ITEM] ?? "";
+          if (item.toString().trim().isEmpty) {
+            subHasEmpty = true;
+          }
+          sec.add(item.toString());
+        });
+        if (!subHasEmpty) {
+          sec.insert(0, "");
+        }
+      });
+
+      if (!hasEmpty) {
+        mainComboItems.insert(0, "");
+      }
+    }
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var formItem = widget._itemMap;
+
+    if (formItem.containsKey(TAG_VALUE)) {
+      String value = formItem[TAG_VALUE].trim();
+      var split = value.split(SEP);
+      if (split.length == 2) {
+        currentMain = split[0];
+        currentSec = split[1];
+      }
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
+          child: SmashUI.normalText(widget._label,
+              color: SmashColors.mainDecorationsDarker),
+        ),
+        Container(
+          decoration: currentMain.trim().isNotEmpty
+              ? BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  border: Border.all(
+                    color: SmashColors.mainDecorations,
+                  ),
+                )
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: SmashUI.DEFAULT_PADDING * 2,
+                      bottom: SmashUI.DEFAULT_PADDING),
+                  child: Container(
+                    padding: EdgeInsets.only(
+                        left: SmashUI.DEFAULT_PADDING,
+                        right: SmashUI.DEFAULT_PADDING),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      border: Border.all(
+                        color: SmashColors.mainDecorations,
+                      ),
+                    ),
+                    child: Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        if (textEditingValue.text == '') {
+                          return const Iterable<String>.empty();
+                        }
+                        return mainComboItems.where((String option) {
+                          return option
+                              .contains(textEditingValue.text.toLowerCase());
+                        });
+                      },
+                      fieldViewBuilder: (context, textEditingController,
+                          focusNode, onFieldSubmitted) {
+                        if (_init) {
+                          _init = true;
+                          return TextFormField(
+                            controller: textEditingController
+                              ..text = currentMain,
+                            focusNode: focusNode,
+                          );
+                        } else {
+                          return TextFormField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                          );
+                        }
+                      },
+                      onSelected: (String selection) {
+                        if (!widget._isReadOnly) {
+                          setState(() {
+                            formItem[TAG_VALUE] = selection + SEP;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                currentMain.trim().isEmpty
+                    ? Container()
+                    : Padding(
+                        padding: const EdgeInsets.only(
+                          left: SmashUI.DEFAULT_PADDING * 2,
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: SmashUI.DEFAULT_PADDING,
+                              right: SmashUI.DEFAULT_PADDING),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: SmashColors.mainDecorations,
+                            ),
+                          ),
+                          child: Autocomplete<String>(
+                            optionsBuilder:
+                                (TextEditingValue textEditingValue) {
+                              if (textEditingValue.text == '') {
+                                return const Iterable<String>.empty();
+                              }
+                              return secondaryCombos[currentMain]
+                                  .where((String option) {
+                                return option.contains(
+                                    textEditingValue.text.toLowerCase());
+                              });
+                            },
+                            fieldViewBuilder: (context, textEditingController,
+                                focusNode, onFieldSubmitted) {
+                              if (_init) {
+                                _init = true;
+                                return TextFormField(
+                                  controller: textEditingController
+                                    ..text = currentSec,
+                                  focusNode: focusNode,
+                                );
+                              } else {
+                                return TextFormField(
+                                  controller: textEditingController,
+                                  focusNode: focusNode,
+                                );
+                              }
+                            },
+                            onSelected: (String selection) {
+                              if (!widget._isReadOnly) {
+                                var str = widget._itemMap[TAG_VALUE];
+                                widget._itemMap[TAG_VALUE] =
+                                    str.split("#")[0] + SEP + selection;
                               }
                             },
                           ),
