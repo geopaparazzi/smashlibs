@@ -6,7 +6,6 @@ part of smashlibs;
  */
 
 /// The name of the app, used to handle project folders and similar.
-const APP_NAME = "smash";
 const MAPS_FOLDER = "maps";
 const CONFIG_FOLDER = "config";
 const FORMS_FOLDER = "forms";
@@ -17,6 +16,8 @@ const IOS_DOCUMENTSFOLDER = "Documents";
 
 /// Application workspace utilities.
 class Workspace {
+  static String APP_NAME =
+      "smash"; // change this if you are customizing the app
   static String _rootFolder;
 
   static bool _isDesktop;
@@ -84,7 +85,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getApplicationFolder() async {
     var rootFolder = await getRootFolder();
-    var applicationFolderPath = HU.FileUtilities.joinPaths(rootFolder.path, APP_NAME);
+    var applicationFolderPath =
+        HU.FileUtilities.joinPaths(rootFolder.path, APP_NAME);
     Directory configFolder = Directory(applicationFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
@@ -97,7 +99,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getProjectsFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var projectsFolderPath = HU.FileUtilities.joinPaths(applicationFolder.path, PROJECTS_FOLDER);
+    var projectsFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, PROJECTS_FOLDER);
     Directory configFolder = Directory(projectsFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
@@ -110,7 +113,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getConfigFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var configFolderPath = HU.FileUtilities.joinPaths(applicationFolder.path, CONFIG_FOLDER);
+    var configFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, CONFIG_FOLDER);
     Directory configFolder = Directory(configFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
@@ -123,7 +127,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getFormsFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var formsFolderPath = HU.FileUtilities.joinPaths(applicationFolder.path, FORMS_FOLDER);
+    var formsFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, FORMS_FOLDER);
     Directory formsFolder = Directory(formsFolderPath);
     if (!formsFolder.existsSync()) {
       formsFolder.createSync();
@@ -136,7 +141,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getMapsFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var mapsFolderPath = HU.FileUtilities.joinPaths(applicationFolder.path, MAPS_FOLDER);
+    var mapsFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, MAPS_FOLDER);
     Directory mapsFolder = Directory(mapsFolderPath);
     if (!mapsFolder.existsSync()) {
       mapsFolder.createSync();
@@ -149,7 +155,8 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getExportsFolder() async {
     var applicationFolder = await getApplicationFolder();
-    var mapsFolderPath = HU.FileUtilities.joinPaths(applicationFolder.path, EXPORT_FOLDER);
+    var mapsFolderPath =
+        HU.FileUtilities.joinPaths(applicationFolder.path, EXPORT_FOLDER);
     Directory mapsFolder = Directory(mapsFolderPath);
     if (!mapsFolder.existsSync()) {
       mapsFolder.createSync();
@@ -175,7 +182,8 @@ class Workspace {
     }
   }
 
-  static List<String> _getAndroidInternalStorage(List<StorageInfo> storageInfo) {
+  static List<String> _getAndroidInternalStorage(
+      List<StorageInfo> storageInfo) {
     String rootDir;
     String appFilesDir;
     if (storageInfo.isNotEmpty) {
@@ -195,7 +203,8 @@ class Workspace {
   static Future<String> getLastUsedFolder() async {
     var rootDir = await getRootFolder();
     var rootPath = rootDir.path;
-    var lastFolder = await GpPreferences().getString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, "");
+    var lastFolder = await GpPreferences()
+        .getString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, "");
     if (lastFolder.length == 0) {
       lastFolder = rootPath;
     } else {
@@ -214,7 +223,8 @@ class Workspace {
     var rootDir = await getRootFolder();
     var rootPath = rootDir.path;
     String relativePath = absolutePath.replaceFirst(rootPath, "");
-    await GpPreferences().setString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, relativePath);
+    await GpPreferences()
+        .setString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, relativePath);
   }
 
   static bool isDesktop() {
