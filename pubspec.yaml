@@ -42,7 +42,7 @@ dependencies:
   # MIT
   proj4dart: ^2.0.0
   # MIT
-  dio: ^3.0.9
+  dio: ^4.0.0
   # MIT
   permission_handler: ^5.1.0
     # git: 

@@ -4,13 +4,13 @@ class SmashPrj {
   static final Projection EPSG4326 = Projection.WGS84;
   static final int EPSG4326_INT = 4326;
   static final int EPSG3857_INT = 3857;
-  static final Projection EPSG3857 = Projection('EPSG:$EPSG3857_INT');
+  static final Projection EPSG3857 = Projection.get('EPSG:$EPSG3857_INT');
 
   /// Create a [Projection] object from a given [srid].
   static Projection fromSrid(int srid) {
     if (srid == EPSG3857_INT) return EPSG3857;
     if (srid == EPSG4326_INT) return EPSG4326;
-    var prj = Projection("EPSG:$srid");
+    var prj = Projection.get("EPSG:$srid");
     return prj;
   }
 
