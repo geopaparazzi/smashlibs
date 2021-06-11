@@ -11,7 +11,8 @@ const bool alsoVideo = false;
 class Camera {
   /// Take a picture and save it to a file. Then run an optional [onCameraFileFunction] function on it.
   static Future<String> takePicture({Function onCameraFileFunction}) async {
-    var imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
+    final picker = ImagePicker();
+    var imageFile = await picker.getImage(source: ImageSource.camera);
     if (imageFile == null) {
       return null;
     }
@@ -24,7 +25,8 @@ class Camera {
   /// Load an image from the gallery. Then run an optional [onCameraFileFunction] function on it.
   static Future<String> loadImageFromGallery(
       {Function onCameraFileFunction}) async {
-    var imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+    final picker = ImagePicker();
+    var imageFile = await picker.getImage(source: ImageSource.gallery);
     if (imageFile == null) {
       return null;
     }

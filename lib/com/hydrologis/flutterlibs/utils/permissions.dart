@@ -65,22 +65,22 @@ class PermissionManager {
       } else {
         SMLogger().w("Location permission is not granted.");
       }
-      if (!granted) {
-        var status = await Permission.location.status;
-        if (status == PermissionStatus.undetermined) {
-          // this is a library bug, since it has been asked for sure.
-          var openSettings = await SmashDialogs.showConfirmDialog(context, "Location permission",
-              "The device could not set the location permission automatically. Open settings to set permission (recomended)?");
-          if (openSettings) {
-            if (await openAppSettings()) {
-              status = await Permission.location.status;
-              if (status == PermissionStatus.granted) {
-                granted = true;
-              }
-            }
-          }
-        }
-      }
+      // if (!granted) {
+      //   var status = await Permission.location.status;
+      //   if (status == PermissionStatus.undetermined) {
+      //     // this is a library bug, since it has been asked for sure.
+      //     var openSettings = await SmashDialogs.showConfirmDialog(context, "Location permission",
+      //         "The device could not set the location permission automatically. Open settings to set permission (recomended)?");
+      //     if (openSettings) {
+      //       if (await openAppSettings()) {
+      //         status = await Permission.location.status;
+      //         if (status == PermissionStatus.granted) {
+      //           granted = true;
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
       return granted;
     }
   }
