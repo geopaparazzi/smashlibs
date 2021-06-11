@@ -40,7 +40,7 @@ dependencies:
   # MIT
   path_provider_ex: ^1.0.1
   # MIT
-  proj4dart: ^1.0.4
+  proj4dart: ^2.0.0
   # MIT
   dio: ^3.0.9
   # MIT
