@@ -21,8 +21,12 @@ class Workspace {
   static String _rootFolder;
 
   static bool _isDesktop;
+  static bool _doSafeMode = false;
 
-  static Future<void> init() async {
+  /// Initialize workspace and all app folders. If [doSafeMode] is set to true,
+  /// the internal storage is used to ensure write permissions without issues.
+  static Future<void> init({bool doSafeMode}) async {
+    _doSafeMode = doSafeMode;
     var rootDir = await getRootFolder();
     _rootFolder = rootDir.path;
     _isDesktop = isDesktop();
@@ -55,18 +59,23 @@ class Workspace {
   /// On Android this will be the internal sdcard storage,
   /// while on IOS that will be the Documents folder.
   static Future<Directory> getRootFolder() async {
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (_doSafeMode) {
       var dir = await getApplicationDocumentsDirectory();
-      return dir;
-    } else if (Platform.isLinux) {
-      var dir = await getApplicationDocumentsDirectory();
-      return dir;
-    } else if (Platform.isAndroid) {
-      var dir = await _getAndroidStorageFolder();
       return dir;
     } else {
-      // TODO
-      return null;
+      if (Platform.isIOS || Platform.isMacOS) {
+        var dir = await getApplicationDocumentsDirectory();
+        return dir;
+      } else if (Platform.isLinux) {
+        var dir = await getApplicationDocumentsDirectory();
+        return dir;
+      } else if (Platform.isAndroid) {
+        var dir = await _getAndroidStorageFolder();
+        return dir;
+      } else {
+        // TODO
+        return null;
+      }
     }
   }
 
@@ -87,6 +96,21 @@ class Workspace {
     var rootFolder = await getRootFolder();
     var applicationFolderPath =
         HU.FileUtilities.joinPaths(rootFolder.path, APP_NAME);
+    Directory configFolder = Directory(applicationFolderPath);
+    if (!configFolder.existsSync()) {
+      configFolder.createSync();
+    }
+    return configFolder;
+  }
+
+  /// Get a save application folder that will always work in write mode.
+  ///
+  /// The [APP_NAME] is used and can be changed for other apps.
+  ///
+  /// Returns the file of the folder to use.
+  static Future<Directory> getSafeApplicationFolder() async {
+    var dir = await getApplicationDocumentsDirectory();
+    var applicationFolderPath = HU.FileUtilities.joinPaths(dir.path, APP_NAME);
     Directory configFolder = Directory(applicationFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
