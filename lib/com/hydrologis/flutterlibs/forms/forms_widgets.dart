@@ -613,7 +613,9 @@ class AutocompleteStringComboWidget extends StatelessWidget {
                   return const Iterable<String>.empty();
                 }
                 return items.where((String option) {
-                  return option.contains(textEditingValue.text.toLowerCase());
+                  return option
+                      .toLowerCase()
+                      .contains(textEditingValue.text.toLowerCase());
                 });
               },
               fieldViewBuilder: (context, textEditingController, focusNode,
@@ -1019,6 +1021,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                         }
                         return mainComboItems.where((String option) {
                           return option
+                              .toLowerCase()
                               .contains(textEditingValue.text.toLowerCase());
                         });
                       },
@@ -1072,7 +1075,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                               }
                               return secondaryCombos[currentMain]
                                   .where((String option) {
-                                return option.contains(
+                                return option.toLowerCase().contains(
                                     textEditingValue.text.toLowerCase());
                               });
                             },
