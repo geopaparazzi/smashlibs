@@ -25,7 +25,7 @@ class Workspace {
 
   /// Initialize workspace and all app folders. If [doSafeMode] is set to true,
   /// the internal storage is used to ensure write permissions without issues.
-  static Future<void> init({bool doSafeMode}) async {
+  static Future<void> init({bool doSafeMode = false}) async {
     _doSafeMode = doSafeMode;
     var rootDir = await getRootFolder();
     _rootFolder = rootDir.path;
