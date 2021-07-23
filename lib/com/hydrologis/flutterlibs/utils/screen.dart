@@ -58,7 +58,7 @@ class ScreenUtilities {
 
   static void keepScreenOn(bool keepOn) {
     if (!SmashPlatform.isDesktop()) {
-      Screen.keepOn(keepOn);
+      FlutterScreenWake.keepOn(keepOn);
     }
   }
 }

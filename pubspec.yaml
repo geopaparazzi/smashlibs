@@ -18,12 +18,12 @@ dependencies:
   #################
 
   #BSD
-  dart_jts: ^0.1.0
+  dart_jts: ^0.2.0
     # path: ../dart_jts/
   #    git:
   #      url: https://github.com/moovida/dart_jts.git
 
-  dart_hydrologis_utils: ^0.5.4
+  dart_hydrologis_utils: ^0.6.0
     # path: ../dart_hydrologis_utils/
 
   ####################
@@ -32,13 +32,16 @@ dependencies:
   # BSD
   # charset_converter: ^1.0.3
   # MIT
-  material_design_icons_flutter: ^4.0.5345
+  material_design_icons_flutter: ^5.0.5955-rc.1
   # MIT
-  share_extend: ^1.1.2
+  share_extend: ^2.0.0
   # BSD
-  path_provider: ^2.0.1
+  path_provider: ^2.0.2
   # MIT
-  path_provider_ex: ^1.0.1
+  path_provider_ex: #^1.0.1
+    git:
+      url: https://github.com/atrope/flutter_path_provider_ex.git
+      ref: feature/nullsafemigration
   # MIT
   proj4dart: ^2.0.0
   # MIT
@@ -50,31 +53,31 @@ dependencies:
     #   path: permission_handler
 
   # BSD
-  device_info: ^0.4.2+1
+  device_info_plus: ^2.1.0
   # MIT
-  after_layout: ^1.0.7+2
+  after_layout: ^1.1.0
 
   # BSD
-  url_launcher: ^6.0.6
+  url_launcher: ^6.0.9
 
   # MIT
-  flutter_tags: ^0.4.8
+  flutter_tags: ^1.0.0-nullsafety.1
 
   # MIT
-  flutter_material_pickers: 3.0.0
+  flutter_material_pickers: ^3.1.0
     # git:
     #   url: https://github.com/moovida/flutter_material_pickers.git
     #   ref: 74bf310
 
   # BSD
-  shared_preferences: ^0.5.6+3
+  shared_preferences: ^2.0.6
   # MIT
-  screen: 0.0.5
+  flutter_screen_wake: ^1.0.2
   # ON ANDROID NEEDS:
   # <uses-permission android:name="android.permission.WAKE_LOCK" />
 
   #BSD
-  image_picker: ^0.8.0+3
+  image_picker: ^0.8.2
   # ON IOS NEEDS:
   #  <key>NSPhotoLibraryUsageDescription</key>
   #  <string>The app needs to access the photo library to attach media to the survey.</string>

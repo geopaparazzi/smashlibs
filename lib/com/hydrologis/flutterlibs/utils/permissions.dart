@@ -5,7 +5,7 @@ part of smashlibs;
  * found in the LICENSE file.
  */
 
-enum PERMISSIONS { STORAGE, LOCATION }
+enum PERMISSIONS { STORAGE, LOCATION, MANAGEEXTSTORAGE }
 
 class PermissionManager {
   static final PermissionManager _instance = PermissionManager._internal();
@@ -26,6 +26,8 @@ class PermissionManager {
     for (int i = 0; i < _permissionsToCheck.length; i++) {
       if (_permissionsToCheck[i] == PERMISSIONS.STORAGE && !Platform.isIOS) {
         granted = await _checkStoragePermissions(context);
+      } else if (_permissionsToCheck[i] == PERMISSIONS.MANAGEEXTSTORAGE) {
+        granted = await _checkManagedExtStoragePermissions(context);
       } else if (_permissionsToCheck[i] == PERMISSIONS.LOCATION) {
         granted = await _checkLocationPermissions(context);
       }
@@ -43,6 +45,21 @@ class PermissionManager {
         return true;
       } else {
         SMLogger().w("Storage permission is not granted.");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<bool> _checkManagedExtStoragePermissions(BuildContext context) async {
+    var status = await Permission.manageExternalStorage.status;
+    if (status != PermissionStatus.granted) {
+      var permissionStatus = await Permission.manageExternalStorage.request();
+      if (permissionStatus.isGranted) {
+        SMLogger().i("Manage External Storage permission granted.");
+        return true;
+      } else {
+        SMLogger().w("Manage External Storage permission is not granted.");
         return false;
       }
     }
@@ -83,5 +100,6 @@ class PermissionManager {
       // }
       return granted;
     }
+    return true;
   }
 }

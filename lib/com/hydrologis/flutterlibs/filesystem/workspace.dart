@@ -94,8 +94,16 @@ class Workspace {
   /// Returns the file of the folder to use.
   static Future<Directory> getApplicationFolder() async {
     var rootFolder = await getRootFolder();
-    var applicationFolderPath =
+    String applicationFolderPath;
+    // if (Platform.isAndroid) {
+    //   applicationFolderPath =
+    //       HU.FileUtilities.joinPaths(rootFolder.path, "Android/data");
+    //   applicationFolderPath = HU.FileUtilities.joinPaths(
+    //       applicationFolderPath, "eu.hydrologis.smash");
+    // } else {
+    applicationFolderPath =
         HU.FileUtilities.joinPaths(rootFolder.path, APP_NAME);
+    // }
     Directory configFolder = Directory(applicationFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
