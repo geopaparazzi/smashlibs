@@ -18,7 +18,7 @@ class SmashDialogs {
   ///         }
   ///     });
   ///
-  static Future<bool> showConfirmDialog(
+  static Future<bool?> showConfirmDialog(
       BuildContext context, String title, String prompt,
       {trueText: 'Yes', falseText: 'No'}) async {
     return await showDialog<bool>(
@@ -28,13 +28,13 @@ class SmashDialogs {
             title: Text(title),
             content: Text(prompt),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context, true);
                 },
                 child: Text(trueText),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context, false);
                 },
@@ -77,7 +77,7 @@ class SmashDialogs {
               ],
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -119,7 +119,7 @@ class SmashDialogs {
               ],
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -132,9 +132,9 @@ class SmashDialogs {
 
   /// Show an info dialog, adding an optional [title] and a [prompt] for the user.
   static Future<void> showInfoDialog(BuildContext context, String prompt,
-      {String title,
+      {String? title,
       double dialogHeight: SIMPLE_DIALOGS_HEIGHT,
-      List<Widget> widgets,
+      List<Widget>? widgets,
       bool doLandscape = false}) async {
     Widget widget;
     if (doLandscape) {
@@ -192,7 +192,7 @@ class SmashDialogs {
               child: widget,
             ),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -209,15 +209,15 @@ class SmashDialogs {
   /// strings for the [okText] and [cancelText] of the buttons.
   ///
   /// If the user pushes the cancel button, null will be returned, if user pushes ok without entering anything the empty string '' is returned.
-  static Future<String> showInputDialog(
+  static Future<String?> showInputDialog(
       BuildContext context, String title, String label,
       {defaultText: '',
       hintText: '',
       okText: 'Ok',
       cancelText: 'Cancel',
       isPassword: false,
-      Function validationFunction}) async {
-    String errorText;
+      Function? validationFunction}) async {
+    String? errorText;
 
     var textEditingController = new TextEditingController(text: defaultText);
     var inputDecoration =
@@ -255,13 +255,13 @@ class SmashDialogs {
             );
           }),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text(cancelText),
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
             ),
-            FlatButton(
+            TextButton(
               child: Text(okText),
               onPressed: () {
                 if (errorText == null) {
@@ -280,11 +280,11 @@ class SmashDialogs {
   /// [title] can be either a String or a Widget.
   ///
   /// Returns the selected item.
-  static Future<String> showComboDialog(
+  static Future<String?> showComboDialog(
     BuildContext context,
     dynamic title,
     List<String> items, {
-    List<String> iconNames,
+    List<String>? iconNames,
     bool allowCancel = false,
     String cancelText = 'Cancel',
   }) async {
@@ -321,7 +321,7 @@ class SmashDialogs {
       ));
     }
 
-    String selection = await showDialog<String>(
+    String? selection = await showDialog<String>(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
@@ -347,7 +347,7 @@ class SmashDialogs {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             actions: [
               if (allowCancel)
-                FlatButton(
+                TextButton(
                   child: Text(cancelText),
                   onPressed: () {
                     Navigator.of(context).pop(null);
@@ -360,7 +360,7 @@ class SmashDialogs {
   }
 
   /// Show an epsg code prompt dialog that returns the int srid or null of cancel invoked.
-  static Future<int> showEpsgInputDialog(BuildContext context) async {
+  static Future<int?> showEpsgInputDialog(BuildContext context) async {
     var epsgString = await showInputDialog(
       context,
       "Add Projection",
@@ -394,11 +394,11 @@ class SmashDialogs {
   /// [title] can be either a String or a Widget.
   ///
   /// Returns the selected item.
-  static Future<List<String>> showMultiSelectionComboDialog(
+  static Future<List<String>?> showMultiSelectionComboDialog(
       BuildContext context, dynamic title, List<String> items,
       {String okText: 'Ok',
       String cancelText: 'Cancel',
-      List<IconData> iconDataList}) async {
+      List<IconData>? iconDataList}) async {
     List<Widget> widgets = [];
     List<String> selected = [];
     for (var i = 0; i < items.length; ++i) {
@@ -412,11 +412,11 @@ class SmashDialogs {
             selected.remove(item);
           }
         },
-        iconData: iconDataList[i],
+        iconData: iconDataList != null ? iconDataList[i] : null,
       ));
     }
 
-    List<String> selection = await showDialog<List<String>>(
+    List<String>? selection = await showDialog<List<String>>(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
@@ -441,13 +441,13 @@ class SmashDialogs {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text(cancelText),
                 onPressed: () {
                   Navigator.of(context).pop(null);
                 },
               ),
-              FlatButton(
+              TextButton(
                 child: Text(okText),
                 onPressed: () {
                   Navigator.of(context).pop(selected);
@@ -464,7 +464,7 @@ class DialogCheckBoxTile extends StatefulWidget {
   final bool selected;
   final String item;
   final onSelection;
-  final IconData iconData;
+  final IconData? iconData;
 
   DialogCheckBoxTile(this.selected, this.item, this.onSelection,
       {this.iconData});
@@ -474,7 +474,7 @@ class DialogCheckBoxTile extends StatefulWidget {
 }
 
 class _DialogCheckBoxTileState extends State<DialogCheckBoxTile> {
-  bool selected;
+  bool selected = false;
 
   @override
   void initState() {
@@ -496,8 +496,10 @@ class _DialogCheckBoxTileState extends State<DialogCheckBoxTile> {
     return CheckboxListTile(
       onChanged: (value) {
         setState(() {
-          selected = value;
-          widget.onSelection(value, widget.item);
+          if (value != null) {
+            selected = value;
+            widget.onSelection(value, widget.item);
+          }
         });
       },
       value: selected,

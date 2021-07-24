@@ -9,7 +9,7 @@ part of smashlibs;
 ///
 /// Returns null if the string is valid. This can be used
 /// as [TextFormField] validator.
-String noEmptyValidator(String value) {
+String? noEmptyValidator(String value) {
   if (value.trim().length == 0) {
     return "Please enter some text to continue.";
   } else {
@@ -21,7 +21,7 @@ String noEmptyValidator(String value) {
 ///
 /// Returns null if the string is valid. This can be used
 /// as [TextFormField] validator.
-String fileNameValidator(String value) {
+String? fileNameValidator(String value) {
   if (value.trim().length == 0) {
     // TODO add proper checks for safe filenames
     return "Please enter a valid file name to continue.";

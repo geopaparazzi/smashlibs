@@ -29,37 +29,52 @@ class ThemeState extends ChangeNotifier {
   SmashThemes _currentTheme = SmashThemes.LIGHT;
   ThemeData _currentThemeData = themeData[0];
 
-  void switchTheme() => currentTheme == SmashThemes.LIGHT ? currentTheme = SmashThemes.DARK : currentTheme = SmashThemes.LIGHT;
+  void switchTheme() => currentTheme == SmashThemes.LIGHT
+      ? currentTheme = SmashThemes.DARK
+      : currentTheme = SmashThemes.LIGHT;
 
-  set currentTheme(SmashThemes theme) {
+  set currentTheme(SmashThemes? theme) {
     if (theme != null) {
       _currentTheme = theme;
-      _currentThemeData = currentTheme == SmashThemes.LIGHT ? themeData[0] : themeData[1];
+      _currentThemeData =
+          currentTheme == SmashThemes.LIGHT ? themeData[0] : themeData[1];
 
       notifyListeners();
     }
   }
 
-  get currentTheme => _currentTheme;
+  SmashThemes get currentTheme => _currentTheme;
 
   get currentThemeData => _currentThemeData;
 
   static InputDecorationTheme getInputdecoTheme() {
     return InputDecorationTheme(
       border: const OutlineInputBorder(
-        borderSide:
-            BorderSide(color: Color.fromARGB(255, SmashColors.mainDecorationsDarkR, SmashColors.mainDecorationsDarkG, SmashColors.mainDecorationsDarkB)),
+        borderSide: BorderSide(
+            color: Color.fromARGB(
+                255,
+                SmashColors.mainDecorationsDarkR,
+                SmashColors.mainDecorationsDarkG,
+                SmashColors.mainDecorationsDarkB)),
       ),
       enabledBorder: OutlineInputBorder(
-        borderSide:
-            BorderSide(color: Color.fromARGB(255, SmashColors.mainDecorationsDarkR, SmashColors.mainDecorationsDarkG, SmashColors.mainDecorationsDarkB)),
+        borderSide: BorderSide(
+            color: Color.fromARGB(
+                255,
+                SmashColors.mainDecorationsDarkR,
+                SmashColors.mainDecorationsDarkG,
+                SmashColors.mainDecorationsDarkB)),
       ),
       disabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: Color.fromARGB(255, 128, 128, 128)),
       ),
       focusedBorder: const OutlineInputBorder(
-        borderSide:
-            BorderSide(color: Color.fromARGB(255, SmashColors.mainSelectionBorderR, SmashColors.mainSelectionBorderG, SmashColors.mainSelectionBorderB)),
+        borderSide: BorderSide(
+            color: Color.fromARGB(
+                255,
+                SmashColors.mainSelectionBorderR,
+                SmashColors.mainSelectionBorderG,
+                SmashColors.mainSelectionBorderB)),
       ),
 //            labelStyle: const TextStyle(
 //              color: Color.fromARGB(255, 128, 128, 128),

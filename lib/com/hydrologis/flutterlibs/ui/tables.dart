@@ -24,8 +24,8 @@ class TableUtilities {
       Color backgroundColor = Colors.white,
       bool doSmallText = false,
       List<double> colWidthFlex = const [0.4, 0.6],
-      String highlightPattern,
-      Color highlightColor}) {
+      String? highlightPattern,
+      Color? highlightColor}) {
     List<TableRow> rows = [];
 
     map.forEach((key, value) {
@@ -33,6 +33,7 @@ class TableUtilities {
       Color color;
       bool doBold = false;
       if (highlightPattern != null &&
+          highlightColor != null &&
           (valueStr.toLowerCase().contains(highlightPattern.toLowerCase()) ||
               key.toLowerCase().contains(highlightPattern.toLowerCase()))) {
         color = highlightColor;

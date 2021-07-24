@@ -6,9 +6,9 @@ part of smashlibs;
  */
 
 class SmashCircularProgress extends StatelessWidget {
-  final String label;
+  String? label;
 
-  SmashCircularProgress({this.label, Key key}) : super(key: key);
+  SmashCircularProgress({this.label, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class SmashCircularProgress extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            SmashUI.normalText(label),
+            SmashUI.normalText(label!),
           ],
         ),
       );

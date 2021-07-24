@@ -10,9 +10,9 @@ const bool alsoVideo = false;
 /// Camera related functions.
 class Camera {
   /// Take a picture and save it to a file. Then run an optional [onCameraFileFunction] function on it.
-  static Future<String> takePicture({Function onCameraFileFunction}) async {
+  static Future<String?> takePicture({Function? onCameraFileFunction}) async {
     final picker = ImagePicker();
-    var imageFile = await picker.getImage(source: ImageSource.camera);
+    var imageFile = await picker.pickImage(source: ImageSource.camera);
     if (imageFile == null) {
       return null;
     }
@@ -23,10 +23,10 @@ class Camera {
   }
 
   /// Load an image from the gallery. Then run an optional [onCameraFileFunction] function on it.
-  static Future<String> loadImageFromGallery(
-      {Function onCameraFileFunction}) async {
+  static Future<String?> loadImageFromGallery(
+      {Function? onCameraFileFunction}) async {
     final picker = ImagePicker();
-    var imageFile = await picker.getImage(source: ImageSource.gallery);
+    var imageFile = await picker.pickImage(source: ImageSource.gallery);
     if (imageFile == null) {
       return null;
     }

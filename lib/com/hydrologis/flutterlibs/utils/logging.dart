@@ -63,7 +63,7 @@ class SMLogger {
     }
   }
 
-  void e(dynamic message, Exception exception, StackTrace stackTrace) {
+  void e(dynamic message, Exception? exception, StackTrace? stackTrace) {
     if (_subLogger != null) {
       _subLogger.e(message, exception, stackTrace);
     } else {
@@ -80,7 +80,7 @@ class SMLogger {
   }
 
   /// Get the current list of log items.
-  List<dynamic> getLogItems({int limit}) {
+  List<dynamic> getLogItems({int? limit}) {
     return _subLogger.getLogItems(limit: limit);
   }
 }

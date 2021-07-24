@@ -287,10 +287,10 @@ class MandatoryConstraint implements IConstraint {
 class RangeConstraint implements IConstraint {
   bool _isValid = false;
 
-  double lowValue;
-  bool includeLow;
-  double highValue;
-  bool includeHigh;
+  late double lowValue;
+  late bool includeLow;
+  late double highValue;
+  late bool includeHigh;
 
   /// @param low low value.
   /// @param includeLow if <code>true</code>, include low.
@@ -523,8 +523,11 @@ class FormUtilities {
         }
         sB.writeln();
       }
-      Map<String, dynamic> form4Name =
+      Map<String, dynamic>? form4Name =
           TagsManager.getForm4Name(formName, sectionObject);
+      if (form4Name == null) {
+        return "";
+      }
       List<Map<String, dynamic>> formItems =
           TagsManager.getFormItems(form4Name);
       for (int i = 0; i < formItems.length; i++) {
@@ -569,15 +572,18 @@ class FormUtilities {
   /// @param formString the form.
   /// @return the list of images paths.
   /// @throws Exception if something goes wrong.
-  static List<String> getImageIds(String formString) {
+  static List<String> getImageIds(String? formString) {
     List<String> imageIds = [];
     if (formString != null && formString.isNotEmpty) {
       Map<String, dynamic> sectionObject = jsonDecode(formString);
       List<String> formsNames = TagsManager.getFormNames4Section(sectionObject);
       for (int j = 0; j < formsNames.length; j++) {
         String formName = formsNames[j];
-        Map<String, dynamic> form4Name =
+        Map<String, dynamic>? form4Name =
             TagsManager.getForm4Name(formName, sectionObject);
+        if (form4Name == null) {
+          return [];
+        }
         var formItems = TagsManager.getFormItems(form4Name);
         for (int i = 0; i < formItems.length; i++) {
           Map<String, dynamic> formItem = formItems[i];
@@ -684,8 +690,8 @@ class TagsManager {
   /// The tags file name end pattern. All files that end with this are ligible as tags.
   static const String TAGSFILENAME_ENDPATTERN = "tags.json";
 
-  List<String> _tagsFileArray;
-  List<String> _tagsFileArrayStrings;
+  List<String>? _tagsFileArray;
+  List<String>? _tagsFileArrayStrings;
 
   static final TagsManager _instance = TagsManager._internal();
 
@@ -696,8 +702,8 @@ class TagsManager {
   /// Creates a new sectionsmap from the tags file
   LinkedHashMap<String, Map<String, dynamic>> getSectionsMap() {
     LinkedHashMap<String, Map<String, dynamic>> _sectionsMap = LinkedHashMap();
-    for (int j = 0; j < _tagsFileArrayStrings.length; j++) {
-      String tagsFileString = _tagsFileArrayStrings[j];
+    for (int j = 0; j < _tagsFileArrayStrings!.length; j++) {
+      String tagsFileString = _tagsFileArrayStrings![j];
       List<dynamic> sectionsArrayObj = jsonDecode(tagsFileString);
       int tagsNum = sectionsArrayObj.length;
       for (int i = 0; i < tagsNum; i++) {
@@ -715,14 +721,14 @@ class TagsManager {
   ///
   /// @param context the context to use.
   /// @throws Exception
-  Future<void> readFileTags([String tagsFilePath]) async {
+  Future<void> readFileTags([String? tagsFilePath]) async {
     if (_tagsFileArray == null) {
       _tagsFileArray = [];
       _tagsFileArrayStrings = [];
     }
 
     if (tagsFilePath != null) {
-      _tagsFileArray.add(tagsFilePath);
+      _tagsFileArray!.add(tagsFilePath);
     } else {
       Directory formsFolder = await Workspace.getFormsFolder();
       List<String> fileNames = HU.FileUtilities.getFilesInPathByExt(
@@ -730,7 +736,7 @@ class TagsManager {
       _tagsFileArray = fileNames
           .map((fn) => HU.FileUtilities.joinPaths(formsFolder.path, fn))
           .toList();
-      if (_tagsFileArray == null || _tagsFileArray.isEmpty) {
+      if (_tagsFileArray == null || _tagsFileArray!.isEmpty) {
         String tagsFile =
             HU.FileUtilities.joinPaths(formsFolder.path, "tags.json");
         if (!File(tagsFile).existsSync()) {
@@ -741,11 +747,11 @@ class TagsManager {
       }
     }
 
-    for (int j = 0; j < _tagsFileArray.length; j++) {
-      String tagsFile = _tagsFileArray[j];
+    for (int j = 0; j < _tagsFileArray!.length; j++) {
+      String tagsFile = _tagsFileArray![j];
       if (!File(tagsFile).existsSync()) continue;
       String tagsFileString = HU.FileUtilities.readFile(tagsFile);
-      _tagsFileArrayStrings.add(tagsFileString);
+      _tagsFileArrayStrings!.add(tagsFileString);
     }
   }
 
@@ -806,9 +812,9 @@ class TagsManager {
   /// @param section  the section object containing the form.
   /// @return the form object.
   /// @ if something goes wrong.
-  static Map<String, dynamic> getForm4Name(
+  static Map<String, dynamic>? getForm4Name(
       String formName, Map<String, dynamic> section) {
-    List<dynamic> jsonArray = section[ATTR_FORMS];
+    List<dynamic>? jsonArray = section[ATTR_FORMS];
     if (jsonArray != null && jsonArray.length > 0) {
       for (int i = 0; i < jsonArray.length; i++) {
         Map<String, dynamic> jsonObject = jsonArray[i];
@@ -856,8 +862,9 @@ class TagsManager {
   /// @return the array of items of the contained form or <code>null</code> if
   /// no form is contained.
   /// @ if something goes wrong.
-  static List<Map<String, dynamic>> getFormItems(Map<String, dynamic> formObj) {
-    if (formObj.containsKey(TAG_FORMITEMS)) {
+  static List<Map<String, dynamic>> getFormItems(
+      Map<String, dynamic>? formObj) {
+    if (formObj != null && formObj.containsKey(TAG_FORMITEMS)) {
       List<dynamic> formItemsArray = formObj[TAG_FORMITEMS];
       int emptyIndex = -1;
       while ((emptyIndex = hasEmpty(formItemsArray)) >= 0) {
@@ -892,7 +899,7 @@ class TagsManager {
   /// @param formItem the json form <b>item</b>.
   /// @return the array of items.
   /// @ if something goes wrong.
-  static List<dynamic> getComboItems(Map<String, dynamic> formItem) {
+  static List<dynamic>? getComboItems(Map<String, dynamic> formItem) {
     if (formItem.containsKey(TAG_VALUES)) {
       var valuesObj = formItem[TAG_VALUES];
       if (valuesObj.containsKey(TAG_ITEMS)) {
@@ -998,18 +1005,15 @@ class TagsManager {
 
 /// The tag object.
 class TagObject {
-  String shortName;
-  String longName;
-  bool hasForm;
-  String jsonString;
+  String? shortName;
+  String? longName;
+  bool hasForm = false;
+  String? jsonString;
 }
 
 /// The combo item object.
 class ItemObject {
   String label;
   String value;
-  ItemObject(String label, String value) {
-    this.label = label;
-    this.value = value;
-  }
+  ItemObject(this.label, this.value);
 }

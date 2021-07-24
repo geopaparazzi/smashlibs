@@ -8,9 +8,9 @@ part of smashlibs;
 class FileDownloadListTileProgressWidget extends StatefulWidget {
   final String _downloadUrl;
   final String _destinationFilePath;
-  final String _name;
+  final String? _name;
   final bool showUrl;
-  final String authHeader;
+  final String? authHeader;
 
   FileDownloadListTileProgressWidget(
       this._downloadUrl, this._destinationFilePath, this._name,
@@ -26,7 +26,7 @@ class FileDownloadListTileProgressWidgetState
     extends State<FileDownloadListTileProgressWidget> {
   bool _downloading = false;
   bool _downloadFinished = false;
-  String _progressString = "";
+  String? _progressString = "";
   CancelToken cancelToken = CancelToken();
 
   @override
@@ -43,7 +43,7 @@ class FileDownloadListTileProgressWidgetState
       await file.parent.create(recursive: true);
     }
 
-    Options options;
+    Options? options;
     if (widget.authHeader != null) {
       options = Options(headers: {"Authorization": widget.authHeader});
     }
@@ -101,7 +101,7 @@ class FileDownloadListTileProgressWidgetState
                   color: SmashColors.mainDecorations,
                 ),
       title: Text(name),
-      subtitle: _progressString != null ? Text(_progressString) : Container(),
+      subtitle: _progressString != null ? Text(_progressString!) : Container(),
       trailing: Icon(
         Icons.file_download,
         color: SmashColors.mainDecorations,
@@ -135,11 +135,11 @@ class FileDownloadListTileProgressWidgetState
               "This file is already in the process of being downloaded.");
           return;
         }
-        bool doDownload = await SmashDialogs.showConfirmDialog(
+        bool? doDownload = await SmashDialogs.showConfirmDialog(
             context,
             "Download",
             "Download file $name to the device? This can take some time.");
-        if (doDownload) {
+        if (doDownload != null && doDownload) {
           await downloadFile();
         }
       },

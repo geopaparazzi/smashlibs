@@ -12,7 +12,7 @@ class SldPropertiesEditor extends StatefulWidget {
   final bool doFill;
   final bool doShape;
   final bool doStroke;
-  final List<String> alphaFields;
+  final List<String>? alphaFields;
 
   SldPropertiesEditor(this.sldString, this.geometryType,
       {this.doLabels = true,
@@ -20,7 +20,7 @@ class SldPropertiesEditor extends StatefulWidget {
       this.doStroke = true,
       this.doFill = true,
       this.alphaFields,
-      Key key})
+      Key? key})
       : super(key: key);
 
   @override
@@ -29,18 +29,18 @@ class SldPropertiesEditor extends StatefulWidget {
 
 class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
   int editorKeyCount = 0;
-  String sldString;
-  JTS.EGeometryType geometryType;
-  bool doLabels;
-  bool doFill;
-  bool doShape;
-  bool doStroke;
-  List<String> alphaFields;
-  HU.SldObjectParser sldParser;
+  late String sldString;
+  late JTS.EGeometryType geometryType;
+  late bool doLabels;
+  late bool doFill;
+  late bool doShape;
+  late bool doStroke;
+  List<String>? alphaFields;
+  late HU.SldObjectParser sldParser;
 
   List<HU.FeatureTypeStyle> widgetFeatureTypeStyles = [];
   Map<int, List<HU.Rule>> widgetRules = {};
-  List<HU.Rule> currentRulesList;
+  List<HU.Rule>? currentRulesList;
   int currentFtsIndex = 0;
   int currentRuleIndex = 0;
 
@@ -52,15 +52,17 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
 
     sldString = widget.sldString;
     geometryType = widget.geometryType;
-    doLabels = widget.doLabels ?? true;
-    doFill = widget.doFill ?? true;
-    doShape = widget.doShape ?? true;
-    doStroke = widget.doStroke ?? true;
+    doLabels = widget.doLabels;
+    doFill = widget.doFill;
+    doShape = widget.doShape;
+    doStroke = widget.doStroke;
     alphaFields = widget.alphaFields;
     // make sure an empty field is there to signal labels are disabled
-    if (alphaFields != null && !alphaFields.contains("")) {
+    if (widget.alphaFields != null &&
+        alphaFields != null &&
+        !alphaFields!.contains("")) {
       alphaFields = []..add("");
-      alphaFields.addAll(widget.alphaFields);
+      alphaFields!.addAll(widget.alphaFields!);
     }
 
     sldParser = HU.SldObjectParser.fromString(sldString);
@@ -92,7 +94,7 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SmashUI.errorWidget("No style found."),
-            FlatButton(
+            TextButton(
               onPressed: () {
                 setState(() {
                   createDefaultSLDString();
@@ -108,7 +110,7 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
 
       var fts = widgetFeatureTypeStyles[currentFtsIndex];
       var rules = widgetRules[currentFtsIndex];
-      var rule = rules[currentRuleIndex];
+      var rule = rules![currentRuleIndex];
 
       if (widgetFeatureTypeStyles.length > 1) {
         headerTiles.add(
@@ -250,7 +252,7 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
           selectedItem: selectedItemString,
           onChanged: (value) {
             setState(() {
-              currentFtsIndex = item2IndexMap[value];
+              currentFtsIndex = item2IndexMap[value] ?? 0;
               currentRuleIndex = 0;
               currentRulesList = widgetRules[currentFtsIndex];
             });
@@ -267,34 +269,36 @@ class _SldPropertiesEditorState extends State<SldPropertiesEditor> {
         color: SmashColors.mainDecorations,
       ),
       onPressed: () {
-        if (currentRulesList.length == 1) {
-          SmashDialogs.showInfoDialog(
-              context, "No other rule styles available.");
-          return;
-        }
+        if (currentRulesList != null) {
+          if (currentRulesList!.length == 1) {
+            SmashDialogs.showInfoDialog(
+                context, "No other rule styles available.");
+            return;
+          }
 
-        List<String> items = [];
-        Map<String, int> item2IndexMap = {};
-        for (var i = 0; i < currentRulesList.length; i++) {
-          var itemString = "${i + 1}) ${currentRulesList[i].name}";
-          item2IndexMap[itemString] = i;
-          items.add(itemString);
-        }
-        var selectedItemString =
-            "${currentRuleIndex + 1}) ${currentRulesList[currentRuleIndex].name}";
+          List<String> items = [];
+          Map<String, int> item2IndexMap = {};
+          for (var i = 0; i < currentRulesList!.length; i++) {
+            var itemString = "${i + 1}) ${currentRulesList![i].name}";
+            item2IndexMap[itemString] = i;
+            items.add(itemString);
+          }
+          var selectedItemString =
+              "${currentRuleIndex + 1}) ${currentRulesList![currentRuleIndex].name}";
 
-        showMaterialScrollPicker(
-          context: context,
-          title: "Select Rule",
-          showDivider: true,
-          items: items,
-          selectedItem: selectedItemString,
-          onChanged: (value) {
-            setState(() {
-              currentRuleIndex = item2IndexMap[value];
-            });
-          },
-        );
+          showMaterialScrollPicker(
+            context: context,
+            title: "Select Rule",
+            showDivider: true,
+            items: items,
+            selectedItem: selectedItemString,
+            onChanged: (value) {
+              setState(() {
+                currentRuleIndex = item2IndexMap[value]!;
+              });
+            },
+          );
+        }
       },
     );
   }
@@ -336,14 +340,14 @@ class RulePropertiesEditor extends StatefulWidget {
   final bool doFill;
   final bool doShape;
   final bool doStroke;
-  final List<String> alphaFields;
+  final List<String>? alphaFields;
   RulePropertiesEditor(this.fts, this.rule, this.geometryType,
       {this.doLabels = true,
       this.doShape = true,
       this.doStroke = true,
       this.doFill = true,
       this.alphaFields,
-      Key key})
+      Key? key})
       : super(key: key);
   @override
   _RulePropertiesEditorState createState() => _RulePropertiesEditorState();
@@ -598,7 +602,7 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
         return;
       }
       var style = widget.rule.pointSymbolizers.first.style;
-      var wktName = style.markerName ??= HU.WktMarkers.CIRCLE.name;
+      var wktName = style.markerName; // ??= HU.WktMarkers.CIRCLE.name;
       var shapeSize = style.markerSize;
 
       List<DropdownMenuItem<String>> shapeItems = HU.WktMarkers.values
@@ -635,7 +639,8 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
                                 value: wktName,
                                 onChanged: (newLabel) {
                                   setState(() {
-                                    style.markerName = newLabel;
+                                    style.markerName =
+                                        newLabel ?? HU.WktMarkers.CIRCLE.name;
                                   });
                                 }),
                           )),
@@ -684,7 +689,7 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
     if (widget.doLabels &&
         widget.geometryType.isPoint() &&
         widget.alphaFields != null &&
-        widget.alphaFields.isNotEmpty) {
+        widget.alphaFields!.isNotEmpty) {
       if (widget.rule.textSymbolizers.isEmpty) {
         return;
       }
@@ -694,7 +699,7 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
       Color textColor = ColorExt(textStyle.textColor);
       String textLabel = textStyle.labelName;
 
-      List<DropdownMenuItem<String>> alphaItems = widget.alphaFields
+      List<DropdownMenuItem<String>> alphaItems = widget.alphaFields!
           .map((e) =>
               DropdownMenuItem<String>(value: e, child: SmashUI.normalText(e)))
           .toList();
@@ -729,7 +734,7 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
                                 value: textLabel,
                                 onChanged: (newLabel) {
                                   setState(() {
-                                    textStyle.labelName = newLabel;
+                                    textStyle.labelName = newLabel ?? "";
                                   });
                                 }),
                           )),
@@ -797,9 +802,9 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
   void doFilterSection(List<Widget> widgets) {
     var filter = widget.rule.filter;
     if (widget.alphaFields != null &&
-        widget.alphaFields.isNotEmpty &&
+        widget.alphaFields!.isNotEmpty &&
         filter != null) {
-      List<DropdownMenuItem<String>> alphaItems = widget.alphaFields
+      List<DropdownMenuItem<String>> alphaItems = widget.alphaFields!
           .map((e) =>
               DropdownMenuItem<String>(value: e, child: SmashUI.normalText(e)))
           .toList();

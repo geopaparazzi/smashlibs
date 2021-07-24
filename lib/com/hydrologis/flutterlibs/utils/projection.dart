@@ -4,10 +4,10 @@ class SmashPrj {
   static final Projection EPSG4326 = Projection.WGS84;
   static final int EPSG4326_INT = 4326;
   static final int EPSG3857_INT = 3857;
-  static final Projection EPSG3857 = Projection.get('EPSG:$EPSG3857_INT');
+  static final Projection EPSG3857 = Projection.get('EPSG:$EPSG3857_INT')!;
 
   /// Create a [Projection] object from a given [srid].
-  static Projection fromSrid(int srid) {
+  static Projection? fromSrid(int srid) {
     if (srid == EPSG3857_INT) return EPSG3857;
     if (srid == EPSG4326_INT) return EPSG4326;
     var prj = Projection.get("EPSG:$srid");
@@ -27,7 +27,7 @@ class SmashPrj {
   }
 
   /// Read a [Projection] from a prj file.
-  static Projection fromFile(String prjFilePath) {
+  static Projection? fromFile(String prjFilePath) {
     var prjFile = File(prjFilePath);
     if (prjFile.existsSync()) {
       var wktPrj = HU.FileUtilities.readFile(prjFilePath);
@@ -39,7 +39,7 @@ class SmashPrj {
   /// Read a [Projection] from the prj file of a given data file.
   ///
   /// Ex. from the prj file, given a shapefile path.
-  static Projection fromDataFile(String dataFilePath) {
+  static Projection? fromDataFile(String dataFilePath) {
     String prjPath = getPrjPath(dataFilePath);
     return fromFile(prjPath);
   }
@@ -47,7 +47,7 @@ class SmashPrj {
   /// Try to get the srid from the [projection] object.
   ///
   /// If the srid is not recognized, null is returned.
-  static int getSrid(Projection projection) {
+  static int? getSrid(Projection projection) {
     String sridStr =
         projection.projName.toLowerCase().replaceFirst("epsg:", "");
     try {
@@ -66,15 +66,15 @@ class SmashPrj {
   }
 
   /// Try to get the epsg from a data file with prj sidecar file..
-  static int getSridFromDataFile(String dataFilePath) {
+  static int? getSridFromDataFile(String dataFilePath) {
     var prjPath = SmashPrj.getPrjPath(dataFilePath);
     var wktPrj = HU.FileUtilities.readFile(prjPath);
-    int srid = SmashPrj.getSridFromWkt(wktPrj);
+    int? srid = SmashPrj.getSridFromWkt(wktPrj);
     return srid;
   }
 
   /// Try to get the epsg from the [wkt] definition.
-  static int getSridFromWkt(String wkt) {
+  static int? getSridFromWkt(String wkt) {
     // try the proj way
     wkt_parser.ProjWKT wktObject = wkt_parser.parseWKT(wkt);
     var authority = wktObject.AUTHORITY;
@@ -114,12 +114,15 @@ class SmashPrj {
   }
 
   /// Try to get the srid by comparing [checkProj] with [PrjInfo] objects saved in preferences.
-  static Future<int> getSridFromMatchingInPreferences(
+  static Future<int?> getSridFromMatchingInPreferences(
       Projection checkProj) async {
-    var prjList = await SmashPrj.getPrjInfoFromPreferences();
+    List<PrjInfo?> prjList = await SmashPrj.getPrjInfoFromPreferences();
     var matchingPi = prjList.firstWhere(
       (pi) {
-        var p = Projection.parse(pi.prjData);
+        if (pi == null) {
+          return false;
+        }
+        var p = Projection.parse(pi.prjData!);
         return SmashPrj.areEqual(p, checkProj);
       },
       orElse: () => null,
@@ -241,22 +244,24 @@ class GeometryReprojectionFilter implements JTS.CoordinateFilter {
   GeometryReprojectionFilter(this.fromProj, this.toProj);
 
   @override
-  void filter(JTS.Coordinate coordinate) {
-    Point p = new Point(x: coordinate.x, y: coordinate.y);
-    Point out;
-    if (toProj == null) {
-      out = SmashPrj.transformToWgs84(fromProj, p);
-    } else {
-      out = SmashPrj.transform(fromProj, toProj, p);
-    }
+  void filter(JTS.Coordinate? coordinate) {
+    if (coordinate != null) {
+      Point p = new Point(x: coordinate.x, y: coordinate.y);
+      Point out;
+      if (toProj == null) {
+        out = SmashPrj.transformToWgs84(fromProj, p);
+      } else {
+        out = SmashPrj.transform(fromProj, toProj, p);
+      }
 
-    coordinate.x = out.x;
-    coordinate.y = out.y;
+      coordinate.x = out.x;
+      coordinate.y = out.y;
+    }
   }
 }
 
 class ProjectionsSettings extends StatefulWidget {
-  final int epsgToDownload;
+  final int? epsgToDownload;
 
   ProjectionsSettings({this.epsgToDownload});
 
@@ -267,8 +272,8 @@ class ProjectionsSettings extends StatefulWidget {
 }
 
 class PrjInfo {
-  int epsg;
-  String prjData;
+  int? epsg;
+  String? prjData;
   PrjInfo([this.epsg, this.prjData]);
   @override
   String toString() {
@@ -282,7 +287,7 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
   static final subtitle = "Projections & CO";
   static final iconData = MdiIcons.earthBox;
 
-  List<PrjInfo> _infoList;
+  late List<PrjInfo?> _infoList;
   bool doLoad = false;
 
   @override
@@ -294,13 +299,16 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     await getData();
 
     if (widget.epsgToDownload != null) {
-      var existing = _infoList.firstWhere(
-          (pi) => pi.epsg == widget.epsgToDownload,
-          orElse: () => null);
+      var existing = _infoList.firstWhere((pi) {
+        if (pi == null) {
+          return false;
+        }
+        return pi.epsg == widget.epsgToDownload;
+      }, orElse: () => null);
       if (existing != null) {
         return;
       }
-      await downloadAndRegisterEpsg(widget.epsgToDownload);
+      await downloadAndRegisterEpsg(widget.epsgToDownload!);
     }
 
     setState(() {
@@ -329,8 +337,14 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     _infoList = await SmashPrj.getPrjInfoFromPreferences();
 
     _infoList.sort((pi1, pi2) {
-      if (pi1.epsg < pi2.epsg) return -1;
-      if (pi1.epsg > pi2.epsg) return 1;
+      if (pi1 == null && pi2 == null) {
+        return 0;
+      }
+      if (pi1 == null || pi2 == null) {
+        return 0;
+      }
+      if (pi1.epsg! < pi2.epsg!) return -1;
+      if (pi1.epsg! > pi2.epsg!) return 1;
       return 0;
     });
   }
@@ -351,10 +365,12 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
           : ListView.builder(
               itemCount: _infoList.length,
               itemBuilder: (BuildContext context, int index) {
+                var epsg = _infoList[index]?.epsg ?? -1;
+                var prjData2 = _infoList[index]?.prjData ?? "";
                 return ListTile(
                   leading: Icon(MdiIcons.earthBox),
-                  title: Text("EPSG:${_infoList[index].epsg}"),
-                  subtitle: Text(_infoList[index].prjData),
+                  title: Text("EPSG:$epsg"),
+                  subtitle: Text(prjData2),
                 );
               },
             ),
@@ -362,10 +378,14 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
         child: Icon(MdiIcons.plus),
         tooltip: "Add projection by epsg code.",
         onPressed: () async {
-          int epsg = await SmashDialogs.showEpsgInputDialog(context);
+          int? epsg = await SmashDialogs.showEpsgInputDialog(context);
           if (epsg != null) {
-            var existing = _infoList.firstWhere((pi) => pi.epsg == epsg,
-                orElse: () => null);
+            var existing = _infoList.firstWhere((pi) {
+              if (pi == null) {
+                return false;
+              }
+              return pi.epsg == epsg;
+            }, orElse: () => null);
             if (existing == null) {
               await downloadAndRegisterEpsg(epsg);
               await getData();

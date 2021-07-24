@@ -44,6 +44,9 @@ class SmashUI {
   static const double MIN_MARKER_SIZE = 5;
   static const int MINMAX_MARKER_DIVISIONS = 19;
 
+  static final DateTime DEFAULT_FIRST_DATE = DateTime(1990, 1, 1);
+  static final DateTime DEFAULT_LAST_DATE = DateTime(2050, 12, 31);
+
   /// Create a text widget with size and color for normal text in pages.
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).
@@ -218,12 +221,12 @@ class SmashUI {
   }
 
   static defaultButtonBar(
-      {String okLabel,
-      Function okFunction,
-      String cancelLabel,
-      Function cancelFunction,
-      String dangerLabel,
-      Function dangerFunction}) {
+      {String? okLabel,
+      Function? okFunction,
+      String? cancelLabel,
+      Function? cancelFunction,
+      String? dangerLabel,
+      Function? dangerFunction}) {
     List<Widget> buttons = [];
 
     if (dangerLabel != null && dangerFunction != null) {
@@ -281,18 +284,18 @@ class SmashUI {
 class EditableTextField extends StatefulWidget {
   final String value;
   final String label;
-  final String hintText;
+  final String? hintText;
   final bool isPassword;
   final bool doBold;
   final Function onSave;
-  final Function validationFunction;
+  final Function? validationFunction;
 
   EditableTextField(this.label, this.value, this.onSave,
       {this.validationFunction,
       this.isPassword = false,
       this.doBold = false,
       this.hintText,
-      Key key})
+      Key? key})
       : super(key: key);
 
   @override
@@ -302,8 +305,8 @@ class EditableTextField extends StatefulWidget {
 class _EditableTextFieldState extends State<EditableTextField> {
   bool editMode = false;
   String _currentValue = "";
-  TextEditingController _controller;
-  TextEditingController _controller2;
+  late TextEditingController _controller;
+  late TextEditingController _controller2;
   bool _canSave = true;
 
   @override
@@ -328,7 +331,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
         _controller.selection = TextSelection.fromPosition(
             TextPosition(offset: _controller.text.length));
       } else {
-        _controller.text = null;
+        _controller.text = "";
       }
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,9 +341,9 @@ class _EditableTextFieldState extends State<EditableTextField> {
               controller: _controller,
               autovalidate: true,
               validator: (inputText) {
-                String errorText;
+                String? errorText;
                 if (widget.validationFunction != null) {
-                  errorText = widget.validationFunction(inputText);
+                  errorText = widget.validationFunction!(inputText);
                 }
                 _canSave = errorText == null;
                 return errorText;
@@ -416,7 +419,7 @@ class StringCombo extends StatefulWidget {
   final List<String> _items;
   final String _selected;
   final Function _onChange;
-  StringCombo(this._items, this._selected, this._onChange, {Key key})
+  StringCombo(this._items, this._selected, this._onChange, {Key? key})
       : super(key: key);
 
   @override
@@ -436,10 +439,12 @@ class _StringComboState extends State<StringCombo> {
     return DropdownButton<String>(
       value: _selected,
       onChanged: (newSelection) {
-        _onChange(newSelection);
-        setState(() {
-          _selected = newSelection;
-        });
+        if (newSelection != null) {
+          _onChange(newSelection);
+          setState(() {
+            _selected = newSelection;
+          });
+        }
       },
       items: _items.map((f) {
         return DropdownMenuItem(

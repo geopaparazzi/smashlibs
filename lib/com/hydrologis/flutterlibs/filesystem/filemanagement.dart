@@ -58,27 +58,27 @@ class FileManager {
     return false;
   }
 
-  static bool isMapsforge(String path) {
+  static bool isMapsforge(String? path) {
     return path != null && path.toLowerCase().endsWith(MAPSFORGE_EXT);
   }
 
-  static bool isMapurl(String path) {
+  static bool isMapurl(String? path) {
     return path != null && path.toLowerCase().endsWith(MAPURL_EXT);
   }
 
-  static bool isMbtiles(String path) {
+  static bool isMbtiles(String? path) {
     return path != null && path.toLowerCase().endsWith(MBTILES_EXT);
   }
 
-  static bool isGpx(String path) {
+  static bool isGpx(String? path) {
     return path != null && path.toLowerCase().endsWith(GPX_EXT);
   }
 
-  static bool isShp(String path) {
+  static bool isShp(String? path) {
     return path != null && path.toLowerCase().endsWith(SHP_EXT);
   }
 
-  static bool isWorldImage(String path) {
+  static bool isWorldImage(String? path) {
     return path != null &&
         (path.toLowerCase().endsWith(TIF_EXT) ||
             path.toLowerCase().endsWith(TIFF_EXT) ||
@@ -86,7 +86,7 @@ class FileManager {
             path.toLowerCase().endsWith(PNG_EXT));
   }
 
-  static bool isGeopackage(String path) {
+  static bool isGeopackage(String? path) {
     return path != null && path.toLowerCase().endsWith(GEOPACKAGE_EXT);
   }
 }
@@ -107,7 +107,7 @@ class FileBrowser extends StatefulWidget {
 }
 
 class FileBrowserState extends State<FileBrowser> {
-  String currentPath;
+  String? currentPath;
   bool onlyFiles = false;
 
   Future<List<List<dynamic>>> getFiles() async {
@@ -115,7 +115,7 @@ class FileBrowserState extends State<FileBrowser> {
       currentPath = widget._startFolder;
     }
 
-    List<List<dynamic>> files = HU.FileUtilities.listFiles(currentPath,
+    List<List<dynamic>> files = HU.FileUtilities.listFiles(currentPath!,
         doOnlyFolder: widget._doFolderMode,
         allowedExtensions: widget._allowedExtensions);
     return files;
@@ -132,12 +132,14 @@ class FileBrowserState extends State<FileBrowser> {
       child: Icon(MdiIcons.folderUpload),
       onPressed: () async {
         var rootDir = await Workspace.getRootFolder();
-        if (currentPath == rootDir.path && !Workspace.isDesktop()) {
+        if (rootDir != null &&
+            currentPath == rootDir.path &&
+            !Workspace.isDesktop()) {
           SmashDialogs.showWarningDialog(
               context, "The top level folder has already been reached.");
         } else {
           setState(() {
-            currentPath = HU.FileUtilities.parentFolderFromFile(currentPath);
+            currentPath = HU.FileUtilities.parentFolderFromFile(currentPath!);
           });
         }
       },
@@ -174,7 +176,7 @@ class FileBrowserState extends State<FileBrowser> {
           future: getFiles(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              List<List<dynamic>> data = snapshot.data;
+              List<List<dynamic>> data = snapshot.data!;
               if (onlyFiles) {
                 data = data.where((pathName) {
                   bool isDir = pathName[2];

@@ -244,7 +244,7 @@ class ColorPickerButton extends StatefulWidget {
   final Color initialColor;
   final Function colorChangedFunction;
 
-  ColorPickerButton(this.initialColor, this.colorChangedFunction, {Key key})
+  ColorPickerButton(this.initialColor, this.colorChangedFunction, {Key? key})
       : super(key: key);
 
   @override
@@ -252,7 +252,7 @@ class ColorPickerButton extends StatefulWidget {
 }
 
 class _ColorPickerButtonState extends State<ColorPickerButton> {
-  Color color;
+  late Color color;
   @override
   void initState() {
     color = widget.initialColor;

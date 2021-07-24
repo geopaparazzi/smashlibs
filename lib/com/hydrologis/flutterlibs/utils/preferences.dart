@@ -52,7 +52,8 @@ class SmashPreferencesKeys {
   static const KEY_GSS_SERVER_URL = 'KEY_GSS_SERVER_URL';
   static const KEY_GSS_SERVER_USER = 'KEY_GSS_SERVER_USER';
   static const KEY_GSS_SERVER_PWD = 'KEY_GSS_SERVER_PWD';
-  static const KEY_GSS_SERVER_ALLOW_SELFCERTIFICATE = 'KEY_GSS_SERVER_ALLOW_SELFCERTIFICATE';
+  static const KEY_GSS_SERVER_ALLOW_SELFCERTIFICATE =
+      'KEY_GSS_SERVER_ALLOW_SELFCERTIFICATE';
 
   static const KEY_PROJECTIONS = 'KEY_PROJECTIONS';
 
@@ -91,7 +92,7 @@ class GpPreferences {
 
   GpPreferences._internal();
 
-  SharedPreferences _preferences;
+  SharedPreferences? _preferences;
 
   Future<void> initialize() async {
     await _checkPreferences();
@@ -113,9 +114,9 @@ class GpPreferences {
   ///
   /// The method takes the preferences [key] and an optional [defaultValue]
   /// which can be returned in case the preference doesn't exist.
-  Future<String> getString(String key, [String defaultValue]) async {
+  Future<String?> getString(String key, [String? defaultValue]) async {
     await _checkPreferences();
-    String prefValue = _preferences.getString(key);
+    String? prefValue = _preferences!.getString(key);
     if (prefValue == null) return defaultValue;
     return prefValue;
   }
@@ -124,9 +125,9 @@ class GpPreferences {
   ///
   /// The method takes the preferences [key] and an optional [defaultValue]
   /// which can be returned in case the preference doesn't exist.
-  String getStringSync(String key, [String defaultValue]) {
+  String? getStringSync(String key, [String? defaultValue]) {
     _checkPreferencesOrThrow();
-    String prefValue = _preferences.getString(key);
+    String? prefValue = _preferences!.getString(key);
     if (prefValue == null) return defaultValue;
     return prefValue;
   }
@@ -134,35 +135,36 @@ class GpPreferences {
   /// Save a string [value] to the preferences using a preferences [key].
   Future<void> setString(String key, String value) async {
     await _checkPreferences();
-    await _preferences.setString(key, value);
+    await _preferences!.setString(key, value);
   }
 
-  List<String> getStringListSync(String key, [List<String> defaultValue]) {
+  List<String>? getStringListSync(String key, [List<String>? defaultValue]) {
     _checkPreferencesOrThrow();
-    List<String> prefValue = _preferences.getStringList(key);
+    List<String>? prefValue = _preferences!.getStringList(key);
     if (prefValue == null) return defaultValue;
     return prefValue;
   }
 
-  Future<List<String>> getStringList(String key, [List<String> defaultValue]) async {
+  Future<List<String>?> getStringList(String key,
+      [List<String>? defaultValue]) async {
     await _checkPreferences();
-    List<String> prefValue = _preferences.getStringList(key);
+    List<String>? prefValue = _preferences!.getStringList(key);
     if (prefValue == null) return defaultValue;
     return prefValue;
   }
 
   Future<void> setStringList(String key, List<String> value) async {
     await _checkPreferences();
-    await _preferences.setStringList(key, value);
+    await _preferences!.setStringList(key, value);
   }
 
   /// Get a boolean from the preferences.
   ///
   /// The method takes the preferences [key] and an optional [defaultValue]
   /// which can be returned in case the preference doesn't exist.
-  Future<bool> getBoolean(String key, [bool defaultValue]) async {
+  Future<bool?> getBoolean(String key, [bool? defaultValue]) async {
     await _checkPreferences();
-    bool prefValue = _preferences.getBool(key);
+    bool? prefValue = _preferences!.getBool(key);
     if (prefValue == null) return defaultValue;
     return prefValue;
   }
@@ -171,9 +173,9 @@ class GpPreferences {
   ///
   /// The method takes the preferences [key] and an optional [defaultValue]
   /// which can be returned in case the preference doesn't exist.
-  bool getBooleanSync(String key, [bool defaultValue]) {
+  bool getBooleanSync(String key, [bool defaultValue = false]) {
     _checkPreferencesOrThrow();
-    bool prefValue = _preferences.getBool(key);
+    bool? prefValue = _preferences!.getBool(key);
     if (prefValue == null) return defaultValue;
     return prefValue;
   }
@@ -181,16 +183,16 @@ class GpPreferences {
   /// Save a bool [value] to the preferences using a preferences [key].
   Future<void> setBoolean(String key, bool value) async {
     await _checkPreferences();
-    await _preferences.setBool(key, value);
+    await _preferences!.setBool(key, value);
   }
 
   /// Get a double sync from the preferences.
   ///
   /// The method takes the preferences [key] and an optional [defaultValue]
   /// which can be returned in case the preference doesn't exist.
-  double getDoubleSync(String key, [double defaultValue]) {
+  double? getDoubleSync(String key, [double? defaultValue]) {
     _checkPreferencesOrThrow();
-    double prefValue = _preferences.getDouble(key);
+    double? prefValue = _preferences!.getDouble(key);
     if (prefValue == null) return defaultValue;
     return prefValue;
   }
@@ -198,16 +200,16 @@ class GpPreferences {
   /// Save a double [value] to the preferences using a preferences [key].
   Future<void> setDouble(String key, double value) async {
     await _checkPreferences();
-    await _preferences.setDouble(key, value);
+    await _preferences!.setDouble(key, value);
   }
 
   /// Get a int sync from the preferences.
   ///
   /// The method takes the preferences [key] and an optional [defaultValue]
   /// which can be returned in case the preference doesn't exist.
-  int getIntSync(String key, [int defaultValue]) {
+  int? getIntSync(String key, [int? defaultValue]) {
     _checkPreferencesOrThrow();
-    int prefValue = _preferences.getInt(key);
+    int? prefValue = _preferences!.getInt(key);
     if (prefValue == null) return defaultValue;
     return prefValue;
   }
@@ -215,47 +217,54 @@ class GpPreferences {
   /// Save an int [value] to the preferences using a preferences [key].
   Future<void> setInt(String key, int value) async {
     await _checkPreferences();
-    await _preferences.setInt(key, value);
+    await _preferences!.setInt(key, value);
   }
 
   List<String> getTmsListSync() {
-    var list = _preferences.getStringList(SmashPreferencesKeys.KEY_SAVED_TMS_LIST);
+    var list =
+        _preferences!.getStringList(SmashPreferencesKeys.KEY_SAVED_TMS_LIST);
     if (list == null) list = [];
     return list;
   }
 
   Future<void> setTmsList(List<String> list) async {
-    await _preferences.setStringList(SmashPreferencesKeys.KEY_SAVED_TMS_LIST, list);
+    await _preferences!
+        .setStringList(SmashPreferencesKeys.KEY_SAVED_TMS_LIST, list);
   }
 
   Future<void> addNewTms(String jsonDefinition) async {
     var tmsList = getTmsListSync();
     if (!tmsList.contains(jsonDefinition)) {
       tmsList.add(jsonDefinition);
-      await _preferences.setStringList(SmashPreferencesKeys.KEY_SAVED_TMS_LIST, tmsList);
+      await _preferences!
+          .setStringList(SmashPreferencesKeys.KEY_SAVED_TMS_LIST, tmsList);
     }
   }
 
   List<String> getWmsListSync() {
-    var list = _preferences.getStringList(SmashPreferencesKeys.KEY_SAVED_WMS_LIST);
+    var list =
+        _preferences!.getStringList(SmashPreferencesKeys.KEY_SAVED_WMS_LIST);
     if (list == null) list = [];
     return list;
   }
 
   Future<void> setWmsList(List<String> list) async {
-    await _preferences.setStringList(SmashPreferencesKeys.KEY_SAVED_WMS_LIST, list);
+    await _preferences!
+        .setStringList(SmashPreferencesKeys.KEY_SAVED_WMS_LIST, list);
   }
 
   Future<void> addNewWms(String jsonDefinition) async {
     var wmsList = getWmsListSync();
     if (!wmsList.contains(jsonDefinition)) {
       wmsList.add(jsonDefinition);
-      await _preferences.setStringList(SmashPreferencesKeys.KEY_SAVED_WMS_LIST, wmsList);
+      await _preferences!
+          .setStringList(SmashPreferencesKeys.KEY_SAVED_WMS_LIST, wmsList);
     }
   }
 
   List<String> getRecentProjectsListSync() {
-    var list = _preferences.getStringList(SmashPreferencesKeys.KEY_RECENTSPROJECTS_LIST);
+    var list = _preferences!
+        .getStringList(SmashPreferencesKeys.KEY_RECENTSPROJECTS_LIST);
     if (list == null) list = [];
     // remove non existing files
     list.removeWhere((p) => p == null || !new File(p).existsSync());
@@ -264,44 +273,46 @@ class GpPreferences {
 
   Future<void> addRecentProject(String projectPath) async {
     await _checkPreferences();
-    var list = _preferences.getStringList(SmashPreferencesKeys.KEY_RECENTSPROJECTS_LIST);
+    var list = _preferences!
+        .getStringList(SmashPreferencesKeys.KEY_RECENTSPROJECTS_LIST);
     if (list == null) list = [];
     list.removeWhere((p) => p == null || p == projectPath);
     if (list.length >= 10) {
       list.removeLast();
     }
     list.insert(0, projectPath);
-    await _preferences.setStringList(SmashPreferencesKeys.KEY_RECENTSPROJECTS_LIST, list);
+    await _preferences!
+        .setStringList(SmashPreferencesKeys.KEY_RECENTSPROJECTS_LIST, list);
   }
 
   /// Return last saved position as [lon, lat, zoom] or null.
-  Future<List<double>> getLastPosition() async {
+  Future<List<double>?> getLastPosition() async {
     await _checkPreferences();
-    var lat = _preferences.getDouble(SmashPreferencesKeys.KEY_LAST_LAT);
-    var lon = _preferences.getDouble(SmashPreferencesKeys.KEY_LAST_LON);
-    var zoom = _preferences.getDouble(SmashPreferencesKeys.KEY_LAST_ZOOM);
-    if (lat == null) return null;
+    var lat = _preferences!.getDouble(SmashPreferencesKeys.KEY_LAST_LAT);
+    var lon = _preferences!.getDouble(SmashPreferencesKeys.KEY_LAST_LON);
+    var zoom = _preferences!.getDouble(SmashPreferencesKeys.KEY_LAST_ZOOM);
+    if (lat == null || lon == null || zoom == null) return null;
     return [lon, lat, zoom];
   }
 
   /// Return last saved position in synch mode as [lon, lat, zoom] or null.
-  List<double> getLastPositionSync() {
-    var lat = _preferences.getDouble(SmashPreferencesKeys.KEY_LAST_LAT);
-    var lon = _preferences.getDouble(SmashPreferencesKeys.KEY_LAST_LON);
-    var zoom = _preferences.getDouble(SmashPreferencesKeys.KEY_LAST_ZOOM);
-    if (lat == null) return null;
+  List<double>? getLastPositionSync() {
+    var lat = _preferences!.getDouble(SmashPreferencesKeys.KEY_LAST_LAT);
+    var lon = _preferences!.getDouble(SmashPreferencesKeys.KEY_LAST_LON);
+    var zoom = _preferences!.getDouble(SmashPreferencesKeys.KEY_LAST_ZOOM);
+    if (lat == null || lon == null || zoom == null) return null;
     return [lon, lat, zoom];
   }
 
   /// Save last position to preferences.
   Future<void> setLastPosition(double lon, double lat, double zoom) async {
     await _checkPreferences();
-    await _preferences.setDouble(SmashPreferencesKeys.KEY_LAST_LAT, lat);
-    await _preferences.setDouble(SmashPreferencesKeys.KEY_LAST_LON, lon);
-    await _preferences.setDouble(SmashPreferencesKeys.KEY_LAST_ZOOM, zoom);
+    await _preferences!.setDouble(SmashPreferencesKeys.KEY_LAST_LAT, lat);
+    await _preferences!.setDouble(SmashPreferencesKeys.KEY_LAST_LON, lon);
+    await _preferences!.setDouble(SmashPreferencesKeys.KEY_LAST_ZOOM, zoom);
   }
 
-  bool getCenterOnGps() {
+  bool? getCenterOnGps() {
     return getBooleanSync(SmashPreferencesKeys.KEY_CENTER_ON_GPS, false);
   }
 
@@ -310,16 +321,17 @@ class GpPreferences {
     await setBoolean(SmashPreferencesKeys.KEY_CENTER_ON_GPS, centerOnGps);
   }
 
-  bool getRotateOnHeading() {
+  bool? getRotateOnHeading() {
     return getBooleanSync(SmashPreferencesKeys.KEY_ROTATE_ON_HEADING, false);
   }
 
   Future<void> setRotateOnHeading(bool rotateOnHeading) async {
     await _checkPreferences();
-    await setBoolean(SmashPreferencesKeys.KEY_ROTATE_ON_HEADING, rotateOnHeading);
+    await setBoolean(
+        SmashPreferencesKeys.KEY_ROTATE_ON_HEADING, rotateOnHeading);
   }
 
-  bool getKeepScreenOn() {
+  bool? getKeepScreenOn() {
     return getBooleanSync(SmashPreferencesKeys.KEY_KEEP_SCREEN_ON, true);
   }
 
@@ -330,7 +342,8 @@ class GpPreferences {
 
   Future<List<String>> getLayerInfoList() async {
     await _checkPreferences();
-    var list = _preferences.getStringList(SmashPreferencesKeys.KEY_LAYERINFO_LIST);
+    var list =
+        _preferences!.getStringList(SmashPreferencesKeys.KEY_LAYERINFO_LIST);
     if (list == null) list = [];
     return list;
   }
@@ -338,12 +351,14 @@ class GpPreferences {
   Future<void> setLayerInfoList(List<String> layerInfoList) async {
     await _checkPreferences();
     if (layerInfoList == null) layerInfoList = [];
-    await _preferences.setStringList(SmashPreferencesKeys.KEY_LAYERINFO_LIST, layerInfoList);
+    await _preferences!
+        .setStringList(SmashPreferencesKeys.KEY_LAYERINFO_LIST, layerInfoList);
   }
 
   Future<List<String>> getProjections() async {
     await _checkPreferences();
-    var list = _preferences.getStringList(SmashPreferencesKeys.KEY_PROJECTIONS);
+    var list =
+        _preferences!.getStringList(SmashPreferencesKeys.KEY_PROJECTIONS);
     if (list == null) list = [];
     return list;
   }
@@ -351,10 +366,11 @@ class GpPreferences {
   Future<void> setProjections(List<String> projectionsList) async {
     await _checkPreferences();
     if (projectionsList == null) projectionsList = [];
-    await _preferences.setStringList(SmashPreferencesKeys.KEY_PROJECTIONS, projectionsList);
+    await _preferences!
+        .setStringList(SmashPreferencesKeys.KEY_PROJECTIONS, projectionsList);
   }
 
-  String getLocationAccuracy() {
+  String? getLocationAccuracy() {
     return getStringSync(SmashPreferencesKeys.KEY_GPS_ACCURACY);
   }
 

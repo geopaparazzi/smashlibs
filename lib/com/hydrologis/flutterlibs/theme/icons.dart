@@ -172,7 +172,8 @@ class IconsWidgetState extends State<IconsWidget> {
   @override
   void initState() {
     chosenIconsList.addAll(GpPreferences().getStringListSync(
-        SmashPreferencesKeys.KEY_ICONS_LIST, DEFAULT_NOTES_ICONDATA));
+            SmashPreferencesKeys.KEY_ICONS_LIST, DEFAULT_NOTES_ICONDATA) ??
+        <String>[]);
 
     MdiIcons.getIconsName().forEach((name) {
       _completeList.add([name, MdiIcons.fromString(name)]);
@@ -269,10 +270,12 @@ class IconsWidgetState extends State<IconsWidget> {
                         value: doCheck,
                         onChanged: (check) {
                           setState(() {
-                            if (check) {
-                              chosenIconsList.add(item[0]);
-                            } else {
-                              chosenIconsList.remove(item[0]);
+                            if (check != null) {
+                              if (check) {
+                                chosenIconsList.add(item[0]);
+                              } else {
+                                chosenIconsList.remove(item[0]);
+                              }
                             }
                           });
                         }),

@@ -52,7 +52,7 @@ class FormSectionsWidgetState extends State<FormSectionsWidget> {
 }
 
 class FormDetailWidget extends StatefulWidget {
-  final String formName;
+  final String? formName;
   final bool isLargeScreen;
   final bool onlyDetail;
   final AFormhelper formHelper;
@@ -75,7 +75,7 @@ class FormDetailWidget extends StatefulWidget {
 }
 
 class FormDetailWidgetState extends State<FormDetailWidget> {
-  List<String> formNames;
+  late List<String> formNames;
 
   @override
   void initState() {
@@ -87,7 +87,7 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 
   @override
   Widget build(BuildContext context) {
-    List<ListTile> widgetsList = [];
+    List<Widget> widgetsList = [];
     var formName = widget.formName;
     if (formName == null) {
       // pick the first of the section
@@ -101,7 +101,7 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 
     for (int i = 0; i < formItems.length; i++) {
       String key = "form${formName}_note${noteId}_item$i";
-      Widget w = getWidget(
+      Widget? w = getWidget(
           context, key, formItems[i], widget.isReadOnly, widget.formHelper);
       if (w != null) {
         widgetsList.add(w);
@@ -156,7 +156,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 
   _MasterDetailPageState(this._formHelper);
 
-  String selectedForm;
+  String? selectedForm;
   var isLargeScreen = false;
 
   @override
@@ -228,7 +228,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
   }
 }
 
-ListTile getWidget(
+ListTile? getWidget(
   BuildContext context,
   String widgetKey,
   final Map<String, dynamic> itemMap,
@@ -249,12 +249,12 @@ ListTile getWidget(
   if (itemMap.containsKey(TAG_TYPE)) {
     type = itemMap[TAG_TYPE].trim();
   }
-  String iconStr;
+  String? iconStr;
   if (itemMap.containsKey(TAG_ICON)) {
     iconStr = itemMap[TAG_ICON].trim();
   }
 
-  Icon icon;
+  Icon? icon;
   if (iconStr != null) {
     var iconData = getSmashIcon(iconStr);
     icon = Icon(
@@ -314,7 +314,7 @@ ListTile getWidget(
         TextFormField field = TextFormField(
           key: ValueKey(widgetKey),
           validator: (value) {
-            if (!constraints.isValid(value)) {
+            if (value != null && !constraints.isValid(value)) {
               return constraints.getDescription();
             }
             return null;
@@ -353,7 +353,7 @@ ListTile getWidget(
           sizeStr = itemMap[TAG_SIZE];
         }
         double size = double.parse(sizeStr);
-        String url;
+        String? url;
         if (itemMap.containsKey(TAG_URL)) {
           url = itemMap[TAG_URL];
           textDecoration = TextDecoration.underline;
@@ -380,7 +380,7 @@ ListTile getWidget(
             leading: icon,
             title: GestureDetector(
               onTap: () async {
-                if (await canLaunch(url)) {
+                if (await canLaunch(url!)) {
                   await launch(url);
                 } else {
                   SmashDialogs.showErrorDialog(
@@ -559,7 +559,7 @@ class AutocompleteStringComboWidget extends StatelessWidget {
   final _itemMap;
   final String _label;
   final bool _isReadOnly;
-  bool _init = true;
+  bool _init = false;
 
   AutocompleteStringComboWidget(
       String _widgetKey, this._itemMap, this._label, this._isReadOnly)
@@ -575,16 +575,19 @@ class AutocompleteStringComboWidget extends StatelessWidget {
     }
 
     var comboItems = TagsManager.getComboItems(_itemMap);
-    List<ItemObject> itemsArray =
+    if (comboItems == null) {
+      comboItems = [];
+    }
+    List<ItemObject?> itemsArray =
         TagsManager.comboItems2ObjectArray(comboItems);
-    ItemObject found = itemsArray.firstWhere((item) => item.value == value,
+    ItemObject? found = itemsArray.firstWhere((item) => item!.value == value,
         orElse: () => null);
     if (found == null) {
       value = "";
     }
     var items = itemsArray
         .map(
-          (itemObj) => itemObj.value,
+          (itemObj) => itemObj!.value,
         )
         .toList();
 
@@ -664,15 +667,18 @@ class ComboboxWidget extends StatefulWidget {
 class ComboboxWidgetState extends State<ComboboxWidget> {
   @override
   Widget build(BuildContext context) {
-    String value = ""; //$NON-NLS-1$
+    String? value = ""; //$NON-NLS-1$
     if (widget._itemMap.containsKey(TAG_VALUE)) {
       value = widget._itemMap[TAG_VALUE].trim();
     }
 
     var comboItems = TagsManager.getComboItems(widget._itemMap);
-    List<ItemObject> itemsArray =
+    if (comboItems == null) {
+      comboItems = [];
+    }
+    List<ItemObject?> itemsArray =
         TagsManager.comboItems2ObjectArray(comboItems);
-    ItemObject found = itemsArray.firstWhere((item) => item.value == value,
+    ItemObject? found = itemsArray.firstWhere((item) => item!.value == value,
         orElse: () => null);
     if (found == null) {
       value = null;
@@ -680,7 +686,7 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
     var items = itemsArray
         .map(
           (itemObj) => new DropdownMenuItem(
-            value: itemObj.value,
+            value: itemObj!.value,
             child: new Text(itemObj.label),
           ),
         )
@@ -853,7 +859,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                       isExpanded: true,
                       items: mainComboItems,
                       onChanged: (selected) {
-                        if (!widget._isReadOnly) {
+                        if (!widget._isReadOnly && selected != null) {
                           setState(() {
                             formItem[TAG_VALUE] = selected + SEP;
                           });
@@ -1073,7 +1079,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                               if (textEditingValue.text == '') {
                                 return const Iterable<String>.empty();
                               }
-                              return secondaryCombos[currentMain]
+                              return secondaryCombos[currentMain]!
                                   .where((String option) {
                                 return option.toLowerCase().contains(
                                     textEditingValue.text.toLowerCase());
@@ -1230,7 +1236,7 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
     if (widget._itemMap.containsKey(TAG_VALUE)) {
       value = widget._itemMap[TAG_VALUE].trim();
     }
-    DateTime dateTime;
+    DateTime? dateTime;
     if (value.isNotEmpty) {
       try {
         dateTime = HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.parse(value);
@@ -1247,8 +1253,10 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
           onPressed: () {
             if (!widget._isReadOnly) {
               showMaterialDatePicker(
+                firstDate: SmashUI.DEFAULT_FIRST_DATE,
+                lastDate: SmashUI.DEFAULT_LAST_DATE,
                 context: context,
-                selectedDate: dateTime,
+                selectedDate: dateTime!,
                 onChanged: (value) {
                   String day =
                       HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(value);
@@ -1313,7 +1321,7 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
     if (widget._itemMap.containsKey(TAG_VALUE)) {
       value = widget._itemMap[TAG_VALUE].trim();
     }
-    DateTime dateTime;
+    DateTime? dateTime;
     if (value.isNotEmpty) {
       try {
         dateTime = HU.TimeUtilities.ISO8601_TS_TIME_FORMATTER.parse(value);

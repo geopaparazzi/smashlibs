@@ -8,7 +8,7 @@ part of smashlibs;
 
 class Device {
   static const UNIQUEID = 'uniqueid';
-  Map<String, dynamic> deviceData;
+  Map<String, dynamic>? deviceData;
 
   static final Device _singleton = Device._internal();
 
@@ -18,12 +18,12 @@ class Device {
 
   Device._internal();
 
-  Future<String> getDeviceId() async {
+  Future<String?> getDeviceId() async {
     await checkDeviceInfo();
-    if(SmashPlatform.isDesktop()){
+    if (SmashPlatform.isDesktop()) {
       return "no-unique-id-available-set-manually";
     }
-    return deviceData[UNIQUEID].toString();
+    return deviceData?[UNIQUEID]?.toString();
   }
 
   Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
