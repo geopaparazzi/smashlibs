@@ -6,6 +6,8 @@ description: Libs and utilities used by the SMASH digital field mapping project.
 # found in the LICENSE file.
 version: 1.0.0
 
+publish_to: none
+
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
