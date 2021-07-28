@@ -74,6 +74,9 @@ class CameraResolutions {
   static const HIGH = "high";
   static const MEDIUM = "medium";
   static const LOW = "low";
+  static const HIGH_VAL = 100;
+  static const MEDIUM_VAL = 80;
+  static const LOW_VAL = 60;
 }
 
 const KEY_COLORPICKER_TYPE = 'KEY_COLORPICKER_TYPE';
