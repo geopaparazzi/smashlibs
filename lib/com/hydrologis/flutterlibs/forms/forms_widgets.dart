@@ -481,7 +481,14 @@ ListTile? getWidget(
               fromGallery: true),
         );
       }
-//      case TYPE_SKETCH:
+    case TYPE_SKETCH:
+      {
+        return ListTile(
+          leading: icon,
+          title:
+              SketchWidget(label, widgetKey, formHelper, itemMap, itemReadonly),
+        );
+      }
 //        addedView = FormUtilities.addSketchView(noteId, this, requestCode, mainView, label, value, constraintDescription);
 //        break;
 //      case TYPE_MAP:
@@ -1424,7 +1431,7 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
                     ? Container()
                     : TextButton(
                         onPressed: () async {
-                          String value = await widget.formHelper
+                          String? value = await widget.formHelper
                               .takePictureForForms(
                                   context, widget.fromGallery, imageSplit);
                           if (value != null) {
@@ -1451,6 +1458,94 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
                                     widget.fromGallery
                                         ? "Load image"
                                         : "Take a picture",
+                                    color: SmashColors.mainDecorations,
+                                    bold: true),
+                              ],
+                            ),
+                          ),
+                        )),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: images,
+                  ),
+                ),
+              ],
+            ),
+          );
+  }
+}
+
+class SketchWidget extends StatefulWidget {
+  final String _label;
+  final bool fromGallery;
+  final AFormhelper formHelper;
+  final bool _isReadOnly;
+  final _itemMap;
+
+  SketchWidget(this._label, String widgetKey, this.formHelper, this._itemMap,
+      this._isReadOnly,
+      {this.fromGallery = false})
+      : super(key: ValueKey(widgetKey));
+
+  @override
+  SketchWidgetState createState() => SketchWidgetState();
+}
+
+class SketchWidgetState extends State<SketchWidget> with AfterLayoutMixin {
+  List<String> imageSplit = [];
+  List<Widget> images = [];
+  bool _loading = true;
+
+  Future<void> getThumbnails(BuildContext context) async {
+    images = await widget.formHelper
+        .getThumbnailsFromDb(context, widget._itemMap, imageSplit);
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) async {
+    await getThumbnails(context);
+    _loading = false;
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _loading
+        ? SmashCircularProgress(label: "Loading Sketch...")
+        : Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                widget._isReadOnly
+                    ? Container()
+                    : TextButton(
+                        onPressed: () async {
+                          String? value = await widget.formHelper
+                              .takeSketchForForms(context, imageSplit);
+                          if (value != null) {
+                            await getThumbnails(context);
+                            setState(() {
+                              widget._itemMap[TAG_VALUE] = value;
+                            });
+                          }
+                        },
+                        child: Center(
+                          child: Padding(
+                            padding: SmashUI.defaultPadding(),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Padding(
+                                  padding: SmashUI.defaultRigthPadding(),
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    color: SmashColors.mainDecorations,
+                                  ),
+                                ),
+                                SmashUI.normalText("Draw a sketch",
                                     color: SmashColors.mainDecorations,
                                     bold: true),
                               ],

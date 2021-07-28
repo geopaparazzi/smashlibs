@@ -162,8 +162,15 @@ abstract class AFormhelper {
   /// The newly created image
   /// id is then inserted in [imagesSplit].
   /// If [fromGallery] is true, then the system image selector should open.
-  Future<String> takePictureForForms(
+  Future<String?> takePictureForForms(
       BuildContext context, bool fromGallery, List<String> imageSplit);
+
+  /// Draw a sketch for a given form identified by the helper's [getId()].
+  ///
+  /// The newly created image
+  /// id is then inserted in [imagesSplit].
+  Future<String?> takeSketchForForms(
+      BuildContext context, List<String> imageSplit);
 
   /// Save the form on exit from the form view.
   Future<void> onSaveFunction(BuildContext context);
