@@ -125,9 +125,13 @@ class FileDownloadListTileProgressWidgetState
       },
       onTap: () async {
         if (dFile.existsSync()) {
-          SmashDialogs.showWarningDialog(
-              context, "This file already exists, will not overwrite.");
-          return;
+          bool? doOverwrite = await SmashDialogs.showConfirmDialog(
+              context,
+              "Overwrite file?",
+              "This file already exists, are you sure you want to overwrite it?");
+          if (doOverwrite == null || !doOverwrite) {
+            return;
+          }
         }
 
         if (_downloading) {
