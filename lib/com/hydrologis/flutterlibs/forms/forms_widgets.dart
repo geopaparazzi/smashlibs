@@ -489,8 +489,6 @@ ListTile? getWidget(
               SketchWidget(label, widgetKey, formHelper, itemMap, itemReadonly),
         );
       }
-//        addedView = FormUtilities.addSketchView(noteId, this, requestCode, mainView, label, value, constraintDescription);
-//        break;
 //      case TYPE_MAP:
 //        if (value.length() <= 0) {
 //          // need to read image
