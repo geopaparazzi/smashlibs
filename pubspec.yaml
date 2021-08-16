@@ -39,7 +39,8 @@ dependencies:
   share_extend: ^2.0.0
   # BSD
   path_provider: ^2.0.2
-  # MIT
+  
+  # MIT (possible substitute external_path)
   path_provider_ex: #^1.0.1
     git:
       url: https://github.com/atrope/flutter_path_provider_ex.git

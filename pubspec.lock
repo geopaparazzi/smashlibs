@@ -322,10 +322,10 @@ packages:
     description:
       path: "."
       ref: "feature/nullsafemigration"
-      resolved-ref: "5538b01b928264db89d2b4f98eb9887c089fe3da"
+      resolved-ref: "7acf51174f589912cefe7d0d17a9dd0e25584839"
       url: "https://github.com/atrope/flutter_path_provider_ex.git"
     source: git
-    version: "2.0.0"
+    version: "2.0.1"
   path_provider_linux:
     dependency: transitive
     description:

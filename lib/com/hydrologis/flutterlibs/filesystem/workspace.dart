@@ -234,6 +234,22 @@ class Workspace {
     String? appFilesDir;
     if (storageInfo.isNotEmpty) {
       rootDir = storageInfo[0].rootDir;
+      // test if the folder is writable
+      var testFile =
+          new File(HU.FileUtilities.joinPaths(rootDir, "smash_test_tmp.txt"));
+      bool canWrite = true;
+      try {
+        testFile.writeAsStringSync('', mode: FileMode.write, flush: true);
+      } on FileSystemException {
+        canWrite = false;
+      } finally {
+        if (testFile.existsSync()) {
+          testFile.deleteSync();
+        }
+      }
+      if (!canWrite) {
+        rootDir = storageInfo[0].appFilesDir;
+      }
       appFilesDir = storageInfo[0].appFilesDir;
     }
     if (rootDir == null || appFilesDir == null) return null;
