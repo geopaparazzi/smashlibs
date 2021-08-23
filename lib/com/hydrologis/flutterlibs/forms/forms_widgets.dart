@@ -564,7 +564,6 @@ class AutocompleteStringComboWidget extends StatelessWidget {
   final _itemMap;
   final String _label;
   final bool _isReadOnly;
-  bool _init = false;
 
   AutocompleteStringComboWidget(
       String _widgetKey, this._itemMap, this._label, this._isReadOnly)
@@ -628,8 +627,7 @@ class AutocompleteStringComboWidget extends StatelessWidget {
               },
               fieldViewBuilder: (context, textEditingController, focusNode,
                   onFieldSubmitted) {
-                if (_init) {
-                  _init = true;
+                if (value.isNotEmpty) {
                   return TextFormField(
                     controller: textEditingController..text = value,
                     focusNode: focusNode,
@@ -937,7 +935,6 @@ class AutocompleteStringConnectedComboboxWidgetState
 
   List<String> mainComboItems = [];
   Map<String, List<String>> secondaryCombos = {};
-  bool _init = true;
 
   @override
   void initState() {
@@ -1038,8 +1035,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                       },
                       fieldViewBuilder: (context, textEditingController,
                           focusNode, onFieldSubmitted) {
-                        if (_init) {
-                          _init = true;
+                        if (currentMain.isNotEmpty) {
                           return TextFormField(
                             controller: textEditingController
                               ..text = currentMain,
@@ -1092,8 +1088,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                             },
                             fieldViewBuilder: (context, textEditingController,
                                 focusNode, onFieldSubmitted) {
-                              if (_init) {
-                                _init = true;
+                              if (currentSec.isNotEmpty) {
                                 return TextFormField(
                                   controller: textEditingController
                                     ..text = currentSec,
