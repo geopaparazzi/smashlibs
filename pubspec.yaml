@@ -67,10 +67,10 @@ dependencies:
   flutter_tags: ^1.0.0-nullsafety.1
 
   # MIT
-  flutter_material_pickers: ^3.1.0
-    # git:
-    #   url: https://github.com/moovida/flutter_material_pickers.git
-    #   ref: 74bf310
+  flutter_material_pickers: #^3.1.0
+    git:
+      url: https://github.com/codegrue/flutter_material_pickers.git
+      ref: 4238fcd6a377328f743e38dd1ee33ac4d2a52c6b
 
   # BSD
   shared_preferences: ^2.0.6
