@@ -319,7 +319,7 @@ ListTile? getWidget(
             }
             return null;
           },
-          autovalidate: true,
+          autovalidateMode: AutovalidateMode.always,
           decoration: InputDecoration(
 //            icon: icon,
             labelText: "$label ${constraints.getDescription()}",

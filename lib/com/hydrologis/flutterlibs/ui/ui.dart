@@ -339,7 +339,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
           Expanded(
             child: TextFormField(
               controller: _controller,
-              autovalidate: true,
+              autovalidateMode: AutovalidateMode.always,
               validator: (inputText) {
                 String? errorText;
                 if (widget.validationFunction != null) {
