@@ -28,6 +28,11 @@ dependencies:
   dart_hydrologis_utils: ^0.6.0
     # path: ../dart_hydrologis_utils/
 
+  dart_hydrologis_db: ^0.7.0
+  # path: ../dart_hydrologis_db/
+  # git:
+  #  url: https://github.com/moovida/dart_hydrologis_db.git
+
   ####################
   # OTHERS
   ####################
