@@ -2,6 +2,9 @@ part of smashlibs;
 
 /// The abstract project db class with an API to access project data.
 abstract class ProjectDb {
+  /// Get the database absolute path.
+  String getPath();
+
   /// Get the count of the current notes
   ///
   /// Get the count using [onlyDirty] to count only dirty notes.
