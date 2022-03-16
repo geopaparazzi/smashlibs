@@ -28,8 +28,8 @@ dependencies:
   dart_hydrologis_utils: ^0.6.0
     # path: ../dart_hydrologis_utils/
 
-  dart_hydrologis_db: ^0.7.0
-  # path: ../dart_hydrologis_db/
+  dart_hydrologis_db: ^0.7.1
+    # path: ../dart_hydrologis_db/
   # git:
   #  url: https://github.com/moovida/dart_hydrologis_db.git
 
@@ -95,8 +95,8 @@ dependencies:
   #  <string>The app needs to use the camera to take vocal notes during the field mapping activity.</string>
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  lints: ^1.0.1
+  test: ^1.20.1
 
 flutter:
   uses-material-design: true
