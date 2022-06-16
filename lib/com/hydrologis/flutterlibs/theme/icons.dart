@@ -315,8 +315,8 @@ class MarkerIcon extends StatelessWidget {
   final IconData iconData;
   final Color iconColor;
   final double iconSize;
-  final String labelText;
-  final Color labelColor;
+  final String? labelText;
+  final Color? labelColor;
   final Color labelBackColor;
 
   const MarkerIcon(
@@ -359,7 +359,7 @@ class MarkerIcon extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(3.0),
                       child: Text(
-                        labelText,
+                        labelText!,
                         style: TextStyle(
                             color: labelColor, fontWeight: FontWeight.bold),
                       ),

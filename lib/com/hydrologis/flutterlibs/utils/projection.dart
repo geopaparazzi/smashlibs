@@ -299,12 +299,15 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     await getData();
 
     if (widget.epsgToDownload != null) {
-      var existing = _infoList.firstWhere((pi) {
+      PrjInfo? existing = null;
+      for (PrjInfo? pi in _infoList) {
         if (pi == null) {
-          return false;
+          continue;
+        } else if (pi.epsg == widget.epsgToDownload) {
+          existing = pi;
+          break;
         }
-        return pi.epsg == widget.epsgToDownload;
-      }, orElse: () => null);
+      }
       if (existing != null) {
         return;
       }

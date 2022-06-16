@@ -35,32 +35,32 @@ abstract class ProjectDb {
   DbImage getImageById(int imageId);
 
   /// Get the image thumbnail of a given [imageDataId].
-  Image getThumbnail(int imageDataId);
+  Image? getThumbnail(int imageDataId);
 
   /// Get the image thumbnail bytes of a given [imageDataId].
-  Uint8List getThumbnailBytes(int imageDataId);
+  Uint8List? getThumbnailBytes(int imageDataId);
 
   /// Get the image of a given [imageDataId].
-  Image getImage(int imageDataId);
+  Image? getImage(int imageDataId);
 
-  Uint8List getImageDataBytes(int imageDataId);
+  Uint8List? getImageDataBytes(int imageDataId);
 
   /// Add a note.
   ///
   /// @param note the note to insert.
   /// @return the inserted note id.
-  int addNote(Note note);
+  int? addNote(Note note);
 
-  int addNoteExt(NoteExt noteExt);
+  int? addNoteExt(NoteExt noteExt);
 
   /// Delete a note by its [noteId].
-  int deleteNote(int noteId);
+  int? deleteNote(int noteId);
 
-  int deleteImageByNoteId(int noteId);
+  int? deleteImageByNoteId(int noteId);
 
-  int deleteImage(int imageId);
+  int? deleteImage(int imageId);
 
-  int updateNoteImages(int noteId, List<int> imageIds);
+  int? updateNoteImages(int noteId, List<int> imageIds);
 
   /// Get the count of the current logs
   ///
@@ -69,11 +69,11 @@ abstract class ProjectDb {
 
   List<Log> getLogs({bool onlyDirty: false});
 
-  Log getLogById(int logId);
+  Log? getLogById(int logId);
 
   List<LogDataPoint> getLogDataPoints(int logId);
 
-  LogProperty getLogProperties(int logId);
+  LogProperty? getLogProperties(int logId);
 
   /// Get the start position coordinate of a log identified by [logId].
   List<LogDataPoint> getLogDataPointsById(int logId);
@@ -82,12 +82,12 @@ abstract class ProjectDb {
   ///
   /// The log is inserted with the properties [prop].
   /// The method returns the id of the inserted log.
-  int addGpsLog(Log insertLog, LogProperty prop);
+  int? addGpsLog(Log insertLog, LogProperty prop);
 
   /// Add a point [logPoint] to a [Log] of id [logId].
   ///
   /// Returns the id of the inserted point.
-  int addGpsLogPoint(int logId, LogDataPoint logPoint);
+  int? addGpsLogPoint(int logId, LogDataPoint logPoint);
 
   /// Delete a gps log by its id.
   ///
@@ -98,24 +98,24 @@ abstract class ProjectDb {
   bool mergeGpslogs(int logId, List<int> mergeLogs);
 
   /// Updates the end timestamp [endTs] of a log of id [logId].
-  int updateGpsLogEndts(int logId, int endTs);
+  int? updateGpsLogEndts(int logId, int endTs);
 
   /// Updates the [name] of a log of id [logId].
-  int updateGpsLogName(int logId, String name);
+  int? updateGpsLogName(int logId, String name);
 
   /// Updates the [color] and [width] of a log of id [logId].
-  int updateGpsLogStyle(int logId, String color, double width);
+  int? updateGpsLogStyle(int logId, String color, double width);
 
   /// Updates the [isVisible] of a log of id [logId].
-  int updateGpsLogVisibility(bool isVisible, [int logId]);
+  int? updateGpsLogVisibility(bool isVisible, [int logId]);
 
   /// Invert the visiblity of all logs.
-  int invertGpsLogsVisibility();
+  int? invertGpsLogsVisibility();
 
   /// Update the length of a log
   ///
   /// Calculates the length of a log of id [logId].
-  double updateLogLength(int logId);
+  double? updateLogLength(int logId);
 
   int updateNote(Note note);
 
