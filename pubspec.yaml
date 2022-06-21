@@ -40,7 +40,8 @@ dependencies:
   # BSD
   # charset_converter: ^1.0.3
   # MIT
-  material_design_icons_flutter: ^5.0.5955-rc.1
+  material_design_icons_flutter: ^5.0.6595
+  
   # MIT
   share_extend: ^2.0.0
   # BSD
@@ -70,7 +71,7 @@ dependencies:
   url_launcher: ^6.0.9
 
   # MIT
-  flutter_tags: ^1.0.0-nullsafety.1
+  flutter_tags_x: ^1.1.0
 
   # MIT
   flutter_material_pickers: #^3.1.0
