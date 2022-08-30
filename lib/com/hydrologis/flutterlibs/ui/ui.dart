@@ -10,7 +10,7 @@ const double SIMPLE_DIALOGS_ICONSIZE = 80;
 
 class SmashPlatform {
   static bool isDesktop() {
-    return Platform.isWindows || Platform.isLinux | Platform.isMacOS;
+    return Platform.isWindows || Platform.isLinux || Platform.isMacOS;
   }
 
   static bool isWeb() {
