@@ -216,6 +216,20 @@ class SmashUI {
         border: Border.all(color: SmashColors.mainDecorations, width: 5));
   }
 
+  static ButtonStyle defaultFlatButtoneStyle({Color? color}) {
+    if (color == null) {
+      color = SmashColors.mainDecorations;
+    }
+    return TextButton.styleFrom(
+      foregroundColor: color,
+      minimumSize: Size(88, 36),
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
+    );
+  }
+
   static getTransparentIcon() {
     return Icon(Icons.clear, color: Colors.white.withAlpha(0));
   }
@@ -231,7 +245,8 @@ class SmashUI {
 
     if (dangerLabel != null && dangerFunction != null) {
       buttons.add(
-        FlatButton(
+        TextButton(
+          style: defaultFlatButtoneStyle(),
           child: Text(
             dangerLabel,
             style: TextStyle(color: SmashColors.mainDanger),
@@ -244,7 +259,8 @@ class SmashUI {
     }
     if (cancelLabel != null && cancelFunction != null) {
       buttons.add(
-        FlatButton(
+        TextButton(
+          style: defaultFlatButtoneStyle(),
           child: Text(
             cancelLabel,
           ),
@@ -256,7 +272,8 @@ class SmashUI {
     }
     if (okLabel != null && okFunction != null) {
       buttons.add(
-        FlatButton(
+        TextButton(
+          style: defaultFlatButtoneStyle(),
           child: Text(
             okLabel,
           ),

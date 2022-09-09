@@ -53,8 +53,8 @@ class Device {
       'tags': build.tags,
       'type': build.type,
       'isPhysicalDevice': build.isPhysicalDevice,
-      'androidId': build.androidId,
-      UNIQUEID: build.androidId,
+      'androidId': build.id,
+      UNIQUEID: build.id,
     };
   }
 

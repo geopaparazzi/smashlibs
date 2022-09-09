@@ -262,8 +262,8 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: FlatButton(
-        shape: SmashUI.defaultShapeBorder(),
+      child: TextButton(
+        style: SmashUI.defaultFlatButtoneStyle(color: color),
         onPressed: () {
           var picker = GpPreferences()
               .getStringSync(KEY_COLORPICKER_TYPE, ColorPickers.SWATCH_PICKER);
@@ -305,7 +305,6 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
             );
           }
         },
-        color: color,
         child: Container(),
       ),
     );
