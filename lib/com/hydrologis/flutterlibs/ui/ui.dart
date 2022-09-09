@@ -216,7 +216,7 @@ class SmashUI {
         border: Border.all(color: SmashColors.mainDecorations, width: 5));
   }
 
-  static ButtonStyle defaultFlatButtoneStyle({Color? color}) {
+  static ButtonStyle defaultFlatButtonStyle({Color? color}) {
     if (color == null) {
       color = SmashColors.mainDecorations;
     }
@@ -227,6 +227,18 @@ class SmashUI {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
+    );
+  }
+
+  static ButtonStyle defaultElevateButtonStyle({Color? color}) {
+    if (color == null) {
+      color = SmashColors.mainDecorations;
+    }
+
+    return ElevatedButton.styleFrom(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      padding: const EdgeInsets.all(12.0),
+      foregroundColor: color,
     );
   }
 
@@ -246,7 +258,7 @@ class SmashUI {
     if (dangerLabel != null && dangerFunction != null) {
       buttons.add(
         TextButton(
-          style: defaultFlatButtoneStyle(),
+          style: defaultFlatButtonStyle(),
           child: Text(
             dangerLabel,
             style: TextStyle(color: SmashColors.mainDanger),
@@ -260,7 +272,7 @@ class SmashUI {
     if (cancelLabel != null && cancelFunction != null) {
       buttons.add(
         TextButton(
-          style: defaultFlatButtoneStyle(),
+          style: defaultFlatButtonStyle(),
           child: Text(
             cancelLabel,
           ),
@@ -273,7 +285,7 @@ class SmashUI {
     if (okLabel != null && okFunction != null) {
       buttons.add(
         TextButton(
-          style: defaultFlatButtoneStyle(),
+          style: defaultFlatButtonStyle(),
           child: Text(
             okLabel,
           ),
