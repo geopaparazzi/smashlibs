@@ -113,6 +113,14 @@ class GpPreferences {
     }
   }
 
+  /// Remove an entry from the preferences using the [key].
+  Future<void> remove(String key) async {
+    await _checkPreferences();
+    if (_preferences!.containsKey(key)) {
+      await _preferences!.remove(key);
+    }
+  }
+
   /// Get a string from the preferences.
   ///
   /// The method takes the preferences [key] and an optional [defaultValue]
