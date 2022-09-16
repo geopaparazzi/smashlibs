@@ -221,7 +221,7 @@ class SmashUI {
       color = SmashColors.mainDecorations;
     }
     return TextButton.styleFrom(
-      foregroundColor: color,
+      backgroundColor: color,
       minimumSize: Size(88, 36),
       padding: EdgeInsets.symmetric(horizontal: 10.0),
       shape: const RoundedRectangleBorder(
