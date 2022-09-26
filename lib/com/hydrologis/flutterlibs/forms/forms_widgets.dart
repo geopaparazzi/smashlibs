@@ -584,8 +584,13 @@ class AutocompleteStringComboWidget extends StatelessWidget {
     }
     List<ItemObject?> itemsArray =
         TagsManager.comboItems2ObjectArray(comboItems);
-    ItemObject? found = itemsArray.firstWhere((item) => item!.value == value,
-        orElse: () => null);
+    ItemObject? found;
+    for (ItemObject? item in itemsArray) {
+      if (item != null && item.value == value) {
+        found = item;
+        break;
+      }
+    }
     if (found == null) {
       value = "";
     }
@@ -681,8 +686,13 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
     }
     List<ItemObject?> itemsArray =
         TagsManager.comboItems2ObjectArray(comboItems);
-    ItemObject? found = itemsArray.firstWhere((item) => item!.value == value,
-        orElse: () => null);
+    ItemObject? found;
+    for (ItemObject? item in itemsArray) {
+      if (item != null && item.value == value) {
+        found = item;
+        break;
+      }
+    }
     if (found == null) {
       value = null;
     }
