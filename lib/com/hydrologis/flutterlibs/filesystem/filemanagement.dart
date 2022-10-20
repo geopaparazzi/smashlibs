@@ -22,9 +22,15 @@ class FileManager {
   static const MAPSFORGE_EXT = "map";
   static const MAPURL_EXT = "mapurl";
   static const MBTILES_EXT = "mbtiles";
+  static const GEOCACHE_EXT = "geocaching";
 
   static const ALLOWED_PROJECT_EXT = [GEOPAPARAZZI_EXT];
-  static const ALLOWED_VECTOR_DATA_EXT = [GPX_EXT, SHP_EXT, GEOPACKAGE_EXT];
+  static const ALLOWED_VECTOR_DATA_EXT = [
+    GPX_EXT,
+    SHP_EXT,
+    GEOPACKAGE_EXT,
+    GEOCACHE_EXT
+  ];
   static const ALLOWED_RASTER_DATA_EXT = [TIF_EXT, TIFF_EXT, JPG_EXT, PNG_EXT];
   static const ALLOWED_TILE_DATA_EXT = [
     GEOPACKAGE_EXT,
@@ -72,6 +78,10 @@ class FileManager {
 
   static bool isGpx(String? path) {
     return path != null && path.toLowerCase().endsWith(GPX_EXT);
+  }
+
+  static bool isGeocaching(String? path) {
+    return path != null && path.toLowerCase().endsWith(GEOCACHE_EXT);
   }
 
   static bool isShp(String? path) {

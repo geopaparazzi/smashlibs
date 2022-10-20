@@ -72,6 +72,7 @@ class SmashIcons {
   static IconData iconTypeHttp = MdiIcons.earth;
   static IconData iconTypeMapsforge = MdiIcons.map;
   static IconData iconTypeGpx = MdiIcons.mapMarker;
+  static IconData iconTypeGeocache = MdiIcons.archive;
   static IconData iconTypeRaster = MdiIcons.checkerboard;
   static IconData iconTypeShp = MdiIcons.vectorPoint;
   static IconData iconTypeGeopackage = MdiIcons.packageVariant;
@@ -102,6 +103,8 @@ class SmashIcons {
       return iconTypeMapsforge;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.GPX_EXT)) {
       return iconTypeGpx;
+    } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.GEOCACHE_EXT)) {
+      return iconTypeGeocache;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.MBTILES_EXT)) {
       return iconTypeRaster;
     } else if (pathOrUrlOrNameOrExtension.endsWith(FileManager.MAPURL_EXT)) {

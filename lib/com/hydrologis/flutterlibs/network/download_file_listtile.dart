@@ -11,10 +11,11 @@ class FileDownloadListTileProgressWidget extends StatefulWidget {
   final String? _name;
   final bool showUrl;
   final String? authHeader;
+  final Map<String, dynamic>? tokenHeader;
 
   FileDownloadListTileProgressWidget(
       this._downloadUrl, this._destinationFilePath, this._name,
-      {this.showUrl = false, this.authHeader});
+      {this.showUrl = false, this.authHeader, this.tokenHeader});
 
   @override
   State<StatefulWidget> createState() {
@@ -46,6 +47,9 @@ class FileDownloadListTileProgressWidgetState
     Options? options;
     if (widget.authHeader != null) {
       options = Options(headers: {"Authorization": widget.authHeader});
+    }
+    if (widget.tokenHeader != null) {
+      options = Options(headers: widget.tokenHeader!);
     }
 
     try {

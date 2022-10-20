@@ -221,11 +221,12 @@ class SmashUI {
       color = SmashColors.mainDecorations;
     }
     return TextButton.styleFrom(
-      backgroundColor: color,
+      foregroundColor: color,
       minimumSize: Size(88, 36),
       padding: EdgeInsets.symmetric(horizontal: 10.0),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(color: color, width: 2.0),
       ),
     );
   }
@@ -239,6 +240,8 @@ class SmashUI {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       padding: const EdgeInsets.all(12.0),
       foregroundColor: color,
+      elevation: 2,
+      backgroundColor: SmashColors.mainBackground,
     );
   }
 
