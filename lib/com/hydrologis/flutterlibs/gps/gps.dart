@@ -228,7 +228,7 @@ class GpsState extends ChangeNotifierPlus {
   }
 
   /// Cancel a timer using its [tag].
-  void stopTimer(String tag) {
+  void stopGpsTimer(String tag) {
     var timer = _gpsTimers.remove(tag);
     if (timer != null) {
       timer.cancel();
@@ -236,7 +236,7 @@ class GpsState extends ChangeNotifierPlus {
   }
 
   /// Stop all available gps timers.
-  void stopAllTimers() {
+  void stopAllGpsTimers() {
     for (var entry in _gpsTimers.entries) {
       var timer = _gpsTimers.remove(entry.key);
       if (timer != null) {
