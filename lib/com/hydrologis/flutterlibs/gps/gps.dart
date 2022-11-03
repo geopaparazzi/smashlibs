@@ -121,6 +121,8 @@ class GpsState extends ChangeNotifierPlus {
   late String filteredLogMode;
   late String notesMode;
 
+  Map<String, Timer> _gpsTimers = {};
+
   void init() {
     gpsMinDistance = GpPreferences()
             .getIntSync(SmashPreferencesKeys.KEY_GPS_MIN_DISTANCE, 1) ??
@@ -204,5 +206,42 @@ class GpsState extends ChangeNotifierPlus {
 
   bool hasFix() {
     return _status == GpsStatus.ON_WITH_FIX || _status == GpsStatus.LOGGING;
+  }
+
+  /// Add a new gps position based timer to the gps model.
+  ///
+  /// The [tag] is used to keep track of the timer and cancel it.
+  /// The [timerFunction] is run in the timer and is supplied with
+  /// a [SmashPosition] and [GpsStatus] object.
+  /// An optional [durationSeconds] can be supplied. 60 seconds i the default.
+  void addGpsTimer(String tag, Function timerFunction,
+      {int durationSeconds = 60}) {
+    var timer = _gpsTimers.remove(tag);
+    if (timer != null) {
+      timer.cancel();
+    }
+    var newTimer =
+        Timer.periodic(Duration(seconds: durationSeconds), (timer) async {
+      await timerFunction(_lastPosition, _status);
+    });
+    _gpsTimers[tag] = newTimer;
+  }
+
+  /// Cancel a timer using its [tag].
+  void stopTimer(String tag) {
+    var timer = _gpsTimers.remove(tag);
+    if (timer != null) {
+      timer.cancel();
+    }
+  }
+
+  /// Stop all available gps timers.
+  void stopAllTimers() {
+    for (var entry in _gpsTimers.entries) {
+      var timer = _gpsTimers.remove(entry.key);
+      if (timer != null) {
+        timer.cancel();
+      }
+    }
   }
 }
