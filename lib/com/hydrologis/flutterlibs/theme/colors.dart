@@ -263,7 +263,15 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
   Widget build(BuildContext context) {
     return Container(
       child: TextButton(
-        style: SmashUI.defaultFlatButtonStyle(color: color),
+        style: TextButton.styleFrom(
+          backgroundColor: color,
+          minimumSize: Size(88, 36),
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            side: BorderSide(color: color, width: 2.0),
+          ),
+        ),
         onPressed: () {
           var picker = GpPreferences()
               .getStringSync(KEY_COLORPICKER_TYPE, ColorPickers.SWATCH_PICKER);
