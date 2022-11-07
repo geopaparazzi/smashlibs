@@ -26,6 +26,22 @@ class Device {
     return deviceData?[UNIQUEID]?.toString();
   }
 
+  Future<String?> getModel() async {
+    await checkDeviceInfo();
+    if (SmashPlatform.isDesktop()) {
+      return "no-model-available";
+    }
+    return deviceData?['model']?.toString();
+  }
+
+  Future<String?> getName() async {
+    await checkDeviceInfo();
+    if (SmashPlatform.isDesktop()) {
+      return "no-name-available";
+    }
+    return deviceData?['name']?.toString();
+  }
+
   Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
     return <String, dynamic>{
       'version.securityPatch': build.version.securityPatch,
@@ -47,6 +63,7 @@ class Device {
       'manufacturer': build.manufacturer,
       'model': build.model,
       'product': build.product,
+      'name': build.product, // TODO check if it makes sense
       'supported32BitAbis': build.supported32BitAbis,
       'supported64BitAbis': build.supported64BitAbis,
       'supportedAbis': build.supportedAbis,

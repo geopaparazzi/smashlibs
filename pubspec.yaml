@@ -63,7 +63,7 @@ dependencies:
     #   path: permission_handler
 
   # BSD
-  device_info_plus: ^4.1.2
+  device_info_plus: ^8.0.0
   # MIT
   after_layout: ^1.2.0
 
