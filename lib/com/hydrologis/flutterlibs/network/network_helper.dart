@@ -19,4 +19,28 @@ class NetworkHelper {
     }
     return dio;
   }
+
+  static HttpOverrides? origOverrides;
+
+  static void toggleAllowSelfSignedCertificates(bool doAllow, String host) {
+    if (doAllow) {
+      origOverrides = HttpOverrides.current;
+      HttpOverrides.global = SmashHttpOverrides(host);
+    } else if (origOverrides != null) {
+      HttpOverrides.global = origOverrides;
+    }
+  }
+}
+
+class SmashHttpOverrides extends HttpOverrides {
+  String? _host;
+  SmashHttpOverrides(this._host);
+
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) =>
+              _host != null ? host == _host : true;
+  }
 }
