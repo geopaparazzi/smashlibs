@@ -458,6 +458,41 @@ class SmashDialogs {
         });
     return selection;
   }
+
+  static Future<void> showToast(BuildContext context, String text,
+      {int durationSeconds = 5,
+      bool isError = false,
+      Color? backgroundColor,
+      Color? mainColor}) async {
+    if (backgroundColor == null) {
+      backgroundColor = SmashColors.mainBackground;
+    }
+    if (mainColor == null) {
+      mainColor = SmashColors.mainDecorations;
+      if (isError) {
+        mainColor = SmashColors.mainDanger;
+      }
+    }
+
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color:
+                isError ? SmashColors.mainDanger : SmashColors.mainDecorations,
+            width: 3,
+          ),
+          borderRadius: BorderRadius.circular(0.0),
+        ),
+        backgroundColor: backgroundColor,
+        duration: Duration(seconds: durationSeconds),
+        content: SmashUI.normalText(text, color: mainColor, bold: isError),
+        action:
+            SnackBarAction(label: 'x', onPressed: scaffold.hideCurrentSnackBar),
+      ),
+    );
+  }
 }
 
 class DialogCheckBoxTile extends StatefulWidget {
