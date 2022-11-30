@@ -393,17 +393,22 @@ class SmashDialogs {
   ///
   /// [title] can be either a String or a Widget.
   ///
-  /// Returns the selected item.
+  /// Returns the selected items.
   static Future<List<String>?> showMultiSelectionComboDialog(
       BuildContext context, dynamic title, List<String> items,
-      {String okText: 'Ok',
+      {List<String>? selectedItems,
+      String okText: 'Ok',
       String cancelText: 'Cancel',
       List<IconData>? iconDataList}) async {
     List<Widget> widgets = [];
     List<String> selected = [];
     for (var i = 0; i < items.length; ++i) {
+      bool itemSelected = false;
+      if (selectedItems != null && selectedItems.contains(items[i])) {
+        itemSelected = true;
+      }
       widgets.add(DialogCheckBoxTile(
-        false,
+        itemSelected,
         items[i],
         (isSelected, item) {
           if (isSelected) {
@@ -454,6 +459,46 @@ class SmashDialogs {
                 },
               ),
             ],
+          );
+        });
+    return selection;
+  }
+
+  /// Show a single choice dialog, adding a [title] and a list of [items] to propose.
+  ///
+  /// [title] can be either a String or a Widget.
+  ///
+  /// Returns the selected item.
+  static Future<String?> showSingleChoiceDialog(
+      BuildContext context, dynamic title, List<String> items,
+      {String? selected}) async {
+    List<Widget> widgets = [];
+
+    for (var i = 0; i < items.length; ++i) {
+      var text = SmashUI.normalText(items[i]);
+      if (selected != null && items[i] == selected) {
+        text = SmashUI.normalText(items[i], bold: true);
+      }
+
+      widgets.add(SimpleDialogOption(
+        onPressed: () {
+          Navigator.pop(context, items[i]);
+        },
+        child: text,
+      ));
+    }
+
+    String? selection = await showDialog<String>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: title is String
+                ? SmashUI.normalText(title,
+                    textAlign: TextAlign.center,
+                    color: SmashColors.mainDecorationsDarker)
+                : title,
+            children: widgets,
           );
         });
     return selection;

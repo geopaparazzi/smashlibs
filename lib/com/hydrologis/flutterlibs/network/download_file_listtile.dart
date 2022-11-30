@@ -67,6 +67,9 @@ class FileDownloadListTileProgressWidgetState
       }, cancelToken: cancelToken, options: options);
     } on Exception catch (e, s) {
       SMLogger().e("Error while downloading file ${widget._downloadUrl}", e, s);
+      SmashDialogs.showToast(
+          context, "Error while downloading file ${widget._downloadUrl}",
+          isError: true);
     }
 
     setState(() {
