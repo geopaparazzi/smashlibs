@@ -193,7 +193,7 @@ abstract class IConstraint {
   /// Getter for the description of the constraint.
   ///
   /// @return the description of the constraint.
-  String getDescription();
+  String getDescription(BuildContext context);
 }
 
 /// A set of constraints.
@@ -241,12 +241,12 @@ class Constraints {
   }
 
   // Get human readable description of the constraint.
-  String getDescription() {
+  String getDescription(BuildContext context) {
     StringBuffer sb = StringBuffer();
     for (int i = 0; i < constraints.length; i++) {
       IConstraint constraint = constraints[i];
       sb.write(",");
-      sb.write(constraint.getDescription());
+      sb.write(constraint.getDescription(context));
     }
 
     if (sb.isEmpty) {
@@ -283,8 +283,8 @@ class MandatoryConstraint implements IConstraint {
     return _isValid;
   }
 
-  String getDescription() {
-    return _description;
+  String getDescription(BuildContext context) {
+    return SLL.of(context).forms_mandatory;
   }
 }
 
@@ -345,7 +345,7 @@ class RangeConstraint implements IConstraint {
     return _isValid;
   }
 
-  String getDescription() {
+  String getDescription(BuildContext context) {
     StringBuffer sb = new StringBuffer();
     if (includeLow) {
       sb.write("[");

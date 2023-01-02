@@ -315,14 +315,14 @@ ListTile? getWidget(
           key: ValueKey(widgetKey),
           validator: (value) {
             if (value != null && !constraints.isValid(value)) {
-              return constraints.getDescription();
+              return constraints.getDescription(context);
             }
             return null;
           },
           autovalidateMode: AutovalidateMode.always,
           decoration: InputDecoration(
 //            icon: icon,
-            labelText: "$label ${constraints.getDescription()}",
+            labelText: "$label ${constraints.getDescription(context)}",
           ),
           initialValue: value,
           onChanged: (text) {
@@ -1459,8 +1459,8 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
                                 ),
                                 SmashUI.normalText(
                                     widget.fromGallery
-                                        ? "Load image"
-                                        : "Take a picture",
+                                        ? SLL.of(context).formsWidgets_loadImage //"Load image"
+                                        : SLL.of(context).formsWidgets_takePicture, //"Take a picture"
                                     color: SmashColors.mainDecorations,
                                     bold: true),
                               ],

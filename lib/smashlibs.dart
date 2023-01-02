@@ -30,6 +30,7 @@ import 'package:flutter_screen_wake/flutter_screen_wake.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smashlibs/com/hydrologis/flutterlibs/utils/logging.dart';
+import 'package:smashlibs/generated/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wkt_parser/wkt_parser.dart' as wkt_parser;
 
