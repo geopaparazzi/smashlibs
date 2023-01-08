@@ -220,11 +220,14 @@ class SmashDialogs {
     String? errorText;
 
     var textEditingController = new TextEditingController(text: defaultText);
-    var inputDecoration =
-        new InputDecoration(labelText: label, hintText: hintText);
+    var inputDecoration = new InputDecoration(
+      labelText: label,
+      hintText: hintText,
+    );
     var _textWidget = new TextFormField(
       controller: textEditingController,
       autofocus: true,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: inputDecoration,
       obscureText: isPassword,
       validator: (inputText) {
