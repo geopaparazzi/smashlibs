@@ -231,9 +231,13 @@ class SmashUI {
     );
   }
 
-  static ButtonStyle defaultElevateButtonStyle({Color? color}) {
+  static ButtonStyle defaultElevateButtonStyle(
+      {Color? color, Color? backgroundColor}) {
     if (color == null) {
       color = SmashColors.mainDecorations;
+    }
+    if (backgroundColor == null) {
+      backgroundColor = SmashColors.mainBackground;
     }
 
     return ElevatedButton.styleFrom(
@@ -241,7 +245,8 @@ class SmashUI {
       padding: const EdgeInsets.all(12.0),
       foregroundColor: color,
       elevation: 2,
-      backgroundColor: SmashColors.mainBackground,
+      backgroundColor: backgroundColor,
+      // textStyle: TextStyle(color: color),
     );
   }
 
