@@ -231,22 +231,16 @@ class SmashUI {
     );
   }
 
-  static ButtonStyle defaultElevateButtonStyle(
-      {Color? color, Color? backgroundColor}) {
+  static ButtonStyle defaultElevateButtonStyle({Color? color}) {
     if (color == null) {
-      color = SmashColors.mainDecorations;
-    }
-    if (backgroundColor == null) {
-      backgroundColor = SmashColors.mainBackground;
+      color = SmashColors.mainBackground;
     }
 
     return ElevatedButton.styleFrom(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       padding: const EdgeInsets.all(12.0),
-      foregroundColor: color,
       elevation: 2,
-      backgroundColor: backgroundColor,
-      // textStyle: TextStyle(color: color),
+      backgroundColor: color,
     );
   }
 
