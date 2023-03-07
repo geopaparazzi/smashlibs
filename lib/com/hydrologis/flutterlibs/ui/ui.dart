@@ -320,12 +320,14 @@ class EditableTextField extends StatefulWidget {
   final bool doBold;
   final Function onSave;
   final Function? validationFunction;
+  final TextInputType? textInputType;
 
   EditableTextField(this.label, this.value, this.onSave,
       {this.validationFunction,
       this.isPassword = false,
       this.doBold = false,
       this.hintText,
+      this.textInputType = TextInputType.text,
       Key? key})
       : super(key: key);
 
@@ -380,6 +382,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
                 return errorText;
               },
               obscureText: widget.isPassword,
+              keyboardType: widget.textInputType,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: widget.label,
@@ -413,6 +416,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
             child: TextFormField(
               controller: _controller2,
               obscureText: widget.isPassword,
+              keyboardType: widget.textInputType,
               readOnly: true,
               style: TextStyle(
                 color: SmashColors.mainTextColor,
