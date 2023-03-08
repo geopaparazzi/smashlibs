@@ -312,6 +312,7 @@ class SmashUI {
 ///  - an [onSave] function that gets the newly text as parameter
 ///  - an optional [validationFunction] to check on the text
 ///  - an optional boolean if it [isPassword]
+///  - an optional [keyboardType] to choose keybaord types
 class EditableTextField extends StatefulWidget {
   final String value;
   final String label;
@@ -320,12 +321,14 @@ class EditableTextField extends StatefulWidget {
   final bool doBold;
   final Function onSave;
   final Function? validationFunction;
+  final TextInputType? keyboardType;
 
   EditableTextField(this.label, this.value, this.onSave,
       {this.validationFunction,
       this.isPassword = false,
       this.doBold = false,
       this.hintText,
+      this.keyboardType = TextInputType.text,
       Key? key})
       : super(key: key);
 
@@ -380,6 +383,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
                 return errorText;
               },
               obscureText: widget.isPassword,
+              keyboardType: widget.keyboardType,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: widget.label,
@@ -413,6 +417,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
             child: TextFormField(
               controller: _controller2,
               obscureText: widget.isPassword,
+              keyboardType: widget.keyboardType,
               readOnly: true,
               style: TextStyle(
                 color: SmashColors.mainTextColor,
