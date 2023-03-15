@@ -641,7 +641,6 @@ class FormUtilities {
 //text = text.replaceAll("\"", "'");
 //return text;
 //}
-
 }
 
 /// Singleton that takes care of tags.
@@ -756,9 +755,13 @@ class TagsManager {
 
     for (int j = 0; j < _tagsFileArray!.length; j++) {
       String tagsFile = _tagsFileArray![j];
-      if (!File(tagsFile).existsSync()) continue;
-      String tagsFileString = HU.FileUtilities.readFile(tagsFile);
-      _tagsFileArrayStrings!.add(tagsFileString);
+      try {
+        if (!File(tagsFile).existsSync()) continue;
+        String tagsFileString = HU.FileUtilities.readFile(tagsFile);
+        _tagsFileArrayStrings!.add(tagsFileString);
+      } on Exception catch (e, s) {
+        SMLogger().e("Unable to import tags file: " + tagsFile, e, s);
+      }
     }
   }
 
@@ -1007,7 +1010,6 @@ class TagsManager {
 //}
 //return valuesMap;
 //}
-
 }
 
 /// The tag object.
