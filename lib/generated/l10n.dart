@@ -5,8 +5,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'l10n_cs.dart';
+import 'l10n_de.dart';
 import 'l10n_en.dart';
+import 'l10n_fr.dart';
+import 'l10n_it.dart';
 import 'l10n_ja.dart';
+import 'l10n_nb.dart';
+import 'l10n_ru.dart';
 
 /// Callers can lookup localized strings with an instance of SLL
 /// returned by `SLL.of(context)`.
@@ -90,7 +96,14 @@ abstract class SLL {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('ja')
+    Locale('cs'),
+    Locale('de'),
+    Locale('fr'),
+    Locale('it'),
+    Locale('ja'),
+    Locale('nb'),
+    Locale('nb', 'NO'),
+    Locale('ru')
   ];
 
   /// No description provided for @formsWidgets_loadImage.
@@ -121,7 +134,7 @@ class _SLLDelegate extends LocalizationsDelegate<SLL> {
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'ja'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['cs', 'de', 'en', 'fr', 'it', 'ja', 'nb', 'ru'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_SLLDelegate old) => false;
@@ -129,11 +142,26 @@ class _SLLDelegate extends LocalizationsDelegate<SLL> {
 
 SLL lookupSLL(Locale locale) {
 
+  // Lookup logic when language+country codes are specified.
+  switch (locale.languageCode) {
+    case 'nb': {
+  switch (locale.countryCode) {
+    case 'NO': return SLLNbNo();
+   }
+  break;
+   }
+  }
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'cs': return SLLCs();
+    case 'de': return SLLDe();
     case 'en': return SLLEn();
+    case 'fr': return SLLFr();
+    case 'it': return SLLIt();
     case 'ja': return SLLJa();
+    case 'nb': return SLLNb();
+    case 'ru': return SLLRu();
   }
 
   throw FlutterError(

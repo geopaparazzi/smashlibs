@@ -710,14 +710,18 @@ class TagsManager {
     LinkedHashMap<String, Map<String, dynamic>> _sectionsMap = LinkedHashMap();
     for (int j = 0; j < _tagsFileArrayStrings!.length; j++) {
       String tagsFileString = _tagsFileArrayStrings![j];
-      List<dynamic> sectionsArrayObj = jsonDecode(tagsFileString);
-      int tagsNum = sectionsArrayObj.length;
-      for (int i = 0; i < tagsNum; i++) {
-        Map<String, dynamic> jsonObject = sectionsArrayObj[i];
-        if (jsonObject.containsKey(ATTR_SECTIONNAME)) {
-          String sectionName = jsonObject[ATTR_SECTIONNAME];
-          _sectionsMap[sectionName] = jsonObject;
+      try {
+        List<dynamic> sectionsArrayObj = jsonDecode(tagsFileString);
+        int tagsNum = sectionsArrayObj.length;
+        for (int i = 0; i < tagsNum; i++) {
+          Map<String, dynamic> jsonObject = sectionsArrayObj[i];
+          if (jsonObject.containsKey(ATTR_SECTIONNAME)) {
+            String sectionName = jsonObject[ATTR_SECTIONNAME];
+            _sectionsMap[sectionName] = jsonObject;
+          }
         }
+      } on Exception catch (e, s) {
+        SMLogger().e("Error.", e, s);
       }
     }
     return _sectionsMap;
@@ -757,8 +761,16 @@ class TagsManager {
       String tagsFile = _tagsFileArray![j];
       try {
         if (!File(tagsFile).existsSync()) continue;
-        String tagsFileString = HU.FileUtilities.readFile(tagsFile);
-        _tagsFileArrayStrings!.add(tagsFileString);
+        String tagsFileString =
+            HU.FileUtilities.readFile(tagsFile, saveMode: true);
+        if (tagsFileString.isEmpty) {
+          SMLogger().w("Unable to read tags file properly: " +
+              tagsFile +
+              " This might be an encoding problem.");
+        }
+        if (tagsFileString.isNotEmpty) {
+          _tagsFileArrayStrings!.add(tagsFileString);
+        }
       } on Exception catch (e, s) {
         SMLogger().e("Unable to import tags file: " + tagsFile, e, s);
       }
