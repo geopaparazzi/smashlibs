@@ -9,14 +9,14 @@ class NetworkHelper {
           SmashPreferencesKeys.KEY_GSS_SERVER_ALLOW_SELFCERTIFICATE, true);
     }
     Dio dio = Dio();
-    if (allowSelfCert && dio.httpClientAdapter is DefaultHttpClientAdapter) {
-      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-          (HttpClient client) {
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
-        return client;
-      };
-    }
+    // if (allowSelfCert && dio.httpClientAdapter is DefaultHttpClientAdapter) {
+    //   (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+    //       (HttpClient client) {
+    //     client.badCertificateCallback =
+    //         (X509Certificate cert, String host, int port) => true;
+    //     return client;
+    //   };
+    // }
     return dio;
   }
 

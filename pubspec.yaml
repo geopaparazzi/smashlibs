@@ -59,9 +59,9 @@ dependencies:
   # MIT
   proj4dart: ^2.1.0
   # MIT
-  dio: ^4.0.6
+  dio: ^5.1.1
   # MIT
-  permission_handler: ^10.0.0
+  permission_handler: ^10.2.0
     # git: 
     #   url: https://github.com/Baseflow/flutter-permission-handler.git
     #   path: permission_handler

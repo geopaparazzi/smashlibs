@@ -908,8 +908,22 @@ class TagsManager {
   }
 
   static String getLabelFromFormItem(Map<String, dynamic> formItem) {
-    String label = formItem[TAG_LABEL] ?? formItem[TAG_KEY];
-    return label;
+    String? label = formItem[TAG_LABEL] ?? formItem[TAG_KEY];
+    // if (label == null) {
+    //   // check if it is type label
+    //   if (formItem.containsKey(TAG_TYPE)) {
+    //     String type = formItem[TAG_TYPE].trim();
+    //     if (type.startsWith(TYPE_LABEL)) {
+    //       dynamic value = "";
+    //       if (formItem.containsKey(TAG_VALUE)) {
+    //         value = formItem[TAG_VALUE].toString().trim();
+    //       }
+    //       return value.toString();
+    //     }
+    //   }
+    //   return "Missing label error.";
+    // }
+    return label!;
   }
 
   static String getTypeFromFormItem(Map<String, dynamic> formItem) {

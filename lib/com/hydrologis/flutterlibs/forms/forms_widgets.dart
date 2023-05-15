@@ -239,15 +239,16 @@ ListTile? getWidget(
   if (itemMap.containsKey(TAG_KEY)) {
     key = itemMap[TAG_KEY].trim();
   }
+  String type = TYPE_STRING;
+  if (itemMap.containsKey(TAG_TYPE)) {
+    type = itemMap[TAG_TYPE].trim();
+  }
+
   String label = TagsManager.getLabelFromFormItem(itemMap);
 
   dynamic value = ""; //$NON-NLS-1$
   if (itemMap.containsKey(TAG_VALUE)) {
     value = itemMap[TAG_VALUE].toString().trim();
-  }
-  String type = TYPE_STRING;
-  if (itemMap.containsKey(TAG_TYPE)) {
-    type = itemMap[TAG_TYPE].trim();
   }
   String? iconStr;
   if (itemMap.containsKey(TAG_ICON)) {
@@ -1459,8 +1460,12 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
                                 ),
                                 SmashUI.normalText(
                                     widget.fromGallery
-                                        ? SLL.of(context).formsWidgets_loadImage //"Load image"
-                                        : SLL.of(context).formsWidgets_takePicture, //"Take a picture"
+                                        ? SLL
+                                            .of(context)
+                                            .formsWidgets_loadImage //"Load image"
+                                        : SLL
+                                            .of(context)
+                                            .formsWidgets_takePicture, //"Take a picture"
                                     color: SmashColors.mainDecorations,
                                     bold: true),
                               ],
