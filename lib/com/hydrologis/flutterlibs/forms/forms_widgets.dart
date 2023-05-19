@@ -141,6 +141,11 @@ class MasterDetailPage extends StatefulWidget {
   final bool doScaffold;
   final bool isReadOnly;
 
+  /// Create a Master+Detail Form page based on the given
+  /// [AFormhelper].
+  ///
+  /// The helper will supply the form section, form title and a way to save
+  /// teh data.
   MasterDetailPage(
     this.formHelper, {
     this.doScaffold = true,

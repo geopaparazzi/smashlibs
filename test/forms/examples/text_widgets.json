@@ -1,0 +1,48 @@
+[
+  {
+    "sectionname": "string examples",
+    "sectiondescription": "string widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "text",
+        "formitems": [
+          {
+            "key": "some_text",
+            "label": "some text",
+            "value": "",
+            "icon": "font",
+            "type": "string"
+          },
+          {
+            "key": "some text area",
+            "value": "line1\nline2",
+            "icon": "scroll",
+            "type": "stringarea"
+          }
+        ]
+      },
+      {
+        "formname": "multiple text",
+        "formitems": [
+          {
+            "key": "some text",
+            "value": "text1; text2; text3",
+            "type": "dynamicstring"
+          }
+        ]
+      },
+      {
+        "formname": "text example with key and label",
+        "formitems": [
+          {
+            "key": "the_key_used_to_index",
+            "label": "the label used to describe",
+            "value": "",
+            "type": "string"
+          }
+        ]
+      }
+    ]
+  }
+]
