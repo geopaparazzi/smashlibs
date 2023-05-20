@@ -1,0 +1,31 @@
+[
+  {
+    "sectionname": "label examples",
+    "sectiondescription": "label widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "labels",
+        "formitems": [
+          {
+            "key": "simple_label_with_key",
+            "value": "a simple label of size 20",
+            "size": "20",
+            "type": "label"
+          },
+          {
+            "label": "an underlined label of size 24",
+            "size": "24",
+            "type": "labelwithline"
+          },
+          {
+            "value": "a label with link to the geopaparazzi homepage",
+            "url": "http://www.geopaparazzi.eu",
+            "size": "20",
+            "type": "labelwithline"
+          }
+        ]
+      }
+    ]
+  }
+]

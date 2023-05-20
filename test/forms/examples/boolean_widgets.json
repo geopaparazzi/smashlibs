@@ -1,0 +1,20 @@
+[
+  {
+    "sectionname": "boolean examples",
+    "sectiondescription": "boolean widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "boolean",
+        "formitems": [
+          {
+            "key": "a boolean choice",
+            "value": "",
+            "icon": "questionCircle",
+            "type": "boolean"
+          }
+        ]
+      }
+    ]
+  }
+]

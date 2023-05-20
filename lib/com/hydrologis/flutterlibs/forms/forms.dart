@@ -938,9 +938,11 @@ class TagsManager {
   }
 
   static String getLabelFromFormItem(Map<String, dynamic> formItem) {
-    String? label = formItem[TAG_LABEL] ?? formItem[TAG_KEY];
+    String? label = formItem[TAG_LABEL];
     if (label == null) {
-      // check if it is type label
+      label = formItem[TAG_KEY];
+
+      // check if it is type label and in case use value instead of key
       if (formItem.containsKey(TAG_TYPE)) {
         String type = formItem[TAG_TYPE].trim();
         if (type.startsWith(TYPE_LABEL)) {
@@ -951,9 +953,11 @@ class TagsManager {
           return value.toString();
         }
       }
+    }
+    if (label == null) {
       return "Missing label error.";
     }
-    return label!;
+    return label;
   }
 
   static String getTypeFromFormItem(Map<String, dynamic> formItem) {

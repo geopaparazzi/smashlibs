@@ -1,0 +1,24 @@
+[
+  {
+    "sectionname": "date and time examples",
+    "sectiondescription": "date and time widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "date and time",
+        "formitems": [
+          {
+            "key": "a date",
+            "value": "",
+            "type": "date"
+          },
+          {
+            "key": "a time",
+            "value": "",
+            "type": "time"
+          }
+        ]
+      }
+    ]
+  }
+]

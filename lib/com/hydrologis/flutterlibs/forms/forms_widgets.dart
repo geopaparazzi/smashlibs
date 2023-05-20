@@ -386,7 +386,7 @@ ListTile? getWidget(
         }
 
         var text = Text(
-          value.toString(),
+          label,
           key: ValueKey(widgetKey),
           style: TextStyle(
               fontSize: size,

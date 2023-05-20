@@ -1,0 +1,30 @@
+[
+  {
+    "sectionname": "numeric examples",
+    "sectiondescription": "numeric widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "numeric text",
+        "formitems": [
+          {
+            "key": "a number",
+            "value": "",
+            "type": "double"
+          },
+          {
+            "key": "an integer number",
+            "value": "",
+            "type": "integer"
+          },
+          {
+            "key": "a number used as map label",
+            "value": "",
+            "islabel": "true",
+            "type": "double"
+          }
+        ]
+      }
+    ]
+  }
+]
