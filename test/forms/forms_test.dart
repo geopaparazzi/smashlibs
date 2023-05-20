@@ -30,6 +30,33 @@ void main() {
     expect(formItems[0]['value'], 'new1changed'); // changed
     expect(formItems[1]['value'], 'new2'); // as set by the setData
   });
+
+  testWidgets('Numeric Widgets Test', (tester) async {
+    var helper = TestFormHelper("numeric_widgets.json");
+    var newValues = {
+      "a number": "1.6",
+      "an integer number": "1",
+      "a number used as map label": "2.3",
+    };
+
+    expect(helper.getSectionName(), "numeric examples");
+    await pumpForm(helper, newValues, tester);
+
+    // set new values and check resulting changes
+    await changeTextFormField(tester, "a number", '2.6');
+    await changeTextFormField(tester, "an integer number", '2');
+
+    final backIcon = find.byIcon(Icons.arrow_back);
+    expect(backIcon, findsOneWidget);
+    await tester.tap(backIcon);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('numeric text', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], '2.6');
+    expect(formItems[1]['value'], '2');
+    expect(formItems[2]['value'], '2.3');
+  });
 }
 
 Future<void> pumpForm(TestFormHelper helper, Map<String, String> newValues,
