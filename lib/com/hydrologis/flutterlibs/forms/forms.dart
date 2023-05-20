@@ -174,6 +174,9 @@ abstract class AFormhelper {
 
   /// Save the form on exit from the form view.
   Future<void> onSaveFunction(BuildContext context);
+
+  /// update the form hashmap with the data from the given [newValues].
+  void setData(Map<String, String> newValues);
 }
 
 /// An interface for constraints.
@@ -467,6 +470,24 @@ class FormUtilities {
     }
   }
 
+  /// Updates the form item arrays with all key/value pairs that
+  /// can be found.
+  static void updateFromMap(List<Map<String, dynamic>> formItemsArray,
+      Map<String, dynamic> updaterMap) {
+    int length = formItemsArray.length;
+
+    for (int i = 0; i < length; i++) {
+      Map<String, dynamic> itemObject = formItemsArray[i];
+      if (itemObject.containsKey(TAG_KEY)) {
+        String objKey = itemObject[TAG_KEY].trim();
+        var newValue = updaterMap[objKey];
+        if (newValue != null) {
+          itemObject[TAG_VALUE] = newValue;
+        }
+      }
+    }
+  }
+
   /// Update those fields that do not generate widgets.
   ///
   /// @param formItemsArray the items array.
@@ -697,7 +718,7 @@ class TagsManager {
   static const String TAGSFILENAME_ENDPATTERN = "tags.json";
 
   List<String>? _tagsFileArray;
-  List<String>? _tagsFileArrayStrings;
+  List<String>? _tagsJsonDataArray;
 
   static final TagsManager _instance = TagsManager._internal();
 
@@ -708,8 +729,8 @@ class TagsManager {
   /// Creates a new sectionsmap from the tags file
   LinkedHashMap<String, Map<String, dynamic>> getSectionsMap() {
     LinkedHashMap<String, Map<String, dynamic>> _sectionsMap = LinkedHashMap();
-    for (int j = 0; j < _tagsFileArrayStrings!.length; j++) {
-      String tagsFileString = _tagsFileArrayStrings![j];
+    for (int j = 0; j < _tagsJsonDataArray!.length; j++) {
+      String tagsFileString = _tagsJsonDataArray![j];
       try {
         List<dynamic> sectionsArrayObj = jsonDecode(tagsFileString);
         int tagsNum = sectionsArrayObj.length;
@@ -727,14 +748,19 @@ class TagsManager {
     return _sectionsMap;
   }
 
-  /// Performs the first data reading. Necessary for everything else.
+  void reset() {
+    _tagsFileArray = null;
+    _tagsJsonDataArray = null;
+  }
+
+  /// Performs the first tags reading if no parameter is passed. Necessary for everything else.
   ///
   /// @param context the context to use.
   /// @throws Exception
-  Future<void> readFileTags([String? tagsFilePath]) async {
+  Future<void> readFileTags({String? tagsFilePath, String? tagsString}) async {
     if (_tagsFileArray == null) {
       _tagsFileArray = [];
-      _tagsFileArrayStrings = [];
+      _tagsJsonDataArray = [];
     }
 
     if (tagsFilePath != null) {
@@ -769,11 +795,15 @@ class TagsManager {
               " This might be an encoding problem.");
         }
         if (tagsFileString.isNotEmpty) {
-          _tagsFileArrayStrings!.add(tagsFileString);
+          _tagsJsonDataArray!.add(tagsFileString);
         }
       } on Exception catch (e, s) {
         SMLogger().e("Unable to import tags file: " + tagsFile, e, s);
       }
+    }
+
+    if (tagsString != null) {
+      _tagsJsonDataArray!.add(tagsString);
     }
   }
 
@@ -805,7 +835,7 @@ class TagsManager {
   /// @ if something goes wrong.
   static List<String> getFormNames4Section(Map<String, dynamic> section) {
     List<String> names = [];
-    List<dynamic> jsonArray = section[ATTR_FORMS];
+    List<dynamic>? jsonArray = section[ATTR_FORMS];
     if (jsonArray != null && jsonArray.isNotEmpty) {
       for (int i = 0; i < jsonArray.length; i++) {
         Map<String, dynamic> jsonObject = jsonArray[i];

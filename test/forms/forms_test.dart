@@ -7,35 +7,66 @@ import 'package:smashlibs/smashlibs.dart';
 void main() {
   testWidgets('Text Widgets Test', (tester) async {
     var helper = TestFormHelper("text_widgets.json");
+    var newValues = {
+      "some_text": "new1",
+      "some text area": "new2",
+      "some multi text": "new3",
+      "the_key_used_to_index": "new4",
+    };
 
     expect(helper.getSectionName(), "string examples");
+    await pumpForm(helper, newValues, tester);
 
-    Widget widget = Material(
-        child: new MediaQuery(
-            data: new MediaQueryData(),
-            child: new MaterialApp(
-                home: MasterDetailPage(helper,
-                    doScaffold: false, isReadOnly: false))));
+    // set new values and check resulting changes
+    await changeTextFormField(tester, "some text", 'new1changed');
 
-    await tester.pumpWidget(widget);
+    final backIcon = find.byIcon(Icons.arrow_back);
+    expect(backIcon, findsOneWidget);
+    await tester.tap(backIcon);
 
-    // Create the Finders.
-    final finder1 = find.text('some text');
-    final finder2 = find.text('some text area');
-
-    expect(finder1, findsOneWidget);
-    expect(finder2, findsOneWidget);
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('text', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 'new1changed'); // changed
+    expect(formItems[1]['value'], 'new2'); // as set by the setData
   });
+}
+
+Future<void> pumpForm(TestFormHelper helper, Map<String, String> newValues,
+    WidgetTester tester) async {
+  helper.setData(newValues);
+
+  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  Widget widget = Material(
+      child: new MediaQuery(
+          data: new MediaQueryData(),
+          child: new MaterialApp(
+              navigatorKey: navigatorKey,
+              home: MasterDetailPage(helper,
+                  doScaffold: true, isReadOnly: false))));
+
+  await tester.pumpWidget(widget);
+}
+
+Future<void> changeTextFormField(tester, previousText, newText) async {
+  var ancestor = find.ancestor(
+    of: find.text(previousText),
+    matching: find.byType(TextFormField),
+  );
+  expect(ancestor, findsOneWidget);
+  await tester.enterText(ancestor, newText);
+  await tester.testTextInput.receiveAction(TextInputAction.done);
+  await tester.pump();
 }
 
 class TestFormHelper extends AFormhelper {
   late Map<String, dynamic> sectionMap;
 
   TestFormHelper(String formName) {
-    String jsonFormString =
-        FileUtilities.readFile("./test/forms/examples/$formName");
-    List<dynamic> sectionsList = jsonDecode(jsonFormString);
-    sectionMap = sectionsList[0];
+    TagsManager().reset();
+    TagsManager().readFileTags(tagsFilePath: "./test/forms/examples/$formName");
+    var sectionsMap = TagsManager().getSectionsMap();
+    sectionMap = sectionsMap.values.first;
   }
 
   @override
@@ -81,10 +112,7 @@ class TestFormHelper extends AFormhelper {
   }
 
   @override
-  Future<void> onSaveFunction(BuildContext context) {
-    // TODO: implement onSaveFunction
-    throw UnimplementedError();
-  }
+  Future<void> onSaveFunction(BuildContext context) async {}
 
   @override
   Future<String?> takePictureForForms(
@@ -98,5 +126,17 @@ class TestFormHelper extends AFormhelper {
       BuildContext context, List<String> imageSplit) {
     // TODO: implement takeSketchForForms
     throw UnimplementedError();
+  }
+
+  @override
+  void setData(Map<String, String> newValues) {
+    var formNames = TagsManager.getFormNames4Section(sectionMap);
+    for (var formName in formNames) {
+      var form = TagsManager.getForm4Name(formName, sectionMap);
+      if (form != null) {
+        var formItems = TagsManager.getFormItems(form);
+        FormUtilities.updateFromMap(formItems, newValues);
+      }
+    }
   }
 }

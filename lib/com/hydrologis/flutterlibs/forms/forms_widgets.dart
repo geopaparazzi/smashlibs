@@ -216,20 +216,28 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
       ]);
     });
     return WillPopScope(
-      onWillPop: () async {
-        // TODO check if something changed would be really good
-        await widget.formHelper.onSaveFunction(context);
-        return true;
-      },
+      onWillPop: _onWillPop,
       child: widget.doScaffold
           ? Scaffold(
               appBar: AppBar(
                 title: widget.formHelper.getFormTitleWidget(),
+                leading: IconButton(
+                  icon:
+                      Icon(Icons.arrow_back, color: SmashColors.mainBackground),
+                  onPressed: () => _onWillPop(),
+                ),
               ),
               body: bodyContainer,
             )
           : bodyContainer,
     );
+  }
+
+  Future<bool> _onWillPop() async {
+    // TODO check if something changed would be really good
+    await widget.formHelper.onSaveFunction(context);
+    Navigator.of(context).pop();
+    return true;
   }
 }
 
