@@ -127,6 +127,35 @@ void main() {
     var formItems = TagsManager.getFormItems(form);
     expect(formItems[0]['value'], 'true');
   });
+
+  testWidgets('Combo Widgets Test', (tester) async {
+    var helper = TestFormHelper("combo_widgets.json");
+
+    var newValues = {
+      "a single choice combo": "choice 1",
+    };
+
+    expect(helper.getSectionName(), "combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    // set new values and check resulting changes
+    // await changeComboFormField(tester, "a single choice combo", "choice 2");
+    final combo = find.byKey(Key("a single choice combo"));
+    await tester.tap(combo);
+    await tester.pumpAndSettle();
+
+    final itemToSelect = find.text('choice 3').last;
+
+    await tester.tap(itemToSelect);
+    await tester.pumpAndSettle();
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 'choice 3');
+  });
 }
 
 Future<void> tapBackIcon(WidgetTester tester) async {
@@ -163,6 +192,17 @@ Future<void> changeTextFormField(tester, previousText, newText) async {
 }
 
 Future<void> changeBooleanFormField(
+    WidgetTester tester, labelText, choice) async {
+  var ancestor = find.ancestor(
+    of: find.text(labelText),
+    matching: find.byType(CheckboxListTile),
+  );
+  expect(ancestor, findsOneWidget);
+  await tester.tap(ancestor);
+  await tester.pump();
+}
+
+Future<void> changeComboFormField(
     WidgetTester tester, labelText, choice) async {
   var ancestor = find.ancestor(
     of: find.text(labelText),

@@ -705,6 +705,10 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
     if (widget._itemMap.containsKey(TAG_VALUE)) {
       value = widget._itemMap[TAG_VALUE].trim();
     }
+    String? key;
+    if (widget._itemMap.containsKey(TAG_KEY)) {
+      key = widget._itemMap[TAG_KEY].trim();
+    }
 
     var comboItems = TagsManager.getComboItems(widget._itemMap);
     if (comboItems == null) {
@@ -751,6 +755,7 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
               ),
             ),
             child: DropdownButton(
+              key: key != null ? Key(key) : null,
               value: value,
               isExpanded: true,
               items: items,
