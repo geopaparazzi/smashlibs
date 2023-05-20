@@ -240,7 +240,7 @@ ListTile? getWidget(
   bool isReadOnly,
   AFormhelper formHelper,
 ) {
-  String key = "-"; //$NON-NLS-1$
+  String key = "-";
   if (itemMap.containsKey(TAG_KEY)) {
     key = itemMap[TAG_KEY].trim();
   }
@@ -328,7 +328,19 @@ ListTile? getWidget(
           autovalidateMode: AutovalidateMode.always,
           decoration: InputDecoration(
 //            icon: icon,
-            labelText: "$label ${constraints.getDescription(context)}",
+            label: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SmashUI.normalText(label),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child:
+                      SmashUI.normalText(constraints.getDescription(context)),
+                ),
+              ],
+            ),
           ),
           initialValue: value,
           onChanged: (text) {

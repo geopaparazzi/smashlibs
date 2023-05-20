@@ -20,7 +20,7 @@ void main() {
     await tester.pumpWidget(widget);
 
     // Create the Finders.
-    final finder1 = find.text('some text', findRichText: true);
+    final finder1 = find.text('some text');
     final finder2 = find.text('some text area');
 
     expect(finder1, findsOneWidget);
