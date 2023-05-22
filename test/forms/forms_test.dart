@@ -239,6 +239,31 @@ void main() {
     var formItems = TagsManager.getFormItems(form);
     expect(formItems[0]['value'], 'choice 2');
   });
+
+  testWidgets('Missing Section Form Widgets Test', (tester) async {
+    // Handle forms that come without section part. These could
+    // be simple straight formitems to be seen as a UI for some model
+    var helper = TestFormHelper("missing_section_form.json");
+
+    expect(helper.getSectionName(), "text");
+
+    var newValues = {
+      "some_text": "new1",
+      "some text area": "new2",
+    };
+    await pumpForm(helper, newValues, tester);
+
+    // set new values and check resulting changes
+    await changeTextFormField(tester, "some text", 'new1changed');
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('text', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 'new1changed');
+    expect(formItems[1]['value'], 'new2'); // as set by the setData
+  });
 }
 
 Future<void> tapBackIcon(WidgetTester tester) async {
@@ -372,7 +397,7 @@ class TestFormHelper extends AFormhelper {
 
   TestFormHelper(String formName) {
     TagsManager().reset();
-    TagsManager().readFileTags(tagsFilePath: "./test/forms/examples/$formName");
+    TagsManager().readTags(tagsFilePath: "./test/forms/examples/$formName");
     var sectionsMap = TagsManager().getSectionsMap();
     sectionMap = sectionsMap.values.first;
   }

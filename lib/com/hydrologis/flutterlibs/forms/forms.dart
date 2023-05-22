@@ -103,6 +103,7 @@ const String ATTR_SECTIONICON = "sectionicon";
 
 const String ATTR_FORMS = "forms";
 const String ATTR_FORMNAME = "formname";
+const String ATTR_FORMITEMS = "formitems";
 const String TAG_LONGNAME = "longname";
 const String TAG_SHORTNAME = "shortname";
 const String TAG_FORMS = "forms";
@@ -732,7 +733,33 @@ class TagsManager {
     for (int j = 0; j < _tagsJsonDataArray!.length; j++) {
       String tagsFileString = _tagsJsonDataArray![j];
       try {
-        List<dynamic> sectionsArrayObj = jsonDecode(tagsFileString);
+        var tmpJsonMap = jsonDecode(tagsFileString);
+        List<dynamic>? sectionsArrayObj;
+        if (tmpJsonMap is List) {
+          sectionsArrayObj = tmpJsonMap;
+        } else if (tmpJsonMap is Map) {
+          if (tmpJsonMap.containsKey(ATTR_SECTIONNAME)) {
+            // we have the section part
+            sectionsArrayObj = [tmpJsonMap];
+          } else {
+            // check if we have the form at least
+            if (tmpJsonMap.containsKey(ATTR_FORMITEMS) &&
+                tmpJsonMap.containsKey(ATTR_FORMNAME)) {
+              sectionsArrayObj = [
+                {
+                  ATTR_SECTIONNAME: tmpJsonMap[ATTR_FORMNAME],
+                  ATTR_SECTIONDESCRIPTION: "",
+                  ATTR_FORMS: [tmpJsonMap],
+                },
+              ];
+            }
+          }
+        }
+
+        if (sectionsArrayObj == null) {
+          throw new Exception("Unable to read froms...");
+        }
+
         int tagsNum = sectionsArrayObj.length;
         for (int i = 0; i < tagsNum; i++) {
           Map<String, dynamic> jsonObject = sectionsArrayObj[i];
@@ -753,11 +780,9 @@ class TagsManager {
     _tagsJsonDataArray = null;
   }
 
-  /// Performs the first tags reading if no parameter is passed. Necessary for everything else.
-  ///
-  /// @param context the context to use.
-  /// @throws Exception
-  Future<void> readFileTags({String? tagsFilePath, String? tagsString}) async {
+  /// Read the tags from the default location or from a given [tagsFilePath] or from
+  /// a passed json string [tagsString].
+  Future<void> readTags({String? tagsFilePath, String? tagsString}) async {
     if (_tagsFileArray == null) {
       _tagsFileArray = [];
       _tagsJsonDataArray = [];

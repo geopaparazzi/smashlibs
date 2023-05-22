@@ -1,0 +1,18 @@
+{
+  "formname": "text",
+  "formitems": [
+    {
+      "key": "some_text",
+      "label": "some text",
+      "value": "",
+      "icon": "font",
+      "type": "string"
+    },
+    {
+      "key": "some text area",
+      "value": "line1\nline2",
+      "icon": "scroll",
+      "type": "stringarea"
+    }
+  ]
+}
