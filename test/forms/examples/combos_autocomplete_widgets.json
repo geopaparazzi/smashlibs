@@ -1,0 +1,41 @@
+[
+  {
+    "sectionname": "autocomplete combo examples",
+    "sectiondescription": "autocomplete combo widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "combos",
+        "formitems": [
+          {
+            "key": "an autocomplete string combo",
+            "values": {
+              "items": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1"
+                },
+                {
+                  "item": "choice 2"
+                },
+                {
+                  "item": "choice 3"
+                },
+                {
+                  "item": "choice 4"
+                },
+                {
+                  "item": "choice 5"
+                }
+              ]
+            },
+            "value": "",
+            "type": "autocompletestringcombo"
+          }
+        ]
+      }
+    ]
+  }
+]

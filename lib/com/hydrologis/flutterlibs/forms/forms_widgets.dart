@@ -599,9 +599,13 @@ class AutocompleteStringComboWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String value = ""; //$NON-NLS-1$
+    String value = "";
     if (_itemMap.containsKey(TAG_VALUE)) {
       value = _itemMap[TAG_VALUE].trim();
+    }
+    String? key;
+    if (_itemMap.containsKey(TAG_KEY)) {
+      key = _itemMap[TAG_KEY].trim();
     }
 
     var comboItems = TagsManager.getComboItems(_itemMap);
@@ -646,6 +650,7 @@ class AutocompleteStringComboWidget extends StatelessWidget {
               ),
             ),
             child: Autocomplete<String>(
+              key: key != null ? Key(key) : null,
               optionsBuilder: (TextEditingValue textEditingValue) {
                 if (textEditingValue.text == '') {
                   return const Iterable<String>.empty();
@@ -1033,6 +1038,11 @@ class AutocompleteStringConnectedComboboxWidgetState
       }
     }
 
+    String? key;
+    if (widget._itemMap.containsKey(TAG_KEY)) {
+      key = widget._itemMap[TAG_KEY].trim();
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1072,6 +1082,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                       ),
                     ),
                     child: Autocomplete<String>(
+                      key: Key("${key}_main"),
                       optionsBuilder: (TextEditingValue textEditingValue) {
                         if (textEditingValue.text == '') {
                           return const Iterable<String>.empty();
@@ -1124,6 +1135,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                             ),
                           ),
                           child: Autocomplete<String>(
+                            key: Key("${key}_secondary"),
                             optionsBuilder:
                                 (TextEditingValue textEditingValue) {
                               if (textEditingValue.text == '') {

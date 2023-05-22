@@ -118,7 +118,7 @@ void main() {
     await pumpForm(helper, newValues, tester);
 
     // set new values and check resulting changes
-    await changeBooleanFormField(tester, "a boolean choice", true);
+    await changeBoolean(tester, "a boolean choice", true);
 
     await tapBackIcon(tester);
 
@@ -138,7 +138,7 @@ void main() {
     expect(helper.getSectionName(), "single choice combo examples");
     await pumpForm(helper, newValues, tester);
 
-    await changeComboFormField(tester, "a single choice combo", 'choice 3');
+    await changeCombo(tester, "a single choice combo", 'choice 3');
 
     await tapBackIcon(tester);
 
@@ -159,7 +159,7 @@ void main() {
     expect(helper.getSectionName(), "single choice label-value combo examples");
     await pumpForm(helper, newValues, tester);
 
-    await changeComboFormField(tester, "combos with item labels", 'choice 3');
+    await changeCombo(tester, "combos with item labels", 'choice 3');
 
     await tapBackIcon(tester);
 
@@ -175,7 +175,7 @@ void main() {
     expect(helper.getSectionName(), "two connected combo examples");
     await pumpForm(helper, {}, tester);
 
-    await changeConnectedComboFormField(
+    await changeConnectedCombo(
         tester, "two connected combos", 'items 2', 'choice 3 of 2');
 
     await tapBackIcon(tester);
@@ -184,6 +184,60 @@ void main() {
     var form = TagsManager.getForm4Name('combos', sectionMap);
     var formItems = TagsManager.getFormItems(form);
     expect(formItems[0]['value'], 'items 2#choice 3 of 2');
+  });
+
+  testWidgets('Two Connected Combo Widgets, Default Selected Test',
+      (tester) async {
+    var helper = TestFormHelper("combos_two_connected_default_selected.json");
+
+    expect(helper.getSectionName(),
+        "two connected default selected combo examples");
+    await pumpForm(helper, {}, tester);
+
+    await changeConnectedComboJustSecond(
+        tester, "two connected combos, default selected", 'choice 3 of 2');
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 'items 2#choice 3 of 2');
+  });
+
+  testWidgets('Two Connected Autocomplete Combo Widgets Test', (tester) async {
+    var helper =
+        TestFormHelper("combos_two_connected_autocomplete_widgets.json");
+
+    expect(helper.getSectionName(), "autocomplete connected combo examples");
+    await pumpForm(helper, {}, tester);
+
+    await changeConnectedAutocompletes(tester,
+        "two connected autocomplete combos", 'items 2', 'choice 3 of 2');
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 'items 2#choice 3 of 2');
+  });
+
+  testWidgets('Autocomplete Combo Widgets Test', (tester) async {
+    var helper = TestFormHelper("combos_autocomplete_widgets.json");
+
+    expect(helper.getSectionName(), "autocomplete combo examples");
+    await pumpForm(helper, {}, tester);
+
+    await changeAutocompletes(
+        tester, "an autocomplete string combo", 'choice 2');
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 'choice 2');
   });
 }
 
@@ -220,8 +274,7 @@ Future<void> changeTextFormField(tester, previousText, newText) async {
   await tester.pump();
 }
 
-Future<void> changeBooleanFormField(
-    WidgetTester tester, labelText, choice) async {
+Future<void> changeBoolean(WidgetTester tester, labelText, choice) async {
   var ancestor = find.ancestor(
     of: find.text(labelText),
     matching: find.byType(CheckboxListTile),
@@ -231,7 +284,7 @@ Future<void> changeBooleanFormField(
   await tester.pump();
 }
 
-Future<void> changeComboFormField(
+Future<void> changeCombo(
     WidgetTester tester, comboKeyString, newChoiceString) async {
   final combo = find.byKey(Key(comboKeyString));
   await tester.tap(combo);
@@ -241,7 +294,7 @@ Future<void> changeComboFormField(
   await tester.pumpAndSettle();
 }
 
-Future<void> changeConnectedComboFormField(WidgetTester tester, comboKeyString,
+Future<void> changeConnectedCombo(WidgetTester tester, comboKeyString,
     newCombo1ChoiceString, newCombo2ChoiceString) async {
   final mainCombo = find.byKey(Key("${comboKeyString}_main"));
   await tester.tap(mainCombo);
@@ -256,6 +309,61 @@ Future<void> changeConnectedComboFormField(WidgetTester tester, comboKeyString,
   await tester.pumpAndSettle();
   final itemToSelect2 = find.text(newCombo2ChoiceString).last;
   await tester.tap(itemToSelect2);
+  await tester.pumpAndSettle();
+}
+
+Future<void> changeConnectedComboJustSecond(
+    WidgetTester tester, comboKeyString, newCombo2ChoiceString) async {
+  final secondaryCombo = find.byKey(Key("${comboKeyString}_secondary"));
+  await tester.tap(secondaryCombo);
+  await tester.pumpAndSettle();
+  final itemToSelect2 = find.text(newCombo2ChoiceString).last;
+  await tester.tap(itemToSelect2);
+  await tester.pumpAndSettle();
+}
+
+Future<void> changeConnectedAutocompletes(WidgetTester tester, comboKeyString,
+    String newCombo1ChoiceString, newCombo2ChoiceString) async {
+  // find main combo
+  final mainCombo = find.byKey(Key("${comboKeyString}_main"));
+  // tap it to gain focus
+  await tester.tap(mainCombo);
+  await tester.pumpAndSettle();
+  // enter part of the text to be selected
+  await tester.enterText(mainCombo, newCombo1ChoiceString.substring(0, 3));
+  await tester.pump();
+  // find inside the just opened autocomplete combo the chosen
+  final itemToSelect1 = find.text(newCombo1ChoiceString).last;
+  // select it and trigger filling of the secondary combo
+  await tester.tap(itemToSelect1);
+  await tester.pumpAndSettle();
+
+  // now second combo has items to choose
+  final secondaryCombo = find.byKey(Key("${comboKeyString}_secondary"));
+  await tester.tap(secondaryCombo);
+  await tester.pumpAndSettle();
+
+  await tester.enterText(secondaryCombo, newCombo2ChoiceString.substring(0, 3));
+  await tester.pump();
+  final itemToSelect2 = find.text(newCombo2ChoiceString).last;
+  await tester.tap(itemToSelect2);
+  await tester.pumpAndSettle();
+}
+
+Future<void> changeAutocompletes(
+    WidgetTester tester, comboKeyString, String newComboChoiceString) async {
+  // find main combo
+  final combo = find.byKey(Key(comboKeyString));
+  // tap it to gain focus
+  await tester.tap(combo);
+  await tester.pumpAndSettle();
+  // enter part of the text to be selected
+  await tester.enterText(combo, newComboChoiceString.substring(0, 3));
+  await tester.pump();
+  // find inside the just opened autocomplete combo the chosen
+  final itemToSelect1 = find.text(newComboChoiceString).last;
+  // select it and trigger saving
+  await tester.tap(itemToSelect1);
   await tester.pumpAndSettle();
 }
 
