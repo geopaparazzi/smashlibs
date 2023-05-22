@@ -782,6 +782,8 @@ class TagsManager {
 
   /// Read the tags from the default location or from a given [tagsFilePath] or from
   /// a passed json string [tagsString].
+  ///
+  /// The 3 options are mutually exclusive.
   Future<void> readTags({String? tagsFilePath, String? tagsString}) async {
     if (_tagsFileArray == null) {
       _tagsFileArray = [];
@@ -790,7 +792,10 @@ class TagsManager {
 
     if (tagsFilePath != null) {
       _tagsFileArray!.add(tagsFilePath);
+    } else if (tagsString != null) {
+      _tagsJsonDataArray!.add(tagsString);
     } else {
+      // read from the default SMASH workspace folder
       Directory formsFolder = await Workspace.getFormsFolder();
       List<String> fileNames = HU.FileUtilities.getFilesInPathByExt(
           formsFolder.path, TAGSFILENAME_ENDPATTERN);
@@ -825,10 +830,6 @@ class TagsManager {
       } on Exception catch (e, s) {
         SMLogger().e("Unable to import tags file: " + tagsFile, e, s);
       }
-    }
-
-    if (tagsString != null) {
-      _tagsJsonDataArray!.add(tagsString);
     }
   }
 
