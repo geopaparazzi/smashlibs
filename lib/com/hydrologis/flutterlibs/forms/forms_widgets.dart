@@ -899,6 +899,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                       ),
                     ),
                     child: DropdownButton<String>(
+                      key: Key("main"),
                       value: currentMain,
                       isExpanded: true,
                       items: mainComboItems,
@@ -929,6 +930,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                             ),
                           ),
                           child: DropdownButton<String>(
+                            key: Key("secondary"),
                             value: currentSec,
                             isExpanded: true,
                             items: secondaryCombos[currentMain],

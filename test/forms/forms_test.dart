@@ -128,26 +128,17 @@ void main() {
     expect(formItems[0]['value'], 'true');
   });
 
-  testWidgets('Combo Widgets Test', (tester) async {
-    var helper = TestFormHelper("combo_widgets.json");
+  testWidgets('Single Choice Combo Widgets Test', (tester) async {
+    var helper = TestFormHelper("combos_single_choice_widgets.json");
 
     var newValues = {
       "a single choice combo": "choice 1",
     };
 
-    expect(helper.getSectionName(), "combo examples");
+    expect(helper.getSectionName(), "single choice combo examples");
     await pumpForm(helper, newValues, tester);
 
-    // set new values and check resulting changes
-    // await changeComboFormField(tester, "a single choice combo", "choice 2");
-    final combo = find.byKey(Key("a single choice combo"));
-    await tester.tap(combo);
-    await tester.pumpAndSettle();
-
-    final itemToSelect = find.text('choice 3').last;
-
-    await tester.tap(itemToSelect);
-    await tester.pumpAndSettle();
+    await changeComboFormField(tester, "a single choice combo", 'choice 3');
 
     await tapBackIcon(tester);
 
@@ -155,6 +146,48 @@ void main() {
     var form = TagsManager.getForm4Name('combos', sectionMap);
     var formItems = TagsManager.getFormItems(form);
     expect(formItems[0]['value'], 'choice 3');
+  });
+
+  testWidgets('Single Label-Value Choice Combo Widgets Test', (tester) async {
+    var helper =
+        TestFormHelper("combos_single_choice_with_labels_widgets.json");
+
+    var newValues = {
+      "combos with item labels": "choice 1",
+    };
+
+    expect(helper.getSectionName(), "single choice label-value combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    await changeComboFormField(tester, "combos with item labels", 'choice 3');
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], '3');
+  });
+
+  testWidgets('Two Connected Combo Widgets Test', (tester) async {
+    var helper = TestFormHelper("combos_two_connected_widgets.json");
+
+    // ! TODO
+    var newValues = {
+      "two connected combos": "choice 1",
+    };
+
+    expect(helper.getSectionName(), "single choice label-value combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    await changeComboFormField(tester, "combos with item labels", 'choice 3');
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], '3');
   });
 }
 
@@ -203,14 +236,13 @@ Future<void> changeBooleanFormField(
 }
 
 Future<void> changeComboFormField(
-    WidgetTester tester, labelText, choice) async {
-  var ancestor = find.ancestor(
-    of: find.text(labelText),
-    matching: find.byType(CheckboxListTile),
-  );
-  expect(ancestor, findsOneWidget);
-  await tester.tap(ancestor);
-  await tester.pump();
+    WidgetTester tester, comboKeyString, newChoiceString) async {
+  final combo = find.byKey(Key(comboKeyString));
+  await tester.tap(combo);
+  await tester.pumpAndSettle();
+  final itemToSelect = find.text(newChoiceString).last;
+  await tester.tap(itemToSelect);
+  await tester.pumpAndSettle();
 }
 
 class TestFormHelper extends AFormhelper {

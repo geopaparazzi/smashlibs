@@ -1,0 +1,61 @@
+[
+  {
+    "sectionname": "combo examples",
+    "sectiondescription": "combo widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "combos",
+        "formitems": [
+          {
+            "key": "two connected combos",
+            "values": {
+              "items 1": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 1"
+                },
+                {
+                  "item": "choice 2 of 1"
+                },
+                {
+                  "item": "choice 3 of 1"
+                },
+                {
+                  "item": "choice 4 of 1"
+                },
+                {
+                  "item": "choice 5 of 1"
+                }
+              ],
+              "items 2": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 2"
+                },
+                {
+                  "item": "choice 2 of 2"
+                },
+                {
+                  "item": "choice 3 of 2"
+                },
+                {
+                  "item": "choice 4 of 2"
+                },
+                {
+                  "item": "choice 5 of 2"
+                }
+              ]
+            },
+            "value": "",
+            "type": "connectedstringcombo"
+          }
+        ]
+      }
+    ]
+  }
+]
