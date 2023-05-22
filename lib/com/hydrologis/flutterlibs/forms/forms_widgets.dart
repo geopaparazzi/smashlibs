@@ -860,6 +860,11 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
       }
     }
 
+    String? key;
+    if (widget._itemMap.containsKey(TAG_KEY)) {
+      key = widget._itemMap[TAG_KEY].trim();
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -870,6 +875,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
               color: SmashColors.mainDecorationsDarker),
         ),
         Container(
+          key: key != null ? Key(key) : null,
           decoration: currentMain.trim().isNotEmpty
               ? BoxDecoration(
                   shape: BoxShape.rectangle,
@@ -899,7 +905,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                       ),
                     ),
                     child: DropdownButton<String>(
-                      key: Key("main"),
+                      key: Key("${key}_main"),
                       value: currentMain,
                       isExpanded: true,
                       items: mainComboItems,
@@ -930,7 +936,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                             ),
                           ),
                           child: DropdownButton<String>(
-                            key: Key("secondary"),
+                            key: Key("${key}_secondary"),
                             value: currentSec,
                             isExpanded: true,
                             items: secondaryCombos[currentMain],

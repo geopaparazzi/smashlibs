@@ -172,22 +172,18 @@ void main() {
   testWidgets('Two Connected Combo Widgets Test', (tester) async {
     var helper = TestFormHelper("combos_two_connected_widgets.json");
 
-    // ! TODO
-    var newValues = {
-      "two connected combos": "choice 1",
-    };
+    expect(helper.getSectionName(), "two connected combo examples");
+    await pumpForm(helper, {}, tester);
 
-    expect(helper.getSectionName(), "single choice label-value combo examples");
-    await pumpForm(helper, newValues, tester);
-
-    await changeComboFormField(tester, "combos with item labels", 'choice 3');
+    await changeConnectedComboFormField(
+        tester, "two connected combos", 'items 2', 'choice 3 of 2');
 
     await tapBackIcon(tester);
 
     var sectionMap = helper.getSectionMap();
     var form = TagsManager.getForm4Name('combos', sectionMap);
     var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], '3');
+    expect(formItems[0]['value'], 'items 2#choice 3 of 2');
   });
 }
 
@@ -242,6 +238,24 @@ Future<void> changeComboFormField(
   await tester.pumpAndSettle();
   final itemToSelect = find.text(newChoiceString).last;
   await tester.tap(itemToSelect);
+  await tester.pumpAndSettle();
+}
+
+Future<void> changeConnectedComboFormField(WidgetTester tester, comboKeyString,
+    newCombo1ChoiceString, newCombo2ChoiceString) async {
+  final mainCombo = find.byKey(Key("${comboKeyString}_main"));
+  await tester.tap(mainCombo);
+  await tester.pumpAndSettle();
+  final itemToSelect1 = find.text(newCombo1ChoiceString).last;
+  await tester.tap(itemToSelect1);
+  await tester.pumpAndSettle();
+
+  // now second combo has items to choose
+  final secondaryCombo = find.byKey(Key("${comboKeyString}_secondary"));
+  await tester.tap(secondaryCombo);
+  await tester.pumpAndSettle();
+  final itemToSelect2 = find.text(newCombo2ChoiceString).last;
+  await tester.tap(itemToSelect2);
   await tester.pumpAndSettle();
 }
 
