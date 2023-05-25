@@ -19,7 +19,7 @@ dependencies:
 
   flutter_localizations:
     sdk: flutter
-  intl: '>=0.16.1 <=0.17.0'
+  intl: '>=0.16.1 <=0.18.0'
 
   ##################
   # OWN
@@ -79,10 +79,10 @@ dependencies:
   flutter_tags_x: ^1.1.0
 
   # MIT
-  flutter_material_pickers: #^3.1.4+1
-    git:
-      url: https://github.com/moovida/flutter_material_pickers.git
-      ref: 1b9f72c
+  flutter_material_pickers: ^3.5.0
+    # git:
+    #   url: https://github.com/moovida/flutter_material_pickers.git
+    #   ref: 1b9f72c
 
   # BSD
   shared_preferences: ^2.0.15
@@ -92,7 +92,7 @@ dependencies:
   # <uses-permission android:name="android.permission.WAKE_LOCK" />
 
   #BSD
-  image_picker: ^0.8.5+3
+  image_picker: ^0.8.7+5
   # ON IOS NEEDS:
   #  <key>NSPhotoLibraryUsageDescription</key>
   #  <string>The app needs to access the photo library to attach media to the survey.</string>

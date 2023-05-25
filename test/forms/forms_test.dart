@@ -18,7 +18,8 @@ void main() {
     await pumpForm(helper, newValues, tester);
 
     // set new values and check resulting changes
-    await changeTextFormField(tester, "some text", 'new1changed');
+    await changeTextFormField(tester, "new1", 'new1changed');
+    await changeTextFormField(tester, "new4", 'new2Changes');
 
     await tapBackIcon(tester);
 
@@ -27,6 +28,7 @@ void main() {
     var formItems = TagsManager.getFormItems(form);
     expect(formItems[0]['value'], 'new1changed'); // changed
     expect(formItems[1]['value'], 'new2'); // as set by the setData
+    expect(formItems[3]['value'], 'new2Changes'); // changed
   });
 
   testWidgets('Numeric Widgets Test', (tester) async {

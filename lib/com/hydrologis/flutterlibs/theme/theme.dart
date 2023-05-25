@@ -13,7 +13,9 @@ class ThemeState extends ChangeNotifier {
       brightness: Brightness.light,
       primaryColor: SmashColors.mainDecorationsMc,
       primarySwatch: SmashColors.mainDecorationsMc,
-      accentColor: SmashColors.mainSelectionMc,
+      colorScheme: ColorScheme.fromSwatch().copyWith(
+        secondary: SmashColors.mainSelectionMc,
+      ),
       canvasColor: SmashColors.mainBackground,
       inputDecorationTheme: getInputdecoTheme(),
     ),
@@ -21,7 +23,9 @@ class ThemeState extends ChangeNotifier {
       brightness: Brightness.dark,
       primaryColor: SmashColors.mainBackgroundDarkTheme,
       primarySwatch: SmashColors.mainDecorationsMcDarkTheme,
-      accentColor: SmashColors.mainSelectionMcDarkTheme,
+      colorScheme: ColorScheme.fromSwatch().copyWith(
+        secondary: SmashColors.mainSelectionMcDarkTheme,
+      ),
       canvasColor: SmashColors.mainBackgroundDarkTheme,
     )
   ];
