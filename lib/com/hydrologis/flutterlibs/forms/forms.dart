@@ -228,7 +228,7 @@ class Constraints {
   ///
   /// @param object the object to check.
   /// @return <code>true</code> if all the constraints are valid.
-  bool isValid(Object object) {
+  bool isValid(Object? object) {
     if (object == null) {
       return false;
     }
@@ -268,9 +268,7 @@ class Constraints {
 class MandatoryConstraint implements IConstraint {
   bool _isValid = false;
 
-  String _description = "mandatory"; //$NON-NLS-1$
-
-  void applyConstraint(Object value) {
+  void applyConstraint(Object? value) {
     if (value == null) {
       _isValid = false;
     } else {
@@ -386,7 +384,7 @@ class FormUtilities {
     return false;
   }
 
-  static String getFormItemLabel(String form, String defaultValue) {
+  static String getFormItemLabel(String? form, String defaultValue) {
     if (form != null) {
       var formObj = jsonDecode(form);
       if (formObj.containsKey(TAG_FORMS)) {
@@ -424,7 +422,7 @@ class FormUtilities {
   /// @return the original {@link Constraints} object or a new created.
   /// @throws Exception if something goes wrong.
   static Constraints handleConstraints(
-      Map<String, dynamic> jsonObject, Constraints constraints) {
+      Map<String, dynamic> jsonObject, Constraints? constraints) {
     if (constraints == null) constraints = new Constraints();
 
     if (jsonObject.containsKey(CONSTRAINT_MANDATORY)) {
@@ -497,7 +495,7 @@ class FormUtilities {
   /// @param pkValue        an optional value to set the PRIMARYKEY to.
   /// @ if something goes wrong.
   static void updateExtras(List<Map<String, dynamic>> formItemsArray,
-      double latitude, double longitude, String pkValue) {
+      double latitude, double longitude, String? pkValue) {
     int length = formItemsArray.length;
 
 // TODO check back if it would be good to check also on labels
@@ -675,44 +673,6 @@ class FormUtilities {
 /// the asset folder of the project. In that case the file is copied over
 /// to the file in the first point.</li>
 /// </ul>
-/// <p>
-/// <p>
-/// The tags file is subdivided as follows:
-/// <p>
-/// [{
-/// "sectionname": "scheda_sisma",
-/// "sectiondescription": "this produces a button names scheda_sisma",
-/// "forms": [
-/// {
-/// "formname": "Name of the section, used in the fragments list",
-/// "formitems": [
-/// ....
-/// ....
-/// ]
-/// },{
-/// "formname": "This name produces a second fragment",
-/// "formitems": [
-/// ....
-/// ....
-/// ]
-/// }
-/// ]
-/// },{
-/// "sectionname": "section 2",
-/// "sectiondescription": "this produces a second button",
-/// "forms": [
-/// {
-/// "formname": "this produces one fragment in the list",
-/// "formitems": [
-/// ....
-/// ....
-/// ]
-/// },{
-/// <p>
-/// }
-/// ]
-/// }]
-///
 /// @author Andrea Antonello (www.hydrologis.com)
 class TagsManager {
   /// The tags file name end pattern. All files that end with this are ligible as tags.
