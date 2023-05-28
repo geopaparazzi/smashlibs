@@ -334,18 +334,21 @@ ListTile? getWidget(
             return null;
           },
           autovalidateMode: AutovalidateMode.always,
+          style: TextStyle(
+            fontSize: SmashUI.NORMAL_SIZE,
+            color: SmashColors.mainDecorationsDarker,
+          ),
           decoration: InputDecoration(
-//            icon: icon,
             label: Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SmashUI.normalText(label),
+                SmashUI.normalText(label, color: SmashColors.disabledText),
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child:
-                      SmashUI.normalText(constraints.getDescription(context)),
+                  child: SmashUI.normalText(constraints.getDescription(context),
+                      color: SmashColors.disabledText),
                 ),
               ],
             ),
@@ -733,7 +736,7 @@ class ComboboxWidgetState extends State<ComboboxWidget> with AfterLayoutMixin {
     }
 
     List<dynamic>? comboItems = TagsManager.getComboItems(widget._itemMap);
-    if (comboItems == null) {
+    if (comboItems == null || comboItems.isEmpty) {
       if (urlComboItems != null) {
         // combo items from url have been retrived
         // so just use that

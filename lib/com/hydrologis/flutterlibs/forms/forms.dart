@@ -1001,8 +1001,8 @@ class TagsManager {
           itemsArray.add(ItemObject(item, item));
         } else if (tagItem.containsKey(TAG_LABEL) &&
             tagItem.containsKey(TAG_VALUE)) {
-          var label = tagItem[TAG_LABEL].trim();
-          var value = tagItem[TAG_VALUE].trim();
+          var label = tagItem[TAG_LABEL].toString().trim();
+          var value = tagItem[TAG_VALUE].toString().trim();
           itemsArray.add(ItemObject(label, value));
         }
       } else {
