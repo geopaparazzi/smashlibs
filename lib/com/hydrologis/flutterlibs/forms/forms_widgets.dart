@@ -652,37 +652,38 @@ class AutocompleteStringComboWidget extends StatelessWidget {
                 color: SmashColors.mainDecorations,
               ),
             ),
-            child: Autocomplete<String>(
-              key: key != null ? Key(key) : null,
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                if (textEditingValue.text == '') {
-                  return const Iterable<String>.empty();
-                }
-                return items.where((String option) {
-                  return option
-                      .toLowerCase()
-                      .contains(textEditingValue.text.toLowerCase());
-                });
-              },
-              fieldViewBuilder: (context, textEditingController, focusNode,
-                  onFieldSubmitted) {
-                if (value.isNotEmpty) {
-                  return TextFormField(
-                    controller: textEditingController..text = value,
-                    focusNode: focusNode,
-                  );
-                } else {
-                  return TextFormField(
-                    controller: textEditingController,
-                    focusNode: focusNode,
-                  );
-                }
-              },
-              onSelected: (String selection) {
-                if (!_isReadOnly) {
+            child: IgnorePointer(
+              ignoring: _isReadOnly,
+              child: Autocomplete<String>(
+                key: key != null ? Key(key) : null,
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text == '') {
+                    return const Iterable<String>.empty();
+                  }
+                  return items.where((String option) {
+                    return option
+                        .toLowerCase()
+                        .contains(textEditingValue.text.toLowerCase());
+                  });
+                },
+                fieldViewBuilder: (context, textEditingController, focusNode,
+                    onFieldSubmitted) {
+                  if (value.isNotEmpty) {
+                    return TextFormField(
+                      controller: textEditingController..text = value,
+                      focusNode: focusNode,
+                    );
+                  } else {
+                    return TextFormField(
+                      controller: textEditingController,
+                      focusNode: focusNode,
+                    );
+                  }
+                },
+                onSelected: (String selection) {
                   _itemMap[TAG_VALUE] = selection;
-                }
-              },
+                },
+              ),
             ),
           ),
         ),
@@ -793,18 +794,19 @@ class ComboboxWidgetState extends State<ComboboxWidget> with AfterLayoutMixin {
                 color: SmashColors.mainDecorations,
               ),
             ),
-            child: DropdownButton(
-              key: key != null ? Key(key) : null,
-              value: value,
-              isExpanded: true,
-              items: items,
-              onChanged: (selected) {
-                if (!widget._isReadOnly) {
+            child: IgnorePointer(
+              ignoring: widget._isReadOnly,
+              child: DropdownButton(
+                key: key != null ? Key(key) : null,
+                value: value,
+                isExpanded: true,
+                items: items,
+                onChanged: (selected) {
                   setState(() {
                     widget._itemMap[TAG_VALUE] = selected;
                   });
-                }
-              },
+                },
+              ),
             ),
           ),
         ),
@@ -943,18 +945,21 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                         color: SmashColors.mainDecorations,
                       ),
                     ),
-                    child: DropdownButton<String>(
-                      key: Key("${key}_main"),
-                      value: currentMain,
-                      isExpanded: true,
-                      items: mainComboItems,
-                      onChanged: (selected) {
-                        if (!widget._isReadOnly && selected != null) {
-                          setState(() {
-                            formItem[TAG_VALUE] = selected + SEP;
-                          });
-                        }
-                      },
+                    child: IgnorePointer(
+                      ignoring: widget._isReadOnly,
+                      child: DropdownButton<String>(
+                        key: Key("${key}_main"),
+                        value: currentMain,
+                        isExpanded: true,
+                        items: mainComboItems,
+                        onChanged: (selected) {
+                          if (selected != null) {
+                            setState(() {
+                              formItem[TAG_VALUE] = selected + SEP;
+                            });
+                          }
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -974,20 +979,21 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                               color: SmashColors.mainDecorations,
                             ),
                           ),
-                          child: DropdownButton<String>(
-                            key: Key("${key}_secondary"),
-                            value: currentSec,
-                            isExpanded: true,
-                            items: secondaryCombos[currentMain],
-                            onChanged: (selected) {
-                              if (!widget._isReadOnly) {
+                          child: IgnorePointer(
+                            ignoring: widget._isReadOnly,
+                            child: DropdownButton<String>(
+                              key: Key("${key}_secondary"),
+                              value: currentSec,
+                              isExpanded: true,
+                              items: secondaryCombos[currentMain],
+                              onChanged: (selected) {
                                 setState(() {
                                   var str = widget._itemMap[TAG_VALUE];
                                   widget._itemMap[TAG_VALUE] =
                                       str.split("#")[0] + SEP + selected;
                                 });
-                              }
-                            },
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -1115,40 +1121,41 @@ class AutocompleteStringConnectedComboboxWidgetState
                         color: SmashColors.mainDecorations,
                       ),
                     ),
-                    child: Autocomplete<String>(
-                      key: Key("${key}_main"),
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        if (textEditingValue.text == '') {
-                          return const Iterable<String>.empty();
-                        }
-                        return mainComboItems.where((String option) {
-                          return option
-                              .toLowerCase()
-                              .contains(textEditingValue.text.toLowerCase());
-                        });
-                      },
-                      fieldViewBuilder: (context, textEditingController,
-                          focusNode, onFieldSubmitted) {
-                        if (currentMain.isNotEmpty) {
-                          return TextFormField(
-                            controller: textEditingController
-                              ..text = currentMain,
-                            focusNode: focusNode,
-                          );
-                        } else {
-                          return TextFormField(
-                            controller: textEditingController,
-                            focusNode: focusNode,
-                          );
-                        }
-                      },
-                      onSelected: (String selection) {
-                        if (!widget._isReadOnly) {
+                    child: IgnorePointer(
+                      ignoring: widget._isReadOnly,
+                      child: Autocomplete<String>(
+                        key: Key("${key}_main"),
+                        optionsBuilder: (TextEditingValue textEditingValue) {
+                          if (textEditingValue.text == '') {
+                            return const Iterable<String>.empty();
+                          }
+                          return mainComboItems.where((String option) {
+                            return option
+                                .toLowerCase()
+                                .contains(textEditingValue.text.toLowerCase());
+                          });
+                        },
+                        fieldViewBuilder: (context, textEditingController,
+                            focusNode, onFieldSubmitted) {
+                          if (currentMain.isNotEmpty) {
+                            return TextFormField(
+                              controller: textEditingController
+                                ..text = currentMain,
+                              focusNode: focusNode,
+                            );
+                          } else {
+                            return TextFormField(
+                              controller: textEditingController,
+                              focusNode: focusNode,
+                            );
+                          }
+                        },
+                        onSelected: (String selection) {
                           setState(() {
                             formItem[TAG_VALUE] = selection + SEP;
                           });
-                        }
-                      },
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -1168,41 +1175,42 @@ class AutocompleteStringConnectedComboboxWidgetState
                               color: SmashColors.mainDecorations,
                             ),
                           ),
-                          child: Autocomplete<String>(
-                            key: Key("${key}_secondary"),
-                            optionsBuilder:
-                                (TextEditingValue textEditingValue) {
-                              if (textEditingValue.text == '') {
-                                return const Iterable<String>.empty();
-                              }
-                              return secondaryCombos[currentMain]!
-                                  .where((String option) {
-                                return option.toLowerCase().contains(
-                                    textEditingValue.text.toLowerCase());
-                              });
-                            },
-                            fieldViewBuilder: (context, textEditingController,
-                                focusNode, onFieldSubmitted) {
-                              if (currentSec.isNotEmpty) {
-                                return TextFormField(
-                                  controller: textEditingController
-                                    ..text = currentSec,
-                                  focusNode: focusNode,
-                                );
-                              } else {
-                                return TextFormField(
-                                  controller: textEditingController,
-                                  focusNode: focusNode,
-                                );
-                              }
-                            },
-                            onSelected: (String selection) {
-                              if (!widget._isReadOnly) {
+                          child: IgnorePointer(
+                            ignoring: widget._isReadOnly,
+                            child: Autocomplete<String>(
+                              key: Key("${key}_secondary"),
+                              optionsBuilder:
+                                  (TextEditingValue textEditingValue) {
+                                if (textEditingValue.text == '') {
+                                  return const Iterable<String>.empty();
+                                }
+                                return secondaryCombos[currentMain]!
+                                    .where((String option) {
+                                  return option.toLowerCase().contains(
+                                      textEditingValue.text.toLowerCase());
+                                });
+                              },
+                              fieldViewBuilder: (context, textEditingController,
+                                  focusNode, onFieldSubmitted) {
+                                if (currentSec.isNotEmpty) {
+                                  return TextFormField(
+                                    controller: textEditingController
+                                      ..text = currentSec,
+                                    focusNode: focusNode,
+                                  );
+                                } else {
+                                  return TextFormField(
+                                    controller: textEditingController,
+                                    focusNode: focusNode,
+                                  );
+                                }
+                              },
+                              onSelected: (String selection) {
                                 var str = widget._itemMap[TAG_VALUE];
                                 widget._itemMap[TAG_VALUE] =
                                     str.split("#")[0] + SEP + selection;
-                              }
-                            },
+                              },
+                            ),
                           ),
                         ),
                       ),
