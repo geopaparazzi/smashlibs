@@ -1,0 +1,22 @@
+[
+  {
+    "sectionname": "single choice combo urlbased examples",
+    "sectiondescription": "single choice combo urlbased widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "combos",
+        "formitems": [
+          {
+            "key": "a single choice combo urlbased",
+            "values": {
+              "url": "https://www.mydataproviderurl.com/api/v1/{id}/data.json"
+            },
+            "value": "",
+            "type": "stringcombo"
+          }
+        ]
+      }
+    ]
+  }
+]

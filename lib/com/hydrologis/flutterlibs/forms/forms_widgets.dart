@@ -703,7 +703,24 @@ class ComboboxWidget extends StatefulWidget {
   ComboboxWidgetState createState() => ComboboxWidgetState();
 }
 
-class ComboboxWidgetState extends State<ComboboxWidget> {
+class ComboboxWidgetState extends State<ComboboxWidget> with AfterLayoutMixin {
+  String? url;
+  List<dynamic>? urlComboItems;
+
+  @override
+  void afterFirstLayout(BuildContext context) async {
+    if (url != null) {
+      url = FormsNetworkSupporter().applyUrlSubstitutions(url!);
+      var jsonString = await FormsNetworkSupporter().getJsonString(url!);
+      if (jsonString != null) {
+        urlComboItems = jsonDecode(jsonString);
+      } else {
+        urlComboItems = [];
+      }
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String? value = ""; //$NON-NLS-1$
@@ -715,12 +732,26 @@ class ComboboxWidgetState extends State<ComboboxWidget> {
       key = widget._itemMap[TAG_KEY].trim();
     }
 
-    var comboItems = TagsManager.getComboItems(widget._itemMap);
+    List<dynamic>? comboItems = TagsManager.getComboItems(widget._itemMap);
     if (comboItems == null) {
-      comboItems = [];
+      if (urlComboItems != null) {
+        // combo items from url have been retrived
+        // so just use that
+        comboItems = urlComboItems;
+      } else {
+        // check if it is url based
+        url = TagsManager.getComboUrl(widget._itemMap);
+        if (url != null) {
+          // we have a url, so
+          // return container and wait for afterFirstLayout to get url items
+          return Container();
+        }
+        // fallback on an empty list
+        comboItems = [];
+      }
     }
     List<ItemObject?> itemsArray =
-        TagsManager.comboItems2ObjectArray(comboItems);
+        TagsManager.comboItems2ObjectArray(comboItems!);
     ItemObject? found;
     for (ItemObject? item in itemsArray) {
       if (item != null && item.value == value) {

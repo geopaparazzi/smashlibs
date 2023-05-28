@@ -14,6 +14,7 @@ import 'package:dart_jts/dart_jts.dart' as JTS;
 import 'package:device_info_plus/device_info_plus.dart'
     if (dart.library.html) 'web_stubs.dart';
 import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;

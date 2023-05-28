@@ -1,10 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smashlibs/smashlibs.dart';
+import 'package:http/http.dart';
+import 'package:http/testing.dart';
 
 void main() {
+  HttpOverrides.global = _MyHttpOverrides();
+
   testWidgets('Text Widgets Test', (tester) async {
     var helper = TestFormHelper("text_widgets.json");
     var newValues = {
@@ -148,6 +153,61 @@ void main() {
     var form = TagsManager.getForm4Name('combos', sectionMap);
     var formItems = TagsManager.getFormItems(form);
     expect(formItems[0]['value'], 'choice 3');
+  });
+
+  testWidgets('Single Choice Combo UrlBased Widgets Test', (tester) async {
+    FormsNetworkSupporter().addUrlSubstitution('id', '12');
+    FormsNetworkSupporter().client = MockClient((request) async {
+      expect(request.url.toString(),
+          "https://www.mydataproviderurl.com/api/v1/12/data.json");
+      final jsonStr = """[
+                        {
+                            "item": {
+                                "value": 1,
+                                "label": "Item 1"
+                            }
+                        },
+                        {
+                            "item": {
+                                "value": 2,
+                                "label": "Item 2"
+                            }
+                        },
+                        {
+                            "item": {
+                                "value": 3,
+                                "label": "Item 3"
+                            }
+                        }
+                    ]""";
+      return Response(jsonStr, 200);
+    });
+
+    var helper = TestFormHelper("combos_single_choice_urlbased_widgets.json");
+
+    var newValues = {
+      "a single choice combo urlbased": "2",
+    };
+
+    expect(helper.getSectionName(), "single choice combo urlbased examples");
+    await pumpForm(helper, newValues, tester);
+
+    // check change of setData
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], '2');
+
+    // now do a change
+    // TODO activate once figured out to trick AfterLayout to finish brfore going on
+    // await changeCombo(tester, "a single choice combo urlbased", 'choice 3');
+
+    await tapBackIcon(tester);
+
+    // sectionMap = helper.getSectionMap();
+    // form = TagsManager.getForm4Name('combos', sectionMap);
+    // formItems = TagsManager.getFormItems(form);
+    // expect(formItems[0]['value'], '2');
   });
 
   testWidgets('Single Label-Value Choice Combo Widgets Test', (tester) async {
@@ -462,16 +522,6 @@ class TestFormHelper extends AFormhelper {
     // TODO: implement takeSketchForForms
     throw UnimplementedError();
   }
-
-  @override
-  void setData(Map<String, dynamic> newValues) {
-    var formNames = TagsManager.getFormNames4Section(sectionMap);
-    for (var formName in formNames) {
-      var form = TagsManager.getForm4Name(formName, sectionMap);
-      if (form != null) {
-        var formItems = TagsManager.getFormItems(form);
-        FormUtilities.updateFromMap(formItems, newValues);
-      }
-    }
-  }
 }
+
+class _MyHttpOverrides extends HttpOverrides {}

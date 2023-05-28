@@ -177,7 +177,18 @@ abstract class AFormhelper {
   Future<void> onSaveFunction(BuildContext context);
 
   /// update the form hashmap with the data from the given [newValues].
-  void setData(Map<String, String> newValues);
+
+  void setData(Map<String, dynamic> newValues) {
+    var sectionMap = getSectionMap();
+    var formNames = TagsManager.getFormNames4Section(sectionMap);
+    for (var formName in formNames) {
+      var form = TagsManager.getForm4Name(formName, sectionMap);
+      if (form != null) {
+        var formItems = TagsManager.getFormItems(form);
+        FormUtilities.updateFromMap(formItems, newValues);
+      }
+    }
+  }
 }
 
 /// An interface for constraints.
@@ -965,6 +976,16 @@ class TagsManager {
     return null;
   }
 
+  static String? getComboUrl(Map<String, dynamic> formItem) {
+    if (formItem.containsKey(TAG_VALUES)) {
+      var valuesObj = formItem[TAG_VALUES];
+      if (valuesObj.containsKey(TAG_URL)) {
+        return valuesObj[TAG_URL];
+      }
+    }
+    return null;
+  }
+
   /// @param comboItems combo items object.
   /// @return the item object (which has label and value) list.
   /// @ if something goes wrong.
@@ -1071,4 +1092,50 @@ class ItemObject {
   String label;
   String value;
   ItemObject(this.label, this.value);
+}
+
+class FormsNetworkSupporter {
+  static final FormsNetworkSupporter _singleton =
+      FormsNetworkSupporter._internal();
+  factory FormsNetworkSupporter() {
+    return _singleton;
+  }
+  FormsNetworkSupporter._internal();
+
+  var client = http.Client();
+
+  Map<String, String> _headers = {};
+  Map<String, String> _urlSubstitutions = {};
+
+  void addHeader(String key, String value) {
+    _headers[key] = value;
+  }
+
+  Map<String, String> getHeaders() {
+    return Map.from(_headers);
+  }
+
+  void addUrlSubstitution(String key, String value) {
+    _urlSubstitutions[key] = value;
+  }
+
+  String applyUrlSubstitutions(String url) {
+    for (var entry in _urlSubstitutions.entries) {
+      var key = entry.key;
+      var value = entry.value;
+
+      url = url.replaceFirst("{$key}", value);
+    }
+    return url;
+  }
+
+  Future<String?> getJsonString(String url) async {
+    var uri = Uri.parse(url);
+    var response =
+        await client.get(uri, headers: FormsNetworkSupporter().getHeaders());
+    if (response.statusCode == 200) {
+      return response.body;
+    }
+    return null;
+  }
 }

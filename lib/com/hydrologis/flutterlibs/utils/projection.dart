@@ -321,7 +321,7 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
 
   Future<void> downloadAndRegisterEpsg(int srid) async {
     String url = "https://epsg.io/$srid.proj4";
-    Response response = await Dio().get(url);
+    var response = await Dio().get(url);
     var prjData = response.data;
     if (prjData != null && prjData is String && prjData.startsWith("+")) {
       Projection.add('EPSG:$srid', prjData);
