@@ -173,6 +173,45 @@ void main() {
     expect(formItems[0]['value'], 3);
   });
 
+  testWidgets('Multi Choice Combo Widgets Test', (tester) async {
+    var helper = TestFormHelper("combos_multi_choice_widgets.json");
+
+    var newValues = {
+      "a multiple choice combo": "choice 1",
+    };
+
+    expect(helper.getSectionName(), "multi choice combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    await changeMultiCombo(
+        tester, "a multiple choice combo", ['choice 3', 'choice 4']);
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 'choice 1;choice 3;choice 4');
+  });
+
+  testWidgets('Integer Multi Choice Combo Widgets Test', (tester) async {
+    var helper = TestFormHelper("combos_int_multi_choice_widgets.json");
+
+    var newValues = {
+      "an int multiple choice combo": "1",
+    };
+
+    expect(helper.getSectionName(), "int multi choice combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    await changeMultiCombo(tester, "an int multiple choice combo", [3, 4]);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], "1;3;4");
+  });
+
   testWidgets('Single Choice Combo UrlBased Widgets Test', (tester) async {
     FormsNetworkSupporter().addUrlSubstitution('id', '12');
     FormsNetworkSupporter().client = MockClient((request) async {
@@ -481,6 +520,18 @@ Future<void> changeCombo(
   await tester.pumpAndSettle();
   final itemToSelect = find.text(newChoiceString.toString()).last;
   await tester.tap(itemToSelect);
+  await tester.pumpAndSettle();
+}
+
+Future<void> changeMultiCombo(
+    WidgetTester tester, comboKeyString, List<dynamic> newChoices) async {
+  final combo = find.byKey(Key(comboKeyString));
+  await tester.tap(combo);
+  await tester.pumpAndSettle();
+  for (var newChoice in newChoices) {
+    final itemToSelect = find.text(newChoice.toString()).last;
+    await tester.tap(itemToSelect);
+  }
   await tester.pumpAndSettle();
 }
 

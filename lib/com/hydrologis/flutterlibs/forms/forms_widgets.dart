@@ -494,13 +494,21 @@ ListTile? getWidget(
 //        addedView = FormUtilities.addOneToManyConnectedComboView(activity, mainView, label, value, oneToManyValuesMap,
 //            constraintDescription);
 //        break;
-//      case TYPE_STRINGMULTIPLECHOICE: {
-//        JSONArray comboItems = TagsManager.getComboItems(jsonObject);
-//        String[] itemsArray = TagsManager.comboItems2StringArray(comboItems);
-//        addedView = FormUtilities.addMultiSelectionView(activity, mainView, label, value, itemsArray,
-//            constraintDescription);
-//        break;
-//      }
+    case TYPE_STRINGMULTIPLECHOICE:
+      {
+        return ListTile(
+          leading: icon,
+          title:
+              MultiComboWidget<String>(widgetKey, itemMap, label, itemReadonly),
+        );
+      }
+    case TYPE_INTMULTIPLECHOICE:
+      {
+        return ListTile(
+          leading: icon,
+          title: MultiComboWidget<int>(widgetKey, itemMap, label, itemReadonly),
+        );
+      }
     case TYPE_PICTURES:
       {
         return ListTile(
@@ -747,7 +755,7 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
 
   @override
   Widget build(BuildContext context) {
-    T? value; //$NON-NLS-1$
+    T? value;
     if (widget._itemMap.containsKey(TAG_VALUE)) {
       value = widget._itemMap[TAG_VALUE];
     }
@@ -1244,7 +1252,7 @@ class AutocompleteStringConnectedComboboxWidgetState
 }
 
 class DynamicStringWidget extends StatefulWidget {
-  var _itemMap;
+  final Map<String, dynamic> _itemMap;
   final String _label;
   final bool _isReadOnly;
 
@@ -1498,6 +1506,191 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
               ),
             ),
           )),
+    );
+  }
+}
+
+class MultiComboWidget<T> extends StatefulWidget {
+  final _itemMap;
+  final String _label;
+  final bool _isReadOnly;
+  MultiComboWidget(
+      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      : super(
+          key: ValueKey(_widgetKey + "_parent"),
+        );
+
+  @override
+  MultiComboWidgetState createState() => MultiComboWidgetState();
+}
+
+class MultiComboWidgetState<T> extends State<MultiComboWidget> {
+  @override
+  Widget build(BuildContext context) {
+    String value = ""; //$NON-NLS-1$
+    if (widget._itemMap.containsKey(TAG_VALUE)) {
+      value = widget._itemMap[TAG_VALUE].trim();
+    }
+    String? key;
+    if (widget._itemMap.containsKey(TAG_KEY)) {
+      key = widget._itemMap[TAG_KEY].trim();
+    }
+
+    return Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
+            child: SmashUI.normalText(widget._label,
+                color: SmashColors.mainDecorationsDarker),
+          ),
+          TextButton(
+              key: key != null ? Key(key) : null,
+              onPressed: () async {
+                if (!widget._isReadOnly) {
+                  await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return MultiSelect(widget._itemMap, widget._label);
+                    },
+                  );
+                }
+              },
+              child: Center(
+                child: Padding(
+                  padding: SmashUI.defaultPadding(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Padding(
+                        padding: SmashUI.defaultRigthPadding(),
+                        child: Icon(
+                          MdiIcons.clock,
+                          color: SmashColors.mainDecorations,
+                        ),
+                      ),
+                      SmashUI.normalText(value.isNotEmpty ? "$value" : "...",
+                          color: SmashColors.mainDecorations, bold: true),
+                    ],
+                  ),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class MultiSelect<T> extends StatefulWidget {
+  final Map<String, dynamic> _itemMap;
+  final String _label;
+  MultiSelect(this._itemMap, this._label, {key})
+      : super(
+          key: key,
+        );
+
+  @override
+  State<StatefulWidget> createState() => _MultiSelectState<T>();
+}
+
+class _MultiSelectState<T> extends State<MultiSelect> with AfterLayoutMixin {
+  String? url;
+  List<dynamic>? urlComboItems;
+
+  @override
+  void afterFirstLayout(BuildContext context) async {
+    if (url != null) {
+      url = FormsNetworkSupporter().applyUrlSubstitutions(url!);
+      var jsonString = await FormsNetworkSupporter().getJsonString(url!);
+      if (jsonString != null) {
+        urlComboItems = jsonDecode(jsonString);
+      } else {
+        urlComboItems = [];
+      }
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String? key;
+    if (widget._itemMap.containsKey(TAG_KEY)) {
+      key = widget._itemMap[TAG_KEY].trim();
+    }
+    List<T> values = [];
+    if (widget._itemMap.containsKey(TAG_VALUE)) {
+      String? value = widget._itemMap[TAG_VALUE];
+      if (value != null && value.isNotEmpty) {
+        if (widget._itemMap[TAG_TYPE] == 'multiintcombo') {
+          values = value
+              .split(";")
+              .map((e) => int.tryParse(e) as T)
+              .where((element) => element != null)
+              .toList();
+        } else {
+          List<String> valueSplit = value.split(";");
+          for (var v in valueSplit) {
+            values.add(v as T);
+          }
+        }
+      }
+    }
+
+    List<dynamic>? comboItems = TagsManager.getComboItems(widget._itemMap);
+    if (comboItems == null || comboItems.isEmpty) {
+      if (urlComboItems != null) {
+        // combo items from url have been retrived
+        // so just use that
+        comboItems = urlComboItems;
+      } else {
+        // check if it is url based
+        url = TagsManager.getComboUrl(widget._itemMap);
+        if (url != null) {
+          // we have a url, so
+          // return container and wait for afterFirstLayout to get url items
+          return Container();
+        }
+        // fallback on an empty list
+        comboItems = [];
+      }
+    }
+    List<ItemObject?> itemsArray =
+        TagsManager.comboItems2ObjectArray(comboItems!);
+    List<ItemObject> selectedItems = [];
+    for (ItemObject? item in itemsArray) {
+      if (item != null && values.contains(item.value)) {
+        selectedItems.add(item);
+      }
+    }
+
+    return AlertDialog(
+      title: Text(widget._label),
+      content: SingleChildScrollView(
+        child: ListBody(
+          key: key != null ? Key(key) : null,
+          children: itemsArray
+              .map((item) => CheckboxListTile(
+                    key: key != null ? Key("${key}_${item!.value}") : null,
+                    value: selectedItems.contains(item),
+                    title: Text(item!.label),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    onChanged: (isChecked) {
+                      if (isChecked!) {
+                        selectedItems.add(item);
+                      } else {
+                        selectedItems.remove(item);
+                      }
+
+                      var selectedItemsString =
+                          selectedItems.map((i) => i.value.toString()).toList();
+                      widget._itemMap[TAG_VALUE] =
+                          selectedItemsString.join(";");
+                      setState(() {});
+                    },
+                  ))
+              .toList(),
+        ),
+      ),
     );
   }
 }

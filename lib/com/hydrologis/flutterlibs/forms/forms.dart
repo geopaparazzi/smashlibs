@@ -57,6 +57,7 @@ const String TYPE_ONETOMANYSTRINGCOMBO = "onetomanystringcombo";
 
 /// Type for a multi combo.
 const String TYPE_STRINGMULTIPLECHOICE = "multistringcombo";
+const String TYPE_INTMULTIPLECHOICE = "multiintcombo";
 
 /// Type for a the NFC UID reader.
 const String TYPE_NFCUID = "nfcuid";

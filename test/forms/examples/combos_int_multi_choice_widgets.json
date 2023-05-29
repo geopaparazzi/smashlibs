@@ -1,0 +1,41 @@
+[
+  {
+    "sectionname": "int multi choice combo examples",
+    "sectiondescription": "int multi choice combo widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "combos",
+        "formitems": [
+          {
+            "key": "an int multiple choice combo",
+            "values": {
+              "items": [
+                {
+                  "item": 0
+                },
+                {
+                  "item": 1
+                },
+                {
+                  "item": 2
+                },
+                {
+                  "item": 3
+                },
+                {
+                  "item": 4
+                },
+                {
+                  "item": 5
+                }
+              ]
+            },
+            "value": "",
+            "type": "multiintcombo"
+          }
+        ]
+      }
+    ]
+  }
+]
