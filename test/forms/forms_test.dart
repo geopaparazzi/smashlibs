@@ -8,8 +8,6 @@ import 'package:http/http.dart';
 import 'package:http/testing.dart';
 
 void main() {
-  HttpOverrides.global = _MyHttpOverrides();
-
   testWidgets('Text Widgets Test', (tester) async {
     var helper = TestFormHelper("text_widgets.json");
     var newValues = {
@@ -155,7 +153,83 @@ void main() {
     expect(formItems[0]['value'], 'choice 3');
   });
 
+  testWidgets('Integer Single Choice Combo Widgets Test', (tester) async {
+    var helper = TestFormHelper("combos_int_single_choice_widgets.json");
+
+    var newValues = {
+      "an int single choice combo": 2,
+    };
+
+    expect(helper.getSectionName(), "int single choice combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    await changeCombo(tester, "an int single choice combo", 3);
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 3);
+  });
+
   testWidgets('Single Choice Combo UrlBased Widgets Test', (tester) async {
+    FormsNetworkSupporter().addUrlSubstitution('id', '12');
+    FormsNetworkSupporter().client = MockClient((request) async {
+      expect(request.url.toString(),
+          "https://www.mydataproviderurl.com/api/v1/12/data.json");
+      final jsonStr = """[
+                        {
+                            "item": {
+                                "value": "1",
+                                "label": "Item 1"
+                            }
+                        },
+                        {
+                            "item": {
+                                "value": "2",
+                                "label": "Item 2"
+                            }
+                        },
+                        {
+                            "item": {
+                                "value": "3",
+                                "label": "Item 3"
+                            }
+                        }
+                    ]""";
+      return Response(jsonStr, 200);
+    });
+
+    var helper = TestFormHelper("combos_single_choice_urlbased_widgets.json");
+
+    var newValues = {
+      "a single choice combo urlbased": "2",
+    };
+
+    expect(helper.getSectionName(), "single choice combo urlbased examples");
+    await pumpForm(helper, newValues, tester);
+
+    // check change of setData
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], '2');
+
+    // now do a change
+    // // TODO activate once figured out to trick AfterLayout to finish brfore going on
+    // await changeCombo(tester, "a single choice combo urlbased", 'Item 3');
+
+    await tapBackIcon(tester);
+
+    // sectionMap = helper.getSectionMap();
+    // form = TagsManager.getForm4Name('combos', sectionMap);
+    // formItems = TagsManager.getFormItems(form);
+    // expect(formItems[0]['value'], '3');
+  });
+
+  testWidgets('Integer Single Choice Combo UrlBased Widgets Test',
+      (tester) async {
     FormsNetworkSupporter().addUrlSubstitution('id', '12');
     FormsNetworkSupporter().client = MockClient((request) async {
       expect(request.url.toString(),
@@ -183,31 +257,33 @@ void main() {
       return Response(jsonStr, 200);
     });
 
-    var helper = TestFormHelper("combos_single_choice_urlbased_widgets.json");
+    var helper =
+        TestFormHelper("combos_int_single_choice_urlbased_widgets.json");
 
     var newValues = {
-      "a single choice combo urlbased": "2",
+      "an int single choice combo urlbased": 2,
     };
 
-    expect(helper.getSectionName(), "single choice combo urlbased examples");
+    expect(
+        helper.getSectionName(), "int single choice combo urlbased examples");
     await pumpForm(helper, newValues, tester);
 
     // check change of setData
     var sectionMap = helper.getSectionMap();
     var form = TagsManager.getForm4Name('combos', sectionMap);
     var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], '2');
+    expect(formItems[0]['value'], 2);
 
     // now do a change
     // TODO activate once figured out to trick AfterLayout to finish brfore going on
-    // await changeCombo(tester, "a single choice combo urlbased", 'choice 3');
+    // await changeCombo(tester, "a single choice combo urlbased", 3);
 
     await tapBackIcon(tester);
 
     // sectionMap = helper.getSectionMap();
     // form = TagsManager.getForm4Name('combos', sectionMap);
     // formItems = TagsManager.getFormItems(form);
-    // expect(formItems[0]['value'], '2');
+    // expect(formItems[0]['value'], 3);
   });
 
   testWidgets('Single Label-Value Choice Combo Widgets Test', (tester) async {
@@ -215,7 +291,7 @@ void main() {
         TestFormHelper("combos_single_choice_with_labels_widgets.json");
 
     var newValues = {
-      "combos with item labels": "choice 1",
+      "combos with item labels": "1",
     };
 
     expect(helper.getSectionName(), "single choice label-value combo examples");
@@ -229,6 +305,29 @@ void main() {
     var form = TagsManager.getForm4Name('combos', sectionMap);
     var formItems = TagsManager.getFormItems(form);
     expect(formItems[0]['value'], '3');
+  });
+
+  testWidgets('Integer Single Label-Value Choice Combo Widgets Test',
+      (tester) async {
+    var helper =
+        TestFormHelper("combos_int_single_choice_with_labels_widgets.json");
+
+    var newValues = {
+      "combos with item int labels": 1,
+    };
+
+    expect(helper.getSectionName(),
+        "int single choice label-value combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    await changeCombo(tester, "combos with item int labels", 'choice 3');
+
+    await tapBackIcon(tester);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], 3);
   });
 
   testWidgets('Two Connected Combo Widgets Test', (tester) async {
@@ -371,12 +470,16 @@ Future<void> changeBoolean(WidgetTester tester, labelText, choice) async {
   await tester.pump();
 }
 
+/// change the value of a combo by tapping on it.
+///
+/// The [newChoiceString] needs to be the label set, also in cases with
+/// label+value.
 Future<void> changeCombo(
     WidgetTester tester, comboKeyString, newChoiceString) async {
   final combo = find.byKey(Key(comboKeyString));
   await tester.tap(combo);
   await tester.pumpAndSettle();
-  final itemToSelect = find.text(newChoiceString).last;
+  final itemToSelect = find.text(newChoiceString.toString()).last;
   await tester.tap(itemToSelect);
   await tester.pumpAndSettle();
 }
@@ -523,5 +626,3 @@ class TestFormHelper extends AFormhelper {
     throw UnimplementedError();
   }
 }
-
-class _MyHttpOverrides extends HttpOverrides {}

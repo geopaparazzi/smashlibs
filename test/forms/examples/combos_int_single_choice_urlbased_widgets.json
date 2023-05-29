@@ -1,0 +1,22 @@
+[
+  {
+    "sectionname": "int single choice combo urlbased examples",
+    "sectiondescription": "int single choice combo urlbased widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "combos",
+        "formitems": [
+          {
+            "key": "an int single choice combo urlbased",
+            "values": {
+              "url": "https://www.mydataproviderurl.com/api/v1/{id}/data.json"
+            },
+            "value": 0,
+            "type": "intcombo"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -40,6 +40,7 @@ const String TYPE_BOOLEAN = "boolean";
 
 /// Type for a {@link Spinner}.
 const String TYPE_STRINGCOMBO = "stringcombo";
+const String TYPE_INTCOMBO = "intcombo";
 
 /// Type for an autocomplete combo.
 const String TYPE_AUTOCOMPLETESTRINGCOMBO = "autocompletestringcombo";
@@ -996,14 +997,14 @@ class TagsManager {
       var itemObj = comboItems[i];
       if (itemObj.containsKey(TAG_ITEM)) {
         var tagItem = itemObj[TAG_ITEM];
-        if (tagItem is String) {
-          var item = tagItem.trim();
-          itemsArray.add(ItemObject(item, item));
-        } else if (tagItem.containsKey(TAG_LABEL) &&
+        if (tagItem is Map &&
+            tagItem.containsKey(TAG_LABEL) &&
             tagItem.containsKey(TAG_VALUE)) {
           var label = tagItem[TAG_LABEL].toString().trim();
-          var value = tagItem[TAG_VALUE].toString().trim();
+          var value = tagItem[TAG_VALUE];
           itemsArray.add(ItemObject(label, value));
+        } else {
+          itemsArray.add(ItemObject(tagItem.toString(), tagItem));
         }
       } else {
         var item = " - ";
@@ -1090,7 +1091,7 @@ class TagObject {
 /// The combo item object.
 class ItemObject {
   String label;
-  String value;
+  dynamic value;
   ItemObject(this.label, this.value);
 }
 

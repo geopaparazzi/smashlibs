@@ -454,7 +454,15 @@ ListTile? getWidget(
       {
         return ListTile(
           leading: icon,
-          title: ComboboxWidget(widgetKey, itemMap, label, itemReadonly),
+          title:
+              ComboboxWidget<String>(widgetKey, itemMap, label, itemReadonly),
+        );
+      }
+    case TYPE_INTCOMBO:
+      {
+        return ListTile(
+          leading: icon,
+          title: ComboboxWidget<int>(widgetKey, itemMap, label, itemReadonly),
         );
       }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
@@ -627,7 +635,7 @@ class AutocompleteStringComboWidget extends StatelessWidget {
     if (found == null) {
       value = "";
     }
-    var items = itemsArray
+    List<dynamic> items = itemsArray
         .map(
           (itemObj) => itemObj!.value,
         )
@@ -660,11 +668,22 @@ class AutocompleteStringComboWidget extends StatelessWidget {
                   if (textEditingValue.text == '') {
                     return const Iterable<String>.empty();
                   }
-                  return items.where((String option) {
-                    return option
+                  List<String> strItems = [];
+                  for (var item in items) {
+                    if (item
+                        .toString()
                         .toLowerCase()
-                        .contains(textEditingValue.text.toLowerCase());
-                  });
+                        .contains(textEditingValue.text.toLowerCase())) {
+                      strItems.add(item);
+                    }
+                  }
+                  return strItems;
+                  // items.where((dynamic option) {
+                  //   return option
+                  //       .toString()
+                  //       .toLowerCase()
+                  //       .contains(textEditingValue.text.toLowerCase());
+                  // });
                 },
                 fieldViewBuilder: (context, textEditingController, focusNode,
                     onFieldSubmitted) {
@@ -692,7 +711,7 @@ class AutocompleteStringComboWidget extends StatelessWidget {
   }
 }
 
-class ComboboxWidget extends StatefulWidget {
+class ComboboxWidget<T> extends StatefulWidget {
   final _itemMap;
   final String _label;
   final bool _isReadOnly;
@@ -704,10 +723,11 @@ class ComboboxWidget extends StatefulWidget {
         );
 
   @override
-  ComboboxWidgetState createState() => ComboboxWidgetState();
+  ComboboxWidgetState<T> createState() => ComboboxWidgetState<T>();
 }
 
-class ComboboxWidgetState extends State<ComboboxWidget> with AfterLayoutMixin {
+class ComboboxWidgetState<T> extends State<ComboboxWidget>
+    with AfterLayoutMixin {
   String? url;
   List<dynamic>? urlComboItems;
 
@@ -727,9 +747,9 @@ class ComboboxWidgetState extends State<ComboboxWidget> with AfterLayoutMixin {
 
   @override
   Widget build(BuildContext context) {
-    String? value = ""; //$NON-NLS-1$
+    T? value; //$NON-NLS-1$
     if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = widget._itemMap[TAG_VALUE].trim();
+      value = widget._itemMap[TAG_VALUE];
     }
     String? key;
     if (widget._itemMap.containsKey(TAG_KEY)) {
@@ -768,7 +788,7 @@ class ComboboxWidgetState extends State<ComboboxWidget> with AfterLayoutMixin {
     }
     var items = itemsArray
         .map(
-          (itemObj) => new DropdownMenuItem(
+          (itemObj) => new DropdownMenuItem<T>(
             value: itemObj!.value,
             child: new Text(itemObj.label),
           ),
@@ -796,7 +816,7 @@ class ComboboxWidgetState extends State<ComboboxWidget> with AfterLayoutMixin {
             ),
             child: IgnorePointer(
               ignoring: widget._isReadOnly,
-              child: DropdownButton(
+              child: DropdownButton<T>(
                 key: key != null ? Key(key) : null,
                 value: value,
                 isExpanded: true,

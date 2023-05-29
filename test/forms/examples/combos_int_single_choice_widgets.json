@@ -1,0 +1,41 @@
+[
+  {
+    "sectionname": "int single choice combo examples",
+    "sectiondescription": "int single choice combo widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "combos",
+        "formitems": [
+          {
+            "key": "an int single choice combo",
+            "values": {
+              "items": [
+                {
+                  "item": 0
+                },
+                {
+                  "item": 1
+                },
+                {
+                  "item": 2
+                },
+                {
+                  "item": 3
+                },
+                {
+                  "item": 4
+                },
+                {
+                  "item": 5
+                }
+              ]
+            },
+            "value": 0,
+            "type": "intcombo"
+          }
+        ]
+      }
+    ]
+  }
+]
