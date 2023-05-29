@@ -746,8 +746,6 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
       var jsonString = await FormsNetworkSupporter().getJsonString(url!);
       if (jsonString != null) {
         urlComboItems = jsonDecode(jsonString);
-      } else {
-        urlComboItems = [];
       }
       setState(() {});
     }
@@ -765,25 +763,25 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
     }
 
     List<dynamic>? comboItems = TagsManager.getComboItems(widget._itemMap);
-    if (comboItems == null || comboItems.isEmpty) {
-      if (urlComboItems != null) {
-        // combo items from url have been retrived
-        // so just use that
-        comboItems = urlComboItems;
-      } else {
-        // check if it is url based
-        url = TagsManager.getComboUrl(widget._itemMap);
-        if (url != null) {
-          // we have a url, so
-          // return container and wait for afterFirstLayout to get url items
-          return Container();
-        }
-        // fallback on an empty list
-        comboItems = [];
+    if (comboItems == null) {
+      comboItems = [];
+    }
+    if (urlComboItems != null) {
+      // combo items from url have been retrived
+      // so just use those
+      comboItems.addAll(urlComboItems!);
+    } else {
+      // check if it is url based
+      url = TagsManager.getComboUrl(widget._itemMap);
+      if (url != null) {
+        // we have a url, so
+        // return container and wait for afterFirstLayout to get url items
+        return Container();
       }
     }
+
     List<ItemObject?> itemsArray =
-        TagsManager.comboItems2ObjectArray(comboItems!);
+        TagsManager.comboItems2ObjectArray(comboItems);
     ItemObject? found;
     for (ItemObject? item in itemsArray) {
       if (item != null && item.value == value) {

@@ -10,6 +10,14 @@
           {
             "key": "a single choice combo urlbased",
             "values": {
+              "items": [
+                {
+                    "item": {
+                        "label": "No data",
+                        "value": -1
+                    }
+                }
+              ],
               "url": "https://www.mydataproviderurl.com/api/v1/{id}/data.json"
             },
             "value": "",
