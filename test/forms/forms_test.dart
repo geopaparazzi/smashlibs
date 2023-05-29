@@ -186,8 +186,6 @@ void main() {
     await changeMultiCombo(
         tester, "a multiple choice combo", ['choice 3', 'choice 4']);
 
-    await tapBackIcon(tester);
-
     var sectionMap = helper.getSectionMap();
     var form = TagsManager.getForm4Name('combos', sectionMap);
     var formItems = TagsManager.getFormItems(form);
@@ -247,6 +245,61 @@ void main() {
     };
 
     expect(helper.getSectionName(), "single choice combo urlbased examples");
+    await pumpForm(helper, newValues, tester);
+
+    // check change of setData
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], '2');
+
+    // now do a change
+    // // TODO activate once figured out to trick AfterLayout to finish brfore going on
+    // await changeCombo(tester, "a single choice combo urlbased", 'Item 3');
+
+    await tapBackIcon(tester);
+
+    // sectionMap = helper.getSectionMap();
+    // form = TagsManager.getForm4Name('combos', sectionMap);
+    // formItems = TagsManager.getFormItems(form);
+    // expect(formItems[0]['value'], '3');
+  });
+
+  testWidgets('Multi Choice Combo UrlBased Widgets Test', (tester) async {
+    FormsNetworkSupporter().addUrlSubstitution('id', '12');
+    FormsNetworkSupporter().client = MockClient((request) async {
+      expect(request.url.toString(),
+          "https://www.mydataproviderurl.com/api/v1/12/data.json");
+      final jsonStr = """[
+                        {
+                            "item": {
+                                "value": "1",
+                                "label": "Item 1"
+                            }
+                        },
+                        {
+                            "item": {
+                                "value": "2",
+                                "label": "Item 2"
+                            }
+                        },
+                        {
+                            "item": {
+                                "value": "3",
+                                "label": "Item 3"
+                            }
+                        }
+                    ]""";
+      return Response(jsonStr, 200);
+    });
+
+    var helper = TestFormHelper("combos_multi_choice_urlbased_widgets.json");
+
+    var newValues = {
+      "a multi choice combo urlbased": "2",
+    };
+
+    expect(helper.getSectionName(), "multi choice combo urlbased examples");
     await pumpForm(helper, newValues, tester);
 
     // check change of setData
@@ -344,6 +397,49 @@ void main() {
     var form = TagsManager.getForm4Name('combos', sectionMap);
     var formItems = TagsManager.getFormItems(form);
     expect(formItems[0]['value'], '3');
+  });
+
+  testWidgets('Multi Label-Value Choice Combo Widgets Test', (tester) async {
+    var helper = TestFormHelper("combos_multi_choice_widgets_with_labels.json");
+
+    var newValues = {
+      "a multiple choice combo with item labels": "1",
+    };
+
+    expect(helper.getSectionName(), "multi choice label-value combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    await changeMultiCombo(tester, "a multiple choice combo with item labels",
+        ['choice 3', 'choice 4']);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], "1;3;4");
+  });
+
+  testWidgets('Integer Multi Label-Value Choice Combo Widgets Test',
+      (tester) async {
+    var helper =
+        TestFormHelper("combos_int_multi_choice_widgets_with_labels.json");
+
+    var newValues = {
+      "an int multiple choice combo with item labels": "1",
+    };
+
+    expect(
+        helper.getSectionName(), "int multi choice label-value combo examples");
+    await pumpForm(helper, newValues, tester);
+
+    await changeMultiCombo(
+        tester,
+        "an int multiple choice combo with item labels",
+        ['choice 3', 'choice 4']);
+
+    var sectionMap = helper.getSectionMap();
+    var form = TagsManager.getForm4Name('combos', sectionMap);
+    var formItems = TagsManager.getFormItems(form);
+    expect(formItems[0]['value'], "1;3;4");
   });
 
   testWidgets('Integer Single Label-Value Choice Combo Widgets Test',

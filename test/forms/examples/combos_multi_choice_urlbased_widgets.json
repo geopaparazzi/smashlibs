@@ -1,0 +1,22 @@
+[
+  {
+    "sectionname": "multi choice combo urlbased examples",
+    "sectiondescription": "multi choice combo urlbased widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "combos",
+        "formitems": [
+          {
+            "key": "a multi choice combo urlbased",
+            "values": {
+              "url": "https://www.mydataproviderurl.com/api/v1/{id}/data.json"
+            },
+            "value": "",
+            "type": "multistringcombo"
+          }
+        ]
+      }
+    ]
+  }
+]
