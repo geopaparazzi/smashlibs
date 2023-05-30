@@ -355,7 +355,13 @@ ListTile? getWidget(
           ),
           initialValue: value,
           onChanged: (text) {
-            itemMap[TAG_VALUE] = text;
+            dynamic result = text;
+            if (type == TYPE_INTEGER) {
+              result = int.tryParse(text);
+            } else if (type == TYPE_DOUBLE) {
+              result = double.tryParse(text);
+            }
+            itemMap[TAG_VALUE] = result;
           },
           enabled: !itemReadonly,
           minLines: minLines,
@@ -769,7 +775,18 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
     if (urlComboItems != null) {
       // combo items from url have been retrived
       // so just use those
-      comboItems.addAll(urlComboItems!);
+
+      if (comboItems.length < urlComboItems!.length) {
+        comboItems.addAll(urlComboItems!);
+      } else {
+        // need to check if the item map is already present and add only if not
+        for (var urlComboItem in urlComboItems!) {
+          if (!comboItems.any(
+              (item) => DeepCollectionEquality().equals(item, urlComboItem))) {
+            comboItems.add(urlComboItem);
+          }
+        }
+      }
     } else {
       // check if it is url based
       url = TagsManager.getComboUrl(widget._itemMap);

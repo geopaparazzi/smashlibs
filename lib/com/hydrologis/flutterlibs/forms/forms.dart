@@ -129,6 +129,10 @@ const String SEP = "#";
 
 /// A class to help out on the abstract web, desktop, mobiles parts.
 abstract class AFormhelper {
+  // the data used to fill the form and that
+  // need to be sent back with the changed data
+  late Map<String, dynamic> _dataUsed;
+
   Future<bool> init();
 
   bool hasForm();
@@ -179,7 +183,6 @@ abstract class AFormhelper {
   Future<void> onSaveFunction(BuildContext context);
 
   /// update the form hashmap with the data from the given [newValues].
-
   void setData(Map<String, dynamic> newValues) {
     var sectionMap = getSectionMap();
     var formNames = TagsManager.getFormNames4Section(sectionMap);
@@ -190,6 +193,21 @@ abstract class AFormhelper {
         FormUtilities.updateFromMap(formItems, newValues);
       }
     }
+    _dataUsed = newValues;
+  }
+
+  /// get the initial data map, changed by the interaction with the form.
+  Map<String, dynamic> getFormChangedData() {
+    var sectionMap = getSectionMap();
+    var formNames = TagsManager.getFormNames4Section(sectionMap);
+    for (var formName in formNames) {
+      var form = TagsManager.getForm4Name(formName, sectionMap);
+      if (form != null) {
+        var formItems = TagsManager.getFormItems(form);
+        FormUtilities.updateToMap(formItems, _dataUsed);
+      }
+    }
+    return _dataUsed;
   }
 }
 
@@ -483,7 +501,7 @@ class FormUtilities {
   }
 
   /// Updates the form item arrays with all key/value pairs that
-  /// can be found.
+  /// can be found in the [updaterMap].
   static void updateFromMap(List<Map<String, dynamic>> formItemsArray,
       Map<String, dynamic> updaterMap) {
     int length = formItemsArray.length;
@@ -496,6 +514,21 @@ class FormUtilities {
         if (newValue != null) {
           itemObject[TAG_VALUE] = newValue;
         }
+      }
+    }
+  }
+
+  /// Updates the [toUpdateMap] with all the matching key/value pairs that
+  /// can be found in the form item arrays..
+  static void updateToMap(List<Map<String, dynamic>> formItemsArray,
+      Map<String, dynamic> toUpdateMap) {
+    int length = formItemsArray.length;
+
+    for (int i = 0; i < length; i++) {
+      Map<String, dynamic> itemObject = formItemsArray[i];
+      var objKey = itemObject[TAG_KEY];
+      if (objKey != null && toUpdateMap.containsKey(objKey)) {
+        toUpdateMap[objKey] = itemObject[TAG_VALUE];
       }
     }
   }

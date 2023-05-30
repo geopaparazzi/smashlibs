@@ -33,6 +33,7 @@ import 'package:smashlibs/com/hydrologis/flutterlibs/utils/logging.dart';
 import 'package:smashlibs/generated/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wkt_parser/wkt_parser.dart' as wkt_parser;
+import 'package:collection/collection.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
