@@ -37,26 +37,26 @@ void main() {
   testWidgets('Numeric Widgets Test', (tester) async {
     var helper = TestFormHelper("numeric_widgets.json");
     var newValues = {
-      "a number": "1.6",
-      "an integer number": "1",
-      "a number used as map label": "2.3",
+      "a number": 1.6,
+      "an integer number": 1,
+      "a number used as map label": 2.3,
     };
 
     expect(helper.getSectionName(), "numeric examples");
     await pumpForm(helper, newValues, tester);
 
     // set new values and check resulting changes
-    await changeTextFormField(tester, "a number", '2.6');
-    await changeTextFormField(tester, "an integer number", '2');
+    await changeTextFormField(tester, "a number", 2.6);
+    await changeTextFormField(tester, "an integer number", 2);
 
     await tapBackIcon(tester);
 
     var sectionMap = helper.getSectionMap();
     var form = TagsManager.getForm4Name('numeric text', sectionMap);
     var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], '2.6');
-    expect(formItems[1]['value'], '2');
-    expect(formItems[2]['value'], '2.3');
+    expect(formItems[0]['value'], 2.6);
+    expect(formItems[1]['value'], 2);
+    expect(formItems[2]['value'], 2.3);
   });
 
   testWidgets('Date and Time Widgets Test', (tester) async {
@@ -590,7 +590,7 @@ Future<void> changeTextFormField(tester, previousText, newText) async {
     matching: find.byType(TextFormField),
   );
   expect(ancestor, findsOneWidget);
-  await tester.enterText(ancestor, newText);
+  await tester.enterText(ancestor, newText.toString());
   await tester.testTextInput.receiveAction(TextInputAction.done);
   await tester.pump();
 }
