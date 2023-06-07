@@ -123,6 +123,36 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'mandatory'**
   String get forms_mandatory;
+
+  /// No description provided for @mainView_loadingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading data...'**
+  String get mainView_loadingData;
+
+  /// No description provided for @tiles_tileProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'Tile Properties'**
+  String get tiles_tileProperties;
+
+  /// No description provided for @tiles_opacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Opacity'**
+  String get tiles_opacity;
+
+  /// No description provided for @tiles_loadGeoPackageAsOverlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Load geopackage tiles as overlay image as opposed to tile layer (best for gdal generated data and different projections).'**
+  String get tiles_loadGeoPackageAsOverlay;
+
+  /// No description provided for @tiles_colorToHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Color to hide'**
+  String get tiles_colorToHide;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

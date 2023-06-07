@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:after_layout/after_layout.dart';
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
@@ -34,6 +35,16 @@ import 'package:smashlibs/generated/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wkt_parser/wkt_parser.dart' as wkt_parser;
 import 'package:collection/collection.dart';
+import 'package:flutter_map/flutter_map.dart' hide Projection;
+import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
+import 'package:mapsforge_flutter/core.dart';
+import 'package:mapsforge_flutter/datastore.dart';
+import 'package:mapsforge_flutter/maps.dart' hide Projection;
+import 'package:mapsforge_flutter/src/graphics/implementation/fluttertilebitmap.dart';
+import 'package:mapsforge_flutter/src/layer/job/job.dart';
+import 'package:mapsforge_flutter/src/layer/job/jobresult.dart';
+import 'package:synchronized/synchronized.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -66,3 +77,12 @@ part 'com/hydrologis/flutterlibs/projectdb/images.dart';
 part 'com/hydrologis/flutterlibs/projectdb/logs.dart';
 part 'com/hydrologis/flutterlibs/projectdb/notes.dart';
 part 'com/hydrologis/flutterlibs/projectdb/othertables.dart';
+
+// maps
+part 'com/hydrologis/flutterlibs/maps/mapview.dart';
+part 'com/hydrologis/flutterlibs/maps/models/map_state.dart';
+part 'com/hydrologis/flutterlibs/maps/models/mapbuilder.dart';
+part 'com/hydrologis/flutterlibs/maps/layersource.dart';
+part 'com/hydrologis/flutterlibs/maps/layers/mapsforge.dart';
+part 'com/hydrologis/flutterlibs/maps/layers/tiles.dart';
+part 'com/hydrologis/flutterlibs/utils/experimentals.dart';

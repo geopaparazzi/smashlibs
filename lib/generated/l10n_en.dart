@@ -12,4 +12,19 @@ class SLLEn extends SLL {
 
   @override
   String get forms_mandatory => 'mandatory';
+
+  @override
+  String get mainView_loadingData => 'Loading data...';
+
+  @override
+  String get tiles_tileProperties => 'Tile Properties';
+
+  @override
+  String get tiles_opacity => 'Opacity';
+
+  @override
+  String get tiles_loadGeoPackageAsOverlay => 'Load geopackage tiles as overlay image as opposed to tile layer (best for gdal generated data and different projections).';
+
+  @override
+  String get tiles_colorToHide => 'Color to hide';
 }

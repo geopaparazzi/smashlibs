@@ -2,5 +2,10 @@
   "@@locale": "en",
   "formsWidgets_loadImage": "Load image",
   "formsWidgets_takePicture": "Take a picture",
-  "forms_mandatory": "mandatory"
+  "forms_mandatory": "mandatory",
+  "mainView_loadingData": "Loading data...",
+  "tiles_tileProperties": "Tile Properties",
+  "tiles_opacity": "Opacity",
+  "tiles_loadGeoPackageAsOverlay": "Load geopackage tiles as overlay image as opposed to tile layer (best for gdal generated data and different projections).",
+  "tiles_colorToHide": "Color to hide"
 }
