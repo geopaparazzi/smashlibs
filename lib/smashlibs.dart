@@ -83,6 +83,8 @@ part 'com/hydrologis/flutterlibs/maps/mapview.dart';
 part 'com/hydrologis/flutterlibs/maps/models/map_state.dart';
 part 'com/hydrologis/flutterlibs/maps/models/mapbuilder.dart';
 part 'com/hydrologis/flutterlibs/maps/layersource.dart';
+part 'com/hydrologis/flutterlibs/maps/layermanager.dart';
+part 'com/hydrologis/flutterlibs/maps/layer.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/mapsforge.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/tiles.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';

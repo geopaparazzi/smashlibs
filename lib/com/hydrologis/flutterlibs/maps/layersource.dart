@@ -149,6 +149,10 @@ abstract class LayerSource {
     }
   }
 
+  /// The method that, using the current flutter map context,
+  /// creates the map layers list from this datasource.
+  Future<List<Widget>?> toLayers(BuildContext context);
+
   bool operator ==(dynamic other) {
     if (other is LayerSource) {
       if (getUrl() != null &&

@@ -14,7 +14,7 @@ class SmashMapWidget extends StatelessWidget {
   bool _canRotate = false;
 
   MapController _mapController = MapController();
-  List<Widget> layers = [];
+  // List<Widget> layers = [];
   List<Widget> nonRotationLayers = [];
   void Function(LatLng, double) _handleTap = (ll, z) {};
   void Function(LatLng, double) _handleLongTap = (ll, z) {};
@@ -38,6 +38,16 @@ class SmashMapWidget extends StatelessWidget {
       Function(LatLng, double)? handleLongTap}) {
     if (handleTap != null) _handleTap = handleTap;
     if (handleLongTap != null) _handleLongTap = handleLongTap;
+  }
+
+  void addLayer(LayerSource layer) {
+    LayerManager().addLayerSource(layer);
+    // layers.add(SmashMapLayer(layer));
+  }
+
+  void removeLayer(LayerSource layer) {
+    LayerManager().removeLayerSource(layer);
+    // layers.add(SmashMapLayer(layer));
   }
 
   void triggerRebuild(BuildContext context) {
@@ -84,7 +94,7 @@ class SmashMapWidget extends StatelessWidget {
                 _handleLongTap(point, _mapController.zoom),
             interactiveFlags: mapFlags,
           ),
-          children: layers,
+          children: LayerManager().getActiveLayers(),
           nonRotatedChildren: [],
           mapController: _mapController,
         ),
