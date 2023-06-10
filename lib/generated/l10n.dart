@@ -153,6 +153,18 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Color to hide'**
   String get tiles_colorToHide;
+
+  /// No description provided for @wms_wmsProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'WMS Properties'**
+  String get wms_wmsProperties;
+
+  /// No description provided for @wms_opacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Opacity'**
+  String get wms_opacity;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

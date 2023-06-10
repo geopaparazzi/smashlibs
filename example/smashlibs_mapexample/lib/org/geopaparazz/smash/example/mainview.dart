@@ -54,6 +54,18 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             child: SmashUI.normalText("OSM"),
           ),
           TextButton(
+            onPressed: () {
+              mapView!.removeLayer(_currentLayerSource);
+              var url = "http://geoservices.retecivica.bz.it/geoserver/ows";
+              _currentLayerSource = WmsSource(
+                  url, "gvcc-Orthoimagery:Aerial-2020-RGB",
+                  imageFormat: "image/png");
+              mapView!.addLayer(_currentLayerSource);
+              mapView!.triggerRebuild(context);
+            },
+            child: SmashUI.normalText("WMS"),
+          ),
+          TextButton(
             onPressed: () async {
               var mapsFolder = await Workspace.getMapsFolder();
 

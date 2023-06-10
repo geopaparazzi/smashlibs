@@ -27,4 +27,10 @@ class SLLJa extends SLL {
 
   @override
   String get tiles_colorToHide => 'Color to hide';
+
+  @override
+  String get wms_wmsProperties => 'WMS Properties';
+
+  @override
+  String get wms_opacity => 'Opacity';
 }

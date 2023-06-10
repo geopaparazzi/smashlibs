@@ -40,8 +40,6 @@ const LAYERSTYPE_FORMAT_TIFF = "image/tiff";
 
 /// A generic persistable layer source.
 abstract class LayerSource {
-  Future<void> open();
-
   /// Get the optional absolute file path, if file based.
   String? getAbsolutePath();
 

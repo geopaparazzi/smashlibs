@@ -7,5 +7,7 @@
   "tiles_tileProperties": "Tile Properties",
   "tiles_opacity": "Opacity",
   "tiles_loadGeoPackageAsOverlay": "Load geopackage tiles as overlay image as opposed to tile layer (best for gdal generated data and different projections).",
-  "tiles_colorToHide": "Color to hide"
+  "tiles_colorToHide": "Color to hide",
+  "wms_wmsProperties": "WMS Properties",
+  "wms_opacity": "Opacity"
 }
