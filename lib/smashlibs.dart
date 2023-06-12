@@ -47,6 +47,8 @@ import 'package:mapsforge_flutter/src/graphics/implementation/fluttertilebitmap.
 import 'package:mapsforge_flutter/src/layer/job/job.dart';
 import 'package:mapsforge_flutter/src/layer/job/jobresult.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:gpx/gpx.dart';
+import 'package:rainbow_color/rainbow_color.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -70,6 +72,7 @@ part 'com/hydrologis/flutterlibs/utils/device.dart';
 part 'com/hydrologis/flutterlibs/utils/permissions.dart';
 part 'com/hydrologis/flutterlibs/utils/preferences.dart';
 part 'com/hydrologis/flutterlibs/utils/projection.dart';
+part 'com/hydrologis/flutterlibs/utils/elevcolor.dart';
 part 'com/hydrologis/flutterlibs/utils/screen.dart';
 part 'com/hydrologis/flutterlibs/utils/notifier.dart';
 part 'com/hydrologis/flutterlibs/utils/share.dart';
@@ -90,4 +93,5 @@ part 'com/hydrologis/flutterlibs/maps/layer.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/mapsforge.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/tiles.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/wms.dart';
+part 'com/hydrologis/flutterlibs/maps/layers/gpx.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';
