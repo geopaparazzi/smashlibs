@@ -56,9 +56,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           TextButton(
             onPressed: () {
               mapView!.removeLayer(_currentLayerSource);
-              var url = "http://geoservices.retecivica.bz.it/geoserver/ows";
+              var url = "https://geoservices.buergernetz.bz.it/mapproxy/wms";
               _currentLayerSource = WmsSource(
-                  url, "gvcc-Orthoimagery:Aerial-2020-RGB",
+                  url, "p_bz-Orthoimagery:Aerial-2020-RGB",
                   imageFormat: "image/png");
               mapView!.addLayer(_currentLayerSource);
               mapView!.triggerRebuild(context);
