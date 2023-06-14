@@ -165,6 +165,54 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Opacity'**
   String get wms_opacity;
+
+  /// No description provided for @gpx_gpxProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'GPX Properties'**
+  String get gpx_gpxProperties;
+
+  /// No description provided for @gpx_wayPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Waypoints'**
+  String get gpx_wayPoints;
+
+  /// No description provided for @gpx_color.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get gpx_color;
+
+  /// No description provided for @gpx_size.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get gpx_size;
+
+  /// No description provided for @gpx_viewLabelsIfAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'View labels if available'**
+  String get gpx_viewLabelsIfAvailable;
+
+  /// No description provided for @gpx_tracksRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks/Routes'**
+  String get gpx_tracksRoutes;
+
+  /// No description provided for @gpx_width.
+  ///
+  /// In en, this message translates to:
+  /// **'Width'**
+  String get gpx_width;
+
+  /// No description provided for @gpx_palette.
+  ///
+  /// In en, this message translates to:
+  /// **'Palette'**
+  String get gpx_palette;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

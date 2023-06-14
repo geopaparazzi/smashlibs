@@ -181,10 +181,10 @@ packages:
     dependency: "direct main"
     description:
       name: dio
-      sha256: b99b1d56dc0d5dece70957023af002dbd49614b4a1bf86d3a254af3fe781bdf2
+      sha256: dfda195cbf351d538054297bbd509d8046d336194ea218655f2c326c65711d1e
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.0+1"
+    version: "5.2.1"
   ecache:
     dependency: transitive
     description:
@@ -932,10 +932,10 @@ packages:
     dependency: transitive
     description:
       name: sembast
-      sha256: "3875487075df740e3ed0817571c950f015e5f730ff84fa0351849bf002fb4e1b"
+      sha256: "84ee4fc05804f88f3f29326cb50b7de23e760d98fd42baabc6af702dff8e6bb9"
       url: "https://pub.dev"
     source: hosted
-    version: "3.4.6+1"
+    version: "3.4.7"
   share_extend:
     dependency: "direct main"
     description:

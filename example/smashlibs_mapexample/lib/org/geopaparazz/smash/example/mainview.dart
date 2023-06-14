@@ -69,6 +69,29 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var mapsFolder = await Workspace.getMapsFolder();
 
+              var gpxPath =
+                  p.join(mapsFolder.path, "ciclabile_peschiera_mantova.gpx");
+              if (!File(gpxPath).existsSync()) {
+                ByteData data = await rootBundle
+                    .load("assets/ciclabile_peschiera_mantova.gpx");
+                List<int> bytes = data.buffer
+                    .asUint8List(data.offsetInBytes, data.lengthInBytes);
+                await File(gpxPath).writeAsBytes(bytes);
+              }
+
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = GpxSource(gpxPath);
+              mapView!.addLayer(_currentLayerSource);
+              if (context.mounted) {
+                mapView!.triggerRebuild(context);
+              }
+            },
+            child: SmashUI.normalText("GPX"),
+          ),
+          TextButton(
+            onPressed: () async {
+              var mapsFolder = await Workspace.getMapsFolder();
+
               var dbPath = p.join(mapsFolder.path, "assisi.map");
               if (!File(dbPath).existsSync()) {
                 ByteData data = await rootBundle.load("assets/assisi.map");

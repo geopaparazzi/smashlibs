@@ -38,6 +38,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_map/flutter_map.dart' hide Projection;
 import 'package:flutter_map/flutter_map.dart' as FM;
 import 'package:flutter_map/src/core/bounds.dart';
+import 'package:flutter_map/src/map/flutter_map_state.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:mapsforge_flutter/core.dart';
@@ -47,8 +48,9 @@ import 'package:mapsforge_flutter/src/graphics/implementation/fluttertilebitmap.
 import 'package:mapsforge_flutter/src/layer/job/job.dart';
 import 'package:mapsforge_flutter/src/layer/job/jobresult.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:gpx/gpx.dart';
+import 'package:gpx/gpx.dart' hide Bounds;
 import 'package:rainbow_color/rainbow_color.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -94,4 +96,5 @@ part 'com/hydrologis/flutterlibs/maps/layers/mapsforge.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/tiles.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/wms.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/gpx.dart';
+part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';

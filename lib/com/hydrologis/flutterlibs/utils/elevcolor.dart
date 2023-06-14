@@ -153,14 +153,14 @@ class EnhancedColorUtility {
       List<Polyline> back = [];
       List<Polyline> front = [];
       loopLine(linePoints, interval, (startI, endI, points) {
-        ElevationPoint p1 = linePoints[startI] as ElevationPoint;
-        ElevationPoint p2 = linePoints[endI] as ElevationPoint;
-        List<Color> grad = [rb[p1.altitude], rb[p2.altitude]];
+        LatLngExt p1 = linePoints[startI] as LatLngExt;
+        LatLngExt p2 = linePoints[endI] as LatLngExt;
+        List<Color> grad = [rb[p1.altim], rb[p2.altim]];
         back.add(Polyline(
           points: points,
           strokeWidth: strokeWidth + 2,
           color: Colors.black,
-          isDotted: p1.altitude > p2.altitude,
+          isDotted: p1.altim > p2.altim,
         ));
         front.add(Polyline(
           points: points,
@@ -178,15 +178,15 @@ class EnhancedColorUtility {
       List<Polyline> front = [];
       double prevSlope = 0.0;
       loopLine(linePoints, interval, (startI, endI, points) {
-        ElevationPoint p1 = linePoints[startI] as ElevationPoint;
-        ElevationPoint p2 = linePoints[endI] as ElevationPoint;
-        var distance = CoordinateUtilities.getDistance(
-            Coordinate(p1.longitude, p1.latitude),
-            Coordinate(p2.longitude, p2.latitude));
+        LatLngExt p1 = linePoints[startI] as LatLngExt;
+        LatLngExt p2 = linePoints[endI] as LatLngExt;
+        var distance = JTS.Geodesy().distanceBetweenTwoGeoPoints(
+            JTS.Coordinate(p1.longitude, p1.latitude),
+            JTS.Coordinate(p2.longitude, p2.latitude));
         if (distance == 0.0) {
           distance = 0.1;
         }
-        double slope = ((p2.altitude - p1.altitude) / distance).abs();
+        double slope = ((p2.altim - p1.altim) / distance).abs();
 
         List<Color> grad = [rb[prevSlope], rb[slope]];
         prevSlope = slope;
@@ -195,7 +195,7 @@ class EnhancedColorUtility {
           points: points,
           strokeWidth: strokeWidth + 2,
           color: Colors.black,
-          isDotted: p1.altitude > p2.altitude,
+          isDotted: p1.altim > p2.altim,
         ));
         front.add(Polyline(
           points: points,
@@ -227,7 +227,7 @@ class EnhancedColorUtility {
           points: points,
           strokeWidth: strokeWidth + 2,
           color: Colors.black,
-          isDotted: p1.altitude > p2.altitude,
+          isDotted: p1.altim > p2.altim,
         ));
         front.add(Polyline(
           points: points,
@@ -253,7 +253,7 @@ class EnhancedColorUtility {
           points: points,
           strokeWidth: strokeWidth + 2,
           color: Colors.black,
-          isDotted: p1.altitude > p2.altitude,
+          isDotted: p1.altim > p2.altim,
         ));
         front.add(Polyline(
           points: points,
@@ -293,8 +293,8 @@ class EnhancedColorUtility {
       List<Color> grad = [];
       for (var i = 0; i < linePoints.length; i++) {
         if (interval == 1 || i % interval == 0) {
-          ElevationPoint p = linePoints[i] as ElevationPoint;
-          grad.add(rb[p.altitude]);
+          LatLngExt p = linePoints[i] as LatLngExt;
+          grad.add(rb[p.altim]);
         }
       }
       grad.add(grad.last);
@@ -313,15 +313,15 @@ class EnhancedColorUtility {
       List<double> colorStops = getLineCoordinateStops(linePoints);
       List<Color> grad = [rb[0.0]];
       for (var i = 1; i < linePoints.length; i++) {
-        ElevationPoint p1 = linePoints[i - 1] as ElevationPoint;
-        ElevationPoint p2 = linePoints[i] as ElevationPoint;
-        var distance = CoordinateUtilities.getDistance(
-            Coordinate(p1.longitude, p1.latitude),
-            Coordinate(p2.longitude, p2.latitude));
+        LatLngExt p1 = linePoints[i - 1] as LatLngExt;
+        LatLngExt p2 = linePoints[i] as LatLngExt;
+        var distance = JTS.Geodesy().distanceBetweenTwoGeoPoints(
+            JTS.Coordinate(p1.longitude, p1.latitude),
+            JTS.Coordinate(p2.longitude, p2.latitude));
         if (distance == 0.0) {
           distance = 0.1;
         }
-        double slope = (p2.altitude - p1.altitude) / distance;
+        double slope = (p2.altim - p1.altim) / distance;
         grad.add(rb[slope.abs()]);
       }
       lines.add(Polyline(
@@ -409,12 +409,12 @@ class EnhancedColorUtility {
   /// @param geodeticCalculator If supplied it will be used for planar distance calculation.
   /// @return the distance considering also elevation.
   static double distance3d(LatLngExt c1, LatLngExt c2) {
-    double deltaElev = (c1.altitude - c2.altitude).abs();
-    var dist = CoordinateUtilities.getDistance(
-        Coordinate(c1.longitude, c1.latitude),
-        Coordinate(c2.longitude, c2.latitude));
+    double deltaElev = (c1.altim - c2.altim).abs();
+    var dist = JTS.Geodesy().distanceBetweenTwoGeoPoints(
+        JTS.Coordinate(c1.longitude, c1.latitude),
+        JTS.Coordinate(c2.longitude, c2.latitude));
 
-    double distance = pythagoras(dist, deltaElev);
+    double distance = pythagoras(dist.toDouble(), deltaElev);
     return distance;
   }
 

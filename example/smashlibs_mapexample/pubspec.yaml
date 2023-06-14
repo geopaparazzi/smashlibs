@@ -77,6 +77,7 @@ flutter:
     # - assets/smash_logo_64.png
     # - assets/smash_text.png
     - assets/assisi.map
+    - assets/ciclabile_peschiera_mantova.gpx
     - assets/defaultrender.xml
     - packages/mapsforge_flutter/assets/patterns/coniferous.svg
     - packages/mapsforge_flutter/assets/patterns/coniferous_and_deciduous.svg

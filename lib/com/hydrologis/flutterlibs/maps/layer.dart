@@ -21,6 +21,10 @@ class _SmashMapLayerState extends State<SmashMapLayer> with AfterLayoutMixin {
     if (_layersList != null) {
       if (_layersList!.length == 1) {
         return _layersList![0];
+      } else {
+        return Stack(
+          children: _layersList!,
+        );
       }
     }
     return Container();

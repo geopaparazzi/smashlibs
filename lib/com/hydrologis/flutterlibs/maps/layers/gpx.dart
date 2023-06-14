@@ -20,7 +20,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   LatLngBounds? _gpxBounds = null;
 
   late String sldString;
-  late SldObjectParser _style;
+  late HU.SldObjectParser _style;
   double minLineElev = double.infinity;
   double maxLineElev = double.negativeInfinity;
   ColorTables _colorTable = ColorTables.none;
@@ -39,30 +39,30 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
 
   Future<void> load(BuildContext context) async {
     if (!isLoaded) {
-      var parentFolder = FileUtilities.parentFolderFromFile(_absolutePath!);
+      var parentFolder = HU.FileUtilities.parentFolderFromFile(_absolutePath!);
 
-      var fileName = FileUtilities.nameFromFile(_absolutePath!, false);
+      var fileName = HU.FileUtilities.nameFromFile(_absolutePath!, false);
       _name ??= fileName;
 
-      sldPath = FileUtilities.joinPaths(parentFolder, fileName + ".sld");
+      sldPath = HU.FileUtilities.joinPaths(parentFolder, fileName + ".sld");
       var sldFile = File(sldPath);
 
       if (sldFile.existsSync()) {
-        sldString = FileUtilities.readFile(sldPath);
-        _style = SldObjectParser.fromString(sldString);
+        sldString = HU.FileUtilities.readFile(sldPath);
+        _style = HU.SldObjectParser.fromString(sldString);
         _style.parse();
       } else {
         // create style for points, lines and text
-        sldString = DefaultSlds.simplePointSld();
-        _style = SldObjectParser.fromString(sldString);
+        sldString = HU.DefaultSlds.simplePointSld();
+        _style = HU.SldObjectParser.fromString(sldString);
         _style.parse();
-        _style.featureTypeStyles.first.rules.first.addLineStyle(LineStyle());
-        _style.featureTypeStyles.first.rules.first.addTextStyle(TextStyle());
+        _style.featureTypeStyles.first.rules.first.addLineStyle(HU.LineStyle());
+        _style.featureTypeStyles.first.rules.first.addTextStyle(HU.TextStyle());
         sldString = _style.toSldString();
-        FileUtilities.writeStringToFile(sldPath, sldString);
+        HU.FileUtilities.writeStringToFile(sldPath, sldString);
       }
 
-      var xml = FileUtilities.readFile(_absolutePath!);
+      var xml = HU.FileUtilities.readFile(_absolutePath!);
       // try {
       _gpx = GpxReader().fromString(xml);
       // } catch(e, s) {
@@ -97,26 +97,32 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
       }
 
       double lengthMeters = 0;
-      Coordinate? prevLatLng;
+      JTS.Coordinate? prevLatLng;
       _gpx!.trks.forEach((trk) {
         trk.trksegs.forEach((trkSeg) {
           List<LatLng> points = trkSeg.trkpts.map((wpt) {
-            Coordinate coord;
+            JTS.Coordinate coord;
             if (wpt.ele == null) {
-              coord = Coordinate.fromYX(wpt.lat!, wpt.lon!);
+              coord = JTS.Coordinate.fromYX(wpt.lat!, wpt.lon!);
             } else {
-              coord = Coordinate.fromXYZ(wpt.lon!, wpt.lat!, wpt.ele!);
+              coord = JTS.Coordinate.fromXYZ(wpt.lon!, wpt.lat!, wpt.ele!);
               minLineElev = min(minLineElev, wpt.ele!);
               maxLineElev = max(maxLineElev, wpt.ele!);
             }
             if (prevLatLng != null) {
               var distance =
-                  CoordinateUtilities.getDistance(prevLatLng!, coord);
+                  JTS.Geodesy().distanceBetweenTwoGeoPoints(prevLatLng!, coord);
               lengthMeters += distance;
             }
             prevLatLng = coord;
-            var latLng = LatLng(coord.y, coord.x);
-            _gpxBounds!.extend(latLng);
+            var latLng = coord.z == JTS.Coordinate.NULL_ORDINATE
+                ? LatLng(coord.y, coord.x)
+                : LatLngExt.fromCoordinate(coord);
+            if (_gpxBounds == null) {
+              _gpxBounds = LatLngBounds.fromPoints([latLng]);
+            } else {
+              _gpxBounds!.extend(latLng);
+            }
             return latLng;
           }).toList();
           _tracksRoutes.add(points);
@@ -126,7 +132,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
         String info = "${_gpx!.trks.length}";
         if (_gpx!.trks.length == 1) {
           // for single track we also give the length in meters
-          info = StringUtilities.formatMeters(lengthMeters);
+          info = HU.StringUtilities.formatMeters(lengthMeters);
         }
         _attribution = _attribution + "Trks( $info ) ";
       }
@@ -135,21 +141,29 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
       prevLatLng = null;
       _gpx!.rtes.forEach((rt) {
         List<LatLng> points = rt.rtepts.map((wpt) {
-          Coordinate? coord;
+          JTS.Coordinate? coord;
           if (wpt.ele == null) {
-            coord = Coordinate.fromYX(wpt.lat!, wpt.lon!);
+            coord = JTS.Coordinate.fromYX(wpt.lat!, wpt.lon!);
           } else {
-            coord = Coordinate.fromXYZ(wpt.lon!, wpt.lat!, wpt.ele!);
+            coord = JTS.Coordinate.fromXYZ(wpt.lon!, wpt.lat!, wpt.ele!);
             minLineElev = min(minLineElev, wpt.ele!);
             maxLineElev = max(maxLineElev, wpt.ele!);
           }
           if (prevLatLng != null) {
-            var distance = CoordinateUtilities.getDistance(prevLatLng!, coord);
+            var distance =
+                JTS.Geodesy().distanceBetweenTwoGeoPoints(prevLatLng!, coord);
             lengthMeters += distance;
           }
           prevLatLng = coord;
-          var latLng = LatLng(coord.y, coord.x);
-          _gpxBounds!.extend(latLng);
+          var latLng = coord.z == JTS.Coordinate.NULL_ORDINATE
+              ? LatLng(coord.y, coord.x)
+              : LatLngExt.fromCoordinate(coord);
+
+          if (_gpxBounds == null) {
+            _gpxBounds = LatLngBounds.fromPoints([latLng]);
+          } else {
+            _gpxBounds!.extend(latLng);
+          }
           return latLng;
         }).toList();
         _tracksRoutes.add(points);
@@ -158,7 +172,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
         String info = "${_gpx!.rtes.length}";
         if (_gpx!.rtes.length == 1) {
           // for single track we also give the length in meters
-          info = StringUtilities.formatMeters(lengthMeters);
+          info = HU.StringUtilities.formatMeters(lengthMeters);
         }
         _attribution = _attribution + "Rtes( $info ) ";
       }
@@ -213,9 +227,9 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
     load(context);
     var map = FlutterMapState.maybeOf(context)!;
 
-    LineStyle? lineStyle;
-    PointStyle? pointStyle;
-    TextStyle? textStyle;
+    HU.LineStyle? lineStyle;
+    HU.PointStyle? pointStyle;
+    HU.TextStyle? textStyle;
     if (_style.featureTypeStyles.isNotEmpty) {
       var fts = _style.featureTypeStyles.first;
       if (fts.rules.isNotEmpty) {
@@ -232,9 +246,9 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
         }
       }
     }
-    lineStyle ??= LineStyle();
-    pointStyle ??= PointStyle();
-    textStyle ??= TextStyle();
+    lineStyle ??= HU.LineStyle();
+    pointStyle ??= HU.PointStyle();
+    textStyle ??= HU.TextStyle();
 
     List<Widget> layers = [];
 
@@ -244,7 +258,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
       if (_colorTable.isValid() &&
           _tracksRoutes.isNotEmpty &&
           _tracksRoutes[0].isNotEmpty &&
-          _tracksRoutes[0][0] is ElevationPoint) {
+          _tracksRoutes[0][0] is LatLngExt) {
         _tracksRoutes.forEach((linePoints) {
           lines = EnhancedColorUtility.buildPolylines(lines, linePoints,
               _colorTable, lineStyle!.strokeWidth, minLineElev, maxLineElev);
@@ -371,9 +385,9 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   @override
   void updateStyle(String newSldString) {
     sldString = newSldString;
-    _style = SldObjectParser.fromString(sldString);
+    _style = HU.SldObjectParser.fromString(sldString);
     _style.parse();
-    FileUtilities.writeStringToFile(sldPath, sldString);
+    HU.FileUtilities.writeStringToFile(sldPath, sldString);
   }
 }
 
@@ -395,9 +409,9 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
   double _minSize = SmashUI.MIN_MARKER_SIZE;
   double _maxWidth = SmashUI.MAX_STROKE_SIZE;
   double _minWidth = SmashUI.MIN_STROKE_SIZE;
-  LineStyle? lineStyle;
-  PointStyle? pointStyle;
-  TextStyle? textStyle;
+  HU.LineStyle? lineStyle;
+  HU.PointStyle? pointStyle;
+  HU.TextStyle? textStyle;
 
   GpxPropertiesWidgetState(this._source);
 
@@ -419,9 +433,9 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
         }
       }
     }
-    lineStyle ??= LineStyle();
-    pointStyle ??= PointStyle();
-    textStyle ??= TextStyle();
+    lineStyle ??= HU.LineStyle();
+    pointStyle ??= HU.PointStyle();
+    textStyle ??= HU.TextStyle();
 
     double _pointSizeSliderValue = pointStyle!.markerSize;
     if (_pointSizeSliderValue > _maxSize) {
@@ -443,7 +457,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
 
     return WillPopScope(
         onWillPop: () async {
-          var sldString = SldObjectBuilder.buildFromFeatureTypeStyles(
+          var sldString = HU.SldObjectBuilder.buildFromFeatureTypeStyles(
               _source._style.featureTypeStyles);
 
           _source.updateStyle(sldString);
@@ -451,7 +465,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(SL.of(context).gpx_gpxProperties), //"Gpx Properties"
+            title: Text(SLL.of(context).gpx_gpxProperties), //"Gpx Properties"
           ),
           body: Center(
             child: ListView(
@@ -470,7 +484,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                                 Padding(
                                   padding: SmashUI.defaultPadding(),
                                   child: SmashUI.normalText(
-                                    SL.of(context).gpx_wayPoints, //"WAYPOINTS"
+                                    SLL.of(context).gpx_wayPoints, //"WAYPOINTS"
                                     bold: true,
                                   ),
                                 ),
@@ -481,7 +495,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                                       padding:
                                           const EdgeInsets.only(right: 8.0),
                                       child: SmashUI.normalText(
-                                          SL.of(context).gpx_color), //"Color"
+                                          SLL.of(context).gpx_color), //"Color"
                                     ),
                                     Flexible(
                                         flex: 1,
@@ -504,7 +518,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                                       padding:
                                           const EdgeInsets.only(right: 8.0),
                                       child: SmashUI.normalText(
-                                          SL.of(context).gpx_size), //"Size"
+                                          SLL.of(context).gpx_size), //"Size"
                                     ),
                                     Flexible(
                                         flex: 1,
@@ -531,7 +545,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                                   ],
                                 ),
                                 CheckboxListTile(
-                                    title: SmashUI.normalText(SL
+                                    title: SmashUI.normalText(SLL
                                         .of(context)
                                         .gpx_viewLabelsIfAvailable), //"View labels if available?"
                                     value: textStyle!.size > 0,
@@ -559,7 +573,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                                 Padding(
                                   padding: SmashUI.defaultPadding(),
                                   child: SmashUI.normalText(
-                                    SL
+                                    SLL
                                         .of(context)
                                         .gpx_tracksRoutes, //"TRACKS/ROUTES"
                                     bold: true,
@@ -572,7 +586,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                                       padding:
                                           const EdgeInsets.only(right: 8.0),
                                       child: SmashUI.normalText(
-                                          SL.of(context).gpx_color), //"Color"
+                                          SLL.of(context).gpx_color), //"Color"
                                     ),
                                     Flexible(
                                         flex: 1,
@@ -595,7 +609,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                                       padding:
                                           const EdgeInsets.only(right: 8.0),
                                       child: SmashUI.normalText(
-                                          SL.of(context).gpx_width), //"Width"
+                                          SLL.of(context).gpx_width), //"Width"
                                     ),
                                     Flexible(
                                         flex: 1,
@@ -627,7 +641,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                                     Padding(
                                       padding:
                                           const EdgeInsets.only(right: 8.0),
-                                      child: SmashUI.normalText(SL
+                                      child: SmashUI.normalText(SLL
                                           .of(context)
                                           .gpx_palette), //"Palette"
                                     ),
