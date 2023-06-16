@@ -45,43 +45,50 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
         title: Text(widget.title),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = TileSource.Open_Street_Map_Standard();
               mapView!.addLayer(_currentLayerSource);
-              mapView!.triggerRebuild(context);
+              var bounds = await _currentLayerSource.getBounds();
+              if (bounds != null) {
+                mapView!.zoomToBounds(bounds);
+              }
+              if (context.mounted) {
+                mapView!.triggerRebuild(context);
+              }
             },
             child: SmashUI.normalText("OSM"),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               mapView!.removeLayer(_currentLayerSource);
               var url = "https://geoservices.buergernetz.bz.it/mapproxy/wms";
               _currentLayerSource = WmsSource(
                   url, "p_bz-Orthoimagery:Aerial-2020-RGB",
                   imageFormat: "image/png");
               mapView!.addLayer(_currentLayerSource);
-              mapView!.triggerRebuild(context);
+              var bounds = await _currentLayerSource.getBounds();
+              if (bounds != null) {
+                mapView!.zoomToBounds(bounds);
+              }
+              if (context.mounted) {
+                mapView!.triggerRebuild(context);
+              }
             },
             child: SmashUI.normalText("WMS"),
           ),
           TextButton(
             onPressed: () async {
-              var mapsFolder = await Workspace.getMapsFolder();
-
               var gpxPath =
-                  p.join(mapsFolder.path, "ciclabile_peschiera_mantova.gpx");
-              if (!File(gpxPath).existsSync()) {
-                ByteData data = await rootBundle
-                    .load("assets/ciclabile_peschiera_mantova.gpx");
-                List<int> bytes = data.buffer
-                    .asUint8List(data.offsetInBytes, data.lengthInBytes);
-                await File(gpxPath).writeAsBytes(bytes);
-              }
+                  await copyToMapFolder("ciclabile_peschiera_mantova.gpx");
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = GpxSource(gpxPath);
               mapView!.addLayer(_currentLayerSource);
+              var bounds = await _currentLayerSource.getBounds();
+              if (bounds != null) {
+                mapView!.zoomToBounds(bounds);
+              }
               if (context.mounted) {
                 mapView!.triggerRebuild(context);
               }
@@ -90,19 +97,32 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           ),
           TextButton(
             onPressed: () async {
-              var mapsFolder = await Workspace.getMapsFolder();
+              var imgPath = await copyToMapFolder("testtiff.tif");
 
-              var dbPath = p.join(mapsFolder.path, "assisi.map");
-              if (!File(dbPath).existsSync()) {
-                ByteData data = await rootBundle.load("assets/assisi.map");
-                List<int> bytes = data.buffer
-                    .asUint8List(data.offsetInBytes, data.lengthInBytes);
-                await File(dbPath).writeAsBytes(bytes);
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = GeoImageSource(imgPath);
+              mapView!.addLayer(_currentLayerSource);
+              var bounds = await _currentLayerSource.getBounds();
+              if (bounds != null) {
+                mapView!.zoomToBounds(bounds);
               }
+              if (context.mounted) {
+                mapView!.triggerRebuild(context);
+              }
+            },
+            child: SmashUI.normalText("IMG"),
+          ),
+          TextButton(
+            onPressed: () async {
+              var dbPath = await copyToMapFolder("assisi.map");
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = TileSource.Mapsforge(dbPath);
               mapView!.addLayer(_currentLayerSource);
+              var bounds = await _currentLayerSource.getBounds();
+              if (bounds != null) {
+                mapView!.zoomToBounds(bounds);
+              }
               if (context.mounted) {
                 mapView!.triggerRebuild(context);
               }
@@ -119,5 +139,19 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
       //   child: const Icon(Icons.add),
       // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<String> copyToMapFolder(String assetName) async {
+    var mapsFolder = await Workspace.getMapsFolder();
+    var newMapPath = p.join(mapsFolder.path, assetName);
+
+    if (!File(newMapPath).existsSync()) {
+      ByteData data = await rootBundle.load("assets/$assetName");
+      List<int> bytes =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      await File(newMapPath).writeAsBytes(bytes);
+    }
+
+    return newMapPath;
   }
 }

@@ -37,7 +37,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
 
   GpxSource(this._absolutePath);
 
-  Future<void> load(BuildContext context) async {
+  Future<void> load(BuildContext? context) async {
     if (!isLoaded) {
       var parentFolder = HU.FileUtilities.parentFolderFromFile(_absolutePath!);
 
@@ -342,6 +342,8 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
 
   @override
   Future<LatLngBounds?> getBounds() async {
+    await load(null);
+    print(_gpxBounds?.center);
     return _gpxBounds;
   }
 

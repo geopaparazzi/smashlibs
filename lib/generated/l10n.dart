@@ -213,6 +213,24 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Palette'**
   String get gpx_palette;
+
+  /// No description provided for @geoImage_opacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Opacity'**
+  String get geoImage_opacity;
+
+  /// No description provided for @geoImage_tiffProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiff Properties'**
+  String get geoImage_tiffProperties;
+
+  /// No description provided for @geoImage_colorToHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Color to hide'**
+  String get geoImage_colorToHide;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

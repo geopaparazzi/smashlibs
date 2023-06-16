@@ -54,6 +54,10 @@ class SmashMapWidget extends StatelessWidget {
     Provider.of<SmashMapBuilder>(context, listen: false).reBuild();
   }
 
+  void zoomToBounds(LatLngBounds bounds) {
+    _mapController.fitBounds(bounds);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<SmashMapBuilder>(builder: (context, mapBuilder, child) {

@@ -180,9 +180,8 @@ class EnhancedColorUtility {
       loopLine(linePoints, interval, (startI, endI, points) {
         LatLngExt p1 = linePoints[startI] as LatLngExt;
         LatLngExt p2 = linePoints[endI] as LatLngExt;
-        var distance = JTS.Geodesy().distanceBetweenTwoGeoPoints(
-            JTS.Coordinate(p1.longitude, p1.latitude),
-            JTS.Coordinate(p2.longitude, p2.latitude));
+        var distance = JTS.Geodesy()
+            .distanceBetweenTwoGeoPoints(p1.toCoordinate(), p2.toCoordinate());
         if (distance == 0.0) {
           distance = 0.1;
         }
@@ -315,9 +314,8 @@ class EnhancedColorUtility {
       for (var i = 1; i < linePoints.length; i++) {
         LatLngExt p1 = linePoints[i - 1] as LatLngExt;
         LatLngExt p2 = linePoints[i] as LatLngExt;
-        var distance = JTS.Geodesy().distanceBetweenTwoGeoPoints(
-            JTS.Coordinate(p1.longitude, p1.latitude),
-            JTS.Coordinate(p2.longitude, p2.latitude));
+        var distance = JTS.Geodesy()
+            .distanceBetweenTwoGeoPoints(p1.toCoordinate(), p2.toCoordinate());
         if (distance == 0.0) {
           distance = 0.1;
         }
@@ -410,9 +408,8 @@ class EnhancedColorUtility {
   /// @return the distance considering also elevation.
   static double distance3d(LatLngExt c1, LatLngExt c2) {
     double deltaElev = (c1.altim - c2.altim).abs();
-    var dist = JTS.Geodesy().distanceBetweenTwoGeoPoints(
-        JTS.Coordinate(c1.longitude, c1.latitude),
-        JTS.Coordinate(c2.longitude, c2.latitude));
+    var dist = JTS.Geodesy()
+        .distanceBetweenTwoGeoPoints(c1.toCoordinate(), c2.toCoordinate());
 
     double distance = pythagoras(dist.toDouble(), deltaElev);
     return distance;

@@ -1,21 +1,22 @@
 part of smashlibs;
 
 class SmashPrj {
-  static final Projection EPSG4326 = Projection.WGS84;
+  static final proj4dart.Projection EPSG4326 = proj4dart.Projection.WGS84;
   static final int EPSG4326_INT = 4326;
   static final int EPSG3857_INT = 3857;
-  static final Projection EPSG3857 = Projection.get('EPSG:$EPSG3857_INT')!;
+  static final proj4dart.Projection EPSG3857 =
+      proj4dart.Projection.get('EPSG:$EPSG3857_INT')!;
 
   /// Create a [Projection] object from a given [srid].
-  static Projection? fromSrid(int srid) {
+  static proj4dart.Projection? fromSrid(int srid) {
     if (srid == EPSG3857_INT) return EPSG3857;
     if (srid == EPSG4326_INT) return EPSG4326;
-    var prj = Projection.get("EPSG:$srid");
+    var prj = proj4dart.Projection.get("EPSG:$srid");
     return prj;
   }
 
   /// Create a [Projection] object from its [wkt] representation.
-  static Projection fromWkt(String wkt) {
+  static proj4dart.Projection fromWkt(String wkt) {
     if (wkt
         .replaceAll(" ", "")
         .toUpperCase()
@@ -23,11 +24,11 @@ class SmashPrj {
       // this is a temporary fix due to a proj4dart issue
       return EPSG3857;
     }
-    return Projection.parse(wkt);
+    return proj4dart.Projection.parse(wkt);
   }
 
   /// Read a [Projection] from a prj file.
-  static Projection? fromFile(String prjFilePath) {
+  static proj4dart.Projection? fromFile(String prjFilePath) {
     var prjFile = File(prjFilePath);
     if (prjFile.existsSync()) {
       var wktPrj = HU.FileUtilities.readFile(prjFilePath);
@@ -39,7 +40,7 @@ class SmashPrj {
   /// Read a [Projection] from the prj file of a given data file.
   ///
   /// Ex. from the prj file, given a shapefile path.
-  static Projection? fromDataFile(String dataFilePath) {
+  static proj4dart.Projection? fromDataFile(String dataFilePath) {
     String prjPath = getPrjPath(dataFilePath);
     return fromFile(prjPath);
   }
@@ -47,7 +48,7 @@ class SmashPrj {
   /// Try to get the srid from the [projection] object.
   ///
   /// If the srid is not recognized, null is returned.
-  static int? getSrid(Projection projection) {
+  static int? getSrid(proj4dart.Projection projection) {
     String sridStr =
         projection.projName.toLowerCase().replaceFirst("epsg:", "");
     try {
@@ -115,14 +116,14 @@ class SmashPrj {
 
   /// Try to get the srid by comparing [checkProj] with [PrjInfo] objects saved in preferences.
   static Future<int?> getSridFromMatchingInPreferences(
-      Projection checkProj) async {
+      proj4dart.Projection checkProj) async {
     List<PrjInfo?> prjList = await SmashPrj.getPrjInfoFromPreferences();
     var matchingPi = prjList.firstWhere(
       (pi) {
         if (pi == null) {
           return false;
         }
-        var p = Projection.parse(pi.prjData!);
+        var p = proj4dart.Projection.parse(pi.prjData!);
         return SmashPrj.areEqual(p, checkProj);
       },
       orElse: () => null,
@@ -130,11 +131,13 @@ class SmashPrj {
     return matchingPi?.epsg;
   }
 
-  static Point transform(Projection from, Projection to, Point point) {
+  static proj4dart.Point transform(proj4dart.Projection from,
+      proj4dart.Projection to, proj4dart.Point point) {
     return from.transform(to, point);
   }
 
-  static Point transformToWgs84(Projection from, Point point) {
+  static proj4dart.Point transformToWgs84(
+      proj4dart.Projection from, proj4dart.Point point) {
     return from.transform(EPSG4326, point);
   }
 
@@ -142,7 +145,7 @@ class SmashPrj {
   ///
   /// The coordinates of the supplied geometry are modified. No copy is done.
   static void transformGeometry(
-      Projection from, Projection to, JTS.Geometry geom) {
+      proj4dart.Projection from, proj4dart.Projection to, JTS.Geometry geom) {
     GeometryReprojectionFilter filter = GeometryReprojectionFilter(from, to);
     geom.applyCF(filter);
     geom.geometryChanged();
@@ -151,7 +154,8 @@ class SmashPrj {
   /// Reproject a [JTS.Geometry] to epsg:4326.
   ///
   /// The coordinates of the supplied geometry are modified. No copy is done.
-  static void transformGeometryToWgs84(Projection from, JTS.Geometry geom) {
+  static void transformGeometryToWgs84(
+      proj4dart.Projection from, JTS.Geometry geom) {
     GeometryReprojectionFilter filter =
         GeometryReprojectionFilter(from, EPSG4326);
     geom.applyCF(filter);
@@ -162,7 +166,7 @@ class SmashPrj {
   ///
   /// The coordinates of the supplied geometries are modified. No copy is done.
   static void transformListToWgs84(
-      Projection from, List<JTS.Geometry> geometries) {
+      proj4dart.Projection from, List<JTS.Geometry> geometries) {
     GeometryReprojectionFilter filter =
         GeometryReprojectionFilter(from, EPSG4326);
     for (JTS.Geometry geom in geometries) {
@@ -220,7 +224,7 @@ class SmashPrj {
   }
 
   /// Check if two [Projection]s are the samer based on some of its parameters.
-  static bool areEqual(Projection p1, Projection p2) {
+  static bool areEqual(proj4dart.Projection p1, proj4dart.Projection p2) {
     if (p1.runtimeType == p2.runtimeType &&
             p1.ellps == p2.ellps && //
             p1.k0 == p2.k0 && //
@@ -246,8 +250,8 @@ class GeometryReprojectionFilter implements JTS.CoordinateFilter {
   @override
   void filter(JTS.Coordinate? coordinate) {
     if (coordinate != null) {
-      Point p = new Point(x: coordinate.x, y: coordinate.y);
-      Point out;
+      proj4dart.Point p = new proj4dart.Point(x: coordinate.x, y: coordinate.y);
+      proj4dart.Point out;
       if (toProj == null) {
         out = SmashPrj.transformToWgs84(fromProj, p);
       } else {
@@ -299,7 +303,7 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     await getData();
 
     if (widget.epsgToDownload != null) {
-      PrjInfo? existing = null;
+      PrjInfo? existing;
       for (PrjInfo? pi in _infoList) {
         if (pi == null) {
           continue;
@@ -324,7 +328,7 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
     var response = await Dio().get(url);
     var prjData = response.data;
     if (prjData != null && prjData is String && prjData.startsWith("+")) {
-      Projection.add('EPSG:$srid', prjData);
+      proj4dart.Projection.add('EPSG:$srid', prjData);
       String projDefinition = "$srid:$prjData";
 
       List<String> projList = await GpPreferences().getProjections();

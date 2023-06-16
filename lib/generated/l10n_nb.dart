@@ -57,6 +57,15 @@ class SLLNb extends SLL {
 
   @override
   String get gpx_palette => 'Palette';
+
+  @override
+  String get geoImage_opacity => 'Opacity';
+
+  @override
+  String get geoImage_tiffProperties => 'Tiff Properties';
+
+  @override
+  String get geoImage_colorToHide => 'Color to hide';
 }
 
 /// The translations for Norwegian Bokmål, as used in Norway (`nb_NO`).

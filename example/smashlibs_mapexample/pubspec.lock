@@ -341,6 +341,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  geoimage:
+    dependency: transitive
+    description:
+      name: geoimage
+      sha256: "5ae1dcebe30e698a263f921ab573eb16fa984adfacd03daba1eff4ba8f75f408"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   golden_toolkit:
     dependency: transitive
     description:
@@ -509,15 +517,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  map_elevation:
-    dependency: transitive
-    description:
-      path: "."
-      ref: flutter_map_4_compat
-      resolved-ref: "86cbf74754fccc3e854762bf6767428533107383"
-      url: "https://github.com/moovida/map_elevation.git"
-    source: git
-    version: "2.0.0"
   mapsforge_flutter:
     dependency: transitive
     description:

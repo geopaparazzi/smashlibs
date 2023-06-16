@@ -181,10 +181,10 @@ packages:
     dependency: "direct main"
     description:
       name: dio
-      sha256: dfda195cbf351d538054297bbd509d8046d336194ea218655f2c326c65711d1e
+      sha256: a9d76e72985d7087eb7c5e7903224ae52b337131518d127c554b9405936752b8
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.1"
+    version: "5.2.1+1"
   ecache:
     dependency: transitive
     description:
@@ -373,6 +373,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.0"
+  geoimage:
+    dependency: "direct main"
+    description:
+      name: geoimage
+      sha256: "5ae1dcebe30e698a263f921ab573eb16fa984adfacd03daba1eff4ba8f75f408"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   glob:
     dependency: transitive
     description:
@@ -565,15 +573,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  map_elevation:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: flutter_map_4_compat
-      resolved-ref: "86cbf74754fccc3e854762bf6767428533107383"
-      url: "https://github.com/moovida/map_elevation.git"
-    source: git
-    version: "2.0.0"
   mapsforge_flutter:
     dependency: "direct main"
     description:
@@ -1137,10 +1136,10 @@ packages:
     dependency: transitive
     description:
       name: tuple
-      sha256: "0ea99cd2f9352b2586583ab2ce6489d1f95a5f6de6fb9492faaf97ae2060f0aa"
+      sha256: a97ce2013f240b2f3807bcbaf218765b6f301c3eff91092bcfa23a039e7dd151
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   typed_data:
     dependency: transitive
     description:
@@ -1241,10 +1240,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: f3743ca475e0c9ef71df4ba15eb2d7684eecd5c8ba20a462462e4e8b561b2e11
+      sha256: c620a6f783fa22436da68e42db7ebbf18b8c44b9a46ab911f666ff09ffd9153f
       url: "https://pub.dev"
     source: hosted
-    version: "11.6.0"
+    version: "11.7.1"
   watcher:
     dependency: transitive
     description:
