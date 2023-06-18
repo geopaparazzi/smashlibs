@@ -10,6 +10,7 @@ const LAYERSKEY_URL = 'url';
 const LAYERSKEY_USER = 'user';
 const LAYERSKEY_PWD = 'pwd';
 const LAYERSKEY_WHERE = 'where';
+const LAYERSKEY_USESSL = 'usessl';
 const LAYERSKEY_BOUNDS = 'bounds';
 const LAYERSKEY_TYPE = 'type';
 const LAYERSKEY_FORMAT = 'format';
@@ -63,7 +64,7 @@ abstract class LayerSource {
   void setActive(bool active);
 
   /// Get the bounds for the resource.
-  Future<LatLngBounds?> getBounds();
+  Future<LatLngBounds?> getBounds(BuildContext? context);
 
   /// Dispose the current layeresource.
   void disposeSource();
@@ -110,37 +111,37 @@ abstract class LayerSource {
       String? url = map[LAYERSKEY_URL];
 
       // ! TODO bring back
-      // if (type != null && type == LAYERSTYPE_WMS) {
-      //   var wms = WmsSource.fromMap(map);
-      //   return [wms];
-      // } else if (file != null && FileManager.isGpx(file)) {
-      //   GpxSource gpx = GpxSource.fromMap(map);
-      //   return [gpx];
-      // } else if (file != null && FileManager.isGeocaching(file)) {
-      //   GeocachingSource geocaching = GeocachingSource.fromMap(map);
-      //   return [geocaching];
-      // } else if (file != null && FileManager.isShp(file)) {
-      //   ShapefileSource shp = ShapefileSource.fromMap(map);
-      //   return [shp];
-      // } else if (file != null && FileManager.isWorldImage(file)) {
-      //   GeoImageSource world = GeoImageSource.fromMap(map);
-      //   return [world];
-      // } else if (file != null && FileManager.isGeopackage(file)) {
-      //   bool? isVector = map[LAYERSKEY_ISVECTOR];
-      //   if (isVector == null || !isVector) {
-      //     TileSource ts = TileSource.fromMap(map);
-      //     return [ts];
-      //   } else {
-      //     GeopackageSource gpkg = GeopackageSource.fromMap(map);
-      //     return [gpkg];
-      //   }
-      // } else if (url != null && url.toLowerCase().startsWith("postgis")) {
-      //   PostgisSource pg = PostgisSource.fromMap(map);
-      //   return [pg];
-      // } else {
-      TileSource ts = TileSource.fromMap(map);
-      return [ts];
-      // }
+      if (type != null && type == LAYERSTYPE_WMS) {
+        var wms = WmsSource.fromMap(map);
+        return [wms];
+      } else if (file != null && FileManager.isGpx(file)) {
+        GpxSource gpx = GpxSource.fromMap(map);
+        return [gpx];
+        // } else if (file != null && FileManager.isGeocaching(file)) {
+        //   GeocachingSource geocaching = GeocachingSource.fromMap(map);
+        //   return [geocaching];
+        // } else if (file != null && FileManager.isShp(file)) {
+        //   ShapefileSource shp = ShapefileSource.fromMap(map);
+        //   return [shp];
+      } else if (file != null && FileManager.isWorldImage(file)) {
+        GeoImageSource world = GeoImageSource.fromMap(map);
+        return [world];
+        // } else if (file != null && FileManager.isGeopackage(file)) {
+        //   bool? isVector = map[LAYERSKEY_ISVECTOR];
+        //   if (isVector == null || !isVector) {
+        //     TileSource ts = TileSource.fromMap(map);
+        //     return [ts];
+        //   } else {
+        //     GeopackageSource gpkg = GeopackageSource.fromMap(map);
+        //     return [gpkg];
+        //   }
+      } else if (url != null && url.toLowerCase().startsWith("postgis")) {
+        PostgisSource pg = PostgisSource.fromMap(map);
+        return [pg];
+      } else {
+        TileSource ts = TileSource.fromMap(map);
+        return [ts];
+      }
     } on Exception catch (e, s) {
       SMLogger().e("Error while loading layer: \n$json", e, s);
       return [];

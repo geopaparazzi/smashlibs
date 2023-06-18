@@ -48,14 +48,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = TileSource.Open_Street_Map_Standard();
-              mapView!.addLayer(_currentLayerSource);
-              var bounds = await _currentLayerSource.getBounds();
-              if (bounds != null) {
-                mapView!.zoomToBounds(bounds);
-              }
-              if (context.mounted) {
-                mapView!.triggerRebuild(context);
-              }
+              await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("OSM"),
           ),
@@ -66,14 +59,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = WmsSource(
                   url, "p_bz-Orthoimagery:Aerial-2020-RGB",
                   imageFormat: "image/png");
-              mapView!.addLayer(_currentLayerSource);
-              var bounds = await _currentLayerSource.getBounds();
-              if (bounds != null) {
-                mapView!.zoomToBounds(bounds);
-              }
-              if (context.mounted) {
-                mapView!.triggerRebuild(context);
-              }
+              await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("WMS"),
           ),
@@ -84,14 +70,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = GpxSource(gpxPath);
-              mapView!.addLayer(_currentLayerSource);
-              var bounds = await _currentLayerSource.getBounds();
-              if (bounds != null) {
-                mapView!.zoomToBounds(bounds);
-              }
-              if (context.mounted) {
-                mapView!.triggerRebuild(context);
-              }
+              await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("GPX"),
           ),
@@ -101,14 +80,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = GeoImageSource(imgPath);
-              mapView!.addLayer(_currentLayerSource);
-              var bounds = await _currentLayerSource.getBounds();
-              if (bounds != null) {
-                mapView!.zoomToBounds(bounds);
-              }
-              if (context.mounted) {
-                mapView!.triggerRebuild(context);
-              }
+              await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("IMG"),
           ),
@@ -118,16 +90,35 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = TileSource.Mapsforge(dbPath);
-              mapView!.addLayer(_currentLayerSource);
-              var bounds = await _currentLayerSource.getBounds();
-              if (bounds != null) {
-                mapView!.zoomToBounds(bounds);
-              }
-              if (context.mounted) {
-                mapView!.triggerRebuild(context);
-              }
+              await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("Mapsforge"),
+          ),
+          TextButton(
+            onPressed: () async {
+              var dbPath = await copyToMapFolder("world.mbtiles");
+
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = TileSource.Mbtiles(dbPath);
+              await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("MBTiles"),
+          ),
+          TextButton(
+            onPressed: () async {
+              mapView!.removeLayer(_currentLayerSource);
+              // TODO change this with your db if you want to test in demo
+              _currentLayerSource = PostgisSource(
+                  "postgis:localhost:5432/testdb",
+                  "testtable",
+                  "testuser",
+                  "testpwd",
+                  null,
+                  null,
+                  useSSL: false);
+              await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("PostGIS"),
           ),
         ],
       ),
@@ -139,6 +130,17 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
       //   child: const Icon(Icons.add),
       // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> addLayerAndZoomTo(BuildContext context) async {
+    mapView!.addLayer(_currentLayerSource);
+    var bounds = await _currentLayerSource.getBounds(context);
+    if (bounds != null) {
+      mapView!.zoomToBounds(bounds);
+    }
+    if (context.mounted) {
+      mapView!.triggerRebuild(context);
+    }
   }
 
   Future<String> copyToMapFolder(String assetName) async {

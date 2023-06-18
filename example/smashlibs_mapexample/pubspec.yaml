@@ -79,6 +79,7 @@ flutter:
     - assets/assisi.map
     - assets/ciclabile_peschiera_mantova.gpx
     - assets/testtiff.tif
+    - assets/world.mbtiles
     - assets/defaultrender.xml
     - packages/mapsforge_flutter/assets/patterns/coniferous.svg
     - packages/mapsforge_flutter/assets/patterns/coniferous_and_deciduous.svg

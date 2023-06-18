@@ -42,10 +42,10 @@ class TileSource extends TiledRasterLayerSource {
     required this.minZoom,
     required this.maxZoom,
     this.attribution,
-    this.subdomains: const <String>[],
-    this.isVisible: true,
-    this.isTms: false,
-    this.opacityPercentage: 100,
+    this.subdomains = const <String>[],
+    this.isVisible = true,
+    this.isTms = false,
+    this.opacityPercentage = 100,
     this.rgbToHide,
     this.doGpkgAsOverlay,
   });
@@ -79,87 +79,87 @@ class TileSource extends TiledRasterLayerSource {
     if (subDomains != null) {
       this.subdomains = subDomains.split(",");
     }
-    getBounds();
+    getBounds(null);
   }
 
   TileSource.Open_Street_Map_Standard({
-    this.name: "Open Street Map",
-    this.url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    this.attribution: "OpenStreetMap, ODbL",
-    this.minZoom: DEFAULT_MINZOOM_INT,
-    this.maxZoom: DEFAULT_MAXZOOM_INT,
-    this.subdomains: const ['a', 'b', 'c'],
-    this.isVisible: true,
-    this.isTms: false,
+    this.name = "Open Street Map",
+    this.url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    this.attribution = "OpenStreetMap, ODbL",
+    this.minZoom = DEFAULT_MINZOOM_INT,
+    this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.subdomains = const ['a', 'b', 'c'],
+    this.isVisible = true,
+    this.isTms = false,
     this.canDoProperties = true,
   });
 
   TileSource.OpenTopoMap({
-    this.name: "OpenTopoMap",
-    this.url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-    this.attribution: "OpenStreetMap, ODbL",
-    this.subdomains: const ['a', 'b', 'c'],
-    this.minZoom: DEFAULT_MINZOOM_INT,
-    this.maxZoom: DEFAULT_MAXZOOM_INT,
-    this.isVisible: true,
+    this.name = "OpenTopoMap",
+    this.url = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    this.attribution = "OpenStreetMap, ODbL",
+    this.subdomains = const ['a', 'b', 'c'],
+    this.minZoom = DEFAULT_MINZOOM_INT,
+    this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.isVisible = true,
     this.canDoProperties = true,
   });
 
   TileSource.Open_Street_Map_HOT({
-    this.name: "Open Street Map H.O.T.",
-    this.url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-    this.attribution: "OpenStreetMap, ODbL",
-    this.subdomains: const ['a', 'b'],
-    this.minZoom: DEFAULT_MINZOOM_INT,
-    this.maxZoom: DEFAULT_MAXZOOM_INT,
-    this.isVisible: true,
-    this.isTms: false,
+    this.name = "Open Street Map H.O.T.",
+    this.url = "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+    this.attribution = "OpenStreetMap, ODbL",
+    this.subdomains = const ['a', 'b'],
+    this.minZoom = DEFAULT_MINZOOM_INT,
+    this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.isVisible = true,
+    this.isTms = false,
     this.canDoProperties = true,
   });
 
   // TileSource.Stamen_Watercolor({
-  //   this.name: "Stamen Watercolor",
-  //   this.url: "https://c.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg",
+  //   this.name= "Stamen Watercolor",
+  //   this.url= "https://c.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg",
   //   this.attribution:
   //       "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL",
-  //   this.minZoom: DEFAULT_MINZOOM,
-  //   this.maxZoom: DEFAULT_MAXZOOM,
-  //   this.isVisible: true,
-  //   this.isTms: false,
+  //   this.minZoom= DEFAULT_MINZOOM,
+  //   this.maxZoom= DEFAULT_MAXZOOM,
+  //   this.isVisible= true,
+  //   this.isTms= false,
   //   this.canDoProperties = true,
   // });
 
   TileSource.Opnvkarte_Transport({
-    this.name: "Opnvkarte Transport",
-    this.url: "https://tile.memomaps.de/tilegen/{z}/{x}/{y}.png",
-    this.attribution: "OpenStreetMap, ODbL",
-    this.minZoom: DEFAULT_MINZOOM_INT,
-    this.maxZoom: DEFAULT_MAXZOOM_INT,
-    this.isVisible: true,
-    this.isTms: false,
+    this.name = "Opnvkarte Transport",
+    this.url = "https://tile.memomaps.de/tilegen/{z}/{x}/{y}.png",
+    this.attribution = "OpenStreetMap, ODbL",
+    this.minZoom = DEFAULT_MINZOOM_INT,
+    this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.isVisible = true,
+    this.isTms = false,
     this.canDoProperties = true,
   });
 
   TileSource.Wikimedia_Map({
-    this.name: "Wikimedia Map",
-    this.url: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
-    this.attribution: "OpenStreetMap contributors, under ODbL",
-    this.minZoom: DEFAULT_MINZOOM_INT,
-    this.maxZoom: DEFAULT_MAXZOOM_INT,
-    this.isVisible: true,
-    this.isTms: false,
+    this.name = "Wikimedia Map",
+    this.url = "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
+    this.attribution = "OpenStreetMap contributors, under ODbL",
+    this.minZoom = DEFAULT_MINZOOM_INT,
+    this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.isVisible = true,
+    this.isTms = false,
     this.canDoProperties = true,
   });
 
   TileSource.Esri_Satellite({
-    this.name: "Esri Satellite",
+    this.name = "Esri Satellite",
     this.url:
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    this.attribution: "Esri",
-    this.minZoom: DEFAULT_MINZOOM_INT,
-    this.maxZoom: DEFAULT_MAXZOOM_INT,
-    this.isVisible: true,
-    this.isTms: true,
+    this.attribution = "Esri",
+    this.minZoom = DEFAULT_MINZOOM_INT,
+    this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.isVisible = true,
+    this.isTms = true,
     this.canDoProperties = true,
   });
 
@@ -233,7 +233,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true;
     this.isTms = true;
     this.canDoProperties = true;
-    getBounds();
+    getBounds(null);
   }
 
   TileSource.Geopackage(String filePath, String tableName) {
@@ -246,7 +246,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isTms = true;
     this.canDoProperties = true;
     this.doGpkgAsOverlay = true;
-    getBounds();
+    getBounds(null);
   }
 
   @override
@@ -282,18 +282,17 @@ class TileSource extends TiledRasterLayerSource {
 
   IconData getIcon() => SmashIcons.iconTypeRaster;
 
-  Future<LatLngBounds?> getBounds() async {
+  Future<LatLngBounds?> getBounds(BuildContext? context) async {
     if (bounds == null) {
       try {
         if (FileManager.isMapsforge(getAbsolutePath())) {
           bounds = await getMapsforgeBounds(File(absolutePath!));
-
+        } else if (FileManager.isMbtiles(getAbsolutePath())) {
+          var prov = SmashMBTilesImageProvider(File(absolutePath!));
+          prov.open();
+          bounds = prov.bounds;
+          prov.dispose();
           //! TODO BRING BACK
-          // } else if (FileManager.isMbtiles(getAbsolutePath())) {
-          //   var prov = SmashMBTilesImageProvider(File(absolutePath!));
-          //   prov.open();
-          //   bounds = prov.bounds;
-          //   prov.dispose();
           // } else if (FileManager.isGeopackage(getAbsolutePath())) {
           //   var ch = ConnectionsHandler();
           //   var db = ch.open(absolutePath!, tableName: name);
@@ -348,25 +347,25 @@ class TileSource extends TiledRasterLayerSource {
           ),
         )
       ];
+    } else if (FileManager.isMbtiles(getAbsolutePath())) {
+      var tileProvider = SmashMBTilesImageProvider(File(absolutePath!));
+      tileProvider.open();
+      // mbtiles
+      return [
+        Opacity(
+          opacity: opacityPercentage / 100.0,
+          child: TileLayer(
+            tileProvider: tileProvider,
+            maxZoom: maxZoom.toDouble(),
+            tms: true,
+            backgroundColor: Colors.transparent,
+            retinaMode: false, // not supported
+            // TODO check overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
+            errorTileCallback: errorTileCallback,
+          ),
+        )
+      ];
       // ! TODO bring back
-      // } else if (FileManager.isMbtiles(getAbsolutePath())) {
-      //   var tileProvider = SmashMBTilesImageProvider(File(absolutePath!));
-      //   tileProvider.open();
-      //   // mbtiles
-      //   return [
-      //     Opacity(
-      //       opacity: opacityPercentage / 100.0,
-      //       child: TileLayer(
-      //         tileProvider: tileProvider,
-      //         maxZoom: maxZoom.toDouble(),
-      //         tms: true,
-      //         backgroundColor: Colors.transparent,
-      //         retinaMode: false, // not supported
-      //         // TODO check overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
-      //         errorTileCallback: errorTileCallback,
-      //       ),
-      //     )
-      //   ];
       // } else if (FileManager.isGeopackage(getAbsolutePath())) {
       //   var ch = ConnectionsHandler();
       //   var db = ch.open(absolutePath!, tableName: name);
@@ -522,8 +521,8 @@ class TileSource extends TiledRasterLayerSource {
   }
 
   @override
-  Future<void> load(BuildContext context) async {
-    getBounds();
+  Future<void> load(BuildContext? context) async {
+    getBounds(context);
   }
 
   @override

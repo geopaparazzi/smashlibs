@@ -161,6 +161,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.3"
+  dart_postgis:
+    dependency: "direct main"
+    description:
+      name: dart_postgis
+      sha256: bf33c13dc8ca244e9ea1c14006286589cbec0097245e7e112dd5797d26800f63
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   device_info_plus:
     dependency: "direct main"
     description:
@@ -270,6 +278,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
+  flutter_geopackage:
+    dependency: "direct main"
+    description:
+      name: flutter_geopackage
+      sha256: fb51c1d11b905d7020bf75533ac859eea11ca16c221f74322419f4971f222ccd
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.2"
   flutter_localizations:
     dependency: "direct main"
     description: flutter

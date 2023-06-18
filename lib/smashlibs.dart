@@ -53,6 +53,7 @@ import 'package:rainbow_color/rainbow_color.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:geoimage/geoimage.dart';
+import 'package:dart_postgis/dart_postgis.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -99,6 +100,8 @@ part 'com/hydrologis/flutterlibs/maps/layers/mapsforge.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/tiles.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/wms.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/gpx.dart';
+part 'com/hydrologis/flutterlibs/maps/layers/mbtiles.dart';
+part 'com/hydrologis/flutterlibs/maps/layers/postgis.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/geoimage.dart';
 part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';

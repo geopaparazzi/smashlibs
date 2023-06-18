@@ -341,9 +341,8 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   }
 
   @override
-  Future<LatLngBounds?> getBounds() async {
+  Future<LatLngBounds?> getBounds(BuildContext? context) async {
     await load(null);
-    print(_gpxBounds?.center);
     return _gpxBounds;
   }
 

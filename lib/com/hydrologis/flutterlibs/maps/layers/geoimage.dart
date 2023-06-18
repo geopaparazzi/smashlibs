@@ -224,7 +224,7 @@ class GeoImageSource extends RasterLayerSource {
   }
 
   @override
-  Future<LatLngBounds> getBounds() async {
+  Future<LatLngBounds> getBounds(BuildContext? context) async {
     if (_imageBounds == null) {
       await load(null);
     }
