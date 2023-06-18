@@ -116,17 +116,31 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           ),
           TextButton(
             onPressed: () async {
+              var dbPath = await copyToMapFolder("vectors.gpkg");
+
               mapView!.removeLayer(_currentLayerSource);
-              // TODO change this with your db if you want to test in demo
-              _currentLayerSource = PostgisSource(
-                  "postgis:localhost:5432/testdb",
-                  "testtable",
-                  "testuser",
-                  "testpwd",
-                  null,
-                  null,
-                  useSSL: false);
-              await addLayerAndZoomTo(context);
+              _currentLayerSource =
+                  GeopackageSource(dbPath, "watercourses_small");
+              if (context.mounted) await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("GPKG-vect"),
+          ),
+          TextButton(
+            onPressed: () async {
+              SmashDialogs.showInfoDialog(context,
+                  "The postgis example connection parameters need to be set in the code. No generic postgis available.");
+
+              // mapView!.removeLayer(_currentLayerSource);
+              // // TODO change this with your db if you want to test in demo
+              // _currentLayerSource = PostgisSource(
+              //     "postgis:localhost:5432/testdb",
+              //     "testtable",
+              //     "testuser",
+              //     "testpwd",
+              //     null,
+              //     null,
+              //     useSSL: false);
+              // await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("PostGIS"),
           ),
