@@ -83,6 +83,7 @@ flutter:
     - assets/orthos.gpkg
     - assets/vectors.gpkg
     - assets/defaultrender.xml
+    - assets/caldaro.geocaching
     - assets/watercourses_small.shp
     - assets/watercourses_small.shx
     - assets/watercourses_small.sld

@@ -141,6 +141,16 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           ),
           TextButton(
             onPressed: () async {
+              var shpPath = await copyToMapFolder("caldaro.geocaching");
+
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = GeocachingSource(shpPath);
+              if (context.mounted) await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("GCaching"),
+          ),
+          TextButton(
+            onPressed: () async {
               SmashDialogs.showInfoDialog(context,
                   "The postgis example connection parameters need to be set in the code. No generic postgis available.");
 
