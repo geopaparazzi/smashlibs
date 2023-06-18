@@ -50,7 +50,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = TileSource.Open_Street_Map_Standard();
               await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("OSM"),
+            child: SmashUI.normalText("WTS"),
           ),
           TextButton(
             onPressed: () async {
@@ -70,7 +70,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = GpxSource(gpxPath);
-              await addLayerAndZoomTo(context);
+              if (context.mounted) await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("GPX"),
           ),
@@ -80,7 +80,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = GeoImageSource(imgPath);
-              await addLayerAndZoomTo(context);
+              if (context.mounted) await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("IMG"),
           ),
@@ -90,7 +90,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = TileSource.Mapsforge(dbPath);
-              await addLayerAndZoomTo(context);
+              if (context.mounted) await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("Mapsforge"),
           ),
@@ -100,9 +100,19 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = TileSource.Mbtiles(dbPath);
-              await addLayerAndZoomTo(context);
+              if (context.mounted) await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("MBTiles"),
+          ),
+          TextButton(
+            onPressed: () async {
+              var dbPath = await copyToMapFolder("orthos.gpkg");
+
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = TileSource.Geopackage(dbPath, "mebo2017");
+              if (context.mounted) await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("GPKG-rast"),
           ),
           TextButton(
             onPressed: () async {

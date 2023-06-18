@@ -5,7 +5,7 @@
  */
 part of smashlibs;
 
-Uint8List? _emptyImageBytes;
+Uint8List? _emptyMBTilesImageBytes;
 
 class SmashMBTilesImageProvider extends TileProvider {
   final File mbtilesFile;
@@ -93,12 +93,12 @@ class SmashMBTileImage extends ImageProvider<SmashMBTileImage> {
     List<int>? bytes = db.getTile(coords.x, coords.y, coords.z);
 
     if (bytes == null) {
-      if (_emptyImageBytes == null) {
+      if (_emptyMBTilesImageBytes == null) {
         ByteData imageData = await rootBundle.load('assets/emptytile256.png');
-        _emptyImageBytes = imageData.buffer.asUint8List();
+        _emptyMBTilesImageBytes = imageData.buffer.asUint8List();
       }
-      if (_emptyImageBytes != null) {
-        bytes = _emptyImageBytes;
+      if (_emptyMBTilesImageBytes != null) {
+        bytes = _emptyMBTilesImageBytes;
       } else {
         return Future<ui.Codec>.error(
             'Failed to load tile for coords: $coords');

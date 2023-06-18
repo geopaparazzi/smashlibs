@@ -54,6 +54,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:geoimage/geoimage.dart';
 import 'package:dart_postgis/dart_postgis.dart';
+import 'package:flutter_geopackage/flutter_geopackage.dart' as GPKG;
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -103,5 +104,6 @@ part 'com/hydrologis/flutterlibs/maps/layers/gpx.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/mbtiles.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/postgis.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/geoimage.dart';
+part 'com/hydrologis/flutterlibs/maps/layers/geopackage.dart';
 part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';
