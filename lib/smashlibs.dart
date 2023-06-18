@@ -55,6 +55,7 @@ import 'package:image/image.dart' as IMG;
 import 'package:geoimage/geoimage.dart';
 import 'package:dart_postgis/dart_postgis.dart';
 import 'package:flutter_geopackage/flutter_geopackage.dart' as GPKG;
+import 'package:dart_shp/dart_shp.dart' as SHP;
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -105,5 +106,6 @@ part 'com/hydrologis/flutterlibs/maps/layers/mbtiles.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/postgis.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/geoimage.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/geopackage.dart';
+part 'com/hydrologis/flutterlibs/maps/layers/shapefile.dart';
 part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';

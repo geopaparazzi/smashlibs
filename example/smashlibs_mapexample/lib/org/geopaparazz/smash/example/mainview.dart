@@ -127,6 +127,20 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           ),
           TextButton(
             onPressed: () async {
+              var shpPath = await copyToMapFolder("watercourses_small.shp");
+              await copyToMapFolder("watercourses_small.shx");
+              await copyToMapFolder("watercourses_small.sld");
+              await copyToMapFolder("watercourses_small.prj");
+              await copyToMapFolder("watercourses_small.dbf");
+
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = ShapefileSource(shpPath);
+              if (context.mounted) await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("SHP"),
+          ),
+          TextButton(
+            onPressed: () async {
               SmashDialogs.showInfoDialog(context,
                   "The postgis example connection parameters need to be set in the code. No generic postgis available.");
 

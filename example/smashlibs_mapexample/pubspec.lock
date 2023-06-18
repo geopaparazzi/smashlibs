@@ -137,6 +137,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1+1"
+  dart_shp:
+    dependency: transitive
+    description:
+      name: dart_shp
+      sha256: "1c318d4b4ea347bc1222b498b285e95ff964229aea945716586611202ead1844"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   device_info_plus:
     dependency: transitive
     description:

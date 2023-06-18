@@ -83,6 +83,11 @@ flutter:
     - assets/orthos.gpkg
     - assets/vectors.gpkg
     - assets/defaultrender.xml
+    - assets/watercourses_small.shp
+    - assets/watercourses_small.shx
+    - assets/watercourses_small.sld
+    - assets/watercourses_small.dbf
+    - assets/watercourses_small.prj
     - packages/mapsforge_flutter/assets/patterns/coniferous.svg
     - packages/mapsforge_flutter/assets/patterns/coniferous_and_deciduous.svg
     - packages/mapsforge_flutter/assets/patterns/deciduous.svg

@@ -53,6 +53,7 @@ dependencies:
   # git:
   #   url: https://github.com/moovida/dart_postgis
   
+  dart_shp: ^1.0.1
   
  ##################################
   # OTHERS MAPS RELATED
