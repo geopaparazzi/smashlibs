@@ -74,8 +74,8 @@ class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
       if (loadOnlyVisible) {
         if (_limitBounds == null) {
           var mapState = Provider.of<SmashMapState>(context, listen: false);
-          if (mapState.mapController != null) {
-            var bounds = mapState.mapController!.bounds;
+          if (mapState.mapView != null) {
+            var bounds = mapState.mapView!.getBounds();
             var n = bounds!.north;
             var s = bounds.south;
             var e = bounds.east;

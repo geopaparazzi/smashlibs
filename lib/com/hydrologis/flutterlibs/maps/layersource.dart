@@ -267,7 +267,7 @@ abstract class DbVectorLayerSource extends EditableVectorLayerSource {
   }
 
   static bool isDbVectorLayerSource(LayerSource source) {
-    return false; // ! TODO source is GeopackageSource || source is PostgisSource;
+    return source is GeopackageSource || source is PostgisSource;
   }
 }
 

@@ -21,25 +21,16 @@ class FeatureAttributesViewer extends StatefulWidget {
 class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
   int _index = 0;
   late int _total;
-  MapController _mapController = MapController();
-  var _baseLayer;
   bool _loading = true;
   late JTS.Geometry _geometry;
+  late SmashMapWidget mapWidget;
   var _srids = {};
 
   void loadOnReady(BuildContext context) async {
-    await setBaseLayer();
-
     _total = widget.features.geoms.length;
 
     try {
       EditableQueryResult f = widget.features;
-      _geometry = f.geoms[_index];
-      var env = _geometry.getEnvelopeInternal();
-      var latLngBounds = LatLngBounds(LatLng(env.getMinY(), env.getMinX()),
-          LatLng(env.getMaxY(), env.getMaxX()));
-      _mapController.fitBounds(latLngBounds);
-
       for (var i = 0; i < f.ids!.length; i++) {
         var db = f.dbs![i];
         var tableName = f.ids![i];
@@ -59,23 +50,6 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     setState(() {});
   }
 
-  Future<void> setBaseLayer() async {
-    var activeBaseLayers = LayerManager().getLayerSources(onlyActive: true);
-    if (activeBaseLayers.isNotEmpty) {
-      if (activeBaseLayers[0] != null) {
-        var baseLayers = await activeBaseLayers[0]!.toLayers(context);
-        if (baseLayers!.isNotEmpty) {
-          for (var baseLayer in baseLayers) {
-            if (baseLayer is TileLayer) {
-              _baseLayer = baseLayer;
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var isLandscape = ScreenUtilities.isLandscape(context);
@@ -85,14 +59,31 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     Color fillPoly = Colors.yellow.withOpacity(0.3);
 
     EditableQueryResult f = widget.features;
-    var layers = <Widget>[];
 
-    if (_baseLayer != null) {
-      layers.add(_baseLayer);
-    }
     _total = f.geoms.length;
 
     _geometry = f.geoms[_index];
+
+    var env = _geometry.getEnvelopeInternal();
+    var expX = env.getWidth() * 0.1;
+    var expY = env.getHeight() * 0.1;
+    env.expandBy(expX, expY);
+    mapWidget = new SmashMapWidget();
+    mapWidget.setInitParameters(
+      initBounds: env,
+      initZoom: 15,
+      minZoom: 7,
+      maxZoom: 19,
+      useLayerManager: false,
+    );
+    mapWidget.setOnMapReady(() => loadOnReady(context));
+
+    var activeBaseLayers = LayerManager().getLayerSources(onlyActive: true);
+    if (activeBaseLayers.isNotEmpty) {
+      if (activeBaseLayers[0] != null) {
+        mapWidget.addLayerSource(activeBaseLayers[0]!);
+      }
+    }
 
     Map<String, dynamic> data = f.data[_index];
     Map<String, String>? typesMap;
@@ -138,7 +129,7 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
           ),
         ],
       );
-      layers.add(layer);
+      mapWidget.addPostLayer(layer);
     } else if (gType.isLine()) {
       List<Polyline> lines = [];
       for (int i = 0; i < _geometry.getNumGeometries(); i++) {
@@ -153,7 +144,7 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
         polylineCulling: true,
         polylines: lines,
       );
-      layers.add(lineLayer);
+      mapWidget.addPostLayer(lineLayer);
     } else if (gType.isPolygon()) {
       List<FM.Polygon> polygons = [];
       for (int i = 0; i < _geometry.getNumGeometries(); i++) {
@@ -180,7 +171,7 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
         polygonCulling: true,
         polygons: polygons,
       );
-      layers.add(polyLayer);
+      mapWidget.addPostLayer(polyLayer);
     }
 
     var tableName = widget.features.ids![_index];
@@ -199,9 +190,7 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
                     setState(() {
                       _index = newIndex;
                       var env = f.geoms[_index].getEnvelopeInternal();
-                      _mapController.fitBounds(LatLngBounds(
-                          LatLng(env.getMinY(), env.getMinX()),
-                          LatLng(env.getMaxY(), env.getMaxX())));
+                      mapWidget.zoomToBounds(env);
                     });
                   },
                 ),
@@ -216,100 +205,69 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
                     setState(() {
                       _index = newIndex;
                       var env = f.geoms[_index].getEnvelopeInternal();
-                      _mapController.fitBounds(LatLngBounds(
-                          LatLng(env.getMinY(), env.getMinX()),
-                          LatLng(env.getMaxY(), env.getMaxX())));
+                      mapWidget.zoomToBounds(env);
                     });
                   },
                 ),
               ]
             : [],
       ),
-      body: _loading
-          ? SmashCircularProgress(
-              label: SLL
-                  .of(context)
-                  .featureAttributesViewer_loadingData) //"Loading data..."
-          : isLandscape
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: SmashColors.tableBorder,
-                          width: 2,
-                        ),
-                      ),
-                      width: MediaQuery.of(context).size.height / 2,
-                      height: double.infinity,
-                      child: FlutterMap(
-                        options: new MapOptions(
-                          center: LatLng(centroid!.y, centroid.x),
-                          zoom: 15,
-                          minZoom: 7,
-                          maxZoom: 19,
-                          onMapReady: () {
-                            loadOnReady(context);
-                          },
-                        ),
-                        children: layers,
-                        mapController: _mapController,
-                      ),
+      body: isLandscape
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: SmashColors.tableBorder,
+                      width: 2,
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: getDataTable(
-                            tableName, data, primaryKey, db, typesMap),
-                      ),
-                    ),
-                  ],
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: SmashColors.tableBorder,
-                          width: 2,
-                        ),
-                      ),
-                      height: MediaQuery.of(context).size.height / 3,
-                      width: double.infinity,
-                      child: FlutterMap(
-                        options: new MapOptions(
-                          center: LatLng(centroid!.y, centroid.x),
-                          zoom: 15,
-                          minZoom: 7,
-                          maxZoom: 19,
-                          onMapReady: () {
-                            loadOnReady(context);
-                          },
-                        ),
-                        children: layers,
-                        mapController: _mapController,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: getDataTable(
-                              tableName, data, primaryKey, db, typesMap!),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+                  width: MediaQuery.of(context).size.height / 2,
+                  height: double.infinity,
+                  child: mapWidget,
                 ),
+                Expanded(
+                  flex: 1,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child:
+                        getDataTable(tableName, data, primaryKey, db, typesMap),
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: SmashColors.tableBorder,
+                      width: 2,
+                    ),
+                  ),
+                  height: MediaQuery.of(context).size.height / 3,
+                  width: double.infinity,
+                  child: mapWidget,
+                ),
+                Expanded(
+                  flex: 1,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: getDataTable(
+                          tableName, data, primaryKey, db, typesMap!),
+                    ),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 

@@ -14,13 +14,14 @@ class SmashMapState extends ChangeNotifierPlus {
   JTS.Coordinate _center = JTS.Coordinate(11.33140, 46.47781);
   double _zoom = 16;
   double _heading = 0;
-  MapController? mapController;
 
   /// Defines whether the map should center on the gps position
   bool _centerOnGps = true;
 
   /// Defines whether the map should rotate following the gps heading
   bool _rotateOnHeading = false;
+
+  SmashMapWidget? mapView;
 
   void init(JTS.Coordinate center, double zoom) {
     _center = center;
@@ -41,8 +42,8 @@ class SmashMapState extends ChangeNotifierPlus {
     } else {
       _center = newCenter;
     }
-    if (mapController != null) {
-      mapController!.move(LatLng(_center.y, _center.x), mapController!.zoom);
+    if (mapView != null) {
+      mapView!.centerOn(_center);
     }
     notifyListenersMsg("set center");
   }
@@ -54,8 +55,8 @@ class SmashMapState extends ChangeNotifierPlus {
   /// Notify anyone that needs to act accordingly.
   set zoom(double newZoom) {
     _zoom = newZoom;
-    if (mapController != null) {
-      mapController!.move(mapController!.center, newZoom);
+    if (mapView != null) {
+      mapView!.zoomTo(newZoom);
     }
     notifyListenersMsg("set zoom");
   }
@@ -66,8 +67,8 @@ class SmashMapState extends ChangeNotifierPlus {
   void setCenterAndZoom(JTS.Coordinate newCenter, double newZoom) {
     _center = newCenter;
     _zoom = newZoom;
-    if (mapController != null) {
-      mapController!.move(LatLng(newCenter.y, newCenter.x), newZoom);
+    if (mapView != null) {
+      mapView!.centerAndZoomOn(newCenter, newZoom);
     }
     notifyListenersMsg("setCenterAndZoom");
   }
@@ -76,11 +77,8 @@ class SmashMapState extends ChangeNotifierPlus {
   ///
   /// Notify anyone that needs to act accordingly.
   void setBounds(JTS.Envelope envelope) {
-    if (mapController != null) {
-      mapController!.fitBounds(LatLngBounds(
-        LatLng(envelope.getMinY(), envelope.getMinX()),
-        LatLng(envelope.getMaxY(), envelope.getMaxX()),
-      ));
+    if (mapView != null) {
+      mapView!.zoomToBounds(envelope);
       notifyListenersMsg("setBounds");
     }
   }
@@ -89,14 +87,14 @@ class SmashMapState extends ChangeNotifierPlus {
 
   set heading(double heading) {
     _heading = heading;
-    if (mapController != null) {
+    if (mapView != null) {
       if (rotateOnHeading) {
         if (heading < 0) {
           heading = 360 + heading;
         }
-        mapController!.rotate(-heading);
+        mapView!.rotate(-heading);
       } else {
-        mapController!.rotate(0);
+        mapView!.rotate(0);
       }
     }
     notifyListenersMsg("set heading");
@@ -137,18 +135,16 @@ class SmashMapState extends ChangeNotifierPlus {
   }
 
   void zoomIn() {
-    if (mapController != null) {
-      var z = mapController!.zoom + 1;
-      if (z > MAXZOOM) z = MAXZOOM;
-      zoom = z;
+    if (mapView != null) {
+      mapView!.zoomIn();
+      notifyListenersMsg("zoomIn");
     }
   }
 
   void zoomOut() {
-    if (mapController != null) {
-      var z = mapController!.zoom - 1;
-      if (z < MINZOOM) z = MINZOOM;
-      zoom = z;
+    if (mapView != null) {
+      mapView!.zoomOut();
+      notifyListenersMsg("zoomOut");
     }
   }
 }

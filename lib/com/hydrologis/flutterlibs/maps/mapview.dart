@@ -7,26 +7,34 @@ abstract class OnMapTapHandler {
 
 // ignore: must_be_immutable
 class SmashMapWidget extends StatelessWidget {
-  JTS.Coordinate? _centerCoordonate;
+  JTS.Coordinate? _initCenterCoordonate;
+  JTS.Envelope? _initBounds;
   double _initZoom = 13.0;
   double _minZoom = SmashMapState.MINZOOM;
   double _maxZoom = SmashMapState.MAXZOOM;
   bool _canRotate = false;
+  bool _useLayerManager = true;
 
   MapController _mapController = MapController();
-  // List<Widget> layers = [];
+  List<Widget> preLayers = [];
+  List<Widget> postLayers = [];
+  List<LayerSource> layerSources = [];
   List<Widget> nonRotationLayers = [];
   void Function(LatLng, double) _handleTap = (ll, z) {};
   void Function(LatLng, double) _handleLongTap = (ll, z) {};
+  void Function() _onMapReady = () {};
 
   void setInitParameters({
-    JTS.Coordinate? centerCoordonate,
+    JTS.Coordinate? centerCoordinate,
+    JTS.Envelope? initBounds,
     double? initZoom,
     double? minZoom,
     double? maxZoom,
     bool canRotate = false,
+    bool useLayerManager = true,
   }) {
-    if (centerCoordonate != null) _centerCoordonate = centerCoordonate;
+    if (centerCoordinate != null) _initCenterCoordonate = centerCoordinate;
+    if (initBounds != null) _initBounds = initBounds;
     if (initZoom != null) _initZoom = initZoom;
     if (minZoom != null) _minZoom = minZoom;
     if (maxZoom != null) _maxZoom = maxZoom;
@@ -40,22 +48,88 @@ class SmashMapWidget extends StatelessWidget {
     if (handleLongTap != null) _handleLongTap = handleLongTap;
   }
 
-  void addLayer(LayerSource layer) {
-    LayerManager().addLayerSource(layer);
-    // layers.add(SmashMapLayer(layer));
+  void setOnMapReady(Function()? onMapReady) {
+    if (onMapReady != null) _onMapReady = onMapReady;
   }
 
-  void removeLayer(LayerSource layer) {
-    LayerManager().removeLayerSource(layer);
-    // layers.add(SmashMapLayer(layer));
+  void addPreLayer(Widget layer) {
+    if (!preLayers.contains(layer)) {
+      preLayers.add(layer);
+    }
+  }
+
+  void addPostLayer(Widget layer) {
+    if (!postLayers.contains(layer)) {
+      postLayers.add(layer);
+    }
+  }
+
+  void addNonRotationLayer(Widget layer) {
+    if (!nonRotationLayers.contains(layer)) {
+      nonRotationLayers.add(layer);
+    }
+  }
+
+  void addLayerSource(LayerSource layerSource) {
+    if (_useLayerManager) {
+      LayerManager().addLayerSource(layerSource);
+    } else if (!layerSources.contains(layerSource)) {
+      layerSources.add(layerSource);
+    }
+  }
+
+  void removeLayer(LayerSource layerSource) {
+    if (_useLayerManager) {
+      LayerManager().removeLayerSource(layerSource);
+    } else if (layerSources.contains(layerSource)) {
+      layerSources.remove(layerSource);
+    }
   }
 
   void triggerRebuild(BuildContext context) {
     Provider.of<SmashMapBuilder>(context, listen: false).reBuild();
   }
 
-  void zoomToBounds(LatLngBounds bounds) {
+  void zoomToBounds(JTS.Envelope bounds) {
+    _mapController.fitBounds(LatLngBounds(
+        LatLng(bounds.getMinY(), bounds.getMinX()),
+        LatLng(bounds.getMaxY(), bounds.getMaxX())));
+  }
+
+  void zoomToLLBounds(LatLngBounds bounds) {
     _mapController.fitBounds(bounds);
+  }
+
+  void centerOn(JTS.Coordinate ll) {
+    _mapController.move(LatLngExt.fromCoordinate(ll), _mapController.zoom);
+  }
+
+  void zoomTo(double newZoom) {
+    _mapController.move(_mapController.center, newZoom);
+  }
+
+  void zoomIn() {
+    var z = _mapController.zoom + 1;
+    if (z > _maxZoom) z = _maxZoom;
+    zoomTo(z);
+  }
+
+  void zoomOut() {
+    var z = _mapController.zoom - 1;
+    if (z < _minZoom) z = _minZoom;
+    zoomTo(z);
+  }
+
+  void centerAndZoomOn(JTS.Coordinate ll, double newZoom) {
+    _mapController.move(LatLngExt.fromCoordinate(ll), newZoom);
+  }
+
+  void rotate(double heading) {
+    _mapController.rotate(heading);
+  }
+
+  LatLngBounds? getBounds() {
+    return _mapController.bounds;
   }
 
   @override
@@ -68,8 +142,16 @@ class SmashMapWidget extends StatelessWidget {
   }
 
   Widget consumeBuild(SmashMapBuilder mapBuilder) {
+    var layers = <Widget>[];
+
+    layers.addAll(preLayers);
+    layers.addAll(LayerManager().getActiveLayers());
+    layers.addAll(postLayers);
+    layers.addAll(nonRotationLayers);
+
     BuildContext context = mapBuilder.context!;
     var mapState = Provider.of<SmashMapState>(context, listen: false);
+    mapState.mapView = this;
     var mapFlags = InteractiveFlag.all &
         ~InteractiveFlag.flingAnimation &
         ~InteractiveFlag.pinchMove;
@@ -77,14 +159,17 @@ class SmashMapWidget extends StatelessWidget {
       mapFlags = mapFlags & ~InteractiveFlag.rotate;
     }
 
-    var postLayersChildren = <Widget>[];
-
     return Stack(
       children: <Widget>[
         FlutterMap(
           options: new MapOptions(
-            center: _centerCoordonate != null
-                ? new LatLng(_centerCoordonate!.y, _centerCoordonate!.x)
+            bounds: _initBounds != null
+                ? LatLngBounds(
+                    LatLng(_initBounds!.getMinY(), _initBounds!.getMinX()),
+                    LatLng(_initBounds!.getMaxY(), _initBounds!.getMaxX()))
+                : null,
+            center: _initCenterCoordonate != null && _initBounds == null
+                ? new LatLng(_initCenterCoordonate!.y, _initCenterCoordonate!.x)
                 : null,
             zoom: _initZoom,
             minZoom: _minZoom,
@@ -100,10 +185,9 @@ class SmashMapWidget extends StatelessWidget {
             onLongPress: (TapPosition tPos, LatLng point) =>
                 _handleLongTap(point, _mapController.zoom),
             interactiveFlags: mapFlags,
+            onMapReady: _onMapReady,
           ),
-          children: [
-            ...LayerManager().getActiveLayers(),
-          ],
+          children: layers,
           nonRotatedChildren: [],
           mapController: _mapController,
         ),

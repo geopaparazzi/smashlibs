@@ -29,13 +29,39 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
     mapView = SmashMapWidget();
     mapView!.setInitParameters(
-        canRotate: false, initZoom: 9, centerCoordonate: Coordinate(11, 46));
+        canRotate: false, initZoom: 9, centerCoordinate: Coordinate(11, 46));
     mapView!.setTapHandlers(handleTap: (ll, zoom) {
       SmashDialogs.showToast(context, "Tapped: ${ll.longitude}, ${ll.latitude}",
           durationSeconds: 1);
     });
-    mapView!.addLayer(_backgroundLayerSource);
-    mapView!.addLayer(_currentLayerSource);
+    mapView!.addLayerSource(_backgroundLayerSource);
+    mapView!.addLayerSource(_currentLayerSource);
+
+    int tapAreaPixels = GpPreferences()
+            .getIntSync(SmashPreferencesKeys.KEY_VECTOR_TAPAREA_SIZE, 50) ??
+        50;
+    mapView!.addPostLayer(FeatureInfoLayer(
+      tapAreaPixelSize: tapAreaPixels.toDouble(),
+    ));
+
+    var centerCrossStyle = CenterCrossStyle.fromPreferences();
+    if (centerCrossStyle.visible) {
+      mapView!.addPostLayer(CenterCrossLayer(
+        crossColor: ColorExt(centerCrossStyle.color),
+        crossSize: centerCrossStyle.size,
+        lineWidth: centerCrossStyle.lineWidth,
+      ));
+    }
+
+    mapView!.addPostLayer(ScaleLayer(
+      lineColor: Colors.black,
+      lineWidth: 3,
+      textStyle: const TextStyle(color: Colors.black, fontSize: 14),
+      padding: const EdgeInsets.all(10),
+    ));
+
+    mapView!.addPostLayer(RulerPluginLayer(tapAreaPixelSize: 1));
+
     setState(() {});
   }
 
@@ -185,7 +211,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
       ),
 
       body: mapView ?? Container(),
-      bottomNavigationBar: BottomToolsBar(32.0),
+      bottomNavigationBar: BottomToolsBar(48.0),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: _incrementCounter,
       //   tooltip: 'Increment',
@@ -195,10 +221,10 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
   }
 
   Future<void> addLayerAndZoomTo(BuildContext context) async {
-    mapView!.addLayer(_currentLayerSource);
+    mapView!.addLayerSource(_currentLayerSource);
     var bounds = await _currentLayerSource.getBounds(context);
     if (bounds != null) {
-      mapView!.zoomToBounds(bounds);
+      mapView!.zoomToLLBounds(bounds);
     }
     if (context.mounted) {
       mapView!.triggerRebuild(context);

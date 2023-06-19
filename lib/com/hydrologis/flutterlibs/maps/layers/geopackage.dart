@@ -49,8 +49,8 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
       JTS.Envelope? limitBounds;
       if (loadOnlyVisible) {
         var mapState = Provider.of<SmashMapState>(context, listen: false);
-        if (mapState.mapController != null) {
-          var bounds = mapState.mapController!.bounds;
+        if (mapState.mapView != null) {
+          var bounds = mapState.mapView!.getBounds();
           var n = bounds!.north;
           var s = bounds.south;
           var e = bounds.east;

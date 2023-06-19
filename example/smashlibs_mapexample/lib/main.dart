@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smashlibs/smashlibs.dart';
 import 'package:smashlibs_mapexample/org/geopaparazz/smash/example/mainview.dart';
 import 'package:provider/provider.dart';
+import 'package:smashlibs/generated/l10n.dart';
 
 void main() {
   runApp(getMainWidget());
@@ -31,6 +32,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Smashlibs Demo',
+      localizationsDelegates: SLL.localizationsDelegates,
+      supportedLocales: SLL.supportedLocales,
       theme: ThemeData(
         colorScheme:
             ColorScheme.fromSeed(seedColor: SmashColors.mainDecorations),
