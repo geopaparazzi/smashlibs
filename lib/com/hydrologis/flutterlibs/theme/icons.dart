@@ -320,7 +320,7 @@ class MarkerIcon extends StatelessWidget {
   final double iconSize;
   final String? labelText;
   final Color? labelColor;
-  final Color labelBackColor;
+  final Color? labelBackColor;
 
   const MarkerIcon(
     this.iconData,
@@ -353,22 +353,23 @@ class MarkerIcon extends StatelessWidget {
                     color: iconColor,
                   ),
                 ),
-                FittedBox(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: labelBackColor,
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Text(
-                        labelText!,
-                        style: TextStyle(
-                            color: labelColor, fontWeight: FontWeight.bold),
+                if (labelText != null)
+                  FittedBox(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: labelBackColor,
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: Text(
+                          labelText!,
+                          style: TextStyle(
+                              color: labelColor, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
-                  ),
-                )
+                  )
               ],
             ),
           );

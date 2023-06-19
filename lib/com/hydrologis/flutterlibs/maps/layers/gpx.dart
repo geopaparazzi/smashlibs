@@ -17,7 +17,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   List<LatLng> _wayPoints = [];
   List<String> _wayPointNames = [];
   List<List<LatLng>> _tracksRoutes = [];
-  LatLngBounds? _gpxBounds = null;
+  LatLngBounds? _gpxBounds;
 
   late String sldString;
   late HU.SldObjectParser _style;

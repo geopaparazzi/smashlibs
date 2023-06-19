@@ -84,6 +84,7 @@ flutter:
     - assets/vectors.gpkg
     - assets/defaultrender.xml
     - assets/caldaro.geocaching
+    - assets/ne_10m_airports.geojson
     - assets/watercourses_small.shp
     - assets/watercourses_small.shx
     - assets/watercourses_small.sld

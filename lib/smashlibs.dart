@@ -58,6 +58,7 @@ import 'package:dart_postgis/dart_postgis.dart';
 import 'package:flutter_geopackage/flutter_geopackage.dart' as GPKG;
 import 'package:dart_shp/dart_shp.dart' as SHP;
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:geojson_vi/geojson_vi.dart' as GEOJSON;
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -110,5 +111,6 @@ part 'com/hydrologis/flutterlibs/maps/layers/geoimage.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/geopackage.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/shapefile.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/geocaching.dart';
+part 'com/hydrologis/flutterlibs/maps/layers/geojson.dart';
 part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';

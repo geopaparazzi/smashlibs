@@ -405,6 +405,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
+  geojson_vi:
+    dependency: "direct main"
+    description:
+      name: geojson_vi
+      sha256: cdfbd832719b0bdb40ef61259c2fdd26ee65fe18af58c3c190fb1bee128f18ac
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   glob:
     dependency: transitive
     description:

@@ -141,6 +141,17 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           ),
           TextButton(
             onPressed: () async {
+              var geojsonPath =
+                  await copyToMapFolder("ne_10m_airports.geojson");
+
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = GeojsonSource(geojsonPath);
+              if (context.mounted) await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("GEOJSON"),
+          ),
+          TextButton(
+            onPressed: () async {
               var shpPath = await copyToMapFolder("caldaro.geocaching");
 
               mapView!.removeLayer(_currentLayerSource);
