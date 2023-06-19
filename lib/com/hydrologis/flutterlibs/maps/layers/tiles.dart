@@ -499,9 +499,8 @@ class TileSource extends TiledRasterLayerSource {
 
   @override
   void disposeSource() {
-    // ! TODO bring back
-    // ConnectionsHandler()
-    //     .close(getAbsolutePath() ?? getUrl()!, tableName: getName());
+    GPKG.ConnectionsHandler()
+        .close(getAbsolutePath() ?? getUrl()!, tableName: getName());
   }
 
   @override

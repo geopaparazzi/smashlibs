@@ -19,7 +19,8 @@ class MainSmashLibsPage extends StatefulWidget {
 class _MainSmashLibsPageState extends State<MainSmashLibsPage>
     with AfterLayoutMixin {
   SmashMapWidget? mapView;
-  LayerSource _currentLayerSource = onlinesTilesSources[0];
+  final LayerSource _backgroundLayerSource = onlinesTilesSources[0];
+  LayerSource _currentLayerSource = onlinesTilesSources[1];
 
   @override
   FutureOr<void> afterFirstLayout(BuildContext context) async {
@@ -33,6 +34,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
       SmashDialogs.showToast(context, "Tapped: ${ll.longitude}, ${ll.latitude}",
           durationSeconds: 1);
     });
+    mapView!.addLayer(_backgroundLayerSource);
     mapView!.addLayer(_currentLayerSource);
     setState(() {});
   }
@@ -47,7 +49,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           TextButton(
             onPressed: () async {
               mapView!.removeLayer(_currentLayerSource);
-              _currentLayerSource = TileSource.Open_Street_Map_Standard();
+              _currentLayerSource = onlinesTilesSources[1];
               await addLayerAndZoomTo(context);
             },
             child: SmashUI.normalText("WTS"),
