@@ -7,7 +7,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-
+import 'package:path/path.dart' as PATH;
 import 'package:after_layout/after_layout.dart';
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart' as HU;
@@ -59,6 +59,9 @@ import 'package:flutter_geopackage/flutter_geopackage.dart' as GPKG;
 import 'package:dart_shp/dart_shp.dart' as SHP;
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:geojson_vi/geojson_vi.dart' as GEOJSON;
+import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
+import 'package:flutter_map_line_editor/flutter_map_line_editor.dart';
+import 'package:badges/badges.dart' as badges;
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -96,7 +99,13 @@ part 'com/hydrologis/flutterlibs/projectdb/othertables.dart';
 
 // maps
 part 'com/hydrologis/flutterlibs/maps/mapview.dart';
+part 'com/hydrologis/flutterlibs/maps/toolbar_tools.dart';
 part 'com/hydrologis/flutterlibs/maps/models/map_state.dart';
+part 'com/hydrologis/flutterlibs/maps/tools/ruler_state.dart';
+part 'com/hydrologis/flutterlibs/maps/tools/info_tool_state.dart';
+part 'com/hydrologis/flutterlibs/maps/tools/geometryeditor_state.dart';
+part 'com/hydrologis/flutterlibs/maps/tools/feature_attributes_viewer.dart';
+part 'com/hydrologis/flutterlibs/maps/tools/tools.dart';
 part 'com/hydrologis/flutterlibs/maps/models/mapbuilder.dart';
 part 'com/hydrologis/flutterlibs/maps/layersource.dart';
 part 'com/hydrologis/flutterlibs/maps/layermanager.dart';
@@ -112,5 +121,10 @@ part 'com/hydrologis/flutterlibs/maps/layers/geopackage.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/shapefile.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/geocaching.dart';
 part 'com/hydrologis/flutterlibs/maps/layers/geojson.dart';
+part 'com/hydrologis/flutterlibs/maps/plugins/pluginshandler.dart';
+part 'com/hydrologis/flutterlibs/maps/plugins/center_cross_plugin.dart';
+part 'com/hydrologis/flutterlibs/maps/plugins/ruler_plugin.dart';
+part 'com/hydrologis/flutterlibs/maps/plugins/scale_plugin.dart';
+part 'com/hydrologis/flutterlibs/maps/plugins/feature_info_plugin.dart';
 part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';

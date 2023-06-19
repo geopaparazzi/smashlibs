@@ -124,6 +124,12 @@ const String TAG_READONLY = "readonly";
 const String TAG_SIZE = "size";
 const String TAG_URL = "url";
 
+const IMAGE_ID_SEPARATOR = ";";
+
+const HM_FORMS_TABLE = "hm_forms";
+const FORMS_TABLENAME_FIELD = "tablename";
+const FORMS_FIELD = "forms";
+
 /// Separator for multiple items in the form results.
 const String SEP = "#";
 
@@ -131,7 +137,7 @@ const String SEP = "#";
 abstract class AFormhelper {
   // the data used to fill the form and that
   // need to be sent back with the changed data
-  late Map<String, dynamic> _dataUsed;
+  late Map<String, dynamic> dataUsed;
 
   Future<bool> init();
 
@@ -193,7 +199,7 @@ abstract class AFormhelper {
         FormUtilities.updateFromMap(formItems, newValues);
       }
     }
-    _dataUsed = newValues;
+    dataUsed = newValues;
   }
 
   /// get the initial data map, changed by the interaction with the form.
@@ -204,10 +210,10 @@ abstract class AFormhelper {
       var form = TagsManager.getForm4Name(formName, sectionMap);
       if (form != null) {
         var formItems = TagsManager.getFormItems(form);
-        FormUtilities.updateToMap(formItems, _dataUsed);
+        FormUtilities.updateToMap(formItems, dataUsed);
       }
     }
-    return _dataUsed;
+    return dataUsed;
   }
 }
 

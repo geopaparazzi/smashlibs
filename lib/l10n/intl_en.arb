@@ -20,6 +20,22 @@
   "gpx_palette": "Palette",
   "geoImage_opacity": "Opacity",
   "geoImage_tiffProperties": "Tiff Properties",
-  "geoImage_colorToHide": "Color to hide"
+  "geoImage_colorToHide": "Color to hide",
+  "toolbarTools_zoomOut": "Zoom out",
+  "toolbarTools_zoomIn": "Zoom in",
+  "toolbarTools_cancelCurrentEdit": "Cancel current edit.",
+  "toolbarTools_saveCurrentEdit": "Save current edit.",
+  "toolbarTools_insertPointMapCenter": "Insert point in map center.",
+  "toolbarTools_insertPointGpsPos": "Insert point in GPS position.",
+  "toolbarTools_removeSelectedFeature": "Remove selected feature.",
+  "toolbarTools_showFeatureAttributes": "Show feature attributes.",
+  "toolbarTools_featureDoesNotHavePrimaryKey": "The feature does not have a primary key. Editing is not allowed.",
+  "toolbarTools_queryFeaturesVectorLayers": "Query features from loaded vector layers.",
+  "toolbarTools_measureDistanceWithFinger": "Measure distances on the map with your finger.",
+  "toolbarTools_modifyGeomVectorLayers": "Modify geometries in editable vector layers.",
+  "featureAttributesViewer_loadingData": "Loading data...",
+  "featureAttributesViewer_setNewValue": "Set new value.",
+  "featureAttributesViewer_field": "FIELD",
+  "featureAttributesViewer_value": "VALUE"
 
 }

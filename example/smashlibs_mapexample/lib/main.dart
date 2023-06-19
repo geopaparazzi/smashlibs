@@ -15,11 +15,11 @@ MultiProvider getMainWidget() {
       ChangeNotifierProvider(create: (_) => ThemeState()),
       ChangeNotifierProvider(create: (_) => GpsState()),
       ChangeNotifierProvider(create: (_) => SmashMapState()),
-      // ChangeNotifierProvider(create: (_) => InfoToolState()),
-      // ChangeNotifierProvider(create: (_) => RulerState()),
-      // ChangeNotifierProvider(create: (_) => GeometryEditorState()),
+      ChangeNotifierProvider(create: (_) => InfoToolState()),
+      ChangeNotifierProvider(create: (_) => RulerState()),
+      ChangeNotifierProvider(create: (_) => GeometryEditorState()),
     ],
-    child: MyApp(),
+    child: const MyApp(),
   );
 }
 

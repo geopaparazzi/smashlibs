@@ -225,7 +225,6 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   @override
   Future<List<Widget>> toLayers(BuildContext context) async {
     load(context);
-    var map = FlutterMapState.maybeOf(context)!;
 
     HU.LineStyle? lineStyle;
     HU.PointStyle? pointStyle;
@@ -312,29 +311,29 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
                 ));
         waypoints.add(m);
       }
-      var waypointsCluster = MarkerClusterLayer(
-          MarkerClusterLayerOptions(
-            maxClusterRadius: 20,
-            size: Size(40, 40),
-            fitBoundsOptions: FitBoundsOptions(
-              padding: EdgeInsets.all(50),
-            ),
-            markers: waypoints,
-            polygonOptions: PolygonOptions(
-                borderColor: colorExt,
-                color: colorExt.withOpacity(0.2),
-                borderStrokeWidth: 3),
-            builder: (context, markers) {
-              return FloatingActionButton(
-                child: Text(markers.length.toString()),
-                onPressed: null,
-                backgroundColor: colorExt,
-                foregroundColor: SmashColors.mainBackground,
-                heroTag: null,
-              );
-            },
+      var waypointsCluster = MarkerClusterLayerWidget(
+        options: MarkerClusterLayerOptions(
+          maxClusterRadius: 20,
+          size: Size(40, 40),
+          fitBoundsOptions: FitBoundsOptions(
+            padding: EdgeInsets.all(50),
           ),
-          map);
+          markers: waypoints,
+          polygonOptions: PolygonOptions(
+              borderColor: colorExt,
+              color: colorExt.withOpacity(0.2),
+              borderStrokeWidth: 3),
+          builder: (context, markers) {
+            return FloatingActionButton(
+              child: Text(markers.length.toString()),
+              onPressed: null,
+              backgroundColor: colorExt,
+              foregroundColor: SmashColors.mainBackground,
+              heroTag: null,
+            );
+          },
+        ),
+      );
       layers.add(waypointsCluster);
     }
     return layers;

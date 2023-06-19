@@ -76,6 +76,9 @@ class SmashMapWidget extends StatelessWidget {
     if (!_canRotate) {
       mapFlags = mapFlags & ~InteractiveFlag.rotate;
     }
+
+    var postLayersChildren = <Widget>[];
+
     return Stack(
       children: <Widget>[
         FlutterMap(
@@ -98,7 +101,9 @@ class SmashMapWidget extends StatelessWidget {
                 _handleLongTap(point, _mapController.zoom),
             interactiveFlags: mapFlags,
           ),
-          children: LayerManager().getActiveLayers(),
+          children: [
+            ...LayerManager().getActiveLayers(),
+          ],
           nonRotatedChildren: [],
           mapController: _mapController,
         ),

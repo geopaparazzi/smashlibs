@@ -66,4 +66,52 @@ class SLLCs extends SLL {
 
   @override
   String get geoImage_colorToHide => 'Color to hide';
+
+  @override
+  String get toolbarTools_zoomOut => 'Zoom out';
+
+  @override
+  String get toolbarTools_zoomIn => 'Zoom in';
+
+  @override
+  String get toolbarTools_cancelCurrentEdit => 'Cancel current edit.';
+
+  @override
+  String get toolbarTools_saveCurrentEdit => 'Save current edit.';
+
+  @override
+  String get toolbarTools_insertPointMapCenter => 'Insert point in map center.';
+
+  @override
+  String get toolbarTools_insertPointGpsPos => 'Insert point in GPS position.';
+
+  @override
+  String get toolbarTools_removeSelectedFeature => 'Remove selected feature.';
+
+  @override
+  String get toolbarTools_showFeatureAttributes => 'Show feature attributes.';
+
+  @override
+  String get toolbarTools_featureDoesNotHavePrimaryKey => 'The feature does not have a primary key. Editing is not allowed.';
+
+  @override
+  String get toolbarTools_queryFeaturesVectorLayers => 'Query features from loaded vector layers.';
+
+  @override
+  String get toolbarTools_measureDistanceWithFinger => 'Measure distances on the map with your finger.';
+
+  @override
+  String get toolbarTools_modifyGeomVectorLayers => 'Modify geometries in editable vector layers.';
+
+  @override
+  String get featureAttributesViewer_loadingData => 'Loading data...';
+
+  @override
+  String get featureAttributesViewer_setNewValue => 'Set new value.';
+
+  @override
+  String get featureAttributesViewer_field => 'FIELD';
+
+  @override
+  String get featureAttributesViewer_value => 'VALUE';
 }

@@ -181,8 +181,6 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
   Future<List<Widget>> toLayers(BuildContext context) async {
     await load(context);
 
-    var map = FlutterMapState.maybeOf(context)!;
-
     List<Widget> layers = [];
     if (_tableData!.geoms.isNotEmpty) {
       List<List<Marker>> allPoints = [];
@@ -208,7 +206,7 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
       });
 
       if (allPoints.isNotEmpty) {
-        addMarkerLayer(allPoints, layers, pointFillColor!, map);
+        addMarkerLayer(allPoints, layers, pointFillColor!);
       } else if (allLines.isNotEmpty) {
         var lineLayer = PolylineLayer(
           polylineCulling: true,
@@ -388,32 +386,32 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
     return points;
   }
 
-  void addMarkerLayer(List<List<Marker>> allPoints, List<Widget> layers,
-      Color pointFillColor, FlutterMapState map) {
+  void addMarkerLayer(
+      List<List<Marker>> allPoints, List<Widget> layers, Color pointFillColor) {
     if (allPoints.length == 1) {
-      var waypointsCluster = MarkerClusterLayer(
-          MarkerClusterLayerOptions(
-            maxClusterRadius: 20,
-            size: Size(40, 40),
-            fitBoundsOptions: FitBoundsOptions(
-              padding: EdgeInsets.all(50),
-            ),
-            markers: allPoints[0],
-            polygonOptions: PolygonOptions(
-                borderColor: pointFillColor,
-                color: pointFillColor.withOpacity(0.2),
-                borderStrokeWidth: 3),
-            builder: (context, markers) {
-              return FloatingActionButton(
-                child: Text(markers.length.toString()),
-                onPressed: null,
-                backgroundColor: pointFillColor,
-                foregroundColor: SmashColors.mainBackground,
-                heroTag: null,
-              );
-            },
+      var waypointsCluster = MarkerClusterLayerWidget(
+        options: MarkerClusterLayerOptions(
+          maxClusterRadius: 20,
+          size: Size(40, 40),
+          fitBoundsOptions: FitBoundsOptions(
+            padding: EdgeInsets.all(50),
           ),
-          map);
+          markers: allPoints[0],
+          polygonOptions: PolygonOptions(
+              borderColor: pointFillColor,
+              color: pointFillColor.withOpacity(0.2),
+              borderStrokeWidth: 3),
+          builder: (context, markers) {
+            return FloatingActionButton(
+              child: Text(markers.length.toString()),
+              onPressed: null,
+              backgroundColor: pointFillColor,
+              foregroundColor: SmashColors.mainBackground,
+              heroTag: null,
+            );
+          },
+        ),
+      );
       layers.add(waypointsCluster);
     } else {
       // in case of multiple rules, we would not know the color for a mixed cluster.
@@ -442,6 +440,7 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
 
   @override
   void disposeSource() {
+    isLoaded = false;
     GPKG.ConnectionsHandler().close(getAbsolutePath(), tableName: getName());
   }
 

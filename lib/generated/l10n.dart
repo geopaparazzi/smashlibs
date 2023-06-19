@@ -231,6 +231,102 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Color to hide'**
   String get geoImage_colorToHide;
+
+  /// No description provided for @toolbarTools_zoomOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom out'**
+  String get toolbarTools_zoomOut;
+
+  /// No description provided for @toolbarTools_zoomIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom in'**
+  String get toolbarTools_zoomIn;
+
+  /// No description provided for @toolbarTools_cancelCurrentEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel current edit.'**
+  String get toolbarTools_cancelCurrentEdit;
+
+  /// No description provided for @toolbarTools_saveCurrentEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save current edit.'**
+  String get toolbarTools_saveCurrentEdit;
+
+  /// No description provided for @toolbarTools_insertPointMapCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert point in map center.'**
+  String get toolbarTools_insertPointMapCenter;
+
+  /// No description provided for @toolbarTools_insertPointGpsPos.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert point in GPS position.'**
+  String get toolbarTools_insertPointGpsPos;
+
+  /// No description provided for @toolbarTools_removeSelectedFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove selected feature.'**
+  String get toolbarTools_removeSelectedFeature;
+
+  /// No description provided for @toolbarTools_showFeatureAttributes.
+  ///
+  /// In en, this message translates to:
+  /// **'Show feature attributes.'**
+  String get toolbarTools_showFeatureAttributes;
+
+  /// No description provided for @toolbarTools_featureDoesNotHavePrimaryKey.
+  ///
+  /// In en, this message translates to:
+  /// **'The feature does not have a primary key. Editing is not allowed.'**
+  String get toolbarTools_featureDoesNotHavePrimaryKey;
+
+  /// No description provided for @toolbarTools_queryFeaturesVectorLayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Query features from loaded vector layers.'**
+  String get toolbarTools_queryFeaturesVectorLayers;
+
+  /// No description provided for @toolbarTools_measureDistanceWithFinger.
+  ///
+  /// In en, this message translates to:
+  /// **'Measure distances on the map with your finger.'**
+  String get toolbarTools_measureDistanceWithFinger;
+
+  /// No description provided for @toolbarTools_modifyGeomVectorLayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify geometries in editable vector layers.'**
+  String get toolbarTools_modifyGeomVectorLayers;
+
+  /// No description provided for @featureAttributesViewer_loadingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading data...'**
+  String get featureAttributesViewer_loadingData;
+
+  /// No description provided for @featureAttributesViewer_setNewValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Set new value.'**
+  String get featureAttributesViewer_setNewValue;
+
+  /// No description provided for @featureAttributesViewer_field.
+  ///
+  /// In en, this message translates to:
+  /// **'FIELD'**
+  String get featureAttributesViewer_field;
+
+  /// No description provided for @featureAttributesViewer_value.
+  ///
+  /// In en, this message translates to:
+  /// **'VALUE'**
+  String get featureAttributesViewer_value;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

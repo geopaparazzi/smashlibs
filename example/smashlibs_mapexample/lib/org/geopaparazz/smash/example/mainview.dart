@@ -185,6 +185,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
       ),
 
       body: mapView ?? Container(),
+      bottomNavigationBar: BottomToolsBar(32.0),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: _incrementCounter,
       //   tooltip: 'Increment',

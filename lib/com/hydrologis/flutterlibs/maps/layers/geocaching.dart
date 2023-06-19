@@ -128,7 +128,6 @@ class GeocachingSource extends VectorLayerSource {
   Future<List<Widget>> toLayers(BuildContext context) async {
     load(context);
 
-    var map = FlutterMapState.maybeOf(context)!;
     List<Widget> layers = [];
 
     if (_pointsList.isNotEmpty) {
@@ -298,29 +297,29 @@ class GeocachingSource extends VectorLayerSource {
       }
       var color = ColorExt("#007106");
       var labelColor = ColorExt("#ffffff");
-      var waypointsCluster = MarkerClusterLayer(
-          MarkerClusterLayerOptions(
-            maxClusterRadius: 60,
-            size: Size(40, 40),
-            fitBoundsOptions: FitBoundsOptions(
-              padding: EdgeInsets.all(50),
-            ),
-            markers: geoCaches,
-            polygonOptions: PolygonOptions(
-                borderColor: color,
-                color: color.withOpacity(0.2),
-                borderStrokeWidth: 3),
-            builder: (context, markers) {
-              return FloatingActionButton(
-                child: Text(markers.length.toString()),
-                onPressed: null,
-                backgroundColor: color,
-                foregroundColor: labelColor,
-                heroTag: null,
-              );
-            },
+      var waypointsCluster = MarkerClusterLayerWidget(
+        options: MarkerClusterLayerOptions(
+          maxClusterRadius: 60,
+          size: Size(40, 40),
+          fitBoundsOptions: FitBoundsOptions(
+            padding: EdgeInsets.all(50),
           ),
-          map);
+          markers: geoCaches,
+          polygonOptions: PolygonOptions(
+              borderColor: color,
+              color: color.withOpacity(0.2),
+              borderStrokeWidth: 3),
+          builder: (context, markers) {
+            return FloatingActionButton(
+              child: Text(markers.length.toString()),
+              onPressed: null,
+              backgroundColor: color,
+              foregroundColor: labelColor,
+              heroTag: null,
+            );
+          },
+        ),
+      );
       layers.add(waypointsCluster);
     }
     return layers;

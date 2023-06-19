@@ -157,7 +157,10 @@ dependencies:
   #  <key>NSMicrophoneUsageDescription</key>
   #  <string>The app needs to use the camera to take vocal notes during the field mapping activity.</string>
 
-  
+  # Apache 2
+  badges: ^3.0.2
+  # git:
+  #   url: https://github.com/yako-dev/flutter_badges.git
 
 dev_dependencies:
   lints: ^1.0.1
