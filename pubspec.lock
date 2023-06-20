@@ -971,10 +971,10 @@ packages:
     dependency: transitive
     description:
       name: sembast
-      sha256: c35f2d3a5ff1c9724d887c18de6846ad090d34fdd45419a5c5abc6c2d5e638e7
+      sha256: da8dd3774b6001bde09378da28e94c40bd4daecde32adb44837517c12e991321
       url: "https://pub.dev"
     source: hosted
-    version: "3.4.8"
+    version: "3.4.9"
   share_extend:
     dependency: "direct main"
     description:
