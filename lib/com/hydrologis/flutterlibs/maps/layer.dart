@@ -13,7 +13,7 @@ class _SmashMapLayerState extends State<SmashMapLayer> with AfterLayoutMixin {
   @override
   void afterFirstLayout(BuildContext context) async {
     _layersList = await widget._layerSource.toLayers(context);
-    setState(() {});
+    if (context.mounted) setState(() {});
   }
 
   @override

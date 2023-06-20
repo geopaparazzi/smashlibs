@@ -344,7 +344,7 @@ class GeocachingSource extends VectorLayerSource {
 
   @override
   bool hasProperties() {
-    return true;
+    return false;
   }
 
   Widget getPropertiesWidget() {
