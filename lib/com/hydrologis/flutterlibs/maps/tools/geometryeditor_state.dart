@@ -29,6 +29,10 @@ class GeometryEditorState extends ChangeNotifier {
     _editableItem = editableGeometry;
     notifyListeners();
   }
+
+  void refreshEditLayer() {
+    notifyListeners();
+  }
 }
 
 class EditableGeometry {
@@ -169,6 +173,9 @@ class GeometryEditManager {
         Provider.of<GeometryEditorState>(context, listen: false);
     geomEditorState.editableGeometry = null;
     GeometryEditManager().stopEditing();
+
+    // geomEditorState.refreshEditLayer();
+    // ! TODO
     SmashMapBuilder mapBuilder =
         Provider.of<SmashMapBuilder>(context, listen: false);
     mapBuilder.reBuild();
@@ -199,9 +206,11 @@ class GeometryEditManager {
                 points: element.points);
             checkedLines.add(tmp);
           });
-          layers.add(PolylineLayer(
-            polylineCulling: true,
-            polylines: checkedLines,
+          layers.add(SmashMapEditLayer(
+            PolylineLayer(
+              polylineCulling: true,
+              polylines: checkedLines,
+            ),
           ));
         } else if (editPolygon != null) {
           List<Polygon> checkedPolys =
@@ -215,14 +224,18 @@ class GeometryEditManager {
             );
             checkedPolys.add(tmp);
           });
-          layers.add(PolygonLayer(
+          layers.add(SmashMapEditLayer(PolygonLayer(
             polygonCulling: true,
             polygons: checkedPolys,
-          ));
+          )));
         }
-        layers.add(DragMarkers(markers: polyEditor!.edit()));
+        layers.add(
+          SmashMapEditLayer(DragMarkers(markers: polyEditor!.edit())),
+        );
       } else if (pointEditor != null) {
-        layers.add(DragMarkers(markers: [pointEditor!]));
+        layers.add(
+          SmashMapEditLayer(DragMarkers(markers: [pointEditor!])),
+        );
       }
     }
   }
@@ -299,7 +312,9 @@ class GeometryEditManager {
 
     _makeLineEditor(editGeometry);
 
-    vectorLayer.disposeSource();
+    disposeLayerToReload(vectorLayer);
+    // geomEditorState.refreshEditLayer();
+    // ! TODO
     SmashMapBuilder mapBuilder =
         Provider.of<SmashMapBuilder>(context, listen: false);
     mapBuilder.reBuild();
@@ -363,7 +378,9 @@ class GeometryEditManager {
       _polygonInWork = false;
     }
 
-    vectorLayer.disposeSource();
+    disposeLayerToReload(vectorLayer);
+    // geomEditorState.refreshEditLayer();
+    // ! TODO
     SmashMapBuilder mapBuilder =
         Provider.of<SmashMapBuilder>(context, listen: false);
     mapBuilder.reBuild();
@@ -456,12 +473,19 @@ class GeometryEditManager {
         );
 
         // reload layer geoms
-        vectorLayer?.disposeSource();
+        disposeLayerToReload(vectorLayer);
+        // geomEditorState.refreshEditLayer();
+        // ! TODO
         SmashMapBuilder mapBuilder =
             Provider.of<SmashMapBuilder>(context, listen: false);
         mapBuilder.reBuild();
       }
     }
+  }
+
+  void disposeLayerToReload(DbVectorLayerSource? vectorLayer) {
+    vectorLayer?.isLoaded = false;
+    // vectorLayer?.disposeSource();
   }
 
   Map<String, DbVectorLayerSource> _getName2SourcesMap() {
@@ -586,6 +610,8 @@ class GeometryEditManager {
         editorState.editableGeometry = editGeom;
         _isEditing = false;
 
+        // editorState.refreshEditLayer();
+        // ! TODO
         SmashMapBuilder builder =
             Provider.of<SmashMapBuilder>(context, listen: false);
         builder.reBuild();
@@ -597,9 +623,12 @@ class GeometryEditManager {
     editorState.editableGeometry = null;
     stopEditing();
 
+    // editorState.refreshEditLayer();
+    // ! TODO
     SmashMapBuilder builder =
         Provider.of<SmashMapBuilder>(context, listen: false);
     builder.reBuild();
+    SmashDialogs.showToast(context, "No feature selected", durationSeconds: 1);
   }
 
   void _makeLineEditor(EditableGeometry editGeom) {

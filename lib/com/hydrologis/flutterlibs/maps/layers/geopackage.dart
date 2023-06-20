@@ -124,7 +124,7 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
   _getDatabase() {
     var ch = GPKG.ConnectionsHandler();
     // ch.doRtreeCheck = DO_RTREE_CHECK;
-    if (_gpkgDb == null) {
+    if (_gpkgDb == null || !_gpkgDb!.isOpen()) {
       _gpkgDb = ch.open(_absolutePath, tableName: _tableName);
     }
   }
@@ -441,6 +441,7 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
   @override
   void disposeSource() {
     isLoaded = false;
+    // ! TODO check this
     GPKG.ConnectionsHandler().close(getAbsolutePath(), tableName: getName());
   }
 

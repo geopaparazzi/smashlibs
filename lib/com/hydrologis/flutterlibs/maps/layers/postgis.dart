@@ -196,7 +196,7 @@ class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
 
   getDatabase() async {
     var ch = PostgisConnectionsHandler();
-    if (_pgDb == null) {
+    if (_pgDb == null || !_pgDb!.isOpen()) {
       _pgDb = await ch.open(_dbUrl, _tableName, _user, _pwd, useSSL);
     }
   }
@@ -533,7 +533,8 @@ class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
   @override
   void disposeSource() {
     isLoaded = false;
-    PostgisConnectionsHandler().close(getUrl(), tableName: getName());
+    // ! TODO check this
+    // PostgisConnectionsHandler().close(getUrl(), tableName: getName());
   }
 
   @override

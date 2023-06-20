@@ -159,6 +159,16 @@ class SmashMapWidget extends StatelessWidget {
       mapFlags = mapFlags & ~InteractiveFlag.rotate;
     }
 
+    GeometryEditorState editorState =
+        Provider.of<GeometryEditorState>(context, listen: false);
+    if (editorState.isEnabled) {
+      GeometryEditManager().startEditing(editorState.editableGeometry, () {
+        // editorState.refreshEditLayer();
+        triggerRebuild(context);
+      });
+      GeometryEditManager().addEditLayers(layers);
+    }
+
     return Stack(
       children: <Widget>[
         FlutterMap(

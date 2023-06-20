@@ -110,31 +110,30 @@ abstract class LayerSource {
       String? type = map[LAYERSKEY_TYPE];
       String? url = map[LAYERSKEY_URL];
 
-      // ! TODO bring back
       if (type != null && type == LAYERSTYPE_WMS) {
         var wms = WmsSource.fromMap(map);
         return [wms];
       } else if (file != null && FileManager.isGpx(file)) {
         GpxSource gpx = GpxSource.fromMap(map);
         return [gpx];
-        // } else if (file != null && FileManager.isGeocaching(file)) {
-        //   GeocachingSource geocaching = GeocachingSource.fromMap(map);
-        //   return [geocaching];
-        // } else if (file != null && FileManager.isShp(file)) {
-        //   ShapefileSource shp = ShapefileSource.fromMap(map);
-        //   return [shp];
+      } else if (file != null && FileManager.isGeocaching(file)) {
+        GeocachingSource geocaching = GeocachingSource.fromMap(map);
+        return [geocaching];
+      } else if (file != null && FileManager.isShp(file)) {
+        ShapefileSource shp = ShapefileSource.fromMap(map);
+        return [shp];
       } else if (file != null && FileManager.isWorldImage(file)) {
         GeoImageSource world = GeoImageSource.fromMap(map);
         return [world];
-        // } else if (file != null && FileManager.isGeopackage(file)) {
-        //   bool? isVector = map[LAYERSKEY_ISVECTOR];
-        //   if (isVector == null || !isVector) {
-        //     TileSource ts = TileSource.fromMap(map);
-        //     return [ts];
-        //   } else {
-        //     GeopackageSource gpkg = GeopackageSource.fromMap(map);
-        //     return [gpkg];
-        //   }
+      } else if (file != null && FileManager.isGeopackage(file)) {
+        bool? isVector = map[LAYERSKEY_ISVECTOR];
+        if (isVector == null || !isVector) {
+          TileSource ts = TileSource.fromMap(map);
+          return [ts];
+        } else {
+          GeopackageSource gpkg = GeopackageSource.fromMap(map);
+          return [gpkg];
+        }
       } else if (url != null && url.toLowerCase().startsWith("postgis")) {
         PostgisSource pg = PostgisSource.fromMap(map);
         return [pg];
@@ -236,32 +235,34 @@ abstract class DbVectorLayerSource extends EditableVectorLayerSource {
       return dbSource.db;
     }
 
-    // ! TODO bring back
-    // if (dbSource is GeopackageSource) {
-    //   return Future.value(
-    //       ConnectionsHandler().open(dbSource.getAbsolutePath()));
-    // } else if (dbSource is PostgisSource) {
-    //   return await PostgisConnectionsHandler().open(dbSource.getUrl(),
-    //       dbSource.getName(), dbSource.getUser(), dbSource.getPassword());
-    // } else {
-    //   throw ArgumentError("Layersource is not a db source: $source");
-    // }
+    if (dbSource is GeopackageSource) {
+      return Future.value(
+          GPKG.ConnectionsHandler().open(dbSource.getAbsolutePath()));
+    } else if (dbSource is PostgisSource) {
+      return await PostgisConnectionsHandler().open(
+          dbSource.getUrl(),
+          dbSource.getName(),
+          dbSource.getUser(),
+          dbSource.getPassword(),
+          dbSource.useSSL);
+    } else {
+      throw ArgumentError("Layersource is not a db source: $source");
+    }
   }
 
   static LayerSource? fromMap(Map<String, dynamic> map) {
     var url = map[LAYERSKEY_URL];
-    // ! TODO bring  back
-    // if (url != null && url.startsWith("postgis")) {
-    //   return PostgisSource.fromMap(map);
-    // }
-    // var file = map[LAYERSKEY_FILE];
-    // var isVector = map[LAYERSKEY_ISVECTOR];
-    // if (file != null &&
-    //     FileManager.isGeopackage(file) &&
-    //     isVector != null &&
-    //     isVector) {
-    //   return GeopackageSource.fromMap(map);
-    // }
+    if (url != null && url.startsWith("postgis")) {
+      return PostgisSource.fromMap(map);
+    }
+    var file = map[LAYERSKEY_FILE];
+    var isVector = map[LAYERSKEY_ISVECTOR];
+    if (file != null &&
+        FileManager.isGeopackage(file) &&
+        isVector != null &&
+        isVector) {
+      return GeopackageSource.fromMap(map);
+    }
 
     return null;
   }

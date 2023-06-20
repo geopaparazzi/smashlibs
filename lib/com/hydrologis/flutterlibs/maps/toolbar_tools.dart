@@ -317,7 +317,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           (layer as DbVectorLayerSource).db == db;
       return isEqual;
     });
-    (layer as LoadableLayerSource).disposeSource();
+    (layer as LoadableLayerSource).isLoaded = false;
 
     SmashMapBuilder mapBuilder =
         Provider.of<SmashMapBuilder>(context, listen: false);
@@ -581,14 +581,12 @@ class GeomEditorButton extends StatefulWidget {
 class _GeomEditorButtonState extends State<GeomEditorButton> {
   @override
   Widget build(BuildContext bcontext) {
-    var msg1 = SLL.of(bcontext).toolbarTools_modifyGeomVectorLayers;
     return Consumer<GeometryEditorState>(
         builder: (context, editorState, child) {
       return Tooltip(
-        message: msg1,
-        //  SLL
-        //     .of(context)
-        //     .toolbarTools_modifyGeomVectorLayers, //"Modify geometries in editable vector layers."
+        message: SLL
+            .of(context)
+            .toolbarTools_modifyGeomVectorLayers, //"Modify geometries in editable vector layers."
         child: GestureDetector(
           child: Padding(
             padding: SmashUI.defaultPadding(),

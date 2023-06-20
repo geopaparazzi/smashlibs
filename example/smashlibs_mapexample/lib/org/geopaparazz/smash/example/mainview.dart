@@ -34,6 +34,15 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
       SmashDialogs.showToast(context, "Tapped: ${ll.longitude}, ${ll.latitude}",
           durationSeconds: 1);
     });
+    mapView!.setTapHandlers(
+      handleTap: (ll, zoom) async {
+        await GeometryEditManager().onMapTap(context, ll);
+      },
+      handleLongTap: (ll, zoom) {
+        GeometryEditManager().onMapLongTap(context, ll, zoom.round());
+      },
+    );
+
     mapView!.addLayerSource(_backgroundLayerSource);
     mapView!.addLayerSource(_currentLayerSource);
 
