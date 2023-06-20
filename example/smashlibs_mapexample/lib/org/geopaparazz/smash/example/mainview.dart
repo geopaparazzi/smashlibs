@@ -233,7 +233,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
     mapView!.addLayerSource(_currentLayerSource);
     var bounds = await _currentLayerSource.getBounds(context);
     if (bounds != null) {
-      mapView!.zoomToLLBounds(bounds);
+      mapView!.zoomToBounds(LatLngBoundsExt.fromBounds(bounds).toEnvelope());
     }
     if (context.mounted) {
       mapView!.triggerRebuild(context);

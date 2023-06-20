@@ -13,6 +13,8 @@ class LatLngExt extends LatLng {
       this.speed, this.ts, this.accuracy)
       : super(latitude, longitude);
 
+  LatLngExt.fromLatLng(LatLng ll) : super(ll.latitude, ll.longitude);
+
   LatLngExt.fromCoordinate(JTS.Coordinate coord) : super(coord.y, coord.x) {
     altim = coord.z;
     accuracy = -1.0;
@@ -23,6 +25,26 @@ class LatLngExt extends LatLng {
 
   JTS.Coordinate toCoordinate() {
     return JTS.Coordinate.fromXYZ(longitude, latitude, altim);
+  }
+}
+
+class LatLngBoundsExt extends LatLngBounds {
+  LatLngBoundsExt(LatLng corner1, LatLng corner2) : super(corner1, corner2);
+
+  LatLngBoundsExt.fromBounds(LatLngBounds bounds)
+      : super(bounds.southWest, bounds.northEast);
+
+  LatLngBoundsExt.fromEnvelope(JTS.Envelope envelope)
+      : super(
+          LatLng(envelope.getMinY(), envelope.getMinX()),
+          LatLng(envelope.getMaxY(), envelope.getMaxX()),
+        );
+
+  JTS.Envelope toEnvelope() {
+    return JTS.Envelope.fromCoordinates(
+      JTS.Coordinate(west, south),
+      JTS.Coordinate(east, north),
+    );
   }
 }
 

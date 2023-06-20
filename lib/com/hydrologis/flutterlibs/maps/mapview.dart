@@ -23,6 +23,8 @@ class SmashMapWidget extends StatelessWidget {
   void Function(LatLng, double) _handleTap = (ll, z) {};
   void Function(LatLng, double) _handleLongTap = (ll, z) {};
   void Function() _onMapReady = () {};
+  void Function(MapPosition, bool) _onPositionChanged =
+      (mapPosition, hasGesture) {};
 
   void setInitParameters({
     JTS.Coordinate? centerCoordinate,
@@ -50,6 +52,10 @@ class SmashMapWidget extends StatelessWidget {
 
   void setOnMapReady(Function()? onMapReady) {
     if (onMapReady != null) _onMapReady = onMapReady;
+  }
+
+  void setOnPositionChanged(Function(MapPosition, bool)? onPositionChanged) {
+    if (onPositionChanged != null) _onPositionChanged = onPositionChanged;
   }
 
   void addPreLayer(Widget layer) {
@@ -96,10 +102,6 @@ class SmashMapWidget extends StatelessWidget {
         LatLng(bounds.getMaxY(), bounds.getMaxX())));
   }
 
-  void zoomToLLBounds(LatLngBounds bounds) {
-    _mapController.fitBounds(bounds);
-  }
-
   void centerOn(JTS.Coordinate ll) {
     _mapController.move(LatLngExt.fromCoordinate(ll), _mapController.zoom);
   }
@@ -128,8 +130,11 @@ class SmashMapWidget extends StatelessWidget {
     _mapController.rotate(heading);
   }
 
-  LatLngBounds? getBounds() {
-    return _mapController.bounds;
+  JTS.Envelope? getBounds() {
+    if (_mapController.bounds != null) {
+      return LatLngBoundsExt.fromBounds(_mapController.bounds!).toEnvelope();
+    }
+    return null;
   }
 
   @override

@@ -75,13 +75,7 @@ class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
         if (_limitBounds == null) {
           var mapState = Provider.of<SmashMapState>(context, listen: false);
           if (mapState.mapView != null) {
-            var bounds = mapState.mapView!.getBounds();
-            var n = bounds!.north;
-            var s = bounds.south;
-            var e = bounds.east;
-            var w = bounds.west;
-            _limitBounds = JTS.Envelope.fromCoordinates(
-                JTS.Coordinate(w, s), JTS.Coordinate(e, n));
+            _limitBounds = mapState.mapView!.getBounds();
           }
         }
       }

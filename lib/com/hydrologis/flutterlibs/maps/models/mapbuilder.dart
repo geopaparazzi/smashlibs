@@ -33,17 +33,17 @@ class SmashMapBuilder extends ChangeNotifierPlus {
     notifyListeners();
   }
 
-  set oneShotUpdateLayers(List<Widget>? newLayers) {
-    _oneShotUpdateLayers = newLayers;
-  }
+  // set oneShotUpdateLayers(List<Widget>? newLayers) {
+  //   _oneShotUpdateLayers = newLayers;
+  // }
 
-  List<Widget>? get oneShotUpdateLayers {
-    try {
-      return _oneShotUpdateLayers;
-    } finally {
-      _oneShotUpdateLayers = null;
-    }
-  }
+  // List<Widget>? get oneShotUpdateLayers {
+  //   try {
+  //     return _oneShotUpdateLayers;
+  //   } finally {
+  //     _oneShotUpdateLayers = null;
+  //   }
+  // }
 
   static void reBuildStatic(BuildContext context) {
     var mapBuilder = Provider.of<SmashMapBuilder>(context, listen: false);
