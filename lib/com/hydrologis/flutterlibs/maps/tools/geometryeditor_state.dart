@@ -174,11 +174,11 @@ class GeometryEditManager {
     geomEditorState.editableGeometry = null;
     GeometryEditManager().stopEditing();
 
-    // geomEditorState.refreshEditLayer();
+    geomEditorState.refreshEditLayer();
     // ! TODO
-    SmashMapBuilder mapBuilder =
-        Provider.of<SmashMapBuilder>(context, listen: false);
-    mapBuilder.reBuild();
+    // SmashMapBuilder mapBuilder =
+    //     Provider.of<SmashMapBuilder>(context, listen: false);
+    // mapBuilder.reBuild();
   }
 
   void addPoint(LatLng ll) {
@@ -193,7 +193,55 @@ class GeometryEditManager {
     }
   }
 
-  void addEditLayers(List<Widget> layers) {
+  // void addEditLayers(List<Widget> layers) {
+  //   if (_isEditing) {
+  //     if (polyEditor != null) {
+  //       if (editPolyline != null) {
+  //         List<Polyline> checkedLines =
+  //             []; // TODO remove this when it is handled in  flutter_map (see issues https://github.com/fleaflet/flutter_map/issues/1037)
+  //         polyLines?.forEach((element) {
+  //           var tmp = new Polyline(
+  //               color: element.color,
+  //               strokeWidth: element.strokeWidth,
+  //               points: element.points);
+  //           checkedLines.add(tmp);
+  //         });
+  //         layers.add(
+  //           PolylineLayer(
+  //             polylineCulling: true,
+  //             polylines: checkedLines,
+  //           ),
+  //         );
+  //       } else if (editPolygon != null) {
+  //         List<Polygon> checkedPolys =
+  //             []; // TODO remove this when it is handled in  flutter_map (see issues https://github.com/fleaflet/flutter_map/issues/1037)
+  //         polygons?.forEach((element) {
+  //           var tmp = new Polygon(
+  //             color: element.color,
+  //             borderColor: element.borderColor,
+  //             borderStrokeWidth: element.borderStrokeWidth,
+  //             points: element.points,
+  //           );
+  //           checkedPolys.add(tmp);
+  //         });
+  //         layers.add(PolygonLayer(
+  //           polygonCulling: true,
+  //           polygons: checkedPolys,
+  //         ));
+  //       }
+  //       layers.add(
+  //         DragMarkers(markers: polyEditor!.edit()),
+  //       );
+  //     } else if (pointEditor != null) {
+  //       layers.add(
+  //         DragMarkers(markers: [pointEditor!]),
+  //       );
+  //     }
+  //   }
+  // }
+
+  List<Widget> getEditLayers() {
+    List<Widget> editLayers = [];
     if (_isEditing) {
       if (polyEditor != null) {
         if (editPolyline != null) {
@@ -206,11 +254,9 @@ class GeometryEditManager {
                 points: element.points);
             checkedLines.add(tmp);
           });
-          layers.add(SmashMapEditLayer(
-            PolylineLayer(
-              polylineCulling: true,
-              polylines: checkedLines,
-            ),
+          editLayers.add(PolylineLayer(
+            polylineCulling: true,
+            polylines: checkedLines,
           ));
         } else if (editPolygon != null) {
           List<Polygon> checkedPolys =
@@ -224,20 +270,17 @@ class GeometryEditManager {
             );
             checkedPolys.add(tmp);
           });
-          layers.add(SmashMapEditLayer(PolygonLayer(
+          editLayers.add(PolygonLayer(
             polygonCulling: true,
             polygons: checkedPolys,
-          )));
+          ));
         }
-        layers.add(
-          SmashMapEditLayer(DragMarkers(markers: polyEditor!.edit())),
-        );
+        editLayers.add(DragMarkers(markers: polyEditor!.edit()));
       } else if (pointEditor != null) {
-        layers.add(
-          SmashMapEditLayer(DragMarkers(markers: [pointEditor!])),
-        );
+        editLayers.add(DragMarkers(markers: [pointEditor!]));
       }
     }
+    return editLayers;
   }
 
   Future<void> onMapTap(BuildContext context, LatLng point) async {
@@ -313,11 +356,11 @@ class GeometryEditManager {
     _makeLineEditor(editGeometry);
 
     disposeLayerToReload(vectorLayer);
-    // geomEditorState.refreshEditLayer();
+    geomEditorState.refreshEditLayer();
     // ! TODO
-    SmashMapBuilder mapBuilder =
-        Provider.of<SmashMapBuilder>(context, listen: false);
-    mapBuilder.reBuild();
+    // SmashMapBuilder mapBuilder =
+    //     Provider.of<SmashMapBuilder>(context, listen: false);
+    // mapBuilder.reBuild();
   }
 
   Future<void> _handlePolygonGeometry(
@@ -379,11 +422,11 @@ class GeometryEditManager {
     }
 
     disposeLayerToReload(vectorLayer);
-    // geomEditorState.refreshEditLayer();
+    geomEditorState.refreshEditLayer();
     // ! TODO
-    SmashMapBuilder mapBuilder =
-        Provider.of<SmashMapBuilder>(context, listen: false);
-    mapBuilder.reBuild();
+    // SmashMapBuilder mapBuilder =
+    //     Provider.of<SmashMapBuilder>(context, listen: false);
+    // mapBuilder.reBuild();
   }
 
   /// Ask the user on which layer to create a new geometry and make a fist one.
@@ -474,11 +517,11 @@ class GeometryEditManager {
 
         // reload layer geoms
         disposeLayerToReload(vectorLayer);
-        // geomEditorState.refreshEditLayer();
+        geomEditorState.refreshEditLayer();
         // ! TODO
-        SmashMapBuilder mapBuilder =
-            Provider.of<SmashMapBuilder>(context, listen: false);
-        mapBuilder.reBuild();
+        // SmashMapBuilder mapBuilder =
+        //     Provider.of<SmashMapBuilder>(context, listen: false);
+        // mapBuilder.reBuild();
       }
     }
   }
@@ -610,11 +653,11 @@ class GeometryEditManager {
         editorState.editableGeometry = editGeom;
         _isEditing = false;
 
-        // editorState.refreshEditLayer();
+        editorState.refreshEditLayer();
         // ! TODO
-        SmashMapBuilder builder =
-            Provider.of<SmashMapBuilder>(context, listen: false);
-        builder.reBuild();
+        // SmashMapBuilder builder =
+        //     Provider.of<SmashMapBuilder>(context, listen: false);
+        // builder.reBuild();
       }
       return;
     }
@@ -623,11 +666,11 @@ class GeometryEditManager {
     editorState.editableGeometry = null;
     stopEditing();
 
-    // editorState.refreshEditLayer();
+    editorState.refreshEditLayer();
     // ! TODO
-    SmashMapBuilder builder =
-        Provider.of<SmashMapBuilder>(context, listen: false);
-    builder.reBuild();
+    // SmashMapBuilder builder =
+    //     Provider.of<SmashMapBuilder>(context, listen: false);
+    // builder.reBuild();
     SmashDialogs.showToast(context, "No feature selected", durationSeconds: 1);
   }
 

@@ -31,15 +31,31 @@ class _SmashMapLayerState extends State<SmashMapLayer> with AfterLayoutMixin {
   }
 }
 
-class SmashMapEditLayer extends StatelessWidget {
-  final Widget editLayer;
-  const SmashMapEditLayer(this.editLayer, {Key? key}) : super(key: key);
+class SmashMapEditLayer extends StatefulWidget {
+  SmashMapEditLayer({Key? key}) : super(key: key);
 
+  @override
+  State<SmashMapEditLayer> createState() => _SmashMapEditLayerState();
+}
+
+class _SmashMapEditLayerState extends State<SmashMapEditLayer> {
   @override
   Widget build(BuildContext context) {
     return Consumer<GeometryEditorState>(builder: (context, provObject, child) {
-      print("REFRESH EDIT LAYER");
-      return editLayer;
+      GeometryEditorState editorState =
+          Provider.of<GeometryEditorState>(context, listen: false);
+      if (editorState.isEnabled) {
+        GeometryEditManager().startEditing(editorState.editableGeometry, () {
+          setState(() {});
+        });
+        var editLayers = GeometryEditManager().getEditLayers();
+        if (editLayers.isNotEmpty) {
+          return Stack(
+            children: editLayers,
+          );
+        }
+      }
+      return Container();
     });
   }
 }

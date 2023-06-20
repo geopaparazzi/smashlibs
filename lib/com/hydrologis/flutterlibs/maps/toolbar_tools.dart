@@ -606,9 +606,11 @@ class _GeomEditorButtonState extends State<GeomEditorButton> {
                   context,
                   BottomToolbarToolsRegistry.GEOMEDITOR,
                   !editorState.isEnabled);
-              SmashMapBuilder mapBuilder =
-                  Provider.of<SmashMapBuilder>(context, listen: false);
-              mapBuilder.reBuild();
+              if (!editorState.isEnabled) {
+                SmashMapBuilder mapBuilder =
+                    Provider.of<SmashMapBuilder>(context, listen: false);
+                mapBuilder.reBuild();
+              }
             });
           },
         ),
