@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:smashlibs/smashlibs.dart';
-import 'package:dart_jts/dart_jts.dart';
-import 'package:path/path.dart' as p;
-import 'package:flutter/services.dart';
 import 'package:after_layout/after_layout.dart';
+import 'package:dart_jts/dart_jts.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path/path.dart' as p;
+import 'package:smashlibs/smashlibs.dart';
+import 'package:provider/provider.dart';
 
 class MainSmashLibsPage extends StatefulWidget {
   const MainSmashLibsPage({super.key, required this.title});
@@ -30,16 +31,23 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
     mapView = SmashMapWidget();
     mapView!.setInitParameters(
         canRotate: false, initZoom: 9, centerCoordinate: Coordinate(11, 46));
-    mapView!.setTapHandlers(handleTap: (ll, zoom) {
-      SmashDialogs.showToast(context, "Tapped: ${ll.longitude}, ${ll.latitude}",
-          durationSeconds: 1);
-    });
     mapView!.setTapHandlers(
       handleTap: (ll, zoom) async {
-        await GeometryEditManager().onMapTap(context, ll);
+        SmashDialogs.showToast(
+            context, "Tapped: ${ll.longitude}, ${ll.latitude}",
+            durationSeconds: 1);
+        GeometryEditorState geomEditorState =
+            Provider.of<GeometryEditorState>(context, listen: false);
+        if (geomEditorState.isEnabled) {
+          await GeometryEditManager().onMapTap(context, ll);
+        }
       },
       handleLongTap: (ll, zoom) {
-        GeometryEditManager().onMapLongTap(context, ll, zoom.round());
+        GeometryEditorState geomEditorState =
+            Provider.of<GeometryEditorState>(context, listen: false);
+        if (geomEditorState.isEnabled) {
+          GeometryEditManager().onMapLongTap(context, ll, zoom.round());
+        }
       },
     );
 
