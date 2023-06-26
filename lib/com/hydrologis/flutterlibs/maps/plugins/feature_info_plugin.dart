@@ -10,7 +10,8 @@ class FeatureInfoLayer extends StatelessWidget {
   final Color tapAreaColor = SmashColors.mainSelectionBorder;
   final double tapAreaPixelSize;
 
-  FeatureInfoLayer({this.tapAreaPixelSize = 10});
+  FeatureInfoLayer({this.tapAreaPixelSize = 10})
+      : super(key: ValueKey("SMASH_FEATUREINFOLAYER"));
 
   @override
   Widget build(BuildContext context) {

@@ -10,7 +10,8 @@ class RulerPluginLayer extends StatefulWidget {
   final Color tapAreaColor = SmashColors.mainSelectionBorder;
   final double tapAreaPixelSize;
 
-  RulerPluginLayer({this.tapAreaPixelSize = 10});
+  RulerPluginLayer({this.tapAreaPixelSize = 10})
+      : super(key: ValueKey("SMASH_RULERPLUGINLAYER"));
 
   @override
   _RulerPluginLayerState createState() => _RulerPluginLayerState();

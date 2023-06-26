@@ -59,15 +59,40 @@ class SmashMapWidget extends StatelessWidget {
   }
 
   void addPreLayer(Widget layer) {
-    if (!preLayers.contains(layer)) {
+    int index = getLayerIndex(preLayers, layer);
+    if (index != -1) {
+      preLayers[index] = layer;
+    } else {
       preLayers.add(layer);
     }
   }
 
   void addPostLayer(Widget layer) {
-    if (!postLayers.contains(layer)) {
+    int index = getLayerIndex(postLayers, layer);
+    if (index != -1) {
+      postLayers[index] = layer;
+    } else {
       postLayers.add(layer);
     }
+  }
+
+  void removeLayer(LayerSource layerSource) {
+    if (_useLayerManager) {
+      LayerManager().removeLayerSource(layerSource);
+    } else if (layerSources.contains(layerSource)) {
+      layerSources.remove(layerSource);
+    }
+  }
+
+  int getLayerIndex(List<Widget> list, Widget layer) {
+    int i = 0;
+    for (var item in list) {
+      if (item.key == layer.key) {
+        return i;
+      }
+      i++;
+    }
+    return -1;
   }
 
   void addNonRotationLayer(Widget layer) {
@@ -81,14 +106,6 @@ class SmashMapWidget extends StatelessWidget {
       LayerManager().addLayerSource(layerSource);
     } else if (!layerSources.contains(layerSource)) {
       layerSources.add(layerSource);
-    }
-  }
-
-  void removeLayer(LayerSource layerSource) {
-    if (_useLayerManager) {
-      LayerManager().removeLayerSource(layerSource);
-    } else if (layerSources.contains(layerSource)) {
-      layerSources.remove(layerSource);
     }
   }
 

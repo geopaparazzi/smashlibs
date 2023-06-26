@@ -52,9 +52,8 @@ class CenterCrossLayer extends StatelessWidget {
   final double lineWidth;
 
   CenterCrossLayer(
-      {this.crossColor = Colors.black,
-      this.crossSize = 10,
-      this.lineWidth = 2});
+      {this.crossColor = Colors.black, this.crossSize = 10, this.lineWidth = 2})
+      : super(key: ValueKey("SMASH_CENTERCROSSLAYER"));
 
   @override
   Widget build(BuildContext context) {
