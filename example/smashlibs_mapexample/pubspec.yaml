@@ -76,6 +76,7 @@ flutter:
     # - assets/smash_icon.png
     # - assets/smash_logo_64.png
     # - assets/smash_text.png
+    - assets/tags.json
     - assets/assisi.map
     - assets/ciclabile_peschiera_mantova.gpx
     - assets/testtiff.tif

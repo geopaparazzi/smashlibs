@@ -7,6 +7,42 @@ part of smashlibs;
 
 typedef Null ItemSelectedCallback(String selectedFormName);
 
+class PresentationMode {
+  bool isReadOnly;
+  bool doIgnoreEmpties;
+  DetailMode detailMode;
+  Color labelTextColor = SmashColors.mainTextColor;
+  bool doLabelBold;
+  Color valueTextColor = SmashColors.mainTextColorNeutral;
+  bool doValueBold;
+
+  PresentationMode({
+    this.isReadOnly = false,
+    this.doIgnoreEmpties = false,
+    this.detailMode = DetailMode.DETAILED,
+    Color? labelTextColor,
+    this.doLabelBold = true,
+    Color? valueTextColor,
+    this.doValueBold = false,
+  }) {
+    if (labelTextColor != null) this.labelTextColor = labelTextColor;
+    if (labelTextColor != null) this.labelTextColor = labelTextColor;
+  }
+}
+
+/// Class to define the compactness and detail to show of the form.
+class DetailMode {
+  static const NORMAL = const DetailMode._("NORMAL");
+  static const COMPACT = const DetailMode._("COMPACT");
+  static const DETAILED = const DetailMode._("DETAILED");
+
+  static get values => [NORMAL, COMPACT, DETAILED];
+
+  final String value;
+
+  const DetailMode._(this.value);
+}
+
 class FormSectionsWidget extends StatefulWidget {
   final ItemSelectedCallback onItemSelected;
   final bool isLargeScreen;
@@ -57,16 +93,22 @@ class FormDetailWidget extends StatefulWidget {
   final bool onlyDetail;
   final AFormhelper formHelper;
   final bool doScaffold;
-  final bool isReadOnly;
+  PresentationMode presentationMode = PresentationMode();
+  final bool isCompact;
 
   FormDetailWidget(
     this.formName,
     this.isLargeScreen,
     this.onlyDetail,
     this.formHelper, {
-    this.isReadOnly = false,
+    presentationMode,
+    this.isCompact = false,
     this.doScaffold = true,
-  });
+  }) {
+    if (presentationMode != null) {
+      this.presentationMode = presentationMode;
+    }
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -101,8 +143,8 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 
     for (int i = 0; i < formItems.length; i++) {
       String key = "form${formName}_note${noteId}_item$i";
-      Widget? w = getWidget(
-          context, key, formItems[i], widget.isReadOnly, widget.formHelper);
+      Widget? w = getWidget(context, key, formItems[i], widget.presentationMode,
+          widget.formHelper);
       if (w != null) {
         widgetsList.add(w);
       }
@@ -139,7 +181,7 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 class MasterDetailPage extends StatefulWidget {
   final AFormhelper formHelper;
   final bool doScaffold;
-  final bool isReadOnly;
+  PresentationMode presentationMode = PresentationMode();
 
   /// Create a Master+Detail Form page based on the given
   /// [AFormhelper].
@@ -149,8 +191,12 @@ class MasterDetailPage extends StatefulWidget {
   MasterDetailPage(
     this.formHelper, {
     this.doScaffold = true,
-    this.isReadOnly = false,
-  });
+    presentationMode,
+  }) {
+    if (presentationMode != null) {
+      this.presentationMode = presentationMode;
+    }
+  }
 
   @override
   _MasterDetailPageState createState() => _MasterDetailPageState(formHelper);
@@ -193,7 +239,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
                           onlyDetail,
                           widget.formHelper,
                           doScaffold: widget.doScaffold,
-                          isReadOnly: widget.isReadOnly,
+                          presentationMode: widget.presentationMode,
                         );
                       },
                     ));
@@ -210,7 +256,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
                   onlyDetail,
                   widget.formHelper,
                   doScaffold: widget.doScaffold,
-                  isReadOnly: widget.isReadOnly,
+                  presentationMode: widget.presentationMode,
                 ))
             : Container(),
       ]);
@@ -245,7 +291,7 @@ ListTile? getWidget(
   BuildContext context,
   String widgetKey,
   final Map<String, dynamic> itemMap,
-  bool isReadOnly,
+  PresentationMode presentationMode,
   AFormhelper formHelper,
 ) {
   String key = "-";
@@ -289,15 +335,25 @@ ListTile? getWidget(
     }
   }
 
-  if (isReadOnly) {
+  if (presentationMode.isReadOnly) {
     // global readonly overrides the item one
     itemReadonly = true;
   }
+
+  var labelTextColor = presentationMode.labelTextColor;
+  var labelBold = presentationMode.doLabelBold;
+  var valueTextColor = presentationMode.valueTextColor;
+  var valueBold = presentationMode.doValueBold;
 
   Constraints constraints = new Constraints();
   FormUtilities.handleConstraints(itemMap, constraints);
 //    key2ConstraintsMap.put(key, constraints);
 //    String constraintDescription = constraints.getDescription();
+
+  var valueString = value.toString();
+  if (valueString.trim().isEmpty && presentationMode.doIgnoreEmpties) {
+    return null;
+  }
 
   var minLines = 1;
   var maxLines = 1;
@@ -325,50 +381,86 @@ ListTile? getWidget(
     TYPE_STRING:
     case TYPE_STRING:
       {
-        TextFormField field = TextFormField(
-          key: ValueKey(widgetKey),
-          validator: (value) {
-            if (value != null && !constraints.isValid(value)) {
-              return constraints.getDescription(context);
-            }
-            return null;
-          },
-          autovalidateMode: AutovalidateMode.always,
-          style: TextStyle(
-            fontSize: SmashUI.NORMAL_SIZE,
-            color: SmashColors.mainDecorationsDarker,
-          ),
-          decoration: InputDecoration(
-            label: Row(
+        Widget? field;
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          if (presentationMode.detailMode == DetailMode.NORMAL) {
+            field = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SmashUI.normalText(label, color: SmashColors.disabledText),
+                SmashUI.normalText(label,
+                    color: labelTextColor, bold: labelBold),
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child: SmashUI.normalText(constraints.getDescription(context),
-                      color: SmashColors.disabledText),
+                  child: SmashUI.normalText(valueString,
+                      color: valueTextColor, bold: valueBold),
                 ),
               ],
+            );
+          } else if (presentationMode.detailMode == DetailMode.COMPACT) {
+            field = Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SmashUI.normalText(label,
+                    color: labelTextColor, bold: labelBold),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: SmashUI.normalText(valueString,
+                      color: valueTextColor, bold: valueBold),
+                ),
+              ],
+            );
+          }
+        } else {
+          field = TextFormField(
+            key: ValueKey(widgetKey),
+            validator: (value) {
+              if (value != null && !constraints.isValid(value)) {
+                return constraints.getDescription(context);
+              }
+              return null;
+            },
+            autovalidateMode: AutovalidateMode.always,
+            style: TextStyle(
+              fontSize: SmashUI.NORMAL_SIZE,
+              color: valueTextColor,
+              fontWeight: valueBold ? FontWeight.bold : FontWeight.normal,
             ),
-          ),
-          initialValue: value,
-          onChanged: (text) {
-            dynamic result = text;
-            if (type == TYPE_INTEGER) {
-              result = int.tryParse(text);
-            } else if (type == TYPE_DOUBLE) {
-              result = double.tryParse(text);
-            }
-            itemMap[TAG_VALUE] = result;
-          },
-          enabled: !itemReadonly,
-          minLines: minLines,
-          maxLines: maxLines,
-          keyboardType: keyboardType,
-        );
-
+            decoration: InputDecoration(
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SmashUI.normalText(label,
+                      color: labelTextColor, bold: labelBold),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: SmashUI.normalText(
+                        constraints.getDescription(context),
+                        color: SmashColors.disabledText),
+                  ),
+                ],
+              ),
+            ),
+            initialValue: value,
+            onChanged: (text) {
+              dynamic result = text;
+              if (type == TYPE_INTEGER) {
+                result = int.tryParse(text);
+              } else if (type == TYPE_DOUBLE) {
+                result = double.tryParse(text);
+              }
+              itemMap[TAG_VALUE] = result;
+            },
+            enabled: !itemReadonly,
+            minLines: minLines,
+            maxLines: maxLines,
+            keyboardType: keyboardType,
+          );
+        }
         ListTile tile = ListTile(
           title: field,
           leading: icon,
@@ -415,8 +507,8 @@ ListTile? getWidget(
             leading: icon,
             title: GestureDetector(
               onTap: () async {
-                if (await canLaunch(url!)) {
-                  await launch(url);
+                if (await canLaunchUrlString(url!)) {
+                  await launchUrlString(url);
                 } else {
                   SmashDialogs.showErrorDialog(
                       context, "Unable to open url: $url");
@@ -437,6 +529,13 @@ ListTile? getWidget(
       }
     case TYPE_DATE:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          return ListTile(
+            leading: icon,
+            title: getSimpleLabelValue(label, valueString, presentationMode),
+          );
+        }
         return ListTile(
           leading: icon,
           title: DatePickerWidget(widgetKey, itemMap, label, itemReadonly),
@@ -444,6 +543,13 @@ ListTile? getWidget(
       }
     case TYPE_TIME:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          return ListTile(
+            leading: icon,
+            title: getSimpleLabelValue(label, valueString, presentationMode),
+          );
+        }
         return ListTile(
           leading: icon,
           title: TimePickerWidget(widgetKey, itemMap, label, itemReadonly),
@@ -458,6 +564,13 @@ ListTile? getWidget(
       }
     case TYPE_STRINGCOMBO:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          return ListTile(
+            leading: icon,
+            title: getSimpleLabelValue(label, valueString, presentationMode),
+          );
+        }
         return ListTile(
           leading: icon,
           title:
@@ -466,6 +579,13 @@ ListTile? getWidget(
       }
     case TYPE_INTCOMBO:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          return ListTile(
+            leading: icon,
+            title: getSimpleLabelValue(label, valueString, presentationMode),
+          );
+        }
         return ListTile(
           leading: icon,
           title: ComboboxWidget<int>(widgetKey, itemMap, label, itemReadonly),
@@ -473,6 +593,13 @@ ListTile? getWidget(
       }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          return ListTile(
+            leading: icon,
+            title: getSimpleLabelValue(label, valueString, presentationMode),
+          );
+        }
         return ListTile(
           leading: icon,
           title: AutocompleteStringComboWidget(
@@ -502,6 +629,13 @@ ListTile? getWidget(
 //        break;
     case TYPE_STRINGMULTIPLECHOICE:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          return ListTile(
+            leading: icon,
+            title: getSimpleLabelValue(label, valueString, presentationMode),
+          );
+        }
         return ListTile(
           leading: icon,
           title:
@@ -510,6 +644,13 @@ ListTile? getWidget(
       }
     case TYPE_INTMULTIPLECHOICE:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          return ListTile(
+            leading: icon,
+            title: getSimpleLabelValue(label, valueString, presentationMode),
+          );
+        }
         return ListTile(
           leading: icon,
           title: MultiComboWidget<int>(widgetKey, itemMap, label, itemReadonly),
@@ -568,6 +709,40 @@ ListTile? getWidget(
   }
 
   return null;
+}
+
+Widget getSimpleLabelValue(String label, String value, PresentationMode pm) {
+  Widget field;
+  if (pm.detailMode == DetailMode.NORMAL) {
+    field = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SmashUI.normalText(label,
+            color: pm.labelTextColor, bold: pm.doLabelBold),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: SmashUI.normalText(value,
+              color: pm.valueTextColor, bold: pm.doValueBold),
+        ),
+      ],
+    );
+  } else {
+    field = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SmashUI.normalText(label,
+            color: pm.labelTextColor, bold: pm.doLabelBold),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: SmashUI.normalText(value,
+              color: pm..valueTextColor, bold: pm.doValueBold),
+        ),
+      ],
+    );
+  }
+  return field;
 }
 
 class CheckboxWidget extends StatefulWidget {

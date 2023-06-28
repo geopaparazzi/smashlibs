@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:smashlibs/smashlibs.dart';
 import 'package:provider/provider.dart';
+import 'package:smashlibs_mapexample/org/geopaparazz/smash/example/utils.dart';
 
 class MainSmashLibsPage extends StatefulWidget {
   const MainSmashLibsPage({super.key, required this.title});
@@ -42,11 +43,16 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           await GeometryEditManager().onMapTap(context, ll);
         }
       },
-      handleLongTap: (ll, zoom) {
+      handleLongTap: (ll, zoom) async {
         GeometryEditorState geomEditorState =
             Provider.of<GeometryEditorState>(context, listen: false);
         if (geomEditorState.isEnabled) {
           GeometryEditManager().onMapLongTap(context, ll, zoom.round());
+        } else {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const FormsExamplePage()));
         }
       },
     );
