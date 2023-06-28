@@ -1,0 +1,465 @@
+[
+  {
+    "sectionname": "image note",
+    "sectiondescription": "note with image",
+    "sectionicon": "image",
+    "forms": [
+      {
+        "formname": "image note",
+        "formitems": [
+          {
+            "key": "description",
+            "islabel": "true",
+            "value": "",
+            "icon": "infoCircle",
+            "type": "string",
+            "mandatory": "no"
+          },
+          {
+            "key": "images",
+            "value": "",
+            "type": "pictures"
+          }
+        ]
+      },
+      {
+        "formname": "image from library",
+        "formitems": [
+          {
+            "key": "description",
+            "islabel": "true",
+            "value": "",
+            "icon": "infoCircle",
+            "type": "string",
+            "mandatory": "no"
+          },
+          {
+            "key": "imagesfromlib",
+            "value": "",
+            "type": "imagelib"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionname": "text note",
+    "sectiondescription": "a simple text note",
+    "sectionicon": "fileAlt",
+    "forms": [
+      {
+        "formname": "text note",
+        "formitems": [
+          {
+            "key": "title",
+            "value": "",
+            "icon": "font",
+            "islabel": "true",
+            "type": "string",
+            "mandatory": "no"
+          },
+          {
+            "key": "description",
+            "value": "",
+            "icon": "infoCircle",
+            "type": "string",
+            "mandatory": "no"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionname": "examples",
+    "sectiondescription": "examples of supported form widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "text",
+        "formitems": [
+          {
+            "key": "some text",
+            "value": "example entry",
+            "icon": "font",
+            "type": "string"
+          },
+          {
+            "key": "some text area",
+            "value": "line1\nline2",
+            "icon": "scroll",
+            "type": "stringarea"
+          }
+        ]
+      },
+      {
+        "formname": "multiple text",
+        "formitems": [
+          {
+            "key": "some text",
+            "value": "text1; text2; text3",
+            "type": "dynamicstring"
+          }
+        ]
+      },
+      {
+        "formname": "text example with key and label",
+        "formitems": [
+          {
+            "key": "the_key_used_to_index",
+            "label": "the label used to describe",
+            "value": "example entry",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "formname": "numeric text",
+        "formitems": [
+          {
+            "key": "a number",
+            "value": "2.3456",
+            "type": "double"
+          },
+          {
+            "key": "an integer number",
+            "value": "1234",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "formname": "numeric text used as label in map",
+        "formitems": [
+          {
+            "key": "a number",
+            "value": "",
+            "islabel": "true",
+            "type": "double"
+          },
+          {
+            "key": "an integer number",
+            "value": "",
+            "type": "integer"
+          }
+        ]
+      },
+      {
+        "formname": "date",
+        "formitems": [
+          {
+            "key": "a date",
+            "value": "",
+            "type": "date"
+          }
+        ]
+      },
+      {
+        "formname": "time",
+        "formitems": [
+          {
+            "key": "a time",
+            "value": "",
+            "type": "time"
+          }
+        ]
+      },
+      {
+        "formname": "labels",
+        "formitems": [
+          {
+            "value": "a simple label of size 20",
+            "size": "20",
+            "type": "label"
+          },
+          {
+            "value": "a underlined label of size 24",
+            "size": "24",
+            "type": "labelwithline"
+          },
+          {
+            "value": "a label with link to the geopaparazzi homepage",
+            "url": "http://www.geopaparazzi.eu",
+            "size": "20",
+            "type": "labelwithline"
+          }
+        ]
+      },
+      {
+        "formname": "boolean",
+        "formitems": [
+          {
+            "key": "a boolean choice",
+            "value": "",
+            "icon": "questionCircle",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "formname": "combos",
+        "formitems": [
+          {
+            "key": "a single choice combo",
+            "values": {
+              "items": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1"
+                },
+                {
+                  "item": "choice 2"
+                },
+                {
+                  "item": "choice 3"
+                },
+                {
+                  "item": "choice 4"
+                },
+                {
+                  "item": "choice 5"
+                }
+              ]
+            },
+            "value": "",
+            "type": "stringcombo"
+          },
+          {
+            "key": "combos with item labels",
+            "values": {
+              "items": [
+                {
+                  "item": {
+                    "label": "",
+                    "value": "0"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 1",
+                    "value": "1"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 2",
+                    "value": "2"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 3",
+                    "value": "3"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 4",
+                    "value": "4"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 5",
+                    "value": "5"
+                  }
+                }
+              ]
+            },
+            "value": "",
+            "type": "stringcombo"
+          },
+          {
+            "key": "two connected combos",
+            "values": {
+              "items 1": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 1"
+                },
+                {
+                  "item": "choice 2 of 1"
+                },
+                {
+                  "item": "choice 3 of 1"
+                },
+                {
+                  "item": "choice 4 of 1"
+                },
+                {
+                  "item": "choice 5 of 1"
+                }
+              ],
+              "items 2": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 2"
+                },
+                {
+                  "item": "choice 2 of 2"
+                },
+                {
+                  "item": "choice 3 of 2"
+                },
+                {
+                  "item": "choice 4 of 2"
+                },
+                {
+                  "item": "choice 5 of 2"
+                }
+              ]
+            },
+            "value": "",
+            "type": "connectedstringcombo"
+          },
+          {
+            "key": "two connected combos, default selected",
+            "values": {
+              "items 1": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 1"
+                },
+                {
+                  "item": "choice 2 of 1"
+                },
+                {
+                  "item": "choice 3 of 1"
+                },
+                {
+                  "item": "choice 4 of 1"
+                },
+                {
+                  "item": "choice 5 of 1"
+                }
+              ],
+              "items 2": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 2"
+                },
+                {
+                  "item": "choice 2 of 2"
+                },
+                {
+                  "item": "choice 3 of 2"
+                },
+                {
+                  "item": "choice 4 of 2"
+                },
+                {
+                  "item": "choice 5 of 2"
+                }
+              ]
+            },
+            "value": "items 2#choice 4 of 2",
+            "type": "connectedstringcombo"
+          },
+          {
+            "key": "an autocomplete string combo",
+            "values": {
+              "items": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1"
+                },
+                {
+                  "item": "choice 2"
+                },
+                {
+                  "item": "choice 3"
+                },
+                {
+                  "item": "choice 4"
+                },
+                {
+                  "item": "choice 5"
+                }
+              ]
+            },
+            "value": "",
+            "type": "autocompletestringcombo"
+          },
+          {
+            "key": "two connected autocomplete combos",
+            "values": {
+              "items 1": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 1"
+                },
+                {
+                  "item": "choice 2 of 1"
+                },
+                {
+                  "item": "choice 3 of 1"
+                },
+                {
+                  "item": "choice 4 of 1"
+                },
+                {
+                  "item": "choice 5 of 1"
+                }
+              ],
+              "items 2": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 2"
+                },
+                {
+                  "item": "choice 2 of 2"
+                },
+                {
+                  "item": "choice 3 of 2"
+                },
+                {
+                  "item": "choice 4 of 2"
+                },
+                {
+                  "item": "choice 5 of 2"
+                }
+              ]
+            },
+            "value": "",
+            "type": "autocompleteconnectedstringcombo"
+          }
+        ]
+      },
+      {
+        "formname": "pictures",
+        "formitems": [
+          {
+            "key": "a picture archive",
+            "value": "",
+            "type": "pictures"
+          }
+        ]
+      },
+      {
+        "formname": "sketch note",
+        "formitems": [
+          {
+            "key": "a sketches archive",
+            "value": "",
+            "type": "sketch"
+          }
+        ]
+      }
+    ]
+  }
+]
