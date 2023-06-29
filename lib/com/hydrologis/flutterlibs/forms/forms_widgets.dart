@@ -608,6 +608,18 @@ ListTile? getWidget(
       }
     case TYPE_CONNECTEDSTRINGCOMBO:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          var finalString = "";
+          if (valueString != finalString) {
+            var split = valueString.split("#");
+            finalString = "${split[0]} -> ${split[1]}";
+          }
+          return ListTile(
+            leading: icon,
+            title: getSimpleLabelValue(label, finalString, presentationMode),
+          );
+        }
         return ListTile(
           leading: icon,
           title:
@@ -737,7 +749,7 @@ Widget getSimpleLabelValue(String label, String value, PresentationMode pm) {
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: SmashUI.normalText(value,
-              color: pm..valueTextColor, bold: pm.doValueBold),
+              color: pm.valueTextColor, bold: pm.doValueBold),
         ),
       ],
     );

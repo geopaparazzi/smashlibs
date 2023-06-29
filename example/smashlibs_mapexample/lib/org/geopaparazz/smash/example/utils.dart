@@ -126,39 +126,40 @@ class _FormsExamplePageState extends State<FormsExamplePage>
               },
             ),
           ),
+          mode.isReadOnly
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: DropdownButton<DetailMode>(
+                    value: mode.detailMode,
+                    onChanged: (DetailMode? value) {
+                      setState(() {
+                        mode.detailMode = value!;
+                      });
+                    },
+                    items: detailModes
+                        .map<DropdownMenuItem<DetailMode>>((DetailMode value) {
+                      return DropdownMenuItem<DetailMode>(
+                        value: value,
+                        child: Text(value.value),
+                      );
+                    }).toList(),
+                  ),
+                )
+              : Container(),
           Tooltip(
             message: "Toggle ignore empties",
-            child: Switch(
-              value: mode.doIgnoreEmpties,
-              onChanged: (bool value) {
-                setState(() {
-                  mode.doIgnoreEmpties = value;
-                });
-              },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Switch(
+                value: mode.doIgnoreEmpties,
+                onChanged: (bool value) {
+                  setState(() {
+                    mode.doIgnoreEmpties = value;
+                  });
+                },
+              ),
             ),
           ),
-          DropdownButton<DetailMode>(
-            value: mode.detailMode,
-            // icon: const Icon(Icons.arrow_downward),
-            // elevation: 16,
-            // style: const TextStyle(color: Colors.deepPurple),
-            // underline: Container(
-            //   height: 2,
-            //   color: Colors.deepPurpleAccent,
-            // ),
-            onChanged: (DetailMode? value) {
-              setState(() {
-                mode.detailMode = value!;
-              });
-            },
-            items: detailModes
-                .map<DropdownMenuItem<DetailMode>>((DetailMode value) {
-              return DropdownMenuItem<DetailMode>(
-                value: value,
-                child: Text(value.value),
-              );
-            }).toList(),
-          )
         ],
       ),
       body: helper == null

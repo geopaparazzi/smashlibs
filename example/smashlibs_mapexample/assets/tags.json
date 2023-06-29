@@ -148,7 +148,7 @@
         "formitems": [
           {
             "key": "a date",
-            "value": "",
+            "value": "2023-06-29",
             "type": "date"
           }
         ]
@@ -158,7 +158,7 @@
         "formitems": [
           {
             "key": "a time",
-            "value": "",
+            "value": "08:38:00",
             "type": "time"
           }
         ]
@@ -222,7 +222,7 @@
                 }
               ]
             },
-            "value": "",
+            "value": "choice 3",
             "type": "stringcombo"
           },
           {
@@ -267,7 +267,7 @@
                 }
               ]
             },
-            "value": "",
+            "value": "4",
             "type": "stringcombo"
           },
           {
