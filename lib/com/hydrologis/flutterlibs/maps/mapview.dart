@@ -26,6 +26,9 @@ class SmashMapWidget extends StatelessWidget {
   void Function(MapPosition, bool) _onPositionChanged =
       (mapPosition, hasGesture) {};
 
+  SmashMapWidget({Key? key})
+      : super(key: key != null ? key : ValueKey("SMASH_MAPVIEW"));
+
   void setInitParameters({
     JTS.Coordinate? centerCoordinate,
     JTS.Envelope? initBounds,
@@ -196,6 +199,7 @@ class SmashMapWidget extends StatelessWidget {
     return Stack(
       children: <Widget>[
         FlutterMap(
+          key: ValueKey("${key.toString()}-FlutterMapWidget"),
           options: new MapOptions(
             bounds: _initBounds != null
                 ? LatLngBounds(
@@ -209,10 +213,7 @@ class SmashMapWidget extends StatelessWidget {
             minZoom: _minZoom,
             maxZoom: _maxZoom,
             onPositionChanged: (newPosition, hasGesture) {
-              mapState.setLastPositionQuiet(
-                  JTS.Coordinate(newPosition.center!.longitude,
-                      newPosition.center!.latitude),
-                  newPosition.zoom!);
+              _onPositionChanged(newPosition, hasGesture);
             },
             onTap: (TapPosition tPos, LatLng point) =>
                 _handleTap(point, _mapController.zoom),

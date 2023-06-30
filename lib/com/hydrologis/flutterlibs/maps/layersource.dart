@@ -6,6 +6,7 @@
 part of smashlibs;
 
 const LAYERSKEY_FILE = 'file';
+const LAYERSKEY_GEOJSON = 'geojson';
 const LAYERSKEY_URL = 'url';
 const LAYERSKEY_USER = 'user';
 const LAYERSKEY_PWD = 'pwd';

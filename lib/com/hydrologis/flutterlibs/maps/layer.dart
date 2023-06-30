@@ -2,7 +2,8 @@ part of smashlibs;
 
 class SmashMapLayer extends StatefulWidget {
   final LayerSource _layerSource;
-  SmashMapLayer(this._layerSource, {Key? key}) : super(key: key);
+  SmashMapLayer(this._layerSource, {Key? key})
+      : super(key: key != null ? key : ValueKey("SMASH_GENERIC_MAP_LAYER"));
 
   @override
   State<SmashMapLayer> createState() => _SmashMapLayerState();
@@ -32,7 +33,11 @@ class _SmashMapLayerState extends State<SmashMapLayer> with AfterLayoutMixin {
 }
 
 class SmashMapEditLayer extends StatefulWidget {
-  SmashMapEditLayer({Key? key}) : super(key: key);
+  SmashMapEditLayer({Key? key})
+      : super(
+            key: key != null
+                ? key
+                : ValueKey("SMASH_GENERIC_MAP_EDITING_LAYER"));
 
   @override
   State<SmashMapEditLayer> createState() => _SmashMapEditLayerState();

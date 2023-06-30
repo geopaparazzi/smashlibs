@@ -17,7 +17,7 @@ class DemoAppFormHelper extends AFormhelper {
     var tagsJson = await rootBundle.loadString("assets/tags.json");
     TagsManager().readTags(tagsString: tagsJson);
     var sectionsMap = TagsManager().getSectionsMap();
-    sectionMap = sectionsMap.values.toList()[2];
+    sectionMap = sectionsMap.values.toList()[0];
     return Future.value(true);
   }
 

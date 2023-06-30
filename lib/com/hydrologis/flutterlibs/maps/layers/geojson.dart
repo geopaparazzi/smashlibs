@@ -7,6 +7,8 @@ part of smashlibs;
 
 class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   String? _absolutePath;
+  String? _geojsonString;
+
   String? _name;
   String? sldPath;
 
@@ -21,147 +23,197 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   HU.TextStyle? _textStyle;
 
   List<String> alphaFields = [];
-  String? sldString;
+  String? _sldString;
   JTS.EGeometryType? geometryType;
 
   GeojsonSource.fromMap(Map<String, dynamic> map) {
     _name = map[LAYERSKEY_LABEL];
-    String relativePath = map[LAYERSKEY_FILE];
-    _absolutePath = Workspace.makeAbsolute(relativePath);
+    String? relativePath = map[LAYERSKEY_FILE];
+    if (relativePath != null) {
+      _absolutePath = Workspace.makeAbsolute(relativePath);
+    }
+    String? geojsonString = map[LAYERSKEY_GEOJSON];
+    if (geojsonString != null) {
+      _geojsonString = geojsonString;
+    }
     isVisible = map[LAYERSKEY_ISVISIBLE];
   }
 
+  GeojsonSource.fromGeojsonGeometry(this._geojsonString);
+
   GeojsonSource(this._absolutePath);
 
+  @override
   Future<void> load(BuildContext? context) async {
     if (!isLoaded) {
-      _name = HU.FileUtilities.nameFromFile(_absolutePath!, false);
+      var gf = JTS.GeometryFactory.defaultPrecision();
+      _featureTree = JTS.STRtree();
+      if (_geojsonString != null) {
+        _name = "geojson";
 
-      var parentFolder = HU.FileUtilities.parentFolderFromFile(_absolutePath!);
+        var jsonGeometry = GEOJSON.GeoJSONGeometry.fromJSON(_geojsonString!);
+        JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
 
-      var geoJsonString = HU.FileUtilities.readFile(_absolutePath!);
-      var fColl = GEOJSON.GeoJSONFeatureCollection.fromJSON(geoJsonString);
-      var bbox = fColl.bbox;
-      var llLatLng = LatLng(bbox![1], bbox[0]);
-      var urLatLng = LatLng(bbox[3], bbox[2]);
-      _geojsonBounds = LatLngBounds.fromPoints([llLatLng, urLatLng]);
+        if (geometry != null) {
+          SHP.Feature f = SHP.Feature()
+            ..fid = 0
+            ..geometry = geometry
+            ..attributes = {};
 
-      if (fColl.features.length > 0) {
-        var firstFeature = fColl.features[0];
-        for (String k in firstFeature!.properties!.keys) {
-          alphaFields.add(k);
-        }
+          var envLL = geometry.getEnvelopeInternal();
+          _geojsonBounds = LatLngBoundsExt.fromEnvelope(envLL);
+          features.add(f);
+          _featureTree!.insert(envLL, f);
 
-        _featureTree = JTS.STRtree();
-
-        var gf = JTS.GeometryFactory.defaultPrecision();
-        int id = 0;
-        for (var jsonFeature in fColl.features) {
-          if (jsonFeature != null) {
-            GEOJSON.GeoJSONGeometry jsonGeometry = jsonFeature.geometry;
-
-            JTS.Geometry geometry;
-
-            switch (jsonGeometry.type) {
-              case GEOJSON.GeoJSONType.point:
-                List<double> coords =
-                    (jsonGeometry as GEOJSON.GeoJSONPoint).coordinates;
-                geometry = gf.createPoint(JTS.Coordinate(coords[0], coords[1]));
-                geometryType = JTS.EGeometryType.POINT;
-                break;
-              case GEOJSON.GeoJSONType.multiPoint:
-                var coordsList =
-                    (jsonGeometry as GEOJSON.GeoJSONMultiPoint).coordinates;
-                var pts = <JTS.Point>[];
-                for (var coords in coordsList) {
-                  pts.add(gf.createPoint(JTS.Coordinate(coords[0], coords[1])));
-                }
-                geometry = gf.createMultiPoint(pts);
-                geometryType = JTS.EGeometryType.MULTIPOINT;
-                break;
-              case GEOJSON.GeoJSONType.lineString:
-                var coordsList =
-                    (jsonGeometry as GEOJSON.GeoJSONLineString).coordinates;
-                geometry = getLine(coordsList, gf);
-                geometryType = JTS.EGeometryType.LINESTRING;
-                break;
-              case GEOJSON.GeoJSONType.multiLineString:
-                var coordsList =
-                    (jsonGeometry as GEOJSON.GeoJSONMultiLineString)
-                        .coordinates;
-
-                var lines = <JTS.LineString>[];
-                for (var lineCoords in coordsList) {
-                  lines.add(getLine(lineCoords, gf));
-                }
-                geometry = gf.createMultiLineString(lines);
-                geometryType = JTS.EGeometryType.MULTILINESTRING;
-                break;
-              case GEOJSON.GeoJSONType.polygon:
-                var coordsList =
-                    (jsonGeometry as GEOJSON.GeoJSONPolygon).coordinates;
-                geometry = getPolygon(coordsList, gf);
-                geometryType = JTS.EGeometryType.POLYGON;
-                break;
-              case GEOJSON.GeoJSONType.multiPolygon:
-                var coordsList =
-                    (jsonGeometry as GEOJSON.GeoJSONMultiPolygon).coordinates;
-                var polygons = <JTS.Polygon>[];
-                for (var polygonCoordsList in coordsList) {
-                  polygons.add(getPolygon(polygonCoordsList, gf));
-                }
-                geometry = gf.createMultiPolygon(polygons);
-                geometryType = JTS.EGeometryType.MULTIPOLYGON;
-                break;
-              case GEOJSON.GeoJSONType.geometryCollection:
-              case GEOJSON.GeoJSONType.featureCollection:
-              case GEOJSON.GeoJSONType.feature:
-                continue;
-            }
-
-            SHP.Feature f = SHP.Feature()
-              ..fid = id++
-              ..geometry = geometry
-              ..attributes =
-                  jsonFeature.properties != null ? jsonFeature.properties! : {};
-
-            var envLL = geometry.getEnvelopeInternal();
-            features.add(f);
-            _featureTree!.insert(envLL, f);
-          }
-        }
-
-        SMLogger().d(
-            "Loaded ${features.length} Geojson features of envelope: $_geojsonBounds");
-
-        sldPath = HU.FileUtilities.joinPaths(parentFolder, _name! + ".sld");
-        var sldFile = File(sldPath!);
-
-        if (sldFile.existsSync()) {
-          sldString = HU.FileUtilities.readFile(sldPath!);
-          _style = HU.SldObjectParser.fromString(sldString!);
-          _style.parse();
-        } else {
           if (geometryType!.isPoint()) {
-            sldString = HU.DefaultSlds.simplePointSld();
+            _sldString = HU.DefaultSlds.simplePointSld();
           } else if (geometryType!.isLine()) {
-            sldString = HU.DefaultSlds.simpleLineSld();
+            _sldString = HU.DefaultSlds.simpleLineSld();
           } else if (geometryType!.isPolygon()) {
-            sldString = HU.DefaultSlds.simplePolygonSld();
+            _sldString = HU.DefaultSlds.simplePolygonSld();
           }
-          if (sldString != null) {
-            HU.FileUtilities.writeStringToFile(sldPath!, sldString!);
-            _style = HU.SldObjectParser.fromString(sldString!);
+          if (_sldString != null) {
+            _style = HU.SldObjectParser.fromString(_sldString!);
             _style.parse();
           }
-        }
-        _textStyle = _style.getFirstTextStyle(false);
+          _textStyle = _style.getFirstTextStyle(false);
 
-        _attribution = _attribution +
-            "${features[0].geometry!.getGeometryType()} (${features.length}) ";
+          _attribution = _attribution +
+              "${features[0].geometry!.getGeometryType()} (${features.length}) ";
+        }
+      } else {
+        _name = HU.FileUtilities.nameFromFile(_absolutePath!, false);
+        var parentFolder =
+            HU.FileUtilities.parentFolderFromFile(_absolutePath!);
+        _geojsonString = HU.FileUtilities.readFile(_absolutePath!);
+
+        var fColl = GEOJSON.GeoJSONFeatureCollection.fromJSON(_geojsonString!);
+        var bbox = fColl.bbox;
+        var llLatLng = LatLng(bbox![1], bbox[0]);
+        var urLatLng = LatLng(bbox[3], bbox[2]);
+        _geojsonBounds = LatLngBounds.fromPoints([llLatLng, urLatLng]);
+
+        if (fColl.features.length > 0) {
+          var firstFeature = fColl.features[0];
+          for (String k in firstFeature!.properties!.keys) {
+            alphaFields.add(k);
+          }
+
+          int id = 0;
+          for (var jsonFeature in fColl.features) {
+            if (jsonFeature != null) {
+              GEOJSON.GeoJSONGeometry jsonGeometry = jsonFeature.geometry;
+              JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
+              if (geometry != null) {
+                SHP.Feature f = SHP.Feature()
+                  ..fid = id++
+                  ..geometry = geometry
+                  ..attributes = jsonFeature.properties != null
+                      ? jsonFeature.properties!
+                      : {};
+
+                var envLL = geometry.getEnvelopeInternal();
+                features.add(f);
+                _featureTree!.insert(envLL, f);
+              }
+            }
+          }
+
+          SMLogger().d(
+              "Loaded ${features.length} Geojson features of envelope: $_geojsonBounds");
+
+          if (id > 0) {
+            sldPath = HU.FileUtilities.joinPaths(parentFolder, _name! + ".sld");
+            var sldFile = File(sldPath!);
+
+            if (sldFile.existsSync()) {
+              _sldString = HU.FileUtilities.readFile(sldPath!);
+              _style = HU.SldObjectParser.fromString(_sldString!);
+              _style.parse();
+            } else {
+              if (geometryType!.isPoint()) {
+                _sldString = HU.DefaultSlds.simplePointSld();
+              } else if (geometryType!.isLine()) {
+                _sldString = HU.DefaultSlds.simpleLineSld();
+              } else if (geometryType!.isPolygon()) {
+                _sldString = HU.DefaultSlds.simplePolygonSld();
+              }
+              if (_sldString != null) {
+                HU.FileUtilities.writeStringToFile(sldPath!, _sldString!);
+                _style = HU.SldObjectParser.fromString(_sldString!);
+                _style.parse();
+              }
+            }
+            _textStyle = _style.getFirstTextStyle(false);
+
+            _attribution = _attribution +
+                "${features[0].geometry!.getGeometryType()} (${features.length}) ";
+          }
+        }
       }
       isLoaded = true;
     }
+  }
+
+  JTS.Geometry? getJtsGeometry(
+      GEOJSON.GeoJSONGeometry jsonGeometry, JTS.GeometryFactory gf) {
+    JTS.Geometry? geometry;
+    switch (jsonGeometry.type) {
+      case GEOJSON.GeoJSONType.point:
+        List<double> coords =
+            (jsonGeometry as GEOJSON.GeoJSONPoint).coordinates;
+        geometry = gf.createPoint(JTS.Coordinate(coords[0], coords[1]));
+        geometryType = JTS.EGeometryType.POINT;
+        break;
+      case GEOJSON.GeoJSONType.multiPoint:
+        var coordsList =
+            (jsonGeometry as GEOJSON.GeoJSONMultiPoint).coordinates;
+        var pts = <JTS.Point>[];
+        for (var coords in coordsList) {
+          pts.add(gf.createPoint(JTS.Coordinate(coords[0], coords[1])));
+        }
+        geometry = gf.createMultiPoint(pts);
+        geometryType = JTS.EGeometryType.MULTIPOINT;
+        break;
+      case GEOJSON.GeoJSONType.lineString:
+        var coordsList =
+            (jsonGeometry as GEOJSON.GeoJSONLineString).coordinates;
+        geometry = getLine(coordsList, gf);
+        geometryType = JTS.EGeometryType.LINESTRING;
+        break;
+      case GEOJSON.GeoJSONType.multiLineString:
+        var coordsList =
+            (jsonGeometry as GEOJSON.GeoJSONMultiLineString).coordinates;
+
+        var lines = <JTS.LineString>[];
+        for (var lineCoords in coordsList) {
+          lines.add(getLine(lineCoords, gf));
+        }
+        geometry = gf.createMultiLineString(lines);
+        geometryType = JTS.EGeometryType.MULTILINESTRING;
+        break;
+      case GEOJSON.GeoJSONType.polygon:
+        var coordsList = (jsonGeometry as GEOJSON.GeoJSONPolygon).coordinates;
+        geometry = getPolygon(coordsList, gf);
+        geometryType = JTS.EGeometryType.POLYGON;
+        break;
+      case GEOJSON.GeoJSONType.multiPolygon:
+        var coordsList =
+            (jsonGeometry as GEOJSON.GeoJSONMultiPolygon).coordinates;
+        var polygons = <JTS.Polygon>[];
+        for (var polygonCoordsList in coordsList) {
+          polygons.add(getPolygon(polygonCoordsList, gf));
+        }
+        geometry = gf.createMultiPolygon(polygons);
+        geometryType = JTS.EGeometryType.MULTIPOLYGON;
+        break;
+      case GEOJSON.GeoJSONType.geometryCollection:
+      case GEOJSON.GeoJSONType.featureCollection:
+      case GEOJSON.GeoJSONType.feature:
+        break;
+      //   continue;
+    }
+    return geometry;
   }
 
   JTS.LineString getLine(
@@ -230,11 +282,20 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   IconData getIcon() => SmashIcons.iconTypeShp;
 
   String toJson() {
-    var relativePath = Workspace.makeRelative(_absolutePath!);
+    var path = "";
+    var g = "";
+    if (_absolutePath != null) {
+      var relativePath = Workspace.makeRelative(_absolutePath!);
+      path = '"$LAYERSKEY_FILE":"$relativePath",';
+    } else if (_geojsonString != null) {
+      g = '"$LAYERSKEY_GEOJSON": $_geojsonString,';
+    }
+
     var json = '''
     {
         "$LAYERSKEY_LABEL": "$_name",
-        "$LAYERSKEY_FILE":"$relativePath",
+        $path
+        $g
         "$LAYERSKEY_SRID": $_srid,
         "$LAYERSKEY_ISVISIBLE": $isVisible 
     }
@@ -504,6 +565,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   @override
   void disposeSource() {
     features = [];
+    _geojsonString = null;
     _geojsonBounds = null;
     _name = null;
     _absolutePath = null;
@@ -516,7 +578,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   }
 
   Widget getPropertiesWidget() {
-    return SldPropertiesEditor(sldString!, geometryType!,
+    return SldPropertiesEditor(_sldString!, geometryType!,
         alphaFields: alphaFields);
   }
 
@@ -532,13 +594,13 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
 
   @override
   void updateStyle(String newSldString) {
-    sldString = newSldString;
-    _style = HU.SldObjectParser.fromString(sldString!);
+    _sldString = newSldString;
+    _style = HU.SldObjectParser.fromString(_sldString!);
     _style.parse();
     if (_style.featureTypeStyles.first.rules.first.textSymbolizers.length > 0) {
       _textStyle = _style
           .featureTypeStyles.first.rules.first.textSymbolizers.first.style;
     }
-    HU.FileUtilities.writeStringToFile(sldPath!, sldString!);
+    HU.FileUtilities.writeStringToFile(sldPath!, _sldString!);
   }
 }

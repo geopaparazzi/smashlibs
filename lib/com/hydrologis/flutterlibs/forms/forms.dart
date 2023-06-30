@@ -88,6 +88,14 @@ const String TYPE_SKETCH = "sketch";
 /// Type for map element.
 const String TYPE_MAP = "map";
 
+/// Type for geometries element.
+const String TYPE_POINT = "point";
+const String TYPE_MULTIPOINT = "multipoint";
+const String TYPE_LINESTRING = "linestring";
+const String TYPE_MULTILINESTRING = "multilinestring";
+const String TYPE_POLYGON = "polygon";
+const String TYPE_MULTIPOLYGON = "multipolygon";
+
 /// Type for barcode element.
 /// <p>
 /// <b>Not in use yet.</b>

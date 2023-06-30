@@ -713,6 +713,19 @@ ListTile? getWidget(
 //      case TYPE_NFCUID:
 //        addedView = new GNfcUidView(this, null, requestCode, mainView, label, value, constraintDescription);
 //        break;
+    // case TYPE_POINT:
+    // case TYPE_MULTIPOINT:
+    // case TYPE_LINESTRING:
+    // case TYPE_MULTILINESTRING:
+    // case TYPE_POLYGON:
+    // case TYPE_MULTIPOLYGON:
+    //   return ListTile(
+    //     leading: icon,
+    //     title: SizedBox(
+    //         height: 300.0,
+    //         child: GeometryWidget(
+    //             label, widgetKey, formHelper, itemMap, itemReadonly)),
+    //   );
     case TYPE_HIDDEN:
       break;
     default:
@@ -2078,5 +2091,84 @@ class SketchWidgetState extends State<SketchWidget> with AfterLayoutMixin {
               ],
             ),
           );
+  }
+}
+
+class GeometryWidget extends StatefulWidget {
+  final String _label;
+  final bool fromGallery;
+  final AFormhelper formHelper;
+  final bool _isReadOnly;
+  final _itemMap;
+
+  GeometryWidget(this._label, String widgetKey, this.formHelper, this._itemMap,
+      this._isReadOnly,
+      {this.fromGallery = false})
+      : super(key: ValueKey(widgetKey));
+
+  @override
+  GeometryWidgetState createState() => GeometryWidgetState();
+}
+
+class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
+  Widget? mapView;
+  bool _loading = true;
+  GeojsonSource? geojsonSource;
+
+  @override
+  void afterFirstLayout(BuildContext context) async {
+    String value = ""; //$NON-NLS-1$
+    if (widget._itemMap.containsKey(TAG_VALUE)) {
+      value = jsonEncode(widget._itemMap[TAG_VALUE]).trim();
+    }
+
+    String keyStr = "SMASH_GEOMWIDGETSTATE_KEY_";
+    if (widget._itemMap.containsKey(TAG_KEY)) {
+      keyStr += widget._itemMap[TAG_KEY].trim();
+    }
+
+    if (value.trim().isEmpty) {
+      mapView = SmashUI.errorWidget("Not loading empty geojson.");
+    } else {
+      geojsonSource = GeojsonSource.fromGeojsonGeometry(value);
+      var bounds = await geojsonSource!.getBounds(context);
+      mapView = SmashMapWidget(key: ValueKey(keyStr));
+      SmashMapWidget sWidget = mapView! as SmashMapWidget;
+      sWidget.setInitParameters(
+          canRotate: false,
+          initBounds: LatLngBoundsExt.fromBounds(bounds!).toEnvelope());
+      sWidget.setTapHandlers(
+        handleTap: (ll, zoom) async {
+          SmashDialogs.showToast(
+              context, "Tapped: ${ll.longitude}, ${ll.latitude}",
+              durationSeconds: 1);
+          GeometryEditorState geomEditorState =
+              Provider.of<GeometryEditorState>(context, listen: false);
+          if (geomEditorState.isEnabled) {
+            await GeometryEditManager().onMapTap(context, ll);
+          }
+        },
+        handleLongTap: (ll, zoom) async {
+          GeometryEditorState geomEditorState =
+              Provider.of<GeometryEditorState>(context, listen: false);
+          if (geomEditorState.isEnabled) {
+            GeometryEditManager().onMapLongTap(context, ll, zoom.round());
+          }
+        },
+      );
+    }
+    _loading = false;
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (mapView != null) {
+      (mapView! as SmashMapWidget).addPostLayer(SmashMapLayer(geojsonSource!));
+      if (widget._isReadOnly) {
+        (mapView! as SmashMapWidget).addPostLayer(SmashMapEditLayer());
+      }
+    }
+    return _loading || mapView == null ? Container() : mapView!;
   }
 }
