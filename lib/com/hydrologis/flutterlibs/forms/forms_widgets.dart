@@ -564,31 +564,18 @@ ListTile? getWidget(
       }
     case TYPE_STRINGCOMBO:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
-          return ListTile(
-            leading: icon,
-            title: getSimpleLabelValue(label, valueString, presentationMode),
-          );
-        }
         return ListTile(
           leading: icon,
-          title:
-              ComboboxWidget<String>(widgetKey, itemMap, label, itemReadonly),
+          title: ComboboxWidget<String>(
+              widgetKey, itemMap, label, presentationMode),
         );
       }
     case TYPE_INTCOMBO:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
-          return ListTile(
-            leading: icon,
-            title: getSimpleLabelValue(label, valueString, presentationMode),
-          );
-        }
         return ListTile(
           leading: icon,
-          title: ComboboxWidget<int>(widgetKey, itemMap, label, itemReadonly),
+          title:
+              ComboboxWidget<int>(widgetKey, itemMap, label, presentationMode),
         );
       }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
@@ -746,7 +733,7 @@ Widget getSimpleLabelValue(String label, String value, PresentationMode pm) {
         SmashUI.normalText(label,
             color: pm.labelTextColor, bold: pm.doLabelBold),
         Padding(
-          padding: const EdgeInsets.only(left: 8.0),
+          padding: const EdgeInsets.only(left: 12.0, top: 8),
           child: SmashUI.normalText(value,
               color: pm.valueTextColor, bold: pm.doValueBold),
         ),
@@ -760,7 +747,7 @@ Widget getSimpleLabelValue(String label, String value, PresentationMode pm) {
         SmashUI.normalText(label,
             color: pm.labelTextColor, bold: pm.doLabelBold),
         Padding(
-          padding: const EdgeInsets.only(left: 8.0),
+          padding: const EdgeInsets.only(left: 12.0, top: 8),
           child: SmashUI.normalText(value,
               color: pm.valueTextColor, bold: pm.doValueBold),
         ),
@@ -928,10 +915,10 @@ class AutocompleteStringComboWidget extends StatelessWidget {
 class ComboboxWidget<T> extends StatefulWidget {
   final _itemMap;
   final String _label;
-  final bool _isReadOnly;
+  final PresentationMode _presentationMode;
 
   ComboboxWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      String _widgetKey, this._itemMap, this._label, this._presentationMode)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -1018,13 +1005,22 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
         )
         .toList();
 
+    if (widget._presentationMode.isReadOnly &&
+        widget._presentationMode.detailMode != DetailMode.DETAILED) {
+      return getSimpleLabelValue(
+          widget._label,
+          found != null ? found.label : value.toString(),
+          widget._presentationMode);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
           child: SmashUI.normalText(widget._label,
-              color: SmashColors.mainDecorationsDarker),
+              color: widget._presentationMode.labelTextColor,
+              bold: widget._presentationMode.doLabelBold),
         ),
         Padding(
           padding: const EdgeInsets.only(left: SmashUI.DEFAULT_PADDING * 2),
@@ -1034,11 +1030,11 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               border: Border.all(
-                color: SmashColors.mainDecorations,
+                color: widget._presentationMode.labelTextColor,
               ),
             ),
             child: IgnorePointer(
-              ignoring: widget._isReadOnly,
+              ignoring: widget._presentationMode.isReadOnly,
               child: DropdownButton<T>(
                 key: key != null ? Key(key) : null,
                 value: value,
