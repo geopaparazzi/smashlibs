@@ -84,11 +84,10 @@ class TileSource extends TiledRasterLayerSource {
 
   TileSource.Open_Street_Map_Standard({
     this.name = "Open Street Map",
-    this.url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    this.url = "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     this.attribution = "OpenStreetMap, ODbL",
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
-    this.subdomains = const ['a', 'b', 'c'],
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
@@ -96,9 +95,8 @@ class TileSource extends TiledRasterLayerSource {
 
   TileSource.OpenTopoMap({
     this.name = "OpenTopoMap",
-    this.url = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    this.url = "https://tile.opentopomap.org/{z}/{x}/{y}.png",
     this.attribution = "OpenStreetMap, ODbL",
-    this.subdomains = const ['a', 'b', 'c'],
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
     this.isVisible = true,
