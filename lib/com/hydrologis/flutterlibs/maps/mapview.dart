@@ -196,10 +196,12 @@ class SmashMapWidget extends StatelessWidget {
     // }
     layers.add(SmashMapEditLayer());
 
+    var mapKey = "${key.toString()}-FlutterMapWidget";
+    print("INMAP: $mapKey");
     return Stack(
       children: <Widget>[
         FlutterMap(
-          key: ValueKey("${key.toString()}-FlutterMapWidget"),
+          key: ValueKey(mapKey),
           options: new MapOptions(
             bounds: _initBounds != null
                 ? LatLngBounds(

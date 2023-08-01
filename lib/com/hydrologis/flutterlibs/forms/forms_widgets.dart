@@ -700,19 +700,19 @@ ListTile? getWidget(
 //      case TYPE_NFCUID:
 //        addedView = new GNfcUidView(this, null, requestCode, mainView, label, value, constraintDescription);
 //        break;
-    // case TYPE_POINT:
-    // case TYPE_MULTIPOINT:
-    // case TYPE_LINESTRING:
-    // case TYPE_MULTILINESTRING:
-    // case TYPE_POLYGON:
-    // case TYPE_MULTIPOLYGON:
-    //   return ListTile(
-    //     leading: icon,
-    //     title: SizedBox(
-    //         height: 300.0,
-    //         child: GeometryWidget(
-    //             label, widgetKey, formHelper, itemMap, itemReadonly)),
-    //   );
+    case TYPE_POINT:
+    case TYPE_MULTIPOINT:
+    case TYPE_LINESTRING:
+    case TYPE_MULTILINESTRING:
+    case TYPE_POLYGON:
+    case TYPE_MULTIPOLYGON:
+      return ListTile(
+        leading: icon,
+        title: SizedBox(
+            height: 300.0,
+            child: GeometryWidget(
+                label, widgetKey, formHelper, itemMap, itemReadonly)),
+      );
     case TYPE_HIDDEN:
       break;
     default:
@@ -2100,7 +2100,9 @@ class GeometryWidget extends StatefulWidget {
   GeometryWidget(this._label, String widgetKey, this.formHelper, this._itemMap,
       this._isReadOnly,
       {this.fromGallery = false})
-      : super(key: ValueKey(widgetKey));
+      : super(key: ValueKey(widgetKey)) {
+    print("PARENT: $widgetKey");
+  }
 
   @override
   GeometryWidgetState createState() => GeometryWidgetState();
@@ -2122,6 +2124,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
     if (widget._itemMap.containsKey(TAG_KEY)) {
       keyStr += widget._itemMap[TAG_KEY].trim();
     }
+    print(keyStr);
 
     if (value.trim().isEmpty) {
       mapView = SmashUI.errorWidget("Not loading empty geojson.");
@@ -2147,9 +2150,9 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         handleLongTap: (ll, zoom) async {
           GeometryEditorState geomEditorState =
               Provider.of<GeometryEditorState>(context, listen: false);
-          if (geomEditorState.isEnabled) {
-            GeometryEditManager().onMapLongTap(context, ll, zoom.round());
-          }
+          // if (geomEditorState.isEnabled) {
+          //   GeometryEditManager().onMapLongTap(context, ll, zoom.round());
+          // }
         },
       );
     }
