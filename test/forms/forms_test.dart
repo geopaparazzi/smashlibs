@@ -573,13 +573,18 @@ Future<void> pumpForm(TestFormHelper helper, Map<String, dynamic> newValues,
   if (newValues.isNotEmpty) helper.setData(newValues);
 
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  PresentationMode pm = PresentationMode();
   Widget widget = Material(
       child: new MediaQuery(
           data: new MediaQueryData(),
           child: new MaterialApp(
               navigatorKey: navigatorKey,
-              home: MasterDetailPage(helper,
-                  doScaffold: true, isReadOnly: false))));
+              home: MasterDetailPage(
+                helper,
+                doScaffold: true,
+                presentationMode: pm,
+              ))));
 
   await tester.pumpWidget(widget);
 }

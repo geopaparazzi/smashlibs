@@ -35,7 +35,7 @@ dependencies:
   smashlibs:
     path: ../..
 
-  dart_jts: ^0.2.0
+  dart_jts: ^0.2.3
 
   provider: ^6.0.5
 
