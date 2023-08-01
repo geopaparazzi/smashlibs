@@ -101,12 +101,12 @@ dependencies:
   # BSD
   # charset_converter: ^1.0.3
   # MIT
-  material_design_icons_flutter: ^6.0.7096
+  material_design_icons_flutter: ^7.0.7296
   
   # MIT
   share_extend: ^2.0.0
   # BSD
-  path_provider: ^2.0.11
+  path_provider: ^2.0.15
   
   # MIT (possible substitute external_path)
   path_provider_ex: #^1.0.1
@@ -118,18 +118,18 @@ dependencies:
   # MIT
   dio: ^5.1.1
   # MIT
-  permission_handler: ^10.2.0
+  permission_handler: ^10.4.3
     # git: 
     #   url: https://github.com/Baseflow/flutter-permission-handler.git
     #   path: permission_handler
 
   # BSD
-  device_info_plus: ^8.0.0
+  device_info_plus: ^9.0.2
   # MIT
   after_layout: ^1.2.0
 
   # BSD
-  url_launcher: ^6.1.5
+  url_launcher: ^6.1.12
 
   # MIT
   flutter_tags_x: ^1.1.0

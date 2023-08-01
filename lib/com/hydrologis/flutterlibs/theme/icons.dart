@@ -178,7 +178,7 @@ class IconsWidgetState extends State<IconsWidget> {
             SmashPreferencesKeys.KEY_ICONS_LIST, DEFAULT_NOTES_ICONDATA) ??
         <String>[]);
 
-    MdiIcons.getIconsName().forEach((name) {
+    MdiIcons.getNames().forEach((name) {
       _completeList.add([name, MdiIcons.fromString(name)]);
     });
     _visualizeList = []..addAll(_completeList);
