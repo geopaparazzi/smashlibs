@@ -40,6 +40,33 @@ class LatLngBoundsExt extends LatLngBounds {
       JTS.Coordinate(east, north),
     );
   }
+
+  double getWidth() {
+    return east - west;
+  }
+
+  double getHeight() {
+    return north - south;
+  }
+
+  /// Expand this enveloe and create a new one.
+  LatLngBoundsExt expandBy(double deltaX, double deltaY) {
+    var env = toEnvelope();
+    env.expandBy(deltaX, deltaY);
+    return LatLngBoundsExt.fromEnvelope(env);
+  }
+
+  /// Expand this envelope by a factor.
+  LatLngBoundsExt expandByFactor(double factor) {
+    var env = toEnvelope();
+    var w = env.getWidth();
+    var h = env.getHeight();
+    var newW = w * factor;
+    var newH = h * factor;
+    var deltaX = newW - w;
+    var deltaY = newH - h;
+    return expandBy(deltaX / 2, deltaY / 2);
+  }
 }
 
 class SLSettings {

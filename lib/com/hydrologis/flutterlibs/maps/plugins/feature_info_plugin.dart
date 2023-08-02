@@ -31,7 +31,7 @@ class FeatureInfoLayer extends StatelessWidget {
                   left: infoToolState.xTapPosition,
                   bottom: infoToolState.yTapPosition,
                 )
-              : Container(),
+              : SizedBox.shrink(),
           infoToolState.isEnabled
               ? GestureDetector(
                   child: InkWell(),
@@ -60,7 +60,7 @@ class FeatureInfoLayer extends StatelessWidget {
                     await queryLayers(envelope, infoToolState, context);
                   },
                 )
-              : Container(),
+              : SizedBox.shrink(),
         ],
       );
     });

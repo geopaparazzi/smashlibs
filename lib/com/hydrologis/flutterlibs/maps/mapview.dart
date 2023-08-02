@@ -14,6 +14,7 @@ class SmashMapWidget extends StatelessWidget {
   double _maxZoom = SmashMapState.MAXZOOM;
   bool _canRotate = false;
   bool _useLayerManager = true;
+  bool _addBorder = false;
 
   MapController _mapController = MapController();
   List<Widget> preLayers = [];
@@ -37,6 +38,7 @@ class SmashMapWidget extends StatelessWidget {
     double? maxZoom,
     bool canRotate = false,
     bool useLayerManager = true,
+    bool addBorder = false,
   }) {
     if (centerCoordinate != null) _initCenterCoordonate = centerCoordinate;
     if (initBounds != null) _initBounds = initBounds;
@@ -44,6 +46,8 @@ class SmashMapWidget extends StatelessWidget {
     if (minZoom != null) _minZoom = minZoom;
     if (maxZoom != null) _maxZoom = maxZoom;
     _canRotate = canRotate;
+    _useLayerManager = useLayerManager;
+    _addBorder = addBorder;
   }
 
   void setTapHandlers(
@@ -170,7 +174,16 @@ class SmashMapWidget extends StatelessWidget {
     var layers = <Widget>[];
 
     layers.addAll(preLayers);
-    layers.addAll(LayerManager().getActiveLayers());
+    if (_useLayerManager) {
+      layers.addAll(LayerManager().getActiveLayers());
+    } else {
+      layers.addAll(layerSources
+          .map((l) => SmashMapLayer(
+                l,
+                key: ValueKey(l.getName()),
+              ))
+          .toList());
+    }
     layers.addAll(postLayers);
     layers.addAll(nonRotationLayers);
 
@@ -194,40 +207,54 @@ class SmashMapWidget extends StatelessWidget {
     //   });
     //   GeometryEditManager().addEditLayers(layers);
     // }
-    layers.add(SmashMapEditLayer());
+    var layerKey = "SmashMapEditLayer-${key.toString()}";
+    layers.add(SmashMapEditLayer(
+      key: ValueKey(layerKey),
+    ));
 
-    var mapKey = "${key.toString()}-FlutterMapWidget";
+    var mapKey = "FlutterMapWidget-${key.toString()}";
     print("INMAP: $mapKey");
+    Widget flutterMap = FlutterMap(
+      key: ValueKey(mapKey),
+      options: new MapOptions(
+        bounds: _initBounds != null
+            ? LatLngBounds(
+                LatLng(_initBounds!.getMinY(), _initBounds!.getMinX()),
+                LatLng(_initBounds!.getMaxY(), _initBounds!.getMaxX()))
+            : null,
+        center: _initCenterCoordonate != null && _initBounds == null
+            ? new LatLng(_initCenterCoordonate!.y, _initCenterCoordonate!.x)
+            : null,
+        zoom: _initZoom,
+        minZoom: _minZoom,
+        maxZoom: _maxZoom,
+        onPositionChanged: (newPosition, hasGesture) {
+          _onPositionChanged(newPosition, hasGesture);
+        },
+        onTap: (TapPosition tPos, LatLng point) =>
+            _handleTap(point, _mapController.zoom),
+        onLongPress: (TapPosition tPos, LatLng point) =>
+            _handleLongTap(point, _mapController.zoom),
+        interactiveFlags: mapFlags,
+        onMapReady: _onMapReady,
+      ),
+      children: layers,
+      nonRotatedChildren: [],
+      mapController: _mapController,
+    );
+
+    if (_addBorder) {
+      flutterMap = Container(
+        child: flutterMap,
+        decoration: BoxDecoration(
+            color: SmashColors.mainBackground,
+            border:
+                Border.all(width: 1, color: SmashColors.mainDecorationsDarker)),
+      );
+    }
     return Stack(
       children: <Widget>[
-        FlutterMap(
-          key: ValueKey(mapKey),
-          options: new MapOptions(
-            bounds: _initBounds != null
-                ? LatLngBounds(
-                    LatLng(_initBounds!.getMinY(), _initBounds!.getMinX()),
-                    LatLng(_initBounds!.getMaxY(), _initBounds!.getMaxX()))
-                : null,
-            center: _initCenterCoordonate != null && _initBounds == null
-                ? new LatLng(_initCenterCoordonate!.y, _initCenterCoordonate!.x)
-                : null,
-            zoom: _initZoom,
-            minZoom: _minZoom,
-            maxZoom: _maxZoom,
-            onPositionChanged: (newPosition, hasGesture) {
-              _onPositionChanged(newPosition, hasGesture);
-            },
-            onTap: (TapPosition tPos, LatLng point) =>
-                _handleTap(point, _mapController.zoom),
-            onLongPress: (TapPosition tPos, LatLng point) =>
-                _handleLongTap(point, _mapController.zoom),
-            interactiveFlags: mapFlags,
-            onMapReady: _onMapReady,
-          ),
-          children: layers,
-          nonRotatedChildren: [],
-          mapController: _mapController,
-        ),
+        flutterMap,
         mapBuilder.inProgress
             ? Center(
                 child: SmashCircularProgress(
@@ -235,7 +262,7 @@ class SmashMapWidget extends StatelessWidget {
                       SLL.of(context).mainView_loadingData, //"Loading data...",
                 ),
               )
-            : Container(),
+            : SizedBox.shrink(),
         // Align(
         //   alignment: Alignment.bottomRight,
         //   child: _iconMode == IconMode.NAVIGATION_MODE

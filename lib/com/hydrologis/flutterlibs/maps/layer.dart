@@ -28,7 +28,7 @@ class _SmashMapLayerState extends State<SmashMapLayer> with AfterLayoutMixin {
         );
       }
     }
-    return Container();
+    return SizedBox.shrink();
   }
 }
 
@@ -60,7 +60,7 @@ class _SmashMapEditLayerState extends State<SmashMapEditLayer> {
           );
         }
       }
-      return Container();
+      return SizedBox.shrink();
     });
   }
 }

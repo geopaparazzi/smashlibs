@@ -138,7 +138,7 @@ class LayerManager {
         .where((l) => l != null)
         .map((l) => SmashMapLayer(
               l!,
-              key: UniqueKey(),
+              key: ValueKey(l.getName()),
             ))
         .toList();
   }

@@ -332,6 +332,7 @@ class TileSource extends TiledRasterLayerSource {
         Opacity(
           opacity: opacityPercentage / 100.0,
           child: TileLayer(
+            key: ValueKey(name),
             tileProvider: mapsforgeTileProvider,
             tileSize: tileSize,
             keepBuffer: 2,
@@ -352,6 +353,7 @@ class TileSource extends TiledRasterLayerSource {
         Opacity(
           opacity: opacityPercentage / 100.0,
           child: TileLayer(
+            key: ValueKey(name),
             tileProvider: tileProvider,
             maxZoom: maxZoom.toDouble(),
             tms: true,
@@ -391,7 +393,7 @@ class TileSource extends TiledRasterLayerSource {
           );
         }).toList();
         return [
-          OverlayImageLayer(overlayImages: overlayImages),
+          OverlayImageLayer(key: ValueKey(name), overlayImages: overlayImages),
         ];
       } else {
         var tileProvider = GeopackageTileImageProvider(
@@ -400,6 +402,7 @@ class TileSource extends TiledRasterLayerSource {
           Opacity(
             opacity: opacityPercentage / 100.0,
             child: TileLayer(
+              key: ValueKey(name),
               tileProvider: tileProvider,
               maxZoom: maxZoom.toDouble(),
               tms: true,
@@ -418,6 +421,7 @@ class TileSource extends TiledRasterLayerSource {
         var tileLayerOptions = Opacity(
           opacity: opacityPercentage / 100.0,
           child: TileLayer(
+            key: ValueKey(name),
             wmsOptions: WMSTileLayerOptions(
               baseUrl: url!,
               layers: [name!],
@@ -436,6 +440,7 @@ class TileSource extends TiledRasterLayerSource {
           Opacity(
             opacity: opacityPercentage / 100.0,
             child: TileLayer(
+              key: ValueKey(name),
               tms: isTms,
               urlTemplate: url,
               backgroundColor: Colors.transparent,
