@@ -2129,6 +2129,12 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       mapView = SmashUI.errorWidget("Not loading empty geojson.");
     } else {
       geojsonSource = GeojsonSource.fromGeojsonGeometry(value);
+      // check if there is style
+      if (widget._itemMap.containsKey(TAG_STYLE)) {
+        Map<String, dynamic> styleMap = widget._itemMap[TAG_STYLE];
+        geojsonSource!.setStyle(styleMap);
+      }
+
       LatLngBounds? bounds = await geojsonSource!.getBounds(context);
       var latLngBoundsExt = LatLngBoundsExt.fromBounds(bounds!);
       if (latLngBoundsExt.getWidth() == 0 && latLngBoundsExt.getHeight() == 0) {

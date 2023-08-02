@@ -130,6 +130,10 @@ const String TAG_ITEM = "item";
 const String TAG_TYPE = "type";
 const String TAG_READONLY = "readonly";
 const String TAG_SIZE = "size";
+const String TAG_WIDTH = "width";
+const String TAG_COLOR = "color";
+const String TAG_OPACITY = "opacity";
+const String TAG_STYLE = "style";
 const String TAG_URL = "url";
 
 const IMAGE_ID_SEPARATOR = ";";

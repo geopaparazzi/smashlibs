@@ -399,7 +399,12 @@
               "type": "Point",
               "coordinates": [11.66, 46.5]
             },
+            "style": {
+              "color": "#FF0000",
+              "size": 15
+            },
             "type": "point"
+            
           },{
             "key": "a multipoint geometry",
             "value": {
@@ -409,6 +414,10 @@
                 [11.76, 46.6],
                 [11.56, 46.7]
               ]
+            },
+            "style": {
+              "color": "#00FF00",
+              "size": 10
             },
             "type": "multipoint"
           }
@@ -427,6 +436,10 @@
                 [11.56, 46.7]
               ]
             },
+            "style": {
+              "color": "#0000FF",
+              "width": 4
+            },
             "type": "linestring"
           }
         ]
@@ -439,11 +452,18 @@
             "value": {
               "type": "Polygon",
               "coordinates": [
-                [11.66, 46.5],
-                [11.76, 46.6],
-                [11.56, 46.7],
-                [11.66, 46.5]
+                [
+                  [11.66, 46.5],
+                  [11.76, 46.6],
+                  [11.56, 46.7],
+                  [11.66, 46.5]
+                ]
               ]
+            },
+            "style": {
+              "color": "#FF0000",
+              "width": 2,
+              "opacity": 0.2
             },
             "type": "polygon"
           }

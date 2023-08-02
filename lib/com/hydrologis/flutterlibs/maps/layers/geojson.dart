@@ -25,6 +25,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   List<String> alphaFields = [];
   String? _sldString;
   JTS.EGeometryType? geometryType;
+  Map<String, dynamic> _styleMap = {};
 
   GeojsonSource.fromMap(Map<String, dynamic> map) {
     _name = map[LAYERSKEY_LABEL];
@@ -42,6 +43,10 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   GeojsonSource.fromGeojsonGeometry(this._geojsonString);
 
   GeojsonSource(this._absolutePath);
+
+  void setStyle(Map<String, dynamic> styleMap) {
+    _styleMap = styleMap;
+  }
 
   @override
   Future<void> load(BuildContext? context) async {
@@ -65,12 +70,17 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
           features.add(f);
           _featureTree!.insert(envLL, f);
 
-          if (geometryType!.isPoint()) {
-            _sldString = HU.DefaultSlds.simplePointSld();
-          } else if (geometryType!.isLine()) {
-            _sldString = HU.DefaultSlds.simpleLineSld();
-          } else if (geometryType!.isPolygon()) {
-            _sldString = HU.DefaultSlds.simplePolygonSld();
+          if (_sldString == null) {
+            _sldString = getCustomStyle(geometryType!);
+          }
+          if (_sldString == null) {
+            if (geometryType!.isPoint()) {
+              _sldString = HU.DefaultSlds.simplePointSld();
+            } else if (geometryType!.isLine()) {
+              _sldString = HU.DefaultSlds.simpleLineSld();
+            } else if (geometryType!.isPolygon()) {
+              _sldString = HU.DefaultSlds.simplePolygonSld();
+            }
           }
           if (_sldString != null) {
             _style = HU.SldObjectParser.fromString(_sldString!);
@@ -126,17 +136,23 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
             sldPath = HU.FileUtilities.joinPaths(parentFolder, _name! + ".sld");
             var sldFile = File(sldPath!);
 
-            if (sldFile.existsSync()) {
+            if (_sldString == null) {
+              _sldString = getCustomStyle(geometryType!);
+            }
+
+            if (sldFile.existsSync() && _sldString == null) {
               _sldString = HU.FileUtilities.readFile(sldPath!);
               _style = HU.SldObjectParser.fromString(_sldString!);
               _style.parse();
             } else {
-              if (geometryType!.isPoint()) {
-                _sldString = HU.DefaultSlds.simplePointSld();
-              } else if (geometryType!.isLine()) {
-                _sldString = HU.DefaultSlds.simpleLineSld();
-              } else if (geometryType!.isPolygon()) {
-                _sldString = HU.DefaultSlds.simplePolygonSld();
+              if (_sldString == null) {
+                if (geometryType!.isPoint()) {
+                  _sldString = HU.DefaultSlds.simplePointSld();
+                } else if (geometryType!.isLine()) {
+                  _sldString = HU.DefaultSlds.simpleLineSld();
+                } else if (geometryType!.isPolygon()) {
+                  _sldString = HU.DefaultSlds.simplePolygonSld();
+                }
               }
               if (_sldString != null) {
                 HU.FileUtilities.writeStringToFile(sldPath!, _sldString!);
@@ -433,6 +449,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
               .getCoordinates()
               .map((c) => LatLng(c.y, c.x))
               .toList();
+          // extCoords.removeAt(extCoords.length - 1);
 
           // inter rings
           var numInteriorRing = p.getNumInteriorRing();
@@ -452,6 +469,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
             holePointsList: intRingCoords,
             borderColor: lineStrokeColor,
             color: fillColor,
+            isFilled: true,
           ));
         }
       }
@@ -602,5 +620,65 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
           .featureTypeStyles.first.rules.first.textSymbolizers.first.style;
     }
     HU.FileUtilities.writeStringToFile(sldPath!, _sldString!);
+  }
+
+  String? getCustomStyle(JTS.EGeometryType eGeometryType) {
+    if (_styleMap.isNotEmpty) {
+      if (geometryType!.isPoint()) {
+        HU.PointStyle ps = HU.PointStyle();
+        if (_styleMap.containsKey(TAG_COLOR)) {
+          var colorStr = _styleMap[TAG_COLOR];
+          ps.fillColorHex = colorStr;
+          ps.fillOpacity = 0.8;
+          ps.strokeColorHex = colorStr;
+        }
+        if (_styleMap.containsKey(TAG_SIZE)) {
+          var size = _styleMap[TAG_SIZE];
+          ps.markerSize = double.parse(size.toString());
+        }
+        return HU.SldObjectBuilder("simplepoint")
+            .addFeatureTypeStyle("fts")
+            .addRule("rule")
+            .addPointSymbolizer(ps)
+            .build();
+      } else if (geometryType!.isLine()) {
+        HU.LineStyle ls = HU.LineStyle();
+        if (_styleMap.containsKey(TAG_COLOR)) {
+          var colorStr = _styleMap[TAG_COLOR];
+          ls.strokeColorHex = colorStr;
+        }
+        if (_styleMap.containsKey(TAG_WIDTH)) {
+          var width = _styleMap[TAG_WIDTH];
+          ls.strokeWidth = double.parse(width.toString());
+        }
+        return HU.SldObjectBuilder("simpleline")
+            .addFeatureTypeStyle("fts")
+            .addRule("rule")
+            .addLineSymbolizer(ls)
+            .build();
+      } else if (geometryType!.isPolygon()) {
+        HU.PolygonStyle ps = HU.PolygonStyle();
+        if (_styleMap.containsKey(TAG_COLOR)) {
+          var colorStr = _styleMap[TAG_COLOR];
+          ps.strokeColorHex = colorStr;
+          ps.fillColorHex = colorStr;
+        }
+        if (_styleMap.containsKey(TAG_OPACITY)) {
+          var opacity = _styleMap[TAG_OPACITY];
+          ps.fillOpacity = double.parse(opacity.toString());
+          ;
+        }
+        if (_styleMap.containsKey(TAG_WIDTH)) {
+          var width = _styleMap[TAG_WIDTH];
+          ps.strokeWidth = double.parse(width.toString());
+        }
+        return HU.SldObjectBuilder("simplepolygon")
+            .addFeatureTypeStyle("fts")
+            .addRule("rule")
+            .addPolygonSymbolizer(ps)
+            .build();
+      }
+    }
+    return null;
   }
 }
