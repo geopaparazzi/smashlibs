@@ -144,7 +144,8 @@ class SmashIcons {
     } else if (HU.StringUtilities.equalsIgnoreCase(wkName, "square")) {
       return MdiIcons.square;
     } else {
-      return MdiIcons.square;
+      // try normal icons
+      return getSmashIcon(wkName);
     }
   }
 }

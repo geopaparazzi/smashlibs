@@ -187,7 +187,8 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           GeometryEditManager().stopEditing();
 
           // reload layer geoms
-          await reloadDbLayers(editableGeometry!.db, editableGeometry.table!);
+          await reloadDbLayers(
+              editableGeometry!.editableDataSource, editableGeometry.table!);
         },
       ),
     );
@@ -294,7 +295,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
         ),
         onLongPress: () async {
           var t = geomEditState.editableGeometry!.table!;
-          var db = geomEditState.editableGeometry!.db;
+          var db = geomEditState.editableGeometry!.editableDataSource;
           bool hasDeleted = await GeometryEditManager()
               .deleteCurrentSelection(context, geomEditState);
           if (hasDeleted) {
@@ -346,7 +347,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           var id = editableGeometry.id;
           if (id != null) {
             var table = editableGeometry.table;
-            var db = editableGeometry.db;
+            var db = editableGeometry.editableDataSource;
             var tableName = TableName(table!,
                 schemaSupported:
                     db is PostgisDb || db is PostgresqlDb ? true : false);

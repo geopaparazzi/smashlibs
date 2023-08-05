@@ -636,6 +636,10 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
           var size = _styleMap[TAG_SIZE];
           ps.markerSize = double.parse(size.toString());
         }
+        if (_styleMap.containsKey(TAG_ICON)) {
+          var icon = _styleMap[TAG_ICON];
+          ps.markerName = icon;
+        }
         return HU.SldObjectBuilder("simplepoint")
             .addFeatureTypeStyle("fts")
             .addRule("rule")

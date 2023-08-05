@@ -38,10 +38,12 @@ class GeometryEditorState extends ChangeNotifier {
 class EditableGeometry {
   int? id;
   String? table;
-  dynamic db;
+  late dynamic editableDataSource; //! TODO make EditableDataSource
 
   JTS.Geometry? geometry;
 }
+
+class EditableDataSource {}
 
 class GeometryEditManager {
   static final GeometryEditManager _singleton = GeometryEditManager._internal();
@@ -295,12 +297,12 @@ class GeometryEditManager {
         var editableGeometry = geomEditorState.editableGeometry;
 
         var tableName = TableName(editableGeometry!.table!,
-            schemaSupported: editableGeometry.db is PostgisDb ||
-                    editableGeometry.db is PostgresqlDb
+            schemaSupported: editableGeometry.editableDataSource is PostgisDb ||
+                    editableGeometry.editableDataSource is PostgresqlDb
                 ? true
                 : false);
-        var gc =
-            await editableGeometry.db.getGeometryColumnsForTable(tableName);
+        var gc = await editableGeometry.editableDataSource
+            .getGeometryColumnsForTable(tableName);
         var gType = gc.geometryType;
 
         if (gType.isLine()) {
@@ -346,7 +348,7 @@ class GeometryEditManager {
     // }
     EditableGeometry editGeometry = EditableGeometry();
     editGeometry.geometry = geometry;
-    editGeometry.db = db;
+    editGeometry.editableDataSource = db;
     editGeometry.id = -1;
     editGeometry.table = vectorLayer!.getName();
     geomEditorState.editableGeometry = editGeometry;
@@ -381,7 +383,7 @@ class GeometryEditManager {
 
       EditableGeometry editGeometry = EditableGeometry();
       editGeometry.geometry = geometry;
-      editGeometry.db = db;
+      editGeometry.editableDataSource = db;
       editGeometry.id = -1;
       editGeometry.table = vectorLayer.getName();
       geomEditorState.editableGeometry = editGeometry;
@@ -407,7 +409,7 @@ class GeometryEditManager {
       // }
       EditableGeometry editGeometry = EditableGeometry();
       editGeometry.geometry = geometry;
-      editGeometry.db = db;
+      editGeometry.editableDataSource = db;
       editGeometry.id = -1;
       editGeometry.table = vectorLayer.getName();
       geomEditorState.editableGeometry = editGeometry;
@@ -495,7 +497,7 @@ class GeometryEditManager {
 
         EditableGeometry editGeom2 = EditableGeometry();
         editGeom2.geometry = geometry;
-        editGeom2.db = db;
+        editGeom2.editableDataSource = db;
         editGeom2.id = lastId;
         editGeom2.table = table;
         geomEditorState.editableGeometry = editGeom2;
@@ -626,7 +628,7 @@ class GeometryEditManager {
                 minDist = distance;
                 editGeom = EditableGeometry();
                 editGeom.geometry = geometry;
-                editGeom.db = db;
+                editGeom.editableDataSource = db;
                 editGeom.id = id;
                 editGeom.table = tableName;
 
@@ -729,7 +731,7 @@ class GeometryEditManager {
   Future<void> saveCurrentEdit(GeometryEditorState geomEditState) async {
     if (editPolyline != null || editPolygon != null || pointEditor != null) {
       var editableGeometry = geomEditState.editableGeometry;
-      var db = editableGeometry!.db;
+      var db = editableGeometry!.editableDataSource;
 
       var tableName = TableName(editableGeometry.table!,
           schemaSupported:
@@ -787,8 +789,8 @@ class GeometryEditManager {
         var tableName = TableName(editableGeometry.table!,
             schemaSupported:
                 db is PostgisDb || db is PostgresqlDb ? true : false);
-        var gc =
-            await editableGeometry.db.getGeometryColumnsForTable(tableName);
+        var gc = await editableGeometry.editableDataSource
+            .getGeometryColumnsForTable(tableName);
         var lastId = -1;
         var sql =
             "INSERT INTO ${tableName.fixedName} (${gc.geometryColumnName}) VALUES (?);";
@@ -810,7 +812,7 @@ class GeometryEditManager {
     if (editableGeometry != null) {
       var id = editableGeometry.id;
       if (id != null) {
-        var db = editableGeometry.db;
+        var db = editableGeometry.editableDataSource;
         var table = TableName(editableGeometry.table!,
             schemaSupported:
                 db is PostgisDb || db is PostgresqlDb ? true : false);

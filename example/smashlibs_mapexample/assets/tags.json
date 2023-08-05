@@ -400,6 +400,7 @@
               "coordinates": [11.66, 46.5]
             },
             "style": {
+              "icon": "tree",
               "color": "#FF0000",
               "size": 15
             },
