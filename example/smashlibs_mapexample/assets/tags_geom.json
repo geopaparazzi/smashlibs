@@ -1,0 +1,46 @@
+[
+  {
+    "sectionname": "examples",
+    "sectiondescription": "examples of supported form widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "polygon geometry notes",
+        "formitems": [
+          {
+            "key": "a polygon geometry",
+            "value": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [11.66, 46.5],
+                  [11.76, 46.6],
+                  [11.56, 46.7],
+                  [11.66, 46.5]
+                ]
+              ]
+            },
+            "style": {
+              "color": "#FF0000",
+              "width": 2,
+              "opacity": 0.2
+            },
+            "type": "polygon"
+          },
+          {
+            "key": "some text",
+            "value": "example entry",
+            "icon": "font",
+            "type": "string"
+          },
+          {
+            "key": "some text area",
+            "value": "line1\nline2",
+            "icon": "scroll",
+            "type": "stringarea"
+          }
+        ]
+      }
+    ]
+  }
+]
