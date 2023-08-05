@@ -103,6 +103,9 @@ dependencies:
   # MIT
   material_design_icons_flutter: ^7.0.7296
   
+  # BSD 2
+  tuple: ^2.0.2
+
   # MIT
   share_extend: ^2.0.0
   # BSD

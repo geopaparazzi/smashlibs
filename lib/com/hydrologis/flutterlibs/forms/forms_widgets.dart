@@ -141,20 +141,48 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 
     var noteId = widget.formHelper.getId();
 
+    List<int> geomIndexes = [];
     for (int i = 0; i < formItems.length; i++) {
       String key = "form${formName}_note${noteId}_item$i";
-      Widget? w = getWidget(context, key, formItems[i], widget.presentationMode,
-          widget.formHelper);
-      if (w != null) {
-        widgetsList.add(w);
+      Tuple2<ListTile, bool>? widgetTuple = getWidget(context, key,
+          formItems[i], widget.presentationMode, widget.formHelper);
+      if (widgetTuple != null) {
+        widgetsList.add(widgetTuple.item1);
+        if (widgetTuple.item2) {
+          geomIndexes.add(i);
+        }
       }
     }
-
-    var bodyContainer = Container(
-      color: widget.isLargeScreen && !widget.onlyDetail
-          ? SmashColors.mainDecorationsMc[50]
-          : null,
-      child: ListView.builder(
+    Widget dataWidget;
+    if (widget.onlyDetail &&
+        geomIndexes.length == 1 &&
+        ScreenUtilities.isLandscape(context)) {
+      // in this case the geom alone is shown at the side if landscape
+      Widget geomWidget = widgetsList.removeAt(geomIndexes[0]);
+      dataWidget = Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            flex: 1,
+            child: geomWidget,
+          ),
+          Expanded(
+            flex: 1,
+            child: ListView.builder(
+              itemCount: widgetsList.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  padding: EdgeInsets.only(top: 10.0),
+                  child: widgetsList[index],
+                );
+              },
+              padding: EdgeInsets.only(bottom: 10.0),
+            ),
+          ),
+        ],
+      );
+    } else {
+      dataWidget = ListView.builder(
         itemCount: widgetsList.length,
         itemBuilder: (context, index) {
           return Container(
@@ -163,7 +191,14 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
           );
         },
         padding: EdgeInsets.only(bottom: 10.0),
-      ),
+      );
+    }
+
+    var bodyContainer = Container(
+      color: widget.isLargeScreen && !widget.onlyDetail
+          ? SmashColors.mainDecorationsMc[50]
+          : null,
+      child: dataWidget,
     );
     return widget.doScaffold
         ? Scaffold(
@@ -287,7 +322,8 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
   }
 }
 
-ListTile? getWidget(
+/// Return a tuple of the widget and a boolean defining if it is geometric.
+Tuple2<ListTile, bool>? getWidget(
   BuildContext context,
   String widgetKey,
   final Map<String, dynamic> itemMap,
@@ -465,7 +501,7 @@ ListTile? getWidget(
           title: field,
           leading: icon,
         );
-        return tile;
+        return Tuple2(tile, false);
       }
     case TYPE_LABELWITHLINE:
       {
@@ -518,80 +554,104 @@ ListTile? getWidget(
             ),
           );
         }
-        return tile;
+        return Tuple2(tile, false);
       }
     case TYPE_DYNAMICSTRING:
       {
-        return ListTile(
-          leading: icon,
-          title: DynamicStringWidget(widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title:
+                  DynamicStringWidget(widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
     case TYPE_DATE:
       {
         if (itemReadonly &&
             presentationMode.detailMode != DetailMode.DETAILED) {
-          return ListTile(
-            leading: icon,
-            title: getSimpleLabelValue(label, valueString, presentationMode),
-          );
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title:
+                    getSimpleLabelValue(label, valueString, presentationMode),
+              ),
+              false);
         }
-        return ListTile(
-          leading: icon,
-          title: DatePickerWidget(widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: DatePickerWidget(widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
     case TYPE_TIME:
       {
         if (itemReadonly &&
             presentationMode.detailMode != DetailMode.DETAILED) {
-          return ListTile(
-            leading: icon,
-            title: getSimpleLabelValue(label, valueString, presentationMode),
-          );
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title:
+                    getSimpleLabelValue(label, valueString, presentationMode),
+              ),
+              false);
         }
-        return ListTile(
-          leading: icon,
-          title: TimePickerWidget(widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: TimePickerWidget(widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
     case TYPE_BOOLEAN:
       {
-        return ListTile(
-          leading: icon,
-          title: CheckboxWidget(widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: CheckboxWidget(widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
     case TYPE_STRINGCOMBO:
       {
-        return ListTile(
-          leading: icon,
-          title: ComboboxWidget<String>(
-              widgetKey, itemMap, label, presentationMode),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: ComboboxWidget<String>(
+                  widgetKey, itemMap, label, presentationMode),
+            ),
+            false);
       }
     case TYPE_INTCOMBO:
       {
-        return ListTile(
-          leading: icon,
-          title:
-              ComboboxWidget<int>(widgetKey, itemMap, label, presentationMode),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: ComboboxWidget<int>(
+                  widgetKey, itemMap, label, presentationMode),
+            ),
+            false);
       }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
       {
         if (itemReadonly &&
             presentationMode.detailMode != DetailMode.DETAILED) {
-          return ListTile(
-            leading: icon,
-            title: getSimpleLabelValue(label, valueString, presentationMode),
-          );
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title:
+                    getSimpleLabelValue(label, valueString, presentationMode),
+              ),
+              false);
         }
-        return ListTile(
-          leading: icon,
-          title: AutocompleteStringComboWidget(
-              widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: AutocompleteStringComboWidget(
+                  widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
     case TYPE_CONNECTEDSTRINGCOMBO:
       {
@@ -602,24 +662,31 @@ ListTile? getWidget(
             var split = valueString.split("#");
             finalString = "${split[0]} -> ${split[1]}";
           }
-          return ListTile(
-            leading: icon,
-            title: getSimpleLabelValue(label, finalString, presentationMode),
-          );
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title:
+                    getSimpleLabelValue(label, finalString, presentationMode),
+              ),
+              false);
         }
-        return ListTile(
-          leading: icon,
-          title:
-              ConnectedComboboxWidget(widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: ConnectedComboboxWidget(
+                  widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
     case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO:
       {
-        return ListTile(
-          leading: icon,
-          title: AutocompleteStringConnectedComboboxWidget(
-              widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: AutocompleteStringConnectedComboboxWidget(
+                  widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
 //      case TYPE_ONETOMANYSTRINGCOMBO:
 //        LinkedHashMap<String, List<NamedList<String>>> oneToManyValuesMap = TagsManager.extractOneToManyComboValuesMap(jsonObject);
@@ -630,55 +697,72 @@ ListTile? getWidget(
       {
         if (itemReadonly &&
             presentationMode.detailMode != DetailMode.DETAILED) {
-          return ListTile(
-            leading: icon,
-            title: getSimpleLabelValue(label, valueString, presentationMode),
-          );
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title:
+                    getSimpleLabelValue(label, valueString, presentationMode),
+              ),
+              false);
         }
-        return ListTile(
-          leading: icon,
-          title:
-              MultiComboWidget<String>(widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: MultiComboWidget<String>(
+                  widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
     case TYPE_INTMULTIPLECHOICE:
       {
         if (itemReadonly &&
             presentationMode.detailMode != DetailMode.DETAILED) {
-          return ListTile(
-            leading: icon,
-            title: getSimpleLabelValue(label, valueString, presentationMode),
-          );
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title:
+                    getSimpleLabelValue(label, valueString, presentationMode),
+              ),
+              false);
         }
-        return ListTile(
-          leading: icon,
-          title: MultiComboWidget<int>(widgetKey, itemMap, label, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: MultiComboWidget<int>(
+                  widgetKey, itemMap, label, itemReadonly),
+            ),
+            false);
       }
     case TYPE_PICTURES:
       {
-        return ListTile(
-          leading: icon,
-          title: PicturesWidget(
-              label, widgetKey, formHelper, itemMap, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: PicturesWidget(
+                  label, widgetKey, formHelper, itemMap, itemReadonly),
+            ),
+            false);
       }
     case TYPE_IMAGELIB:
       {
-        return ListTile(
-          leading: icon,
-          title: PicturesWidget(
-              label, widgetKey, formHelper, itemMap, itemReadonly,
-              fromGallery: true),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: PicturesWidget(
+                  label, widgetKey, formHelper, itemMap, itemReadonly,
+                  fromGallery: true),
+            ),
+            false);
       }
     case TYPE_SKETCH:
       {
-        return ListTile(
-          leading: icon,
-          title:
-              SketchWidget(label, widgetKey, formHelper, itemMap, itemReadonly),
-        );
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: SketchWidget(
+                  label, widgetKey, formHelper, itemMap, itemReadonly),
+            ),
+            false);
       }
 //      case TYPE_MAP:
 //        if (value.length() <= 0) {
@@ -707,13 +791,15 @@ ListTile? getWidget(
     case TYPE_POLYGON:
     case TYPE_MULTIPOLYGON:
       var h = ScreenUtilities.getHeight(context) * 0.8;
-      return ListTile(
-        leading: icon,
-        title: SizedBox(
-            height: h,
-            child: GeometryWidget(
-                label, widgetKey, formHelper, itemMap, itemReadonly)),
-      );
+      return Tuple2(
+          ListTile(
+            leading: icon,
+            title: SizedBox(
+                height: h,
+                child: GeometryWidget(
+                    label, widgetKey, formHelper, itemMap, itemReadonly)),
+          ),
+          true);
     case TYPE_HIDDEN:
       break;
     default:

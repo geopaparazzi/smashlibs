@@ -62,6 +62,7 @@ import 'package:geojson_vi/geojson_vi.dart' as GEOJSON;
 import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:flutter_map_line_editor/flutter_map_line_editor.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:tuple/tuple.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
