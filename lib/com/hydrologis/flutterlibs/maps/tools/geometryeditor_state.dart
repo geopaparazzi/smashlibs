@@ -305,10 +305,10 @@ class GeometryEditManager {
 
         if (gType.isLine()) {
           await _completeFirstLineGeometry(
-              editableGeometry, point, tableName, gc, geomEditorState, context);
+              editableGeometry, point, geomEditorState);
         } else if (gType.isPolygon()) {
           await _handlePolygonGeometry(
-              editableGeometry, point, tableName, gc, geomEditorState, context);
+              editableGeometry, point, geomEditorState);
         }
       }
     } else {
@@ -324,12 +324,10 @@ class GeometryEditManager {
   /// when this method is called, the usable line geometry and the appropriate layer
   /// can be created (before a opint layer was used for the first point)
   Future<void> _completeFirstLineGeometry(
-      EditableGeometry editableGeometry,
-      LatLng point,
-      TableName tableName,
-      gc,
-      GeometryEditorState geomEditorState,
-      BuildContext context) async {
+    EditableGeometry editableGeometry,
+    LatLng point,
+    GeometryEditorState geomEditorState,
+  ) async {
     var gf = JTS.GeometryFactory.defaultPrecision();
     Map<String, DbVectorLayerSource> name2SourceMap = _getName2SourcesMap();
     var vectorLayer = name2SourceMap[editableGeometry.table];
@@ -364,12 +362,10 @@ class GeometryEditManager {
   }
 
   Future<void> _handlePolygonGeometry(
-      EditableGeometry editableGeometry,
-      LatLng point,
-      TableName tableName,
-      gc,
-      GeometryEditorState geomEditorState,
-      BuildContext context) async {
+    EditableGeometry editableGeometry,
+    LatLng point,
+    GeometryEditorState geomEditorState,
+  ) async {
     var gf = JTS.GeometryFactory.defaultPrecision();
     Map<String, DbVectorLayerSource> name2SourceMap = _getName2SourcesMap();
     var vectorLayer = name2SourceMap[editableGeometry.table];

@@ -2161,13 +2161,20 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
           }
         },
         handleLongTap: (ll, zoom) async {
-          GeometryEditorState geomEditorState =
-              Provider.of<GeometryEditorState>(context, listen: false);
-          // if (geomEditorState.isEnabled) {
-          //   GeometryEditManager().onMapLongTap(context, ll, zoom.round());
-          // }
+          if (!widget._isReadOnly) {
+            GeometryEditorState geomEditorState =
+                Provider.of<GeometryEditorState>(context, listen: false);
+            if (geomEditorState.isEnabled) {
+              GeometryEditManager().onMapLongTap(context, ll, zoom.round());
+            }
+          }
         },
       );
+      if (!widget._isReadOnly) {
+        GeometryEditorState geomEditorState =
+            Provider.of<GeometryEditorState>(context, listen: false);
+        geomEditorState.setEnabled(true);
+      }
     }
     _loading = false;
     setState(() {});
