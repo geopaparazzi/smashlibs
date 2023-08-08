@@ -175,6 +175,19 @@ class SmashPrj {
     }
   }
 
+  /// Reproject [FeatureCollection] to epsg:4326.
+  ///
+  /// The coordinates of the supplied geometries are modified. No copy is done.
+  static void transformFeaturesListToWgs84(
+      proj4dart.Projection from, HU.FeatureCollection featureCollection) {
+    GeometryReprojectionFilter filter =
+        GeometryReprojectionFilter(from, EPSG4326);
+    for (HU.Feature feature in featureCollection.features) {
+      feature.geometry!.applyCF(filter);
+      feature.geometry!.geometryChanged();
+    }
+  }
+
   /// Get the sidecar prj file from a data file (ex. shp or tiff).
   static String getPrjPath(String mainDataFilePath) {
     String folder = HU.FileUtilities.parentFolderFromFile(mainDataFilePath);

@@ -15,7 +15,7 @@ class ShapefileSource extends VectorLayerSource implements SldLayerSource {
   String _attribution = "";
   int? _srid; //SmashPrj.EPSG4326_INT;
 
-  List<SHP.Feature> features = [];
+  List<HU.Feature> features = [];
   JTS.STRtree? _featureTree;
   JTS.Envelope? _shpBounds;
   late HU.SldObjectParser _style;
@@ -163,13 +163,13 @@ class ShapefileSource extends VectorLayerSource implements SldLayerSource {
     return json;
   }
 
-  List<SHP.Feature> getInRoi(
+  List<HU.Feature> getInRoi(
       {JTS.Geometry? roiGeom, JTS.Envelope? roiEnvelope}) {
     if (roiEnvelope != null || roiGeom != null) {
       if (roiEnvelope == null) {
         roiEnvelope = roiGeom!.getEnvelopeInternal();
       }
-      List<SHP.Feature> result = _featureTree!.query(roiEnvelope).cast();
+      List<HU.Feature> result = _featureTree!.query(roiEnvelope).cast();
       if (roiGeom != null) {
         result.removeWhere((f) => !f.geometry!.intersects(roiGeom));
       }

@@ -26,29 +26,29 @@ dependencies:
   #################
 
   #BSD
-  dart_jts: ^0.2.0
+  dart_jts: ^0.2.3
     # path: ../dart_jts/
   #    git:
   #      url: https://github.com/moovida/dart_jts.git
 
-  dart_hydrologis_utils: ^0.6.4
+  dart_hydrologis_utils: ^0.8.0
     # path: ../dart_hydrologis_utils/
 
-  dart_hydrologis_db: ^1.0.0
+  dart_hydrologis_db: ^1.0.1
     # path: ../dart_hydrologis_db/
   # git:
   #  url: https://github.com/moovida/dart_hydrologis_db.git
 
   # apache 2
-  geoimage: ^0.2.0
+  geoimage: ^0.4.0
 
   # apache 2
-  flutter_geopackage: ^0.6.1
+  flutter_geopackage: ^0.6.2
   # path: ../flutter_geopackage/
   #  git:
   #    url: https://github.com/moovida/flutter_geopackage.git
   
-  dart_postgis: ^0.3.1
+  dart_postgis: ^0.3.2
   # path: /home/hydrologis/development/SMASH/dart_postgis/
   # git:
   #   url: https://github.com/moovida/dart_postgis

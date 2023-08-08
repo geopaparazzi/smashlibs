@@ -38,7 +38,7 @@ class GeometryEditorState extends ChangeNotifier {
 class EditableGeometry {
   int? id;
   String? table;
-  late dynamic editableDataSource; //! TODO make EditableDataSource
+  late EditableDataSource editableDataSource;
 
   JTS.Geometry? geometry;
 }

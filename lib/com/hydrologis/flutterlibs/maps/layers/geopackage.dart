@@ -15,9 +15,9 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
   bool isVisible = true;
   String _attribution = "";
 
-  GPKG.GPQueryResult? _tableData;
+  HU.FeatureCollection? _tableData;
   JTS.Envelope? _tableBounds;
-  GPKG.GeometryColumn? _geometryColumn;
+  HU.GeometryColumn? _geometryColumn;
   late HU.SldObjectParser _style;
   HU.TextStyle? _textStyle;
 
@@ -99,14 +99,15 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
 
       var fromPrj = SmashPrj.fromSrid(_srid!);
       if (fromPrj != null) {
-        SmashPrj.transformListToWgs84(fromPrj, _tableData!.geoms);
+        SmashPrj.transformFeaturesListToWgs84(fromPrj, _tableData!);
         _tableBounds = JTS.Envelope.empty();
-        _tableData!.geoms.forEach((g) {
-          _tableBounds!.expandToIncludeEnvelope(g.getEnvelopeInternal());
+        _tableData!.features.forEach((f) {
+          _tableBounds!
+              .expandToIncludeEnvelope(f.geometry!.getEnvelopeInternal());
         });
 
         _attribution =
-            "${_geometryColumn!.geometryType.getTypeName()} (${_tableData!.geoms.length}) ";
+            "${_geometryColumn!.geometryType.getTypeName()} (${_tableData!.features.length}) ";
 
         isLoaded = true;
       }
@@ -124,7 +125,7 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
   }
 
   bool hasData() {
-    return _tableData != null && _tableData!.geoms.length > 0;
+    return _tableData != null && _tableData!.features.length > 0;
   }
 
   String getAbsolutePath() {
@@ -176,7 +177,7 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
     await load(context);
 
     List<Widget> layers = [];
-    if (_tableData!.geoms.isNotEmpty) {
+    if (_tableData!.features.isNotEmpty) {
       List<List<Marker>> allPoints = [];
       List<Polyline> allLines = [];
       List<Polygon> allPolygons = [];
@@ -239,14 +240,13 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
     Color fillColor = ColorExt(polygonStyle.fillColorHex)
         .withAlpha((polygonStyle.fillOpacity * 255).toInt());
 
-    var featureCount = _tableData!.geoms.length;
+    var featureCount = _tableData!.features.length;
     for (var i = 0; i < featureCount; i++) {
-      var geom = _tableData!.geoms[i];
-      var attributes = _tableData!.data[i];
-      if (key == null || attributes[key]?.toString() == value) {
-        var count = geom.getNumGeometries();
+      var feature = _tableData!.features[i];
+      if (key == null || feature.attributes[key]?.toString() == value) {
+        var count = feature.geometry!.getNumGeometries();
         for (var i = 0; i < count; i++) {
-          JTS.Polygon p = geom.getGeometryN(i) as JTS.Polygon;
+          JTS.Polygon p = feature.geometry!.getGeometryN(i) as JTS.Polygon;
           // ext ring
           var extCoords = p
               .getExteriorRing()
@@ -297,14 +297,14 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
     var lineOpacity = lineStyle.strokeOpacity * 255;
     lineStrokeColor = lineStrokeColor.withAlpha(lineOpacity.toInt());
 
-    var featureCount = _tableData!.geoms.length;
+    var featureCount = _tableData!.features.length;
     for (var i = 0; i < featureCount; i++) {
-      var geom = _tableData!.geoms[i];
-      var attributes = _tableData!.data[i];
-      if (key == null || attributes[key]?.toString() == value) {
-        var count = geom.getNumGeometries();
+      var feature = _tableData!.features[i];
+      if (key == null || feature.attributes[key]?.toString() == value) {
+        var count = feature.geometry!.getNumGeometries();
         for (var i = 0; i < count; i++) {
-          JTS.LineString l = geom.getGeometryN(i) as JTS.LineString;
+          JTS.LineString l =
+              feature.geometry!.getGeometryN(i) as JTS.LineString;
           var linePoints =
               l.getCoordinates().map((c) => LatLng(c.y, c.x)).toList();
           lines.add(Polyline(
@@ -342,15 +342,14 @@ class GeopackageSource extends DbVectorLayerSource implements SldLayerSource {
       labelColor = ColorExt(_textStyle!.textColor);
     }
 
-    var featureCount = _tableData!.geoms.length;
+    var featureCount = _tableData!.features.length;
     for (var i = 0; i < featureCount; i++) {
-      var geom = _tableData!.geoms[i];
-      var attributes = _tableData!.data[i];
-      if (key == null || attributes[key]?.toString() == value) {
-        var count = geom.getNumGeometries();
+      var feature = _tableData!.features[i];
+      if (key == null || feature.attributes[key]?.toString() == value) {
+        var count = feature.geometry!.getNumGeometries();
         for (var i = 0; i < count; i++) {
-          JTS.Point l = geom.getGeometryN(i) as JTS.Point;
-          var labelText = attributes[labelName];
+          JTS.Point l = feature.geometry!.getGeometryN(i) as JTS.Point;
+          var labelText = feature.attributes[labelName];
           double textExtraHeight = MARKER_ICON_TEXT_EXTRA_HEIGHT;
           String? labelTextString;
           if (labelText == null) {
@@ -528,8 +527,9 @@ class GeopackageLazyTileImageProvider
       if (_tile.tileImageBytes != null) {
         var finalBytes = _tile.tileImageBytes;
         if (EXPERIMENTAL_HIDE_COLOR_RASTER__ENABLED && _rgbToHide != null) {
-          final image = IMG.decodeImage(_tile.tileImageBytes!);
-          HU.ImageUtilities.colorToAlphaImg(
+          var image =
+              IMG.decodeImage(Uint8List.fromList(_tile.tileImageBytes!));
+          image = ImageUtilities.colorToAlpha(
               image!, _rgbToHide![0], _rgbToHide![1], _rgbToHide![2]);
           finalBytes = IMG.encodePng(image);
         }

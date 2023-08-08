@@ -49,10 +49,10 @@ class InfoToolState extends ChangeNotifier {
       for (var vLayer in visibleVectorLayers) {
         if (vLayer is GeopackageSource) {
           var db = GPKG.ConnectionsHandler().open(vLayer.getAbsolutePath());
-          GPKG.GPQueryResult queryResult = db.getTableData(
+          var queryResult = db.getTableData(
               TableName(vLayer.getName(), schemaSupported: false),
               envelope: env);
-          if (queryResult.data.isNotEmpty) {
+          if (queryResult.features.isNotEmpty) {
             print("Found data for: " + vLayer.getName());
           }
         } else if (vLayer is PostgisSource) {
@@ -63,9 +63,9 @@ class InfoToolState extends ChangeNotifier {
               vLayer.getPassword(),
               vLayer.useSSL);
           if (db != null) {
-            PGQueryResult queryResult = await db
-                .getTableData(TableName(vLayer.getName()), envelope: env);
-            if (queryResult.data.isNotEmpty) {
+            var queryResult = await db.getTableData(TableName(vLayer.getName()),
+                envelope: env);
+            if (queryResult.features.isNotEmpty) {
               print("Found data for: " + vLayer.getName());
             }
           }

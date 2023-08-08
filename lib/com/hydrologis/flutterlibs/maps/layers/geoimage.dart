@@ -134,7 +134,7 @@ class GeoImageSource extends RasterLayerSource {
     // IMG.Image _decodedImage = IMG.decodeImage(bytes);
     bool changed = false;
     if (EXPERIMENTAL_HIDE_COLOR_RASTER__ENABLED && r != null) {
-      HU.ImageUtilities.colorToAlphaImg(_decodedImage, r, g, b);
+      _decodedImage = ImageUtilities.colorToAlpha(_decodedImage, r, g, b);
       changed = true;
     }
 
