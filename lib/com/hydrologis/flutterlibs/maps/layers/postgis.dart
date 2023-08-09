@@ -7,7 +7,8 @@
 part of smashlibs;
 
 /// Postgis vector data layer.
-class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
+class PostgisSource extends DbVectorLayerSource
+    implements SldLayerSource, EditableDataSource {
   static final double POINT_SIZE_FACTOR = 3;
 
   late String _tableName;
@@ -18,6 +19,7 @@ class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
   HU.FeatureCollection? _tableData;
   JTS.Envelope? _tableBounds;
   HU.GeometryColumn? _geometryColumn;
+  String? _primaryKey;
   late HU.SldObjectParser _style;
   HU.TextStyle? _textStyle;
   late bool canHanldeStyle;
@@ -82,12 +84,15 @@ class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
 
       await getDatabase();
       if (_pgDb == null) {
-        SmashDialogs.showErrorDialog(context, "Unable to open database.");
+        SmashDialogs.showErrorDialog(
+            context, "Unable to open database: $_tableName.");
         isLoaded = false;
         return;
       }
 
-      sqlName = TableName(_tableName);
+      sqlName = TableName(_tableName, schemaSupported: true);
+
+      _primaryKey = await _pgDb!.getPrimaryKey(sqlName);
       _geometryColumn = await _pgDb!.getGeometryColumnsForTable(sqlName);
       if (_geometryColumn == null) {
         SmashDialogs.showErrorDialog(context,
@@ -212,6 +217,7 @@ class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
 
   String getPassword() => _pwd;
 
+  @override
   String getName() {
     return _tableName;
   }
@@ -590,6 +596,227 @@ class PostgisSource extends DbVectorLayerSource implements SldLayerSource {
     } else {
       await GpPreferences().setString("style_${sqlName.name}", sldString!);
     }
+  }
+
+  @override
+  Future<HU.GeometryColumn?> getGeometryColumn() async {
+    return _geometryColumn;
+  }
+
+  @override
+  Future<Tuple2<String, int>?> getGeometryColumnNameAndSrid() async {
+    // var nameSrid = await _pgDb!.getGeometryColumnNameAndSridForTable(sqlName);
+    // if (nameSrid != null) {
+    //   return Tuple2(nameSrid[0] as String, nameSrid[1]! as int);
+    // }
+    // return null;
+    return Tuple2(_geometryColumn!.geometryColumnName, _geometryColumn!.srid);
+  }
+
+  @override
+  Future<void> saveCurrentEdit(
+      GeometryEditorState geomEditState, List<LatLng> newPoints) async {
+    var geometryColumn = await getGeometryColumn();
+    JTS.EGeometryType gType = geometryColumn!.geometryType;
+    var gf = JTS.GeometryFactory.defaultPrecision();
+    JTS.Geometry? geom;
+
+    //! TODO this for now only supports single geometries
+    if (gType.isLine()) {
+      geom = gf.createLineString(newPoints
+          .map((c) => JTS.Coordinate(c.longitude, c.latitude))
+          .toList());
+      if (gType.isMulti()) {
+        geom = gf.createMultiLineString([geom as JTS.LineString]);
+      }
+    } else if (gType.isPolygon()) {
+      newPoints.add(newPoints[0]);
+      var linearRing = gf.createLinearRing(newPoints
+          .map((c) => JTS.Coordinate(c.longitude, c.latitude))
+          .toList());
+      geom = gf.createPolygon(linearRing, null);
+      if (gType.isMulti()) {
+        geom = gf.createMultiPolygon([geom as JTS.Polygon]);
+      }
+    } else if (gType.isPoint()) {
+      var newPoint = newPoints[0];
+      geom =
+          gf.createPoint(JTS.Coordinate(newPoint.longitude, newPoint.latitude));
+      if (gType.isMulti()) {
+        geom = gf.createMultiPoint([geom as JTS.Point]);
+      }
+    }
+
+    geom!.setSRID(geometryColumn.srid);
+    if (geometryColumn.srid != SmashPrj.EPSG4326_INT) {
+      var to = SmashPrj.fromSrid(geometryColumn.srid);
+      SmashPrj.transformGeometry(SmashPrj.EPSG4326, to!, geom);
+    }
+
+    var editableGeometry = geomEditState.editableGeometry;
+    if (editableGeometry != null) {
+      if (editableGeometry.id != -1) {
+        dynamic sqlObj = _pgDb!.geometryToSql(geom);
+        Map<String, dynamic> newRow = {
+          geometryColumn.geometryColumnName: sqlObj
+        };
+        await _pgDb!
+            .updateMap(sqlName, newRow, "$_primaryKey=${editableGeometry.id}");
+      } else {
+        // insert new
+        int? lastId = -1;
+        var sql =
+            "INSERT INTO ${sqlName.fixedName} (${geometryColumn.geometryColumnName}) VALUES (?);";
+        var sqlObj = _pgDb!.geometryToSql(geom);
+        lastId = await _pgDb!
+            .execute(sql, arguments: [sqlObj], getLastInsertId: true);
+        editableGeometry.geometry = geom;
+        editableGeometry.id = lastId;
+      }
+    }
+  }
+
+  @override
+  Future<Tuple2<String?, EditableGeometry?>> createNewGeometry(
+      LatLng point) async {
+    var tableColumns = await db.getTableColumns(sqlName);
+
+    // check if there is a pk and if the columns are set to be non null in other case
+    bool hasPk = false;
+    bool hasNonNull = false;
+    tableColumns.forEach((tc) {
+      var pk = tc[2];
+      if (pk == 1) {
+        hasPk = true;
+      } else {
+        var nonNull = tc[3];
+        if (nonNull == 1) {
+          hasNonNull = true;
+        }
+      }
+    });
+    if (!hasPk || hasNonNull) {
+      return Tuple2(
+          "Currently only editing of tables with a primary key and nullable columns is supported.",
+          null);
+    }
+
+    // create a minimal geometry to work on
+    var gc = await getGeometryColumn();
+    if (gc == null) {
+      return Tuple2(
+          "No geometry column could be found in the datasource.", null);
+    }
+    var gType = gc.geometryType;
+
+    var gf = JTS.GeometryFactory.defaultPrecision();
+
+    // Create first as just point, even if the layer is of different type
+    JTS.Geometry geometry =
+        gf.createPoint(JTS.Coordinate(point.longitude, point.latitude));
+
+    int? lastId = -1;
+    if (gType.isPoint()) {
+      var dataPrj = SmashPrj.fromSrid(getSrid()!);
+      SmashPrj.transformGeometry(SmashPrj.EPSG4326, dataPrj!, geometry);
+      var sql =
+          "INSERT INTO ${sqlName.fixedName} (${gc.geometryColumnName}) VALUES (?);";
+      var sqlObj = _pgDb!.geometryToSql(geometry);
+      lastId =
+          await _pgDb!.execute(sql, arguments: [sqlObj], getLastInsertId: true);
+    }
+
+    EditableGeometry editGeom = EditableGeometry();
+    editGeom.geometry = geometry;
+    editGeom.editableDataSource = this;
+    editGeom.id = lastId;
+
+    return Tuple2(null, editGeom);
+  }
+
+  @override
+  Future<bool> deleteCurrentSelection(GeometryEditorState geomEditState) async {
+    var editableGeometry = geomEditState.editableGeometry;
+    if (editableGeometry != null) {
+      var id = editableGeometry.id;
+      if (id != null) {
+        var pk = await _pgDb!.getPrimaryKey(sqlName);
+        var sql = "delete from ${sqlName.fixedName} where $pk=$id";
+        await db.execute(sql);
+
+        geomEditState.editableGeometry = null;
+
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  Future<HU.Feature?> getFeatureById(int id) async {
+    var key = await _pgDb!.getPrimaryKey(sqlName);
+    HU.FeatureCollection fc =
+        await _pgDb!.getTableData(sqlName, where: "$key=$id");
+    if (fc.features.length == 1) {
+      return fc.features[0];
+    }
+    return null;
+  }
+
+  @override
+  Future<Map<String, String>> getTypesMap() async {
+    var tableColumns = await _pgDb!.getTableColumns(sqlName);
+    Map<String, String> typesMap = {};
+    tableColumns.forEach((column) {
+      typesMap[column[0]] = column[1];
+    });
+    return typesMap;
+  }
+
+  @override
+  String? getIdFieldName() {
+    return _primaryKey;
+  }
+
+  @override
+  Future<Tuple2<List<JTS.Geometry>, JTS.Geometry>?> getGeometriesIntersecting(
+      LatLng pointLL, JTS.Envelope envLL) async {
+    // create the env
+    if (_srid != null) {
+      var dataPrj = SmashPrj.fromSrid(_srid!);
+
+      // create the touch point and buffer in the current layer prj
+      var touchBufferLayerPrj =
+          HU.GeometryUtilities.fromEnvelope(envLL, makeCircle: false);
+      touchBufferLayerPrj.setSRID(_srid!);
+      var touchPointLayerPrj = JTS.GeometryFactory.defaultPrecision()
+          .createPoint(JTS.Coordinate(pointLL.longitude, pointLL.latitude));
+      touchPointLayerPrj.setSRID(_srid!);
+      if (_srid != SmashPrj.EPSG4326_INT) {
+        SmashPrj.transformGeometry(
+            SmashPrj.EPSG4326, dataPrj!, touchBufferLayerPrj);
+        SmashPrj.transformGeometry(
+            SmashPrj.EPSG4326, dataPrj, touchPointLayerPrj);
+      }
+      var gc = await getGeometryColumn();
+      if (gc != null) {
+        // if polygon, then it has to be inside,
+        // for other types we use the buffer
+        JTS.Geometry checkGeom;
+        if (gc.geometryType.isPolygon()) {
+          checkGeom = touchPointLayerPrj;
+        } else {
+          checkGeom = touchBufferLayerPrj;
+        }
+        List<JTS.Geometry> geomsIntersected = await _pgDb!.getGeometriesIn(
+          sqlName,
+          intersectionGeometry: checkGeom,
+          userDataField: _primaryKey,
+        );
+        return Tuple2(geomsIntersected, checkGeom);
+      }
+    }
+    return null;
   }
 }
 

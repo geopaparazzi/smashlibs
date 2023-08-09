@@ -81,7 +81,7 @@ class FeatureInfoLayer extends StatelessWidget {
     totalQueryResult.fieldAndTypemap = [];
     totalQueryResult.ids = [];
     totalQueryResult.primaryKeys = [];
-    totalQueryResult.dbs = [];
+    totalQueryResult.edsList = [];
     for (var vLayer in visibleVectorLayers) {
       if (DbVectorLayerSource.isDbVectorLayerSource(vLayer!)) {
         var db = await DbVectorLayerSource.getDb(vLayer);
@@ -120,7 +120,7 @@ class FeatureInfoLayer extends StatelessWidget {
           queryResult.geoms.forEach((g) {
             totalQueryResult.ids!.add(name);
             totalQueryResult.primaryKeys!.add(pk);
-            totalQueryResult.dbs!.add(db);
+            totalQueryResult.edsList!.add(db);
             totalQueryResult.fieldAndTypemap!.add(typesMap);
             totalQueryResult.editable!.add(pk != null);
             if (srid != SmashPrj.EPSG4326_INT) {
@@ -161,7 +161,7 @@ class EditableQueryResult {
 
   List<bool>? editable;
   List<String?>? primaryKeys;
-  List<dynamic>? dbs;
+  List<EditableDataSource>? edsList;
   List<Map<String, dynamic>>? attributes;
   List<Map<String, String>>? fieldAndTypemap;
 }

@@ -187,8 +187,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           GeometryEditManager().stopEditing();
 
           // reload layer geoms
-          await reloadDbLayers(
-              editableGeometry!.editableDataSource, editableGeometry.table!);
+          await reloadDbLayers(editableGeometry!.editableDataSource);
         },
       ),
     );
@@ -294,31 +293,31 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           ),
         ),
         onLongPress: () async {
-          var t = geomEditState.editableGeometry!.table!;
-          var db = geomEditState.editableGeometry!.editableDataSource;
+          var eds = geomEditState.editableGeometry!.editableDataSource;
           bool hasDeleted = await GeometryEditManager()
               .deleteCurrentSelection(context, geomEditState);
           if (hasDeleted) {
             // reload layer geoms
-            await reloadDbLayers(db, t);
+            await reloadDbLayers(eds);
           }
         },
       ),
     );
   }
 
-  Future<void> reloadDbLayers(dynamic db, String table) async {
+  Future<void> reloadDbLayers(EditableDataSource eds) async {
     // reload layer geoms
-    var layerSources = LayerManager().getLayerSources(onlyActive: true);
-    var layer =
-        layerSources.where((layer) => layer != null).firstWhere((layer) {
-      var isDbVector = DbVectorLayerSource.isDbVectorLayerSource(layer!);
-      bool isEqual = isDbVector &&
-          layer.getName() == table &&
-          (layer as DbVectorLayerSource).db == db;
-      return isEqual;
-    });
-    (layer as LoadableLayerSource).isLoaded = false;
+    // var layerSources = LayerManager().getLayerSources(onlyActive: true);
+    // var layer =
+    //     layerSources.where((layer) => layer != null).firstWhere((layer) {
+    //   var isDbVector = DbVectorLayerSource.isDbVectorLayerSource(layer!);
+    //   bool isEqual = isDbVector &&
+    //       layer.getName() == table &&
+    //       (layer as DbVectorLayerSource).db == eds;
+    //   return isEqual;
+    // });
+    if (eds is LoadableLayerSource)
+      (eds as LoadableLayerSource).isLoaded = false;
 
     SmashMapBuilder mapBuilder =
         Provider.of<SmashMapBuilder>(context, listen: false);
@@ -346,42 +345,28 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           var editableGeometry = geometryEditorState.editableGeometry!;
           var id = editableGeometry.id;
           if (id != null) {
-            var table = editableGeometry.table;
-            var db = editableGeometry.editableDataSource;
-            var tableName = TableName(table!,
-                schemaSupported:
-                    db is PostgisDb || db is PostgresqlDb ? true : false);
-            var key = await db.getPrimaryKey(tableName);
-            var geometryColumn = await db.getGeometryColumnsForTable(tableName);
-            var tableColumns = await db.getTableColumns(tableName);
-            Map<String, String> typesMap = {};
-            tableColumns.forEach((column) {
-              typesMap[column[0]] = column[1];
-            });
+            EditableDataSource eds = editableGeometry.editableDataSource;
 
-            var tableData = await db.getTableData(tableName, where: "$key=$id");
-            if (tableData.data.isNotEmpty) {
+            HU.Feature? feature = await eds.getFeatureById(id);
+            var gcAndSrid = await eds.getGeometryColumnNameAndSrid();
+
+            if (feature != null) {
+              Map<String, String> typesMap = await eds.getTypesMap();
+
               EditableQueryResult totalQueryResult = EditableQueryResult();
               totalQueryResult.editable = [true];
-              totalQueryResult.fieldAndTypemap = [];
-              totalQueryResult.ids = [];
-              totalQueryResult.primaryKeys = [];
-              totalQueryResult.dbs = [];
-              tableData.geoms.forEach((g) {
-                totalQueryResult.ids?.add(table);
-                totalQueryResult.primaryKeys?.add(key);
-                totalQueryResult.dbs?.add(db);
-                totalQueryResult.fieldAndTypemap?.add(typesMap);
-                totalQueryResult.editable?.add(true);
-                if (geometryColumn.srid != SmashPrj.EPSG4326_INT) {
-                  var from = SmashPrj.fromSrid(geometryColumn.srid)!;
-                  SmashPrj.transformGeometryToWgs84(from, g);
-                }
-                totalQueryResult.geoms.add(g);
-              });
-              tableData.data.forEach((d) {
-                totalQueryResult.data.add(d);
-              });
+              totalQueryResult.fieldAndTypemap = [typesMap];
+              totalQueryResult.ids = [eds.getName()];
+              totalQueryResult.primaryKeys = [eds.getIdFieldName()];
+              totalQueryResult.edsList = [eds];
+              // totalQueryResult.editable?.add(true);
+              if (gcAndSrid != null &&
+                  gcAndSrid.item2 != SmashPrj.EPSG4326_INT) {
+                var from = SmashPrj.fromSrid(gcAndSrid.item2)!;
+                SmashPrj.transformGeometryToWgs84(from, feature.geometry!);
+              }
+              totalQueryResult.geoms.add(feature.geometry!);
+              totalQueryResult.data.add(feature.attributes);
 
               var formHelper = SmashDatabaseFormHelper(totalQueryResult);
               await formHelper.init();
@@ -400,7 +385,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
                             )));
               }
               // reload layer geoms
-              await reloadDbLayers(db, table);
+              await reloadDbLayers(eds);
             }
           } else {
             SmashDialogs.showWarningDialog(
@@ -632,7 +617,7 @@ class SmashDatabaseFormHelper extends AFormhelper {
 
   @override
   Future<bool> init() async {
-    _db = _queryResult.dbs?[0];
+    _db = _queryResult.edsList?[0];
 
     _titleWidget = SmashUI.titleText(_queryResult.ids!.first,
         color: SmashColors.mainBackground, bold: true);

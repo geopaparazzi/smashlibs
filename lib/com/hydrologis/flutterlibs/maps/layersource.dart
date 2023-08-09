@@ -273,7 +273,6 @@ abstract class DbVectorLayerSource extends EditableVectorLayerSource {
   }
 }
 
-/// Interface for editable vector data based layersources.
 abstract class EditableVectorLayerSource extends VectorLayerSource {}
 
 /// Interface for raster data based layersources.

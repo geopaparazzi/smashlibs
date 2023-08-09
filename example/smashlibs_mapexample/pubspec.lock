@@ -125,10 +125,10 @@ packages:
     dependency: transitive
     description:
       name: dart_hydrologis_utils
-      sha256: "775194cbe8bb5474a3ec74c708fcc9cc31f99290966cbe5d5697c8d302676919"
+      sha256: c021cdae987fd216fd32f2dc6ff2abe0ef645de3b1057ff271a322f464dc9075
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.4"
+    version: "0.8.0"
   dart_jts:
     dependency: "direct main"
     description:
@@ -141,18 +141,18 @@ packages:
     dependency: transitive
     description:
       name: dart_postgis
-      sha256: "233c54d5428031c5a0c2707e5f6b299757a1476fd093c71351470ca865c3acdb"
+      sha256: "24c491356983e18b0f987620e5332f596133ad990d9e991c18664998d26ce184"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.1+1"
+    version: "0.3.2+1"
   dart_shp:
     dependency: transitive
     description:
       name: dart_shp
-      sha256: "1c318d4b4ea347bc1222b498b285e95ff964229aea945716586611202ead1844"
+      sha256: "8e708ba9047668c09405a65983b9cf65a485234b6fbd167cd9bbe1a9562b080b"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.1.0+1"
   device_info_plus:
     dependency: transitive
     description:
@@ -197,10 +197,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: ed5337a5660c506388a9f012be0288fb38b49020ce2b45fe1f8b8323fe429f99
+      sha256: "7bf0adc28a23d395f19f3f1eb21dd7cfd1dd9f8e1c50051c069122e6853bc878"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   file:
     dependency: transitive
     description:
@@ -266,10 +266,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_geopackage
-      sha256: fb51c1d11b905d7020bf75533ac859eea11ca16c221f74322419f4971f222ccd
+      sha256: eda45da3cf3e0d773fad5699a7ea2c59e8d55b60965e37420ac1d944bb4eb1ab
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.6.3+1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -377,10 +377,10 @@ packages:
     dependency: transitive
     description:
       name: geoimage
-      sha256: "5ae1dcebe30e698a263f921ab573eb16fa984adfacd03daba1eff4ba8f75f408"
+      sha256: aa1de97b5c74bc98df1a8ca26ac2ebc6f76c6e4694d0b69dfd0096e670b93b72
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "0.4.0"
   geojson_vi:
     dependency: transitive
     description:
@@ -433,10 +433,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "8e9d133755c3e84c73288363e6343157c383a0c6c56fc51afcc5d4d7180306d6"
+      sha256: a72242c9a0ffb65d03de1b7113bc4e189686fc07c7147b8b41811d0dd0e0d9bf
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "4.0.17"
   image_picker:
     dependency: transitive
     description:
@@ -650,10 +650,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider
-      sha256: "3087813781ab814e4157b172f1a11c46be20179fcc9bea043e0fba36bc0acaa2"
+      sha256: "909b84830485dbcd0308edf6f7368bc8fd76afa26a270420f34cabea2a6467a0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.15"
+    version: "2.1.0"
   path_provider_android:
     dependency: transitive
     description:
@@ -1159,10 +1159,10 @@ packages:
     dependency: transitive
     description:
       name: xdg_directories
-      sha256: e0b1147eec179d3911f1f19b59206448f78195ca1d20514134e10641b7d7fbff
+      sha256: f0c26453a2d47aa4c2570c6a033246a3fc62da2fe23c7ffdd0a7495086dc0247
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   xml:
     dependency: transitive
     description:

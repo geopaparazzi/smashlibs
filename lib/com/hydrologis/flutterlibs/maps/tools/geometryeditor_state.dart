@@ -37,13 +37,44 @@ class GeometryEditorState extends ChangeNotifier {
 
 class EditableGeometry {
   int? id;
-  String? table;
   late EditableDataSource editableDataSource;
 
   JTS.Geometry? geometry;
 }
 
-class EditableDataSource {}
+/// Parent class for editable data sources.
+abstract class EditableDataSource {
+  String getName();
+
+  /// Get the name of the field holding the id/primary key.
+  String? getIdFieldName();
+
+  /// Get a feature by its id/primary key.
+  Future<HU.Feature?> getFeatureById(int id);
+
+  /// Get the hashmap of the attributes types (name:type).
+  Future<Map<String, String>> getTypesMap();
+
+  /// Get the complete [GeometryColumn] information of the datasource.
+  Future<HU.GeometryColumn?> getGeometryColumn();
+
+  /// A fast method to query the datasource for name and srid. This needs to be fast.
+  Future<Tuple2<String, int>?> getGeometryColumnNameAndSrid();
+
+  Future<void> saveCurrentEdit(
+      GeometryEditorState geomEditState, List<LatLng> points);
+
+  Future<Tuple2<String?, EditableGeometry?>> createNewGeometry(LatLng point);
+
+  Future<bool> deleteCurrentSelection(GeometryEditorState geomEditState);
+
+  /// Get the geometries intersecting the current point.
+  ///
+  /// Returns a tuple with the list of geometries and the checkGeometry that
+  /// has been used to do the intersection.
+  Future<Tuple2<List<JTS.Geometry>, JTS.Geometry>?> getGeometriesIntersecting(
+      LatLng pointLL, JTS.Envelope envLL);
+}
 
 class GeometryEditManager {
   static final GeometryEditManager _singleton = GeometryEditManager._internal();
@@ -294,23 +325,17 @@ class GeometryEditManager {
       } else {
         resetToNulls();
         // geometry is not yet of the layer type
-        var editableGeometry = geomEditorState.editableGeometry;
-
-        var tableName = TableName(editableGeometry!.table!,
-            schemaSupported: editableGeometry.editableDataSource is PostgisDb ||
-                    editableGeometry.editableDataSource is PostgresqlDb
-                ? true
-                : false);
-        var gc = await editableGeometry.editableDataSource
-            .getGeometryColumnsForTable(tableName);
-        var gType = gc.geometryType;
-
-        if (gType.isLine()) {
-          await _completeFirstLineGeometry(
-              editableGeometry, point, geomEditorState);
-        } else if (gType.isPolygon()) {
-          await _handlePolygonGeometry(
-              editableGeometry, point, geomEditorState);
+        var editableGeometry = geomEditorState.editableGeometry!;
+        var gc = await editableGeometry.editableDataSource.getGeometryColumn();
+        if (gc != null) {
+          var gType = gc.geometryType;
+          if (gType.isLine()) {
+            await _completeFirstLineGeometry(
+                editableGeometry, point, geomEditorState);
+          } else if (gType.isPolygon()) {
+            await _handlePolygonGeometry(
+                editableGeometry, point, geomEditorState);
+          }
         }
       }
     } else {
@@ -324,16 +349,13 @@ class GeometryEditManager {
 
   /// Create the line geometry. Since 2 coordinates are enough to create a line,
   /// when this method is called, the usable line geometry and the appropriate layer
-  /// can be created (before a opint layer was used for the first point)
+  /// can be created (before a point layer was used for the first point)
   Future<void> _completeFirstLineGeometry(
     EditableGeometry editableGeometry,
     LatLng point,
     GeometryEditorState geomEditorState,
   ) async {
     var gf = JTS.GeometryFactory.defaultPrecision();
-    Map<String, DbVectorLayerSource> name2SourceMap = _getName2SourcesMap();
-    var vectorLayer = name2SourceMap[editableGeometry.table];
-    var db = await DbVectorLayerSource.getDb(vectorLayer as LayerSource);
     // var dataPrj = SmashPrj.fromSrid(vectorLayer.getSrid());
     var coordinate = editableGeometry.geometry?.getCoordinate();
     var p2 = gf.createPoint(JTS.Coordinate(point.longitude, point.latitude));
@@ -348,14 +370,13 @@ class GeometryEditManager {
     // }
     EditableGeometry editGeometry = EditableGeometry();
     editGeometry.geometry = geometry;
-    editGeometry.editableDataSource = db;
+    editGeometry.editableDataSource = editableGeometry.editableDataSource;
     editGeometry.id = -1;
-    editGeometry.table = vectorLayer!.getName();
     geomEditorState.editableGeometry = editGeometry;
 
     _makeLineEditor(editGeometry);
 
-    disposeLayerToReload(vectorLayer);
+    disposeLayerToReload(editableGeometry.editableDataSource);
     geomEditorState.refreshEditLayer();
     // ! TODO
     // SmashMapBuilder mapBuilder =
@@ -369,10 +390,8 @@ class GeometryEditManager {
     GeometryEditorState geomEditorState,
   ) async {
     var gf = JTS.GeometryFactory.defaultPrecision();
-    Map<String, DbVectorLayerSource> name2SourceMap = _getName2SourcesMap();
-    var vectorLayer = name2SourceMap[editableGeometry.table];
-    var db = await DbVectorLayerSource.getDb(vectorLayer!);
-    // var dataPrj = SmashPrj.fromSrid(vectorLayer.getSrid());
+
+    var eds = editableGeometry.editableDataSource;
     var coordinates = editableGeometry.geometry?.getCoordinates();
 
     if (coordinates!.length == 1) {
@@ -383,9 +402,8 @@ class GeometryEditManager {
 
       EditableGeometry editGeometry = EditableGeometry();
       editGeometry.geometry = geometry;
-      editGeometry.editableDataSource = db;
+      editGeometry.editableDataSource = eds;
       editGeometry.id = -1;
-      editGeometry.table = vectorLayer.getName();
       geomEditorState.editableGeometry = editGeometry;
 
       _makeLineEditor(editGeometry);
@@ -409,9 +427,8 @@ class GeometryEditManager {
       // }
       EditableGeometry editGeometry = EditableGeometry();
       editGeometry.geometry = geometry;
-      editGeometry.editableDataSource = db;
+      editGeometry.editableDataSource = eds;
       editGeometry.id = -1;
-      editGeometry.table = vectorLayer.getName();
       geomEditorState.editableGeometry = editGeometry;
 
       _makePolygonEditor(editGeometry);
@@ -419,7 +436,7 @@ class GeometryEditManager {
       _polygonInWork = false;
     }
 
-    disposeLayerToReload(vectorLayer);
+    disposeLayerToReload(eds);
     geomEditorState.refreshEditLayer();
     // ! TODO
     // SmashMapBuilder mapBuilder =
@@ -430,7 +447,7 @@ class GeometryEditManager {
   /// Ask the user on which layer to create a new geometry and make a fist one.
   Future<void> _createNewGeometryOnSelectedLayer(BuildContext context,
       LatLng point, GeometryEditorState geomEditorState) async {
-    Map<String, DbVectorLayerSource> name2SourceMap = _getName2SourcesMap();
+    Map<String, EditableDataSource> name2SourceMap = _getName2SourcesMap();
     if (name2SourceMap.length == 0) {
       await SmashDialogs.showWarningDialog(
           context, "No editable layer is currently loaded.");
@@ -445,63 +462,18 @@ class GeometryEditManager {
         selectedName = namesList[0];
       }
       if (selectedName != null) {
-        var vectorLayer = name2SourceMap[selectedName];
-        var db = await DbVectorLayerSource.getDb(vectorLayer);
-        var table = vectorLayer?.getName();
-        var tableColumns = await db.getTableColumns(TableName(table!,
-            schemaSupported:
-                db is PostgisDb || db is PostgresqlDb ? true : false));
+        EditableDataSource? editableLayerSource = name2SourceMap[selectedName];
 
-        // check if there is a pk and if the columns are set to be non null in other case
-        bool hasPk = false;
-        bool hasNonNull = false;
-        tableColumns.forEach((tc) {
-          var pk = tc[2];
-          if (pk == 1) {
-            hasPk = true;
-          } else {
-            var nonNull = tc[3];
-            if (nonNull == 1) {
-              hasNonNull = true;
-            }
-          }
-        });
-        if (!hasPk || hasNonNull) {
-          await SmashDialogs.showWarningDialog(context,
-              "Currently only editing of tables with a primary key and nullable columns is supported.");
+        Tuple2<String?, EditableGeometry?> result =
+            await editableLayerSource!.createNewGeometry(point);
+
+        if (result.item1 != null) {
+          await SmashDialogs.showWarningDialog(context, result.item1!);
           return;
         }
 
-        // create a minimal geometry to work on
-        var tableName = TableName(table,
-            schemaSupported:
-                db is PostgisDb || db is PostgresqlDb ? true : false);
-        var gc = await db.getGeometryColumnsForTable(tableName);
-        var gType = gc.geometryType;
-        JTS.Geometry geometry;
-        var gf = JTS.GeometryFactory.defaultPrecision();
-
-        // Create first as just point, even if the layer is of different type
-        geometry =
-            gf.createPoint(JTS.Coordinate(point.longitude, point.latitude));
-
-        var lastId = -1;
-        if (gType.isPoint()) {
-          var dataPrj = SmashPrj.fromSrid(vectorLayer!.getSrid()!);
-          SmashPrj.transformGeometry(SmashPrj.EPSG4326, dataPrj!, geometry);
-          var sql =
-              "INSERT INTO ${tableName.fixedName} (${gc.geometryColumnName}) VALUES (?);";
-          var sqlObj = db.geometryToSql(geometry);
-          lastId = db.execute(sql, arguments: [sqlObj], getLastInsertId: true);
-        }
-
-        EditableGeometry editGeom2 = EditableGeometry();
-        editGeom2.geometry = geometry;
-        editGeom2.editableDataSource = db;
-        editGeom2.id = lastId;
-        editGeom2.table = table;
+        EditableGeometry editGeom2 = result.item2!;
         geomEditorState.editableGeometry = editGeom2;
-
         // When starting editing it is always a point.
         var coord = editGeom2.geometry!.getCoordinate();
 
@@ -514,7 +486,7 @@ class GeometryEditManager {
         );
 
         // reload layer geoms
-        disposeLayerToReload(vectorLayer);
+        disposeLayerToReload(editableLayerSource);
         geomEditorState.refreshEditLayer();
         // ! TODO
         // SmashMapBuilder mapBuilder =
@@ -524,21 +496,23 @@ class GeometryEditManager {
     }
   }
 
-  void disposeLayerToReload(DbVectorLayerSource? vectorLayer) {
-    vectorLayer?.isLoaded = false;
+  void disposeLayerToReload(dynamic editableLayer) {
+    if (editableLayer is LoadableLayerSource) {
+      editableLayer.isLoaded = false;
+    }
     // vectorLayer?.disposeSource();
   }
 
-  Map<String, DbVectorLayerSource> _getName2SourcesMap() {
+  Map<String, EditableDataSource> _getName2SourcesMap() {
     List<LayerSource?> editableLayers = LayerManager()
         .getLayerSources()
         .reversed
-        .where((l) => l != null && l is DbVectorLayerSource && l.isActive())
+        .where((l) => l != null && l is EditableDataSource && l.isActive())
         .toList();
-    Map<String, DbVectorLayerSource> name2SourceMap = {};
+    Map<String, EditableDataSource> name2SourceMap = {};
     editableLayers.forEach((element) {
-      if (element is DbVectorLayerSource) {
-        name2SourceMap[element.getName()!] = element;
+      if (element is EditableDataSource) {
+        name2SourceMap[element!.getName()!] = element as EditableDataSource;
       }
     });
     return name2SourceMap;
@@ -558,85 +532,46 @@ class GeometryEditManager {
     List<LayerSource?> editableLayers = LayerManager()
         .getLayerSources()
         .reversed
-        .where((l) => l != null && l is DbVectorLayerSource && l.isActive())
+        .where((l) => l != null && l is EditableDataSource && l.isActive())
         .toList();
 
     var radius = ZOOM2TOUCHRADIUS[zoom] * 10;
 
-    var env = JTS.Envelope.fromCoordinate(
+    var env4326 = JTS.Envelope.fromCoordinate(
         JTS.Coordinate(point.longitude, point.latitude));
-    env.expandByDistance(radius);
+    env4326.expandByDistance(radius);
 
     EditableGeometry? editGeom;
     double minDist = 1000000000;
     for (LayerSource? vLayer in editableLayers) {
-      var srid = vLayer!.getSrid()!;
-      var db = await DbVectorLayerSource.getDb(vLayer);
-      // create the env
-      var dataPrj = SmashPrj.fromSrid(srid);
+      var eds = vLayer as EditableDataSource;
+      Tuple2<List<JTS.Geometry>, JTS.Geometry>? geomsIntersected =
+          await eds.getGeometriesIntersecting(point, env4326);
 
-      // create the touch point and buffer in the current layer prj
-      var touchBufferLayerPrj =
-          GPKG.GeometryUtilities.fromEnvelope(env, makeCircle: false);
-      touchBufferLayerPrj.setSRID(srid);
-      var touchPointLayerPrj = JTS.GeometryFactory.defaultPrecision()
-          .createPoint(JTS.Coordinate(point.longitude, point.latitude));
-      touchPointLayerPrj.setSRID(srid);
-      if (srid != SmashPrj.EPSG4326_INT) {
-        SmashPrj.transformGeometry(
-            SmashPrj.EPSG4326, dataPrj!, touchBufferLayerPrj);
-        SmashPrj.transformGeometry(
-            SmashPrj.EPSG4326, dataPrj, touchPointLayerPrj);
-      }
-      var tableName = vLayer.getName();
-      var sqlName = TableName(tableName!,
-          schemaSupported:
-              db is PostgisDb || db is PostgresqlDb ? true : false);
-      var gc = await db.getGeometryColumnsForTable(sqlName);
-      var primaryKey = await db.getPrimaryKey(sqlName);
-      // if polygon, then it has to be inside,
-      // for other types we use the buffer
-      // Envelope checkEnv;
-      JTS.Geometry checkGeom;
-      if (gc.geometryType.isPolygon()) {
-        // checkEnv = touchPointLayerPrj.getEnvelopeInternal();
-        checkGeom = touchPointLayerPrj;
-      } else {
-        // checkEnv = touchBufferLayerPrj.getEnvelopeInternal();
-        checkGeom = touchBufferLayerPrj;
-      }
-      var geomsIntersected = await db.getGeometriesIn(
-        sqlName,
-        intersectionGeometry: checkGeom,
-        // envelope: checkEnv,
-        userDataField: primaryKey,
-      );
+      var gc = await eds.getGeometryColumn();
 
-      if (geomsIntersected.isNotEmpty) {
+      if (geomsIntersected != null && gc != null) {
         // find touching
-        for (var geometry in geomsIntersected) {
-          if (geometry.intersects(checkGeom)) {
-            var userData = geometry.getUserData();
-            if (userData != null) {
-              var id = int.parse(userData.toString());
-              // distance always from touch center
-              double distance = geometry.distance(touchPointLayerPrj);
-              if (distance < minDist) {
-                // transform to 4326 for editing
-                SmashPrj.transformGeometry(
-                    dataPrj!, SmashPrj.EPSG4326, geometry);
-                minDist = distance;
-                editGeom = EditableGeometry();
-                editGeom.geometry = geometry;
-                editGeom.editableDataSource = db;
-                editGeom.id = id;
-                editGeom.table = tableName;
+        var dataPrj = SmashPrj.fromSrid(gc.srid);
+        for (var geometry in geomsIntersected.item1) {
+          var userData = geometry.getUserData();
+          if (userData != null) {
+            var id = int.parse(userData.toString());
+            // distance always from touch center
+            double distance = geometry.distance(geomsIntersected.item2);
+            if (distance < minDist) {
+              // transform to 4326 for editing
+              SmashPrj.transformGeometry(dataPrj!, SmashPrj.EPSG4326, geometry);
+              minDist = distance;
+              editGeom = EditableGeometry();
+              editGeom.geometry = geometry;
+              editGeom.editableDataSource = eds;
+              editGeom.id = id;
 
-                if (gc.geometryType.isLine()) {
-                  _makeLineEditor(editGeom);
-                } else if (gc.geometryType.isPolygon()) {
-                  _makePolygonEditor(editGeom);
-                }
+              if (gc.geometryType.isLine()) {
+                _makeLineEditor(editGeom);
+              } else if (gc.geometryType.isPolygon()) {
+                _makePolygonEditor(editGeom);
               }
             }
           }
@@ -729,79 +664,19 @@ class GeometryEditManager {
   }
 
   Future<void> saveCurrentEdit(GeometryEditorState geomEditState) async {
-    if (editPolyline != null || editPolygon != null || pointEditor != null) {
+    List<LatLng>? points;
+    if (editPolyline != null) {
+      points = editPolyline!.points;
+    } else if (editPolygon != null) {
+      points = editPolygon!.points;
+    } else if (pointEditor != null) {
+      points = [pointEditor!.point];
+    }
+    if (points != null) {
       var editableGeometry = geomEditState.editableGeometry;
-      var db = editableGeometry!.editableDataSource;
+      EditableDataSource eds = editableGeometry!.editableDataSource;
 
-      var tableName = TableName(editableGeometry.table!,
-          schemaSupported:
-              db is PostgisDb || db is PostgresqlDb ? true : false);
-      var primaryKey = await db.getPrimaryKey(tableName);
-      var geometryColumn = await db.getGeometryColumnsForTable(tableName);
-      JTS.EGeometryType gType = geometryColumn.geometryType;
-      var gf = JTS.GeometryFactory.defaultPrecision();
-      JTS.Geometry? geom;
-      if (gType.isLine()) {
-        var newPoints = editPolyline!.points;
-        geom = gf.createLineString(newPoints
-            .map((c) => JTS.Coordinate(c.longitude, c.latitude))
-            .toList());
-        if (gType.isMulti()) {
-          geom = gf.createMultiLineString([geom as JTS.LineString]);
-        }
-      } else if (gType.isPolygon()) {
-        var newPoints = editPolygon!.points;
-        newPoints.add(newPoints[0]);
-        var linearRing = gf.createLinearRing(newPoints
-            .map((c) => JTS.Coordinate(c.longitude, c.latitude))
-            .toList());
-        geom = gf.createPolygon(linearRing, null);
-        if (gType.isMulti()) {
-          geom = gf.createMultiPolygon([geom as JTS.Polygon]);
-        }
-      } else if (gType.isPoint()) {
-        var newPoint = pointEditor!.point;
-        geom = gf
-            .createPoint(JTS.Coordinate(newPoint.longitude, newPoint.latitude));
-        if (gType.isMulti()) {
-          geom = gf.createMultiPoint([geom as JTS.Point]);
-        }
-      }
-
-      geom!.setSRID(geometryColumn.srid);
-      if (geometryColumn.srid != SmashPrj.EPSG4326_INT) {
-        var to = SmashPrj.fromSrid(geometryColumn.srid);
-        SmashPrj.transformGeometry(SmashPrj.EPSG4326, to!, geom);
-      }
-
-      if (editableGeometry.id != -1) {
-        dynamic sqlObj = db.geometryToSql(geom);
-        Map<String, dynamic> newRow = {
-          geometryColumn.geometryColumnName: sqlObj
-        };
-        await db.updateMap(
-            tableName, newRow, "$primaryKey=${editableGeometry.id}");
-      } else {
-        // insert new
-        Map<String, DbVectorLayerSource> name2SourceMap = _getName2SourcesMap();
-        var vectorLayer = name2SourceMap[editableGeometry.table];
-        var db = await DbVectorLayerSource.getDb(vectorLayer);
-        var tableName = TableName(editableGeometry.table!,
-            schemaSupported:
-                db is PostgisDb || db is PostgresqlDb ? true : false);
-        var gc = await editableGeometry.editableDataSource
-            .getGeometryColumnsForTable(tableName);
-        var lastId = -1;
-        var sql =
-            "INSERT INTO ${tableName.fixedName} (${gc.geometryColumnName}) VALUES (?);";
-        if (vectorLayer is DbVectorLayerSource) {
-          var sqlObj = db.geometryToSql(geom);
-          lastId =
-              await db.execute(sql, arguments: [sqlObj], getLastInsertId: true);
-          editableGeometry.geometry = geom;
-          editableGeometry.id = lastId;
-        }
-      }
+      await eds.saveCurrentEdit(geomEditState, points);
     }
   }
 
@@ -809,26 +684,14 @@ class GeometryEditManager {
   Future<bool> deleteCurrentSelection(
       BuildContext context, GeometryEditorState geomEditState) async {
     var editableGeometry = geomEditState.editableGeometry;
-    if (editableGeometry != null) {
-      var id = editableGeometry.id;
-      if (id != null) {
-        var db = editableGeometry.editableDataSource;
-        var table = TableName(editableGeometry.table!,
-            schemaSupported:
-                db is PostgisDb || db is PostgresqlDb ? true : false);
-        var pk = await db.getPrimaryKey(table);
-        var sql = "delete from ${table.fixedName} where $pk=$id";
-        await db.execute(sql);
+    EditableDataSource eds = editableGeometry!.editableDataSource;
 
-        geomEditState.editableGeometry = null;
+    var res = await eds.deleteCurrentSelection(geomEditState);
 
-        resetToNulls();
-        cancel(context);
+    resetToNulls();
+    cancel(context);
 
-        return true;
-      }
-    }
-    return false;
+    return res;
   }
 }
 

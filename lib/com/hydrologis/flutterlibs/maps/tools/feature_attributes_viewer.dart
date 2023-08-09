@@ -32,14 +32,10 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     try {
       EditableQueryResult f = widget.features;
       for (var i = 0; i < f.ids!.length; i++) {
-        var db = f.dbs![i];
-        var tableName = f.ids![i];
-        var gcAndSrid = await db.getGeometryColumnNameAndSridForTable(TableName(
-            tableName,
-            schemaSupported:
-                db is PostgisDb || db is PostgresqlDb ? true : false));
+        var eds = f.edsList![i];
+        var gcAndSrid = await eds.getGeometryColumnNameAndSrid();
         if (gcAndSrid != null) {
-          _srids[tableName] = gcAndSrid[1];
+          _srids[eds.getName()] = gcAndSrid.item2;
         }
       }
     } on Exception catch (e, s) {
@@ -92,7 +88,7 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     if (f.editable![_index]) {
       typesMap = f.fieldAndTypemap![_index];
       primaryKey = f.primaryKeys![_index];
-      db = f.dbs![_index];
+      db = f.edsList![_index];
     }
 
     var centroid = _geometry.getCentroid().getCoordinate();
