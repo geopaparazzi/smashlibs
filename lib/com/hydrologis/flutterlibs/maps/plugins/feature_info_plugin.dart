@@ -6,69 +6,142 @@
 part of smashlibs;
 
 /// A plugin that handles tap info from vector layers
-class FeatureInfoLayer extends StatelessWidget {
-  final Color tapAreaColor = SmashColors.mainSelectionBorder;
+class FeatureInfoLayer extends StatefulWidget {
   final double tapAreaPixelSize;
 
   FeatureInfoLayer({this.tapAreaPixelSize = 10})
       : super(key: ValueKey("SMASH_FEATUREINFOLAYER"));
 
   @override
+  State<FeatureInfoLayer> createState() => _FeatureInfoLayerState();
+}
+
+class RectPainter extends CustomPainter {
+  Offset? _start;
+  Offset? _running;
+  RectPainter(this._start, this._running);
+
+  final Paint paintObject = Paint();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    _drawPath(canvas);
+  }
+
+  void _drawPath(Canvas canvas) {
+    // ui.Path path = ui.Path();
+    paintObject.color = SmashColors.mainSelectionBorder;
+    paintObject.strokeWidth = 3;
+    paintObject.style = PaintingStyle.fill;
+    if (_start == null || _running == null) {
+      return;
+    }
+    paintObject.style = PaintingStyle.stroke;
+
+    ui.Rect rect = ui.Rect.fromPoints(_start!, _running!);
+    canvas.drawRect(rect, paintObject);
+  }
+
+  @override
+  bool shouldRepaint(RectPainter oldDelegate) => true;
+}
+
+class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
+  final Color tapAreaColor = SmashColors.mainSelectionBorder;
+
+  Offset? _start;
+  Offset? _running;
+
+  late FlutterMapState map;
+
+  @override
   Widget build(BuildContext context) {
-    FlutterMapState map = FlutterMapState.maybeOf(context)!;
+    map = FlutterMapState.maybeOf(context)!;
     return Consumer<InfoToolState>(builder: (context, infoToolState, child) {
-      double radius = tapAreaPixelSize / 2.0;
+      if (!infoToolState.isEnabled) {
+        return Container();
+      }
+
+      List<Widget> stackWidgets = [];
+      if (_start != null && _running != null) {
+        stackWidgets.add(
+          CustomPaint(
+              size: Size.infinite, painter: RectPainter(_start, _running)),
+        );
+      }
+      stackWidgets.add(
+        GestureDetector(
+          onTapDown: (detail) {
+            dragStart(detail.localPosition);
+          },
+          onPanDown: (detail) {
+            dragStart(detail.localPosition);
+          },
+          onHorizontalDragUpdate: (detail) {
+            dragUpdate(detail.localPosition);
+          },
+          onVerticalDragUpdate: (detail) {
+            dragUpdate(detail.localPosition);
+          },
+          onHorizontalDragEnd: (detail) {
+            dragEnd(context, infoToolState);
+          },
+          onVerticalDragEnd: (detail) {
+            dragEnd(context, infoToolState);
+          },
+        ),
+      );
 
       return Stack(
-        children: <Widget>[
-          infoToolState.isEnabled && infoToolState.xTapPosition != null
-              ? Positioned(
-                  child: TapSelectionCircle(
-                    size: tapAreaPixelSize,
-                    color: tapAreaColor.withAlpha(128),
-                    shape: BoxShape.circle,
-                  ),
-                  left: infoToolState.xTapPosition,
-                  bottom: infoToolState.yTapPosition,
-                )
-              : SizedBox.shrink(),
-          infoToolState.isEnabled
-              ? GestureDetector(
-                  child: InkWell(),
-                  onTapUp: (e) async {
-                    Provider.of<SmashMapBuilder>(context, listen: false)
-                        .setInProgress(true);
-                    var p = e.localPosition;
-                    var pixelBounds = map.pixelBounds;
-
-                    CustomPoint pixelOrigin = map.pixelOrigin;
-                    var ll = map.unproject(CustomPoint(
-                        pixelOrigin.x + p.dx - radius,
-                        pixelOrigin.y + (p.dy - radius)));
-                    var ur = map.unproject(CustomPoint(
-                        pixelOrigin.x + p.dx + radius,
-                        pixelOrigin.y + (p.dy + radius)));
-                    var envelope = JTS.Envelope.fromCoordinates(
-                        JTS.Coordinate(ll.longitude, ll.latitude),
-                        JTS.Coordinate(ur.longitude, ur.latitude));
-
-                    var height =
-                        pixelBounds.bottomLeft.y - pixelBounds.topLeft.y;
-                    infoToolState.isSearching = true;
-                    infoToolState.setTapAreaCenter(
-                        p.dx - radius, height - p.dy - radius);
-                    await queryLayers(envelope, infoToolState, context);
-                  },
-                )
-              : SizedBox.shrink(),
-        ],
+        children: stackWidgets,
       );
     });
   }
 
-  Future<void> queryLayers(
-      JTS.Envelope env, InfoToolState state, BuildContext context) async {
-    var boundsGeom = GPKG.GeometryUtilities.fromEnvelope(env, makeCircle: true);
+  void dragStart(Offset p) {
+    _start = p;
+    setState(() {});
+  }
+
+  void dragUpdate(Offset p) {
+    _running = p;
+    setState(() {});
+  }
+
+  Future<void> dragEnd(
+      BuildContext context, InfoToolState infoToolState) async {
+    await endAndQuery(context, infoToolState);
+    // setState(() {});
+  }
+
+  Future<void> endAndQuery(
+      BuildContext context, InfoToolState infoToolState) async {
+    Provider.of<SmashMapBuilder>(context, listen: false).setInProgress(true);
+
+    CustomPoint pixelOrigin = map.pixelOrigin;
+    var p1 = map.unproject(
+        CustomPoint(pixelOrigin.x + _start!.dx, pixelOrigin.y + _start!.dy));
+    var p2 = map.unproject(CustomPoint(
+        pixelOrigin.x + _running!.dx, pixelOrigin.y + _running!.dy));
+    print("***");
+    print(p1);
+    print(p2);
+    var envelope = JTS.Envelope.fromCoordinates(
+        JTS.Coordinate(p1.longitude, p1.latitude),
+        JTS.Coordinate(p2.longitude, p2.latitude));
+
+    // var height = pixelBounds.bottomLeft.y - pixelBounds.topLeft.y;
+    infoToolState.isSearching = true;
+    // infoToolState.setTapAreaCenter(p.dx - radius, height - p.dy - radius);
+
+    await queryLayers(envelope, context);
+    _start = null;
+    _running = null;
+  }
+
+  Future<void> queryLayers(JTS.Envelope env, BuildContext context) async {
+    var boundsGeom =
+        GPKG.GeometryUtilities.fromEnvelope(env, makeCircle: false);
     boundsGeom.setSRID(4326);
     var boundMap = {4326: boundsGeom};
 
@@ -85,8 +158,7 @@ class FeatureInfoLayer extends StatelessWidget {
     for (var vLayer in visibleVectorLayers) {
       if (vLayer is EditableDataSource) {
         HU.FeatureCollection? fc = await (vLayer as EditableDataSource)
-            .getFeaturesIntersecting(
-                checkEnv: boundsGeom.getEnvelopeInternal());
+            .getFeaturesIntersecting(checkGeom: boundsGeom);
         if (fc != null) {
           fc.features.forEach((f) {
             totalQueryResult.ids!.add(vLayer!.getName()!);
