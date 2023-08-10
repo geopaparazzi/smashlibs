@@ -74,6 +74,10 @@ abstract class EditableDataSource {
   /// has been used to do the intersection.
   Future<Tuple2<List<JTS.Geometry>, JTS.Geometry>?> getGeometriesIntersecting(
       LatLng pointLL, JTS.Envelope envLL);
+
+  /// Get the features in a given geometry.
+  Future<HU.FeatureCollection?> getFeaturesIntersecting(
+      {JTS.Geometry? checkGeom, JTS.Envelope? checkEnv});
 }
 
 class GeometryEditManager {

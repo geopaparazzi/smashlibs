@@ -729,6 +729,13 @@ class GeopackageSource extends DbVectorLayerSource
     }
     return null;
   }
+
+  @override
+  Future<HU.FeatureCollection?> getFeaturesIntersecting(
+      {JTS.Geometry? checkGeom, JTS.Envelope? checkEnv}) async {
+    return _gpkgDb!
+        .getTableData(sqlName, envelope: checkEnv, geometry: checkGeom);
+  }
 }
 
 class GeopackageLazyTileImageProvider

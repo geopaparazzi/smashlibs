@@ -83,7 +83,21 @@ class FeatureInfoLayer extends StatelessWidget {
     totalQueryResult.primaryKeys = [];
     totalQueryResult.edsList = [];
     for (var vLayer in visibleVectorLayers) {
-      if (DbVectorLayerSource.isDbVectorLayerSource(vLayer!)) {
+      if (vLayer is EditableDataSource) {
+        HU.FeatureCollection? fc = await (vLayer as EditableDataSource)
+            .getFeaturesIntersecting(
+                checkEnv: boundsGeom.getEnvelopeInternal());
+        if (fc != null) {
+          fc.features.forEach((f) {
+            totalQueryResult.ids!.add(vLayer!.getName()!);
+            totalQueryResult.primaryKeys?.add(null);
+            totalQueryResult.editable!.add(false);
+            totalQueryResult.geoms.add(f.geometry!);
+            totalQueryResult.data.add(f.attributes);
+            totalQueryResult.edsList!.add(vLayer as EditableDataSource);
+          });
+        }
+      } else if (DbVectorLayerSource.isDbVectorLayerSource(vLayer!)) {
         var db = await DbVectorLayerSource.getDb(vLayer);
 
         var srid = vLayer.getSrid()!;

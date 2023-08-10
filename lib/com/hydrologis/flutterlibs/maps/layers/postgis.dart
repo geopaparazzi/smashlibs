@@ -818,6 +818,13 @@ class PostgisSource extends DbVectorLayerSource
     }
     return null;
   }
+
+  @override
+  Future<HU.FeatureCollection?> getFeaturesIntersecting(
+      {JTS.Geometry? checkGeom, JTS.Envelope? checkEnv}) async {
+    return await _pgDb!
+        .getTableData(sqlName, envelope: checkEnv, geometry: checkGeom);
+  }
 }
 
 class PostgisConnectionsHandler {
