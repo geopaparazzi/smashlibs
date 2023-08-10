@@ -133,13 +133,14 @@ class LayerManager {
   // }
 
   List<SmashMapLayer> getActiveLayers() {
-    return LayerManager()
-        .getLayerSources()
-        .where((l) => l != null)
-        .map((l) => SmashMapLayer(
-              l!,
-              key: ValueKey(l.getName()),
-            ))
-        .toList();
+    return LayerManager().getLayerSources().where((l) => l != null).map((l) {
+      if (l is LoadableLayerSource && !l.isLoaded) {
+        l = LayerSource.fromJson(l.toJson())[0];
+      }
+      return SmashMapLayer(
+        l!,
+        key: ValueKey(l.getName()),
+      );
+    }).toList();
   }
 }

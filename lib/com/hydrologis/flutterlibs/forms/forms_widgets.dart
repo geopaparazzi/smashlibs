@@ -2185,9 +2185,7 @@ class GeometryWidget extends StatefulWidget {
 
   GeometryWidget(this._label, String widgetKey, this.formHelper, this._itemMap,
       this._isReadOnly)
-      : super(key: ValueKey(widgetKey)) {
-    print("PARENT: $widgetKey");
-  }
+      : super(key: ValueKey(widgetKey)) {}
 
   @override
   GeometryWidgetState createState() => GeometryWidgetState();

@@ -36,10 +36,13 @@ class WmsSource extends RasterLayerSource {
     _srid = map[LAYERSKEY_SRID] ?? SmashPrj.EPSG3857_INT;
 
     // TODO get bounds
+    isLoaded = true;
   }
 
   WmsSource(this._getCapabilitiesUrl, this._layerName,
-      {this.imageFormat, this.opacityPercentage, this.isVisible});
+      {this.imageFormat, this.opacityPercentage, this.isVisible}) {
+    isLoaded = true;
+  }
 
   Future<void> load(BuildContext context) async {}
 

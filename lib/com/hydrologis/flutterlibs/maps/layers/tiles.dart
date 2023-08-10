@@ -48,7 +48,9 @@ class TileSource extends TiledRasterLayerSource {
     this.opacityPercentage = 100,
     this.rgbToHide,
     this.doGpkgAsOverlay,
-  });
+  }) {
+    isLoaded = true;
+  }
 
   TileSource.fromMap(Map<String, dynamic> map) {
     this.name = map[LAYERSKEY_LABEL];
@@ -80,6 +82,7 @@ class TileSource extends TiledRasterLayerSource {
       this.subdomains = subDomains.split(",");
     }
     getBounds(null);
+    isLoaded = true;
   }
 
   TileSource.Open_Street_Map_Standard({
@@ -91,7 +94,9 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
-  });
+  }) {
+    isLoaded = true;
+  }
 
   TileSource.OpenTopoMap({
     this.name = "OpenTopoMap",
@@ -101,7 +106,9 @@ class TileSource extends TiledRasterLayerSource {
     this.maxZoom = DEFAULT_MAXZOOM_INT,
     this.isVisible = true,
     this.canDoProperties = true,
-  });
+  }) {
+    isLoaded = true;
+  }
 
   TileSource.Open_Street_Map_HOT({
     this.name = "Open Street Map H.O.T.",
@@ -113,7 +120,9 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
-  });
+  }) {
+    isLoaded = true;
+  }
 
   // TileSource.Stamen_Watercolor({
   //   this.name= "Stamen Watercolor",
@@ -136,7 +145,9 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
-  });
+  }) {
+    isLoaded = true;
+  }
 
   TileSource.Wikimedia_Map({
     this.name = "Wikimedia Map",
@@ -147,7 +158,9 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
-  });
+  }) {
+    isLoaded = true;
+  }
 
   TileSource.Esri_Satellite({
     this.name = "Esri Satellite",
@@ -159,7 +172,9 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = true,
     this.canDoProperties = true,
-  });
+  }) {
+    isLoaded = true;
+  }
 
   TileSource.Mapsforge(String filePath) {
     this.name = HU.FileUtilities.nameFromFile(filePath, false);
@@ -171,6 +186,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true;
     this.isTms = false;
     this.canDoProperties = true;
+    isLoaded = true;
   }
 
   TileSource.Mapurl(String filePath) {
@@ -220,6 +236,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true;
     this.isTms = type == "tms";
     this.canDoProperties = true;
+    isLoaded = true;
   }
 
   TileSource.Mbtiles(String filePath) {
@@ -232,6 +249,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isTms = true;
     this.canDoProperties = true;
     getBounds(null);
+    isLoaded = true;
   }
 
   TileSource.Geopackage(String filePath, String tableName) {
@@ -245,9 +263,9 @@ class TileSource extends TiledRasterLayerSource {
     this.canDoProperties = true;
     this.doGpkgAsOverlay = true;
     getBounds(null);
+    isLoaded = true;
   }
 
-  @override
   Future<void> open() async {}
 
   String? getAbsolutePath() {

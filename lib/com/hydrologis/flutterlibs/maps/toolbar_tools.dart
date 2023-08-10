@@ -316,8 +316,10 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
     //       (layer as DbVectorLayerSource).db == eds;
     //   return isEqual;
     // });
-    if (eds is LoadableLayerSource)
+    if (eds is LoadableLayerSource) {
       (eds as LoadableLayerSource).isLoaded = false;
+      // (eds as LoadableLayerSource).load(context);
+    }
 
     SmashMapBuilder mapBuilder =
         Provider.of<SmashMapBuilder>(context, listen: false);

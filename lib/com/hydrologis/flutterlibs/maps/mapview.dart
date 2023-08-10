@@ -15,6 +15,7 @@ class SmashMapWidget extends StatelessWidget {
   bool _canRotate = false;
   bool _useLayerManager = true;
   bool _addBorder = false;
+  bool consumerBuild = false;
 
   MapController _mapController = MapController();
   List<Widget> preLayers = [];
@@ -163,7 +164,9 @@ class SmashMapWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    consumerBuild = false;
     return Consumer<SmashMapBuilder>(builder: (context, mapBuilder, child) {
+      consumerBuild = true;
       mapBuilder.context = context;
       // mapBuilder.scaffoldKey = _scaffoldKey;
       return consumeBuild(mapBuilder);
@@ -213,7 +216,6 @@ class SmashMapWidget extends StatelessWidget {
     ));
 
     var mapKey = "FlutterMapWidget-${key.toString()}";
-    print("INMAP: $mapKey");
     Widget flutterMap = FlutterMap(
       key: ValueKey(mapKey),
       options: new MapOptions(
