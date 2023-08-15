@@ -634,7 +634,7 @@ class SmashDatabaseFormHelper extends AFormhelper {
     if (await _db.hasTable(TableName(HM_FORMS_TABLE,
         schemaSupported:
             _db is PostgisDb || _db is PostgresqlDb ? true : false))) {
-      QueryResult result = await _db.select(
+      HU.QueryResult result = await _db.select(
           "select $FORMS_FIELD from $HM_FORMS_TABLE where $FORMS_TABLENAME_FIELD='$_tableName'");
       if (result.length == 1) {
         String formJsonString = result.first.get(FORMS_FIELD);

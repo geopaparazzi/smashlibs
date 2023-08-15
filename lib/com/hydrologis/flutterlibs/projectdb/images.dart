@@ -125,7 +125,7 @@ class DbImageData {
 
 class ImageQueryBuilder extends QueryObjectBuilder<DbImage> {
   @override
-  DbImage fromRow(QueryResultRow map) {
+  DbImage fromRow(HU.QueryResultRow map) {
     DbImage image = DbImage()
       ..id = map.get(IMAGES_COLUMN_ID)
       ..lon = map.get(IMAGES_COLUMN_LON)
@@ -163,7 +163,7 @@ class ImageDataQueryBuilder extends QueryObjectBuilder<DbImageData> {
   ImageDataQueryBuilder({this.doData: true, this.doThumb: true});
 
   @override
-  DbImageData fromRow(QueryResultRow map) {
+  DbImageData fromRow(HU.QueryResultRow map) {
     DbImageData imageData = DbImageData()..id = map.get(IMAGESDATA_COLUMN_ID);
     if (doData) imageData.data = map.get(IMAGESDATA_COLUMN_IMAGE);
     if (doThumb) imageData.thumb = map.get(IMAGESDATA_COLUMN_THUMBNAIL);
