@@ -192,14 +192,33 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           ),
           TextButton(
             onPressed: () async {
-              var geojsonPath =
-                  await copyToMapFolder("ne_10m_airports.geojson");
+              var geojsonPath = await copyToMapFolder("gjson_points.json");
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = GeojsonSource(geojsonPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("GEOJSON"),
+            child: SmashUI.normalText("JSON pt"),
+          ),
+          TextButton(
+            onPressed: () async {
+              var geojsonPath = await copyToMapFolder("gjson_lines.json");
+
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = GeojsonSource(geojsonPath);
+              if (context.mounted) await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("JSON ln"),
+          ),
+          TextButton(
+            onPressed: () async {
+              var geojsonPath = await copyToMapFolder("gjson_poygons.json");
+
+              mapView!.removeLayer(_currentLayerSource);
+              _currentLayerSource = GeojsonSource(geojsonPath);
+              if (context.mounted) await addLayerAndZoomTo(context);
+            },
+            child: SmashUI.normalText("JSON pl"),
           ),
           TextButton(
             onPressed: () async {

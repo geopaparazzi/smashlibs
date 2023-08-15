@@ -2196,6 +2196,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
   bool _loading = true;
   GeojsonSource? geojsonSource;
   late String keyStr;
+  double _iconSize = 24;
 
   @override
   void afterFirstLayout(BuildContext context) async {
@@ -2277,6 +2278,185 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       //       SmashMapEditLayer(key: ValueKey(keyStr + "_smasheditlayer")));
       // }
     }
-    return _loading || mapView == null ? Container() : mapView!;
+    return _loading || mapView == null ? Container() : getMainWidget()!;
+  }
+
+  Widget? getMainWidget() {
+    if (widget._isReadOnly) {
+      return mapView;
+    } else {
+      // ! TODO
+      GeometryEditorState geomEditorState =
+          Provider.of<GeometryEditorState>(context, listen: false);
+      return Stack(
+        children: [
+          Row(
+            children: [
+              getCancelEditButton(geomEditorState),
+              getSaveFeatureButton(geomEditorState),
+            ],
+          ),
+          mapView!,
+        ],
+      );
+    }
+  }
+
+  Widget getCancelEditButton(GeometryEditorState geomEditState) {
+    return Tooltip(
+      message: SLL
+          .of(context)
+          .toolbarTools_cancelCurrentEdit, //"Cancel current edit."
+      child: GestureDetector(
+        child: Padding(
+          padding: SmashUI.defaultPadding(),
+          child: InkWell(
+            child: Icon(
+              MdiIcons.markerCancel,
+              color: geomEditState.editableGeometry != null
+                  ? SmashColors.mainSelection
+                  : SmashColors.mainBackground,
+              size: _iconSize,
+            ),
+          ),
+        ),
+        onLongPress: () {
+          setState(() {
+            geomEditState.editableGeometry = null;
+            GeometryEditManager().stopEditing();
+            SmashMapBuilder mapBuilder =
+                Provider.of<SmashMapBuilder>(context, listen: false);
+            mapBuilder.reBuild();
+          });
+        },
+      ),
+    );
+  }
+
+  Widget getSaveFeatureButton(GeometryEditorState geomEditState) {
+    return Tooltip(
+      message:
+          SLL.of(context).toolbarTools_saveCurrentEdit, //"Save current edit."
+      child: GestureDetector(
+        child: Padding(
+          padding: SmashUI.defaultPadding(),
+          child: InkWell(
+            child: Icon(
+              MdiIcons.contentSaveEdit,
+              color: geomEditState.editableGeometry != null
+                  ? SmashColors.mainSelection
+                  : SmashColors.mainBackground,
+              size: _iconSize,
+            ),
+          ),
+        ),
+        onTap: () async {
+          var editableGeometry = geomEditState.editableGeometry;
+          await GeometryEditManager().saveCurrentEdit(geomEditState);
+
+          // stop editing
+          geomEditState.editableGeometry = null;
+          GeometryEditManager().stopEditing();
+
+          // reload layer geoms
+          await reloadDbLayers(editableGeometry!.editableDataSource);
+        },
+      ),
+    );
+  }
+
+  Widget getInsertPointInCenterButton(GeometryEditorState geomEditState) {
+    return Tooltip(
+      message: SLL
+          .of(context)
+          .toolbarTools_insertPointMapCenter, //"Insert point in map center."
+      child: GestureDetector(
+        child: Padding(
+          padding: SmashUI.defaultPadding(),
+          child: InkWell(
+            child: Icon(
+              SmashIcons.iconInMapCenter,
+              color: SmashColors.mainBackground,
+              size: _iconSize,
+            ),
+          ),
+        ),
+        onTap: () async {
+          SmashMapState mapState =
+              Provider.of<SmashMapState>(context, listen: false);
+          var center = mapState.center;
+
+          GeometryEditManager().addPoint(LatLng(center.y, center.x));
+        },
+      ),
+    );
+  }
+
+  Widget getInsertPointInGpsButton(GeometryEditorState geomEditState) {
+    return Tooltip(
+      message: SLL
+          .of(context)
+          .toolbarTools_insertPointGpsPos, //"Insert point in GPS position."
+      child: GestureDetector(
+        child: Padding(
+          padding: SmashUI.defaultPadding(),
+          child: InkWell(
+            child: Icon(
+              SmashIcons.iconInGps,
+              color: SmashColors.mainBackground,
+              size: _iconSize,
+            ),
+          ),
+        ),
+        onTap: () async {
+          GpsState gpsState = Provider.of<GpsState>(context, listen: false);
+          var gpsPosition = gpsState.lastGpsPosition;
+          if (gpsPosition != null) {
+            GeometryEditManager()
+                .addPoint(LatLng(gpsPosition.latitude, gpsPosition.longitude));
+          }
+        },
+      ),
+    );
+  }
+
+  Widget getRemoveFeatureButton(GeometryEditorState geomEditState) {
+    return Tooltip(
+      message: SLL
+          .of(context)
+          .toolbarTools_removeSelectedFeature, //"Remove selected feature."
+      child: GestureDetector(
+        child: Padding(
+          padding: SmashUI.defaultPadding(),
+          child: InkWell(
+            child: Icon(
+              MdiIcons.trashCan,
+              color: SmashColors.mainBackground,
+              size: _iconSize,
+            ),
+          ),
+        ),
+        onLongPress: () async {
+          var eds = geomEditState.editableGeometry!.editableDataSource;
+          bool hasDeleted = await GeometryEditManager()
+              .deleteCurrentSelection(context, geomEditState);
+          if (hasDeleted) {
+            // reload layer geoms
+            await reloadDbLayers(eds);
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> reloadDbLayers(EditableDataSource eds) async {
+    if (eds is LoadableLayerSource) {
+      (eds as LoadableLayerSource).isLoaded = false;
+      // (eds as LoadableLayerSource).load(context);
+    }
+
+    SmashMapBuilder mapBuilder =
+        Provider.of<SmashMapBuilder>(context, listen: false);
+    mapBuilder.reBuild();
   }
 }

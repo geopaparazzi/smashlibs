@@ -631,9 +631,10 @@ class SmashDatabaseFormHelper extends AFormhelper {
       _db = (_eds as DbVectorLayerSource).db;
     }
 
-    if (await _db.hasTable(TableName(HM_FORMS_TABLE,
-        schemaSupported:
-            _db is PostgisDb || _db is PostgresqlDb ? true : false))) {
+    if (_db != null &&
+        await _db.hasTable(TableName(HM_FORMS_TABLE,
+            schemaSupported:
+                _db is PostgisDb || _db is PostgresqlDb ? true : false))) {
       HU.QueryResult result = await _db.select(
           "select $FORMS_FIELD from $HM_FORMS_TABLE where $FORMS_TABLENAME_FIELD='$_tableName'");
       if (result.length == 1) {

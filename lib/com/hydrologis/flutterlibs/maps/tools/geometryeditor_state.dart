@@ -544,7 +544,8 @@ class GeometryEditManager {
     var env4326 = JTS.Envelope.fromCoordinate(
         JTS.Coordinate(point.longitude, point.latitude));
     env4326.expandByDistance(radius);
-
+    var pointGeom = JTS.GeometryFactory.defaultPrecision()
+        .createPoint(JTS.Coordinate(point.longitude, point.latitude));
     EditableGeometry? editGeom;
     double minDist = 1000000000;
     for (LayerSource? vLayer in editableLayers) {
@@ -562,7 +563,7 @@ class GeometryEditManager {
           if (userData != null) {
             var id = int.parse(userData.toString());
             // distance always from touch center
-            double distance = geometry.distance(geomsIntersected.item2);
+            double distance = geometry.distance(pointGeom);
             if (distance < minDist) {
               // transform to 4326 for editing
               SmashPrj.transformGeometry(dataPrj!, SmashPrj.EPSG4326, geometry);

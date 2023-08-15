@@ -5,9 +5,10 @@
  */
 part of smashlibs;
 
-class GeojsonSource extends VectorLayerSource implements SldLayerSource {
+class GeojsonSource extends VectorLayerSource
+    implements SldLayerSource, EditableDataSource {
   String? _absolutePath;
-  String? _geojsonString;
+  String? _geojsonGeometryString;
 
   String? _name;
   String? sldPath;
@@ -16,13 +17,13 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   String _attribution = "";
   int _srid = SmashPrj.EPSG4326_INT;
 
-  List<HU.Feature> features = [];
+  Map<int, HU.Feature> featuresMap = {};
   JTS.STRtree? _featureTree;
   LatLngBounds? _geojsonBounds;
   late HU.SldObjectParser _style;
   HU.TextStyle? _textStyle;
 
-  List<String> alphaFields = [];
+  Map<String, String> fieldsAndTypesMap = {};
   String? _sldString;
   JTS.EGeometryType? geometryType;
   Map<String, dynamic> _styleMap = {};
@@ -35,14 +36,19 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
     }
     String? geojsonString = map[LAYERSKEY_GEOJSON];
     if (geojsonString != null) {
-      _geojsonString = geojsonString;
+      _geojsonGeometryString = geojsonString;
     }
     isVisible = map[LAYERSKEY_ISVISIBLE];
   }
 
-  GeojsonSource.fromGeojsonGeometry(this._geojsonString);
+  /// Create a geojson source from a geojson geometry (i.e. no featurecollection)
+  GeojsonSource.fromGeojsonGeometry(this._geojsonGeometryString) {
+    _name = "geojson";
+  }
 
-  GeojsonSource(this._absolutePath);
+  GeojsonSource(this._absolutePath) {
+    _name = HU.FileUtilities.nameFromFile(this._absolutePath!, false);
+  }
 
   void setStyle(Map<String, dynamic> styleMap) {
     _styleMap = styleMap;
@@ -53,10 +59,9 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
     if (!isLoaded) {
       var gf = JTS.GeometryFactory.defaultPrecision();
       _featureTree = JTS.STRtree();
-      if (_geojsonString != null) {
-        _name = "geojson";
-
-        var jsonGeometry = GEOJSON.GeoJSONGeometry.fromJSON(_geojsonString!);
+      if (_geojsonGeometryString != null) {
+        var jsonGeometry =
+            GEOJSON.GeoJSONGeometry.fromJSON(_geojsonGeometryString!);
         JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
 
         if (geometry != null) {
@@ -67,7 +72,8 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
 
           var envLL = geometry.getEnvelopeInternal();
           _geojsonBounds = LatLngBoundsExt.fromEnvelope(envLL);
-          features.add(f);
+          // single geom has just id 1
+          featuresMap[0] = f;
           _featureTree!.insert(envLL, f);
 
           if (_sldString == null) {
@@ -89,15 +95,16 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
           _textStyle = _style.getFirstTextStyle(false);
 
           _attribution = _attribution +
-              "${features[0].geometry!.getGeometryType()} (${features.length}) ";
+              "${f.geometry!.getGeometryType()} (${featuresMap.length}) ";
         }
       } else {
         _name = HU.FileUtilities.nameFromFile(_absolutePath!, false);
         var parentFolder =
             HU.FileUtilities.parentFolderFromFile(_absolutePath!);
-        _geojsonString = HU.FileUtilities.readFile(_absolutePath!);
+        _geojsonGeometryString = HU.FileUtilities.readFile(_absolutePath!);
 
-        var fColl = GEOJSON.GeoJSONFeatureCollection.fromJSON(_geojsonString!);
+        var fColl =
+            GEOJSON.GeoJSONFeatureCollection.fromJSON(_geojsonGeometryString!);
         var bbox = fColl.bbox;
         var llLatLng = LatLng(bbox![1], bbox[0]);
         var urLatLng = LatLng(bbox[3], bbox[2]);
@@ -105,9 +112,18 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
 
         if (fColl.features.length > 0) {
           var firstFeature = fColl.features[0];
-          for (String k in firstFeature!.properties!.keys) {
-            alphaFields.add(k);
-          }
+          firstFeature!.properties!.entries.forEach((entry) {
+            // check type from first record
+            var fieldType = "TEXT";
+            if (entry.value is double) {
+              fieldType = "DOUBLE";
+            } else if (entry.value is int) {
+              fieldType = "INTEGER";
+            } else if (entry.value is bool) {
+              fieldType = "BOOLEAN";
+            }
+            fieldsAndTypesMap[entry.key] = fieldType;
+          });
 
           int id = 0;
           for (var jsonFeature in fColl.features) {
@@ -123,14 +139,14 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
                       : {};
 
                 var envLL = geometry.getEnvelopeInternal();
-                features.add(f);
+                featuresMap[id] = f;
                 _featureTree!.insert(envLL, f);
               }
             }
           }
 
           SMLogger().d(
-              "Loaded ${features.length} Geojson features of envelope: $_geojsonBounds");
+              "Loaded ${featuresMap.length} Geojson features of envelope: $_geojsonBounds");
 
           if (id > 0) {
             sldPath = HU.FileUtilities.joinPaths(parentFolder, _name! + ".sld");
@@ -163,7 +179,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
             _textStyle = _style.getFirstTextStyle(false);
 
             _attribution = _attribution +
-                "${features[0].geometry!.getGeometryType()} (${features.length}) ";
+                "${featuresMap.values.first.geometry!.getGeometryType()} (${featuresMap.length}) ";
           }
         }
       }
@@ -264,7 +280,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
   }
 
   bool hasData() {
-    return features.isNotEmpty;
+    return featuresMap.isNotEmpty;
   }
 
   String? getAbsolutePath() {
@@ -279,8 +295,8 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
 
   String? getPassword() => null;
 
-  String? getName() {
-    return _name;
+  String getName() {
+    return _name!;
   }
 
   String getAttribution() {
@@ -303,8 +319,8 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
     if (_absolutePath != null) {
       var relativePath = Workspace.makeRelative(_absolutePath!);
       path = '"$LAYERSKEY_FILE":"$relativePath",';
-    } else if (_geojsonString != null) {
-      g = '"$LAYERSKEY_GEOJSON": $_geojsonString,';
+    } else if (_geojsonGeometryString != null) {
+      g = '"$LAYERSKEY_GEOJSON": $_geojsonGeometryString,';
     }
 
     var json = '''
@@ -331,7 +347,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
       }
       return result;
     } else {
-      return features;
+      return featuresMap.values.toList();
     }
   }
 
@@ -340,7 +356,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
     await load(context);
     List<Widget> layers = [];
 
-    if (features.isNotEmpty) {
+    if (featuresMap.isNotEmpty) {
       List<List<Marker>> allPoints = [];
       List<Polyline> allLines = [];
       List<Polygon> allPolygons = [];
@@ -438,7 +454,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
     Color fillColor = ColorExt(polygonStyle.fillColorHex)
         .withAlpha((polygonStyle.fillOpacity * 255).toInt());
 
-    features.forEach((f) {
+    featuresMap.values.forEach((f) {
       if (key == null || f.attributes[key]?.toString() == value) {
         var count = f.geometry!.getNumGeometries();
         for (var i = 0; i < count; i++) {
@@ -495,7 +511,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
     var lineOpacity = lineStyle.strokeOpacity * 255;
     lineStrokeColor = lineStrokeColor.withAlpha(lineOpacity.toInt());
 
-    features.forEach((f) {
+    featuresMap.values.forEach((f) {
       if (key == null || f.attributes[key]?.toString() == value) {
         var count = f.geometry!.getNumGeometries();
         for (var i = 0; i < count; i++) {
@@ -537,7 +553,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
       labelColor = ColorExt(_textStyle!.textColor);
     }
 
-    features.forEach((f) {
+    featuresMap.values.forEach((f) {
       if (key == null || f.attributes[key]?.toString() == value) {
         var count = f.geometry!.getNumGeometries();
         for (var i = 0; i < count; i++) {
@@ -582,8 +598,8 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
 
   @override
   void disposeSource() {
-    features = [];
-    _geojsonString = null;
+    featuresMap = {};
+    _geojsonGeometryString = null;
     _geojsonBounds = null;
     _name = null;
     _absolutePath = null;
@@ -597,7 +613,7 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
 
   Widget getPropertiesWidget() {
     return SldPropertiesEditor(_sldString!, geometryType!,
-        alphaFields: alphaFields);
+        alphaFields: fieldsAndTypesMap.keys.toList());
   }
 
   @override
@@ -684,5 +700,106 @@ class GeojsonSource extends VectorLayerSource implements SldLayerSource {
       }
     }
     return null;
+  }
+
+  @override
+  Future<Tuple2<String?, EditableGeometry?>> createNewGeometry(LatLng point) {
+    // TODO: implement createNewGeometry
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> deleteCurrentSelection(GeometryEditorState geomEditState) async {
+    if (geomEditState._editableItem != null) {
+      var idToRemove = geomEditState._editableItem!.id;
+      featuresMap.remove(idToRemove);
+
+      // reload data in tree
+      _featureTree = JTS.STRtree();
+      featuresMap.values.forEach((f) {
+        var envLL = f.geometry!.getEnvelopeInternal();
+        _geojsonBounds = LatLngBoundsExt.fromEnvelope(envLL);
+        _featureTree!.insert(envLL, f);
+      });
+
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  Future<HU.Feature?> getFeatureById(int id) async {
+    return featuresMap[id];
+  }
+
+  @override
+  Future<HU.FeatureCollection?> getFeaturesIntersecting(
+      {JTS.Geometry? checkGeom, JTS.Envelope? checkEnv}) async {
+    List<HU.Feature> features =
+        getInRoi(roiGeom: checkGeom, roiEnvelope: checkEnv);
+    HU.FeatureCollection fc = HU.FeatureCollection()
+      ..features = features
+      ..geomName = "the_geom";
+    return fc;
+  }
+
+  @override
+  Future<Tuple2<List<JTS.Geometry>, JTS.Geometry>?> getGeometriesIntersecting(
+      LatLng pointLL, JTS.Envelope envLL) async {
+    // create the touch point and buffer in the current layer prj
+    var touchBufferLayerPrj =
+        HU.GeometryUtilities.fromEnvelope(envLL, makeCircle: false);
+    touchBufferLayerPrj.setSRID(_srid!);
+    var touchPointLayerPrj = JTS.GeometryFactory.defaultPrecision()
+        .createPoint(JTS.Coordinate(pointLL.longitude, pointLL.latitude));
+    touchPointLayerPrj.setSRID(_srid!);
+    // if polygon, then it has to be inside,
+    // for other types we use the buffer
+    JTS.Geometry checkGeom;
+    if (geometryType!.isPolygon()) {
+      checkGeom = touchPointLayerPrj;
+    } else {
+      checkGeom = touchBufferLayerPrj;
+    }
+    List<HU.Feature> features = getInRoi(roiGeom: checkGeom);
+    List<JTS.Geometry> geomsIntersected =
+        features.where((e) => e.geometry != null).map((e) {
+      e.geometry!.setUserData(e.fid);
+      return e.geometry!;
+    }).toList();
+    return Tuple2(geomsIntersected, checkGeom);
+  }
+
+  @override
+  Future<HU.GeometryColumn?> getGeometryColumn() async {
+    return HU.GeometryColumn()
+      ..tableName = _name!
+      ..geometryColumnName = "the_geom"
+      ..geometryType = geometryType!
+      ..coordinatesDimension = 2
+      ..srid = _srid
+      ..isSpatialIndexEnabled = 1;
+  }
+
+  @override
+  Future<Tuple2<String, int>?> getGeometryColumnNameAndSrid() async {
+    return Tuple2("the_geom", _srid);
+  }
+
+  @override
+  String? getIdFieldName() {
+    return "id";
+  }
+
+  @override
+  Future<Map<String, String>> getTypesMap() async {
+    return fieldsAndTypesMap;
+  }
+
+  @override
+  Future<void> saveCurrentEdit(
+      GeometryEditorState geomEditState, List<LatLng> points) {
+    // TODO: implement saveCurrentEdit
+    throw UnimplementedError();
   }
 }

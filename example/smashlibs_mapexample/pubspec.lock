@@ -117,18 +117,18 @@ packages:
     dependency: transitive
     description:
       name: dart_hydrologis_db
-      sha256: "4c4bc5fa5c6f9a78548551f64d6982b8500c74abb8b21da6cbb33bedd54850d6"
+      sha256: "5aa48e3f2ed6928c15c83b30df95307c2c777680398f85214ee3529366100147"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1+4"
+    version: "1.1.0+1"
   dart_hydrologis_utils:
     dependency: transitive
     description:
       name: dart_hydrologis_utils
-      sha256: c021cdae987fd216fd32f2dc6ff2abe0ef645de3b1057ff271a322f464dc9075
+      sha256: "89b4c28e948939d67daf90d4f8501955190f28c6f444a1c1c2ad96257def5099"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.0"
+    version: "0.8.1"
   dart_jts:
     dependency: "direct main"
     description:
@@ -141,10 +141,10 @@ packages:
     dependency: transitive
     description:
       name: dart_postgis
-      sha256: "24c491356983e18b0f987620e5332f596133ad990d9e991c18664998d26ce184"
+      sha256: ce61c709cc156688bdb589de5b29e7b0a305eb8eca8fa421e88d2402139be6e4
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.2+1"
+    version: "0.3.2+2"
   dart_shp:
     dependency: transitive
     description:
@@ -266,10 +266,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_geopackage
-      sha256: eda45da3cf3e0d773fad5699a7ea2c59e8d55b60965e37420ac1d944bb4eb1ab
+      sha256: d3516402c9f5ec4e25f865992919c771929bd6935c6ecbc759d10ebab98aa509
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.3+1"
+    version: "0.6.4"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -915,10 +915,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_foundation
-      sha256: f39696b83e844923b642ce9dd4bd31736c17e697f6731a5adf445b1274cf3cd4
+      sha256: d29753996d8eb8f7619a1f13df6ce65e34bc107bef6330739ed76f18b22310ef
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.3.3"
   shared_preferences_linux:
     dependency: transitive
     description:
@@ -975,10 +975,10 @@ packages:
     dependency: transitive
     description:
       name: sqlite3
-      sha256: "281b672749af2edf259fc801f0fcba092257425bcd32a0ce1c8237130bc934c7"
+      sha256: db65233e6b99e99b2548932f55a987961bc06d82a31a0665451fa0b4fff4c3fb
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.2"
+    version: "2.1.0"
   stack_trace:
     dependency: transitive
     description:
@@ -1071,10 +1071,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "78cb6dea3e93148615109e58e42c35d1ffbf5ef66c44add673d0ab75f12ff3af"
+      sha256: "3dd2388cc0c42912eee04434531a26a82512b9cb1827e0214430c9bcbddfe025"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.37"
+    version: "6.0.38"
   url_launcher_ios:
     dependency: transitive
     description:

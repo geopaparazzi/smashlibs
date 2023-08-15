@@ -59,8 +59,8 @@ class TileSource extends TiledRasterLayerSource {
       absolutePath = Workspace.makeAbsolute(relativePath);
     }
     this.url = map[LAYERSKEY_URL];
-    this.minZoom = map[LAYERSKEY_MINZOOM] ?? DEFAULT_MINZOOM;
-    this.maxZoom = map[LAYERSKEY_MAXZOOM] ?? DEFAULT_MAXZOOM;
+    this.minZoom = map[LAYERSKEY_MINZOOM] ?? DEFAULT_MINZOOM_INT;
+    this.maxZoom = map[LAYERSKEY_MAXZOOM] ?? DEFAULT_MAXZOOM_INT;
     this.attribution = map[LAYERSKEY_ATTRIBUTION];
     this.isVisible = map[LAYERSKEY_ISVISIBLE];
     this.opacityPercentage = (map[LAYERSKEY_OPACITY] ?? 100).toDouble();

@@ -96,9 +96,9 @@ class LayerManager {
 
   /// Remove a layersource form the available layers list.
   void removeLayerSource(LayerSource sourceItem) {
-    sourceItem.disposeSource();
     if (_layerSources.contains(sourceItem)) {
       _layerSources.remove(sourceItem);
+      sourceItem.disposeSource();
     }
   }
 

@@ -77,6 +77,9 @@ flutter:
     # - assets/smash_logo_64.png
     # - assets/smash_text.png
     - assets/tags.json
+    - assets/gjson_points.json
+    - assets/gjson_lines.json
+    - assets/gjson_polygons.json
     - assets/assisi.map
     - assets/ciclabile_peschiera_mantova.gpx
     - assets/testtiff.tif
@@ -85,7 +88,6 @@ flutter:
     - assets/vectors.gpkg
     - assets/defaultrender.xml
     - assets/caldaro.geocaching
-    - assets/ne_10m_airports.geojson
     - assets/watercourses_small.shp
     - assets/watercourses_small.shx
     - assets/watercourses_small.sld
