@@ -59,45 +59,7 @@ class GeojsonSource extends VectorLayerSource
     if (!isLoaded) {
       var gf = JTS.GeometryFactory.defaultPrecision();
       _featureTree = JTS.STRtree();
-      if (_geojsonGeometryString != null) {
-        var jsonGeometry =
-            GEOJSON.GeoJSONGeometry.fromJSON(_geojsonGeometryString!);
-        JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
-
-        if (geometry != null) {
-          HU.Feature f = HU.Feature()
-            ..fid = 0
-            ..geometry = geometry
-            ..attributes = {};
-
-          var envLL = geometry.getEnvelopeInternal();
-          _geojsonBounds = LatLngBoundsExt.fromEnvelope(envLL);
-          // single geom has just id 1
-          featuresMap[0] = f;
-          _featureTree!.insert(envLL, f);
-
-          if (_sldString == null) {
-            _sldString = getCustomStyle(geometryType!);
-          }
-          if (_sldString == null) {
-            if (geometryType!.isPoint()) {
-              _sldString = HU.DefaultSlds.simplePointSld();
-            } else if (geometryType!.isLine()) {
-              _sldString = HU.DefaultSlds.simpleLineSld();
-            } else if (geometryType!.isPolygon()) {
-              _sldString = HU.DefaultSlds.simplePolygonSld();
-            }
-          }
-          if (_sldString != null) {
-            _style = HU.SldObjectParser.fromString(_sldString!);
-            _style.parse();
-          }
-          _textStyle = _style.getFirstTextStyle(false);
-
-          _attribution = _attribution +
-              "${f.geometry!.getGeometryType()} (${featuresMap.length}) ";
-        }
-      } else {
+      if (_absolutePath != null) {
         _name = HU.FileUtilities.nameFromFile(_absolutePath!, false);
         var parentFolder =
             HU.FileUtilities.parentFolderFromFile(_absolutePath!);
@@ -132,7 +94,7 @@ class GeojsonSource extends VectorLayerSource
               JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
               if (geometry != null) {
                 HU.Feature f = HU.Feature()
-                  ..fid = id++
+                  ..fid = id
                   ..geometry = geometry
                   ..attributes = jsonFeature.properties != null
                       ? jsonFeature.properties!
@@ -141,6 +103,8 @@ class GeojsonSource extends VectorLayerSource
                 var envLL = geometry.getEnvelopeInternal();
                 featuresMap[id] = f;
                 _featureTree!.insert(envLL, f);
+
+                id++;
               }
             }
           }
@@ -181,6 +145,44 @@ class GeojsonSource extends VectorLayerSource
             _attribution = _attribution +
                 "${featuresMap.values.first.geometry!.getGeometryType()} (${featuresMap.length}) ";
           }
+        }
+      } else {
+        var jsonGeometry =
+            GEOJSON.GeoJSONGeometry.fromJSON(_geojsonGeometryString!);
+        JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
+
+        if (geometry != null) {
+          HU.Feature f = HU.Feature()
+            ..fid = 0
+            ..geometry = geometry
+            ..attributes = {};
+
+          var envLL = geometry.getEnvelopeInternal();
+          _geojsonBounds = LatLngBoundsExt.fromEnvelope(envLL);
+          // single geom has just id 1
+          featuresMap[0] = f;
+          _featureTree!.insert(envLL, f);
+
+          if (_sldString == null) {
+            _sldString = getCustomStyle(geometryType!);
+          }
+          if (_sldString == null) {
+            if (geometryType!.isPoint()) {
+              _sldString = HU.DefaultSlds.simplePointSld();
+            } else if (geometryType!.isLine()) {
+              _sldString = HU.DefaultSlds.simpleLineSld();
+            } else if (geometryType!.isPolygon()) {
+              _sldString = HU.DefaultSlds.simplePolygonSld();
+            }
+          }
+          if (_sldString != null) {
+            _style = HU.SldObjectParser.fromString(_sldString!);
+            _style.parse();
+          }
+          _textStyle = _style.getFirstTextStyle(false);
+
+          _attribution = _attribution +
+              "${f.geometry!.getGeometryType()} (${featuresMap.length}) ";
         }
       }
       isLoaded = true;
@@ -714,14 +716,8 @@ class GeojsonSource extends VectorLayerSource
       var idToRemove = geomEditState._editableItem!.id;
       featuresMap.remove(idToRemove);
 
-      // reload data in tree
-      _featureTree = JTS.STRtree();
-      featuresMap.values.forEach((f) {
-        var envLL = f.geometry!.getEnvelopeInternal();
-        _geojsonBounds = LatLngBoundsExt.fromEnvelope(envLL);
-        _featureTree!.insert(envLL, f);
-      });
-
+      dumpFeatureCollection();
+      isLoaded = false;
       return true;
     }
     return false;
@@ -749,7 +745,7 @@ class GeojsonSource extends VectorLayerSource
     // create the touch point and buffer in the current layer prj
     var touchBufferLayerPrj =
         HU.GeometryUtilities.fromEnvelope(envLL, makeCircle: false);
-    touchBufferLayerPrj.setSRID(_srid!);
+    touchBufferLayerPrj.setSRID(_srid);
     var touchPointLayerPrj = JTS.GeometryFactory.defaultPrecision()
         .createPoint(JTS.Coordinate(pointLL.longitude, pointLL.latitude));
     touchPointLayerPrj.setSRID(_srid!);
@@ -798,8 +794,67 @@ class GeojsonSource extends VectorLayerSource
 
   @override
   Future<void> saveCurrentEdit(
-      GeometryEditorState geomEditState, List<LatLng> points) {
-    // TODO: implement saveCurrentEdit
-    throw UnimplementedError();
+      GeometryEditorState geomEditState, List<LatLng> points) async {
+    if (geomEditState._editableItem != null) {
+      print(geomEditState._editableItem!.id);
+      var editedFeature = featuresMap[geomEditState._editableItem!.id];
+      var gf = JTS.GeometryFactory.defaultPrecision();
+      if (geometryType!.isPoint()) {
+        editedFeature!.geometry = gf.createPoint(
+            JTS.Coordinate(points[0].longitude, points[0].latitude));
+      } else if (geometryType!.isLine()) {
+        editedFeature!.geometry = gf.createLineString(points
+            .map((e) => JTS.Coordinate(e.longitude, e.latitude))
+            .toList());
+      } else if (geometryType!.isPolygon()) {
+        var lr = gf.createLinearRing(points
+            .map((e) => JTS.Coordinate(e.longitude, e.latitude))
+            .toList());
+        editedFeature!.geometry = gf.createPolygon(lr, null);
+      }
+
+      dumpFeatureCollection();
+      isLoaded = false;
+    }
+  }
+
+  void dumpFeatureCollection() {
+    final featureCollection = GEOJSON.GeoJSONFeatureCollection([]);
+    featuresMap.forEach((id, feature) {
+      var geom = feature.geometry;
+      if (geom != null) {
+        var geojsonGeometry;
+        if (geometryType!.isPoint()) {
+          JTS.Point p = geom as JTS.Point;
+          geojsonGeometry = GEOJSON.GeoJSONPoint([p.getX(), p.getY()]);
+        } else if (geometryType!.isLine()) {
+          JTS.LineString l = geom as JTS.LineString;
+          geojsonGeometry = GEOJSON.GeoJSONLineString(
+              l.getCoordinates().map((e) => [e.x, e.y]).toList());
+        } else if (geometryType!.isPolygon()) {
+          JTS.Polygon pl = geom as JTS.Polygon;
+          geojsonGeometry = GEOJSON.GeoJSONPolygon([
+            pl
+                .getExteriorRing()
+                .getCoordinates()
+                .map((e) => [e.x, e.y])
+                .toList()
+          ]);
+        }
+        final gjsonFeature = GEOJSON.GeoJSONFeature(
+          geojsonGeometry,
+          properties: feature.attributes,
+        );
+        featureCollection.features.add(gjsonFeature);
+      }
+    });
+
+    if (_absolutePath != null) {
+      _geojsonGeometryString = featureCollection.toJSON();
+      HU.FileUtilities.writeStringToFile(
+          _absolutePath!, _geojsonGeometryString!);
+    } else if (_geojsonGeometryString != null) {
+      // ! TODO
+    }
   }
 }

@@ -17,6 +17,8 @@ class FileManager {
   static const JPG_WLD_EXT = "jgw";
   static const PNG_EXT = "png";
   static const PNG_WLD_EXT = "pgw";
+  static const GEOJSON_EXT = "geojson";
+  static const JSON_EXT = "json";
 
   static const GEOPACKAGE_EXT = "gpkg";
   static const MAPSFORGE_EXT = "map";
@@ -78,6 +80,12 @@ class FileManager {
 
   static bool isGpx(String? path) {
     return path != null && path.toLowerCase().endsWith(GPX_EXT);
+  }
+
+  static bool isGeojson(String? path) {
+    return path != null &&
+        (path.toLowerCase().endsWith(GEOJSON_EXT) ||
+            path.toLowerCase().endsWith(JSON_EXT));
   }
 
   static bool isGeocaching(String? path) {

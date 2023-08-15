@@ -117,6 +117,9 @@ abstract class LayerSource {
       } else if (file != null && FileManager.isGpx(file)) {
         GpxSource gpx = GpxSource.fromMap(map);
         return [gpx];
+      } else if (file != null && FileManager.isGeojson(file)) {
+        GeojsonSource geojson = GeojsonSource.fromMap(map);
+        return [geojson];
       } else if (file != null && FileManager.isGeocaching(file)) {
         GeocachingSource geocaching = GeocachingSource.fromMap(map);
         return [geocaching];
