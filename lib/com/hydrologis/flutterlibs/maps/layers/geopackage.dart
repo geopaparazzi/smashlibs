@@ -217,12 +217,14 @@ class GeopackageSource extends DbVectorLayerSource
         addMarkerLayer(allPoints, layers, pointFillColor!);
       } else if (allLines.isNotEmpty) {
         var lineLayer = PolylineLayer(
+          key: ValueKey("$_absolutePath#$_tableName"),
           polylineCulling: true,
           polylines: allLines,
         );
         layers.add(lineLayer);
       } else if (allPolygons.isNotEmpty) {
         var polygonLayer = PolygonLayer(
+          key: ValueKey("$_absolutePath#$_tableName"),
           polygonCulling: true,
           // simplify: true,
           polygons: allPolygons,
@@ -396,6 +398,7 @@ class GeopackageSource extends DbVectorLayerSource
       List<List<Marker>> allPoints, List<Widget> layers, Color pointFillColor) {
     if (allPoints.length == 1) {
       var waypointsCluster = MarkerClusterLayerWidget(
+        key: ValueKey("$_absolutePath#$_tableName"),
         options: MarkerClusterLayerOptions(
           maxClusterRadius: 20,
           size: Size(40, 40),
@@ -423,7 +426,10 @@ class GeopackageSource extends DbVectorLayerSource
       // in case of multiple rules, we would not know the color for a mixed cluster.
       List<Marker> points = [];
       allPoints.forEach((p) => points.addAll(p));
-      layers.add(MarkerLayer(markers: points));
+      layers.add(MarkerLayer(
+        key: ValueKey("$_absolutePath#$_tableName"),
+        markers: points,
+      ));
     }
   }
 

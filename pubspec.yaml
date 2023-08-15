@@ -34,7 +34,7 @@ dependencies:
   dart_hydrologis_utils: ^0.8.0
     # path: ../dart_hydrologis_utils/
 
-  dart_hydrologis_db: ^1.0.1
+  dart_hydrologis_db: ^1.1.0
     # path: ../dart_hydrologis_db/
   # git:
   #  url: https://github.com/moovida/dart_hydrologis_db.git
@@ -53,7 +53,7 @@ dependencies:
   # git:
   #   url: https://github.com/moovida/dart_postgis
   
-  dart_shp: ^1.0.1
+  dart_shp: ^1.1.0
   
  ##################################
   # OTHERS MAPS RELATED

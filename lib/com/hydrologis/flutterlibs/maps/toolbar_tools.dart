@@ -611,20 +611,25 @@ class SmashDatabaseFormHelper extends AFormhelper {
   final EditableQueryResult _queryResult;
   var _titleWidget;
   var _sectionName;
-  var _db;
+  EditableDataSource? _eds;
   List<Map<String, dynamic>> sectionMapList = [];
   late String _tableName;
+  dynamic _db;
 
   SmashDatabaseFormHelper(this._queryResult);
 
   @override
   Future<bool> init() async {
-    _db = _queryResult.edsList?[0];
+    _eds = _queryResult.edsList?[0];
 
     _titleWidget = SmashUI.titleText(_queryResult.ids!.first,
         color: SmashColors.mainBackground, bold: true);
 
     _tableName = _queryResult.ids!.first;
+
+    if (_eds is DbVectorLayerSource) {
+      _db = (_eds as DbVectorLayerSource).db;
+    }
 
     if (await _db.hasTable(TableName(HM_FORMS_TABLE,
         schemaSupported:
@@ -697,36 +702,38 @@ class SmashDatabaseFormHelper extends AFormhelper {
 
   /// Save data on form exit.
   Future<void> onSaveFunction(BuildContext context) async {
-    List<Map<String, dynamic>> formsList = [];
-    formsList = (sectionMapList.first[ATTR_FORMS] as List<dynamic>)
-        .map((e) => e as Map<String, dynamic>)
-        .toList();
+    if (_db != null) {
+      List<Map<String, dynamic>> formsList = [];
+      formsList = (sectionMapList.first[ATTR_FORMS] as List<dynamic>)
+          .map((e) => e as Map<String, dynamic>)
+          .toList();
 
-    var data = _queryResult.data.first;
+      var data = _queryResult.data.first;
 
-    formsList.forEach((form) {
-      var formItems = TagsManager.getFormItems(form);
-      formItems.forEach((element) {
-        String key = element[TAG_KEY].toString();
-        dynamic value = element[TAG_VALUE];
-        if (value != null) {
-          // TODO check type and convert string to that type (value is always a string)
-          // also booleans need to be checked etc (true doesn't resolve to 1)
-          data[key] = value;
-        }
+      formsList.forEach((form) {
+        var formItems = TagsManager.getFormItems(form);
+        formItems.forEach((element) {
+          String key = element[TAG_KEY].toString();
+          dynamic value = element[TAG_VALUE];
+          if (value != null) {
+            // TODO check type and convert string to that type (value is always a string)
+            // also booleans need to be checked etc (true doesn't resolve to 1)
+            data[key] = value;
+          }
+        });
       });
-    });
 
-    var pk = _queryResult.primaryKeys!.first;
-    var id = _queryResult.data.first[pk];
+      var pk = _queryResult.primaryKeys!.first;
+      var id = _queryResult.data.first[pk];
 
-    var where = "$pk=$id";
-    await _db.updateMap(
-        TableName(_tableName,
-            schemaSupported:
-                _db is PostgisDb || _db is PostgresqlDb ? true : false),
-        data,
-        where);
+      var where = "$pk=$id";
+      await _db.updateMap(
+          TableName(_tableName,
+              schemaSupported:
+                  _db is PostgisDb || _db is PostgresqlDb ? true : false),
+          data,
+          where);
+    }
   }
 
   /// Take a picture for forms
