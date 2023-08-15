@@ -212,7 +212,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           ),
           TextButton(
             onPressed: () async {
-              var geojsonPath = await copyToMapFolder("gjson_poygons.json");
+              var geojsonPath = await copyToMapFolder("gjson_polygons.json");
 
               mapView!.removeLayer(_currentLayerSource);
               _currentLayerSource = GeojsonSource(geojsonPath);

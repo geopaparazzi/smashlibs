@@ -807,9 +807,10 @@ class GeojsonSource extends VectorLayerSource
             .map((e) => JTS.Coordinate(e.longitude, e.latitude))
             .toList());
       } else if (geometryType!.isPolygon()) {
-        var lr = gf.createLinearRing(points
-            .map((e) => JTS.Coordinate(e.longitude, e.latitude))
-            .toList());
+        var pl =
+            points.map((e) => JTS.Coordinate(e.longitude, e.latitude)).toList();
+        pl.add(JTS.Coordinate(points[0].longitude, points[0].latitude));
+        var lr = gf.createLinearRing(pl);
         editedFeature!.geometry = gf.createPolygon(lr, null);
       }
 
@@ -849,12 +850,10 @@ class GeojsonSource extends VectorLayerSource
       }
     });
 
+    _geojsonGeometryString = featureCollection.toJSON();
     if (_absolutePath != null) {
-      _geojsonGeometryString = featureCollection.toJSON();
       HU.FileUtilities.writeStringToFile(
           _absolutePath!, _geojsonGeometryString!);
-    } else if (_geojsonGeometryString != null) {
-      // ! TODO
     }
   }
 }
