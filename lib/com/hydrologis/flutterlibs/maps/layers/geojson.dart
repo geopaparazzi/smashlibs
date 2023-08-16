@@ -54,6 +54,10 @@ class GeojsonSource extends VectorLayerSource
     _styleMap = styleMap;
   }
 
+  void setGeometryType(JTS.EGeometryType? gType) {
+    geometryType = gType;
+  }
+
   @override
   Future<void> load(BuildContext? context) async {
     if (!isLoaded) {
@@ -147,42 +151,45 @@ class GeojsonSource extends VectorLayerSource
           }
         }
       } else {
-        var jsonGeometry =
-            GEOJSON.GeoJSONGeometry.fromJSON(_geojsonGeometryString!);
-        JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
+        if (_geojsonGeometryString != null &&
+            _geojsonGeometryString!.trim().length != 0) {
+          var jsonGeometry =
+              GEOJSON.GeoJSONGeometry.fromJSON(_geojsonGeometryString!);
+          JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
 
-        if (geometry != null) {
-          HU.Feature f = HU.Feature()
-            ..fid = 0
-            ..geometry = geometry
-            ..attributes = {};
+          if (geometry != null) {
+            HU.Feature f = HU.Feature()
+              ..fid = 0
+              ..geometry = geometry
+              ..attributes = {};
 
-          var envLL = geometry.getEnvelopeInternal();
-          _geojsonBounds = LatLngBoundsExt.fromEnvelope(envLL);
-          // single geom has just id 1
-          featuresMap[0] = f;
-          _featureTree!.insert(envLL, f);
+            var envLL = geometry.getEnvelopeInternal();
+            _geojsonBounds = LatLngBoundsExt.fromEnvelope(envLL);
+            // single geom has just id 1
+            featuresMap[0] = f;
+            _featureTree!.insert(envLL, f);
 
-          if (_sldString == null) {
-            _sldString = getCustomStyle(geometryType!);
-          }
-          if (_sldString == null) {
-            if (geometryType!.isPoint()) {
-              _sldString = HU.DefaultSlds.simplePointSld();
-            } else if (geometryType!.isLine()) {
-              _sldString = HU.DefaultSlds.simpleLineSld();
-            } else if (geometryType!.isPolygon()) {
-              _sldString = HU.DefaultSlds.simplePolygonSld();
+            if (_sldString == null) {
+              _sldString = getCustomStyle(geometryType!);
             }
-          }
-          if (_sldString != null) {
-            _style = HU.SldObjectParser.fromString(_sldString!);
-            _style.parse();
-          }
-          _textStyle = _style.getFirstTextStyle(false);
+            if (_sldString == null) {
+              if (geometryType!.isPoint()) {
+                _sldString = HU.DefaultSlds.simplePointSld();
+              } else if (geometryType!.isLine()) {
+                _sldString = HU.DefaultSlds.simpleLineSld();
+              } else if (geometryType!.isPolygon()) {
+                _sldString = HU.DefaultSlds.simplePolygonSld();
+              }
+            }
+            if (_sldString != null) {
+              _style = HU.SldObjectParser.fromString(_sldString!);
+              _style.parse();
+            }
+            _textStyle = _style.getFirstTextStyle(false);
 
-          _attribution = _attribution +
-              "${f.geometry!.getGeometryType()} (${featuresMap.length}) ";
+            _attribution = _attribution +
+                "${f.geometry!.getGeometryType()} (${featuresMap.length}) ";
+          }
         }
       }
       isLoaded = true;
@@ -321,7 +328,8 @@ class GeojsonSource extends VectorLayerSource
     if (_absolutePath != null) {
       var relativePath = Workspace.makeRelative(_absolutePath!);
       path = '"$LAYERSKEY_FILE":"$relativePath",';
-    } else if (_geojsonGeometryString != null) {
+    } else if (_geojsonGeometryString != null &&
+        _geojsonGeometryString!.trim().length > 0) {
       g = '"$LAYERSKEY_GEOJSON": $_geojsonGeometryString,';
     }
 
@@ -705,9 +713,42 @@ class GeojsonSource extends VectorLayerSource
   }
 
   @override
-  Future<Tuple2<String?, EditableGeometry?>> createNewGeometry(LatLng point) {
-    // TODO: implement createNewGeometry
-    throw UnimplementedError();
+  Future<Tuple2<String?, EditableGeometry?>> createNewGeometry(
+      LatLng point) async {
+    // create a minimal geometry to work on
+    var gc = await getGeometryColumn();
+    if (gc == null) {
+      return Tuple2(
+          "No geometry column could be found in the datasource.", null);
+    }
+    var gType = gc.geometryType;
+
+    var gf = JTS.GeometryFactory.defaultPrecision();
+
+    // Create first as just point, even if the layer is of different type
+    JTS.Geometry geometry =
+        gf.createPoint(JTS.Coordinate(point.longitude, point.latitude));
+
+    int? newId = featuresMap.keys.maxOrNull;
+    if (newId == null) {
+      newId = 0;
+    } else {
+      newId = newId + 1;
+    }
+    if (gType.isPoint()) {
+      featuresMap[newId] = HU.Feature()
+        ..fid = newId
+        ..geometry = geometry;
+      dumpFeatureCollection();
+      isLoaded = false;
+    }
+
+    EditableGeometry editGeom = EditableGeometry();
+    editGeom.geometry = geometry;
+    editGeom.editableDataSource = this;
+    editGeom.id = newId;
+
+    return Tuple2(null, editGeom);
   }
 
   @override
@@ -726,6 +767,10 @@ class GeojsonSource extends VectorLayerSource
   @override
   Future<HU.Feature?> getFeatureById(int id) async {
     return featuresMap[id];
+  }
+
+  int getFeatureCount() {
+    return featuresMap.length;
   }
 
   @override
@@ -850,10 +895,18 @@ class GeojsonSource extends VectorLayerSource
       }
     });
 
-    _geojsonGeometryString = featureCollection.toJSON();
     if (_absolutePath != null) {
+      _geojsonGeometryString = featureCollection.toJSON();
       HU.FileUtilities.writeStringToFile(
           _absolutePath!, _geojsonGeometryString!);
+    } else {
+      // we need to extract the single geometry
+      if (featureCollection.features.length > 0) {
+        _geojsonGeometryString =
+            featureCollection.features[0]!.geometry.toJSON();
+      } else {
+        _geojsonGeometryString = "";
+      }
     }
   }
 }

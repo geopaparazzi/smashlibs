@@ -407,6 +407,15 @@
             "type": "point"
             
           },{
+            "key": "an empty point geometry",
+            "value": "",
+            "style": {
+              "icon": "tree",
+              "color": "#FF0000",
+              "size": 15
+            },
+            "type": "point"
+          },{
             "key": "a multipoint geometry",
             "value": {
               "type": "MultiPoint",

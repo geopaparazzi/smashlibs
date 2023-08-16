@@ -2196,13 +2196,23 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
   bool _loading = true;
   GeojsonSource? geojsonSource;
   late String keyStr;
-  double _iconSize = 24;
+  double _iconSize = 32;
 
   @override
   void afterFirstLayout(BuildContext context) async {
     String value = ""; //$NON-NLS-1$
+    JTS.EGeometryType? geomType;
     if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = jsonEncode(widget._itemMap[TAG_VALUE]).trim();
+      var tmpValue = widget._itemMap[TAG_VALUE];
+      if (tmpValue is String && tmpValue.trim().length == 0) {
+        value = "";
+        if (widget._itemMap.containsKey(TAG_TYPE)) {
+          var typeName = widget._itemMap[TAG_TYPE].trim();
+          geomType = JTS.EGeometryType.forTypeName(typeName);
+        }
+      } else {
+        value = jsonEncode(widget._itemMap[TAG_VALUE]).trim();
+      }
     }
 
     keyStr = "SMASH_GEOMWIDGETSTATE_KEY_";
@@ -2210,57 +2220,82 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       keyStr += widget._itemMap[TAG_KEY].trim();
     }
 
-    if (value.trim().isEmpty) {
-      mapView = SmashUI.errorWidget("Not loading empty geojson.");
-    } else {
-      geojsonSource = GeojsonSource.fromGeojsonGeometry(value);
-      // check if there is style
-      if (widget._itemMap.containsKey(TAG_STYLE)) {
-        Map<String, dynamic> styleMap = widget._itemMap[TAG_STYLE];
-        geojsonSource!.setStyle(styleMap);
-      }
+    // if (value.trim().isEmpty) {
+    //   mapView = SmashUI.errorWidget("Not loading empty geojson.");
+    // } else {
+    geojsonSource = GeojsonSource.fromGeojsonGeometry(value);
+    geojsonSource!.setGeometryType(geomType);
 
-      LatLngBounds? bounds = await geojsonSource!.getBounds(context);
-      var latLngBoundsExt = LatLngBoundsExt.fromBounds(bounds!);
+    // check if there is style
+    if (widget._itemMap.containsKey(TAG_STYLE)) {
+      Map<String, dynamic> styleMap = widget._itemMap[TAG_STYLE];
+      geojsonSource!.setStyle(styleMap);
+    }
+
+    LatLngBounds? bounds = await geojsonSource!.getBounds(context);
+    LatLngBoundsExt latLngBoundsExt;
+    if (bounds == null) {
+      // create a bound around the current note point
+      SmashMapState mapState =
+          Provider.of<SmashMapState>(context, listen: false);
+      var center = mapState.center;
+      latLngBoundsExt = LatLngBoundsExt.fromCoordinate(center, 0.01);
+    } else {
+      latLngBoundsExt = LatLngBoundsExt.fromBounds(bounds!);
       if (latLngBoundsExt.getWidth() == 0 && latLngBoundsExt.getHeight() == 0) {
         latLngBoundsExt = latLngBoundsExt.expandBy(0.01, 0.01);
       }
       // expand to better include points
       latLngBoundsExt = latLngBoundsExt.expandByFactor(1.1);
+    }
 
-      mapView = SmashMapWidget(key: ValueKey(keyStr));
-      SmashMapWidget sWidget = mapView! as SmashMapWidget;
-      sWidget.setInitParameters(
-          canRotate: false,
-          initBounds: latLngBoundsExt.toEnvelope(),
-          addBorder: true);
-      sWidget.setTapHandlers(
-        handleTap: (ll, zoom) async {
+    mapView = SmashMapWidget(key: ValueKey(keyStr));
+    SmashMapWidget sWidget = mapView! as SmashMapWidget;
+    sWidget.setInitParameters(
+        canRotate: false,
+        initBounds: latLngBoundsExt.toEnvelope(),
+        addBorder: true);
+    sWidget.setTapHandlers(
+      handleTap: (ll, zoom) async {
+        GeometryEditorState geomEditorState =
+            Provider.of<GeometryEditorState>(context, listen: false);
+        if (geomEditorState.isEnabled) {
+          if (geomEditorState.editableGeometry == null &&
+              geojsonSource!.getFeatureCount() != 0) {
+            SmashDialogs.showWarningDialog(
+              context,
+              "At the moment editing is supported only for single geometries.",
+            );
+            return;
+          }
+          await GeometryEditManager().onMapTap(
+            context,
+            ll,
+            eds: geojsonSource,
+          );
+        } else {
           SmashDialogs.showToast(
               context, "Tapped: ${ll.longitude}, ${ll.latitude}",
               durationSeconds: 1);
+        }
+      },
+      handleLongTap: (ll, zoom) async {
+        if (!widget._isReadOnly) {
           GeometryEditorState geomEditorState =
               Provider.of<GeometryEditorState>(context, listen: false);
           if (geomEditorState.isEnabled) {
-            await GeometryEditManager().onMapTap(context, ll);
+            await GeometryEditManager()
+                .onMapLongTap(context, ll, zoom.round(), eds: geojsonSource);
           }
-        },
-        handleLongTap: (ll, zoom) async {
-          if (!widget._isReadOnly) {
-            GeometryEditorState geomEditorState =
-                Provider.of<GeometryEditorState>(context, listen: false);
-            if (geomEditorState.isEnabled) {
-              GeometryEditManager().onMapLongTap(context, ll, zoom.round());
-            }
-          }
-        },
-      );
-      if (!widget._isReadOnly) {
-        GeometryEditorState geomEditorState =
-            Provider.of<GeometryEditorState>(context, listen: false);
-        geomEditorState.setEnabled(true);
-      }
+        }
+      },
+    );
+    if (!widget._isReadOnly) {
+      GeometryEditorState geomEditorState =
+          Provider.of<GeometryEditorState>(context, listen: false);
+      geomEditorState.setEnabled(true);
     }
+    // }
     _loading = false;
     setState(() {});
   }
@@ -2285,18 +2320,24 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
     if (widget._isReadOnly) {
       return mapView;
     } else {
-      // ! TODO
       GeometryEditorState geomEditorState =
           Provider.of<GeometryEditorState>(context, listen: false);
       return Stack(
         children: [
-          Row(
-            children: [
-              getCancelEditButton(geomEditorState),
-              getSaveFeatureButton(geomEditorState),
-            ],
-          ),
           mapView!,
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Row(
+              children: [
+                getCancelEditButton(geomEditorState),
+                getRemoveFeatureButton(geomEditorState),
+                // getInsertPointInCenterButton(geomEditorState),
+                // if (Provider.of<GpsState>(context, listen: false).hasFix())
+                //   getInsertPointInGpsButton(geomEditorState),
+                getSaveFeatureButton(geomEditorState),
+              ],
+            ),
+          ),
         ],
       );
     }
@@ -2311,12 +2352,18 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         child: Padding(
           padding: SmashUI.defaultPadding(),
           child: InkWell(
-            child: Icon(
-              MdiIcons.markerCancel,
-              color: geomEditState.editableGeometry != null
-                  ? SmashColors.mainSelection
-                  : SmashColors.mainBackground,
-              size: _iconSize,
+            child: Container(
+              color: SmashColors.mainDecorations,
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Icon(
+                  MdiIcons.markerCancel,
+                  color: geomEditState.editableGeometry != null
+                      ? SmashColors.mainSelection
+                      : SmashColors.mainBackground,
+                  size: _iconSize,
+                ),
+              ),
             ),
           ),
         ),
@@ -2327,6 +2374,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
             SmashMapBuilder mapBuilder =
                 Provider.of<SmashMapBuilder>(context, listen: false);
             mapBuilder.reBuild();
+            setState(() {});
           });
         },
       ),
@@ -2341,25 +2389,39 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         child: Padding(
           padding: SmashUI.defaultPadding(),
           child: InkWell(
-            child: Icon(
-              MdiIcons.contentSaveEdit,
-              color: geomEditState.editableGeometry != null
-                  ? SmashColors.mainSelection
-                  : SmashColors.mainBackground,
-              size: _iconSize,
+            child: Container(
+              color: SmashColors.mainDecorations,
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Icon(
+                  MdiIcons.contentSaveEdit,
+                  color: geomEditState.editableGeometry != null
+                      ? SmashColors.mainSelection
+                      : SmashColors.mainBackground,
+                  size: _iconSize,
+                ),
+              ),
             ),
           ),
         ),
         onTap: () async {
-          var editableGeometry = geomEditState.editableGeometry;
           await GeometryEditManager().saveCurrentEdit(geomEditState);
+          if (widget._itemMap.containsKey(TAG_VALUE)) {
+            var jsonString = geojsonSource!.toJson();
+            var jsonMap = jsonDecode(jsonString);
+            var geojson = jsonMap[LAYERSKEY_GEOJSON];
+
+            widget._itemMap[TAG_VALUE] = geojson;
+          }
 
           // stop editing
           geomEditState.editableGeometry = null;
           GeometryEditManager().stopEditing();
 
           // reload layer geoms
-          await reloadDbLayers(editableGeometry!.editableDataSource);
+          await reloadLayerSource(geojsonSource!);
+
+          setState(() {});
         },
       ),
     );
@@ -2374,10 +2436,16 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         child: Padding(
           padding: SmashUI.defaultPadding(),
           child: InkWell(
-            child: Icon(
-              SmashIcons.iconInMapCenter,
-              color: SmashColors.mainBackground,
-              size: _iconSize,
+            child: Container(
+              color: SmashColors.mainDecorations,
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Icon(
+                  SmashIcons.iconInMapCenter,
+                  color: SmashColors.mainBackground,
+                  size: _iconSize,
+                ),
+              ),
             ),
           ),
         ),
@@ -2401,10 +2469,16 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         child: Padding(
           padding: SmashUI.defaultPadding(),
           child: InkWell(
-            child: Icon(
-              SmashIcons.iconInGps,
-              color: SmashColors.mainBackground,
-              size: _iconSize,
+            child: Container(
+              color: SmashColors.mainDecorations,
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Icon(
+                  SmashIcons.iconInGps,
+                  color: SmashColors.mainBackground,
+                  size: _iconSize,
+                ),
+              ),
             ),
           ),
         ),
@@ -2429,10 +2503,16 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         child: Padding(
           padding: SmashUI.defaultPadding(),
           child: InkWell(
-            child: Icon(
-              MdiIcons.trashCan,
-              color: SmashColors.mainBackground,
-              size: _iconSize,
+            child: Container(
+              color: SmashColors.mainDecorations,
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Icon(
+                  MdiIcons.trashCan,
+                  color: SmashColors.mainBackground,
+                  size: _iconSize,
+                ),
+              ),
             ),
           ),
         ),
@@ -2440,16 +2520,30 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
           var eds = geomEditState.editableGeometry!.editableDataSource;
           bool hasDeleted = await GeometryEditManager()
               .deleteCurrentSelection(context, geomEditState);
+          if (widget._itemMap.containsKey(TAG_VALUE)) {
+            if (geojsonSource != null) {
+              var jsonString = geojsonSource!.toJson();
+              var jsonMap = jsonDecode(jsonString);
+              var geojson = jsonMap[LAYERSKEY_GEOJSON];
+              widget._itemMap[TAG_VALUE] = geojson ?? "";
+            } else {
+              widget._itemMap[TAG_VALUE] = "";
+            }
+          }
+          // stop editing
+          geomEditState.editableGeometry = null;
+          GeometryEditManager().stopEditing();
           if (hasDeleted) {
             // reload layer geoms
-            await reloadDbLayers(eds);
+            await reloadLayerSource(eds);
           }
+          setState(() {});
         },
       ),
     );
   }
 
-  Future<void> reloadDbLayers(EditableDataSource eds) async {
+  Future<void> reloadLayerSource(EditableDataSource eds) async {
     if (eds is LoadableLayerSource) {
       (eds as LoadableLayerSource).isLoaded = false;
       // (eds as LoadableLayerSource).load(context);

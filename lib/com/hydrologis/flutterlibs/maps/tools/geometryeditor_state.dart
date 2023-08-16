@@ -320,7 +320,8 @@ class GeometryEditManager {
     return editLayers;
   }
 
-  Future<void> onMapTap(BuildContext context, LatLng point) async {
+  Future<void> onMapTap(BuildContext context, LatLng point,
+      {EditableDataSource? eds}) async {
     GeometryEditorState geomEditorState =
         Provider.of<GeometryEditorState>(context, listen: false);
     if (_isEditing && geomEditorState.editableGeometry != null) {
@@ -345,8 +346,8 @@ class GeometryEditManager {
     } else {
       if (geomEditorState.isEnabled) {
         // add a new geometry to a layer selected by the user
-        await _createNewGeometryOnSelectedLayer(
-            context, point, geomEditorState);
+        await _createNewGeometryOnSelectedLayer(context, point, geomEditorState,
+            eds: eds);
       }
     }
   }
@@ -449,9 +450,15 @@ class GeometryEditManager {
   }
 
   /// Ask the user on which layer to create a new geometry and make a fist one.
-  Future<void> _createNewGeometryOnSelectedLayer(BuildContext context,
-      LatLng point, GeometryEditorState geomEditorState) async {
-    Map<String, EditableDataSource> name2SourceMap = _getName2SourcesMap();
+  Future<void> _createNewGeometryOnSelectedLayer(
+      BuildContext context, LatLng point, GeometryEditorState geomEditorState,
+      {EditableDataSource? eds, bool allowOnlySingleGeom = false}) async {
+    Map<String, EditableDataSource> name2SourceMap;
+    if (eds != null) {
+      name2SourceMap = {eds.getName(): eds};
+    } else {
+      name2SourceMap = _getName2SourcesMap();
+    }
     if (name2SourceMap.length == 0) {
       await SmashDialogs.showWarningDialog(
           context, "No editable layer is currently loaded.");
@@ -523,8 +530,13 @@ class GeometryEditManager {
   }
 
   /// On map long tap, if the editor state is on, the feature is selected or deselected.
-  Future<void> onMapLongTap(
-      BuildContext context, LatLng point, int zoom) async {
+  ///
+  /// The tap is calculated in a certain [point] at a certain [zoom].
+  ///
+  /// Optionally an [EditableDataSource] can be forced, in which case the touch check is
+  /// no longer done using the [LayerManager], but directly/only on the datasource.
+  Future<void> onMapLongTap(BuildContext context, LatLng point, int zoom,
+      {EditableDataSource? eds}) async {
     GeometryEditorState editorState =
         Provider.of<GeometryEditorState>(context, listen: false);
     if (!editorState.isEnabled) {
@@ -533,12 +545,17 @@ class GeometryEditManager {
 
     resetToNulls();
 
-    List<LayerSource?> editableLayers = LayerManager()
-        .getLayerSources()
-        .reversed
-        .where((l) => l != null && l is EditableDataSource && l.isActive())
-        .toList();
-
+    List<EditableDataSource> editableLayers;
+    if (eds != null) {
+      editableLayers = [eds];
+    } else {
+      editableLayers = LayerManager()
+          .getLayerSources()
+          .reversed
+          .where((l) => l != null && l is EditableDataSource && l.isActive())
+          .map((l) => l as EditableDataSource)
+          .toList();
+    }
     var radius = ZOOM2TOUCHRADIUS[zoom] * 10;
 
     var env4326 = JTS.Envelope.fromCoordinate(
@@ -548,12 +565,11 @@ class GeometryEditManager {
         .createPoint(JTS.Coordinate(point.longitude, point.latitude));
     EditableGeometry? editGeom;
     double minDist = 1000000000;
-    for (LayerSource? vLayer in editableLayers) {
-      var eds = vLayer as EditableDataSource;
+    for (EditableDataSource vLayer in editableLayers) {
       Tuple2<List<JTS.Geometry>, JTS.Geometry>? geomsIntersected =
-          await eds.getGeometriesIntersecting(point, env4326);
+          await vLayer.getGeometriesIntersecting(point, env4326);
 
-      var gc = await eds.getGeometryColumn();
+      var gc = await vLayer.getGeometryColumn();
 
       if (geomsIntersected != null && gc != null) {
         // find touching
@@ -570,7 +586,7 @@ class GeometryEditManager {
               minDist = distance;
               editGeom = EditableGeometry();
               editGeom.geometry = geometry;
-              editGeom.editableDataSource = eds;
+              editGeom.editableDataSource = vLayer;
               editGeom.id = id;
 
               if (gc.geometryType.isLine()) {

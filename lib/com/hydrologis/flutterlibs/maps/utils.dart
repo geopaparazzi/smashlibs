@@ -34,6 +34,12 @@ class LatLngBoundsExt extends LatLngBounds {
           LatLng(envelope.getMaxY(), envelope.getMaxX()),
         );
 
+  LatLngBoundsExt.fromCoordinate(JTS.Coordinate coordinate, double buffer)
+      : super(
+          LatLng(coordinate.y - buffer, coordinate.x - buffer),
+          LatLng(coordinate.y + buffer, coordinate.x + buffer),
+        );
+
   JTS.Envelope toEnvelope() {
     return JTS.Envelope.fromCoordinates(
       JTS.Coordinate(west, south),
