@@ -133,10 +133,10 @@ packages:
     dependency: "direct main"
     description:
       name: dart_jts
-      sha256: "5729ef853a592973234bb7fb9550bd31b8cb4eafd8c765a75a74e27702f0926b"
+      sha256: c8ed8c93634c65c52e80e9d0f588e6c7153bec41c11b513718a9680fc6bfac6e
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.3"
+    version: "0.2.3+2"
   dart_postgis:
     dependency: transitive
     description:

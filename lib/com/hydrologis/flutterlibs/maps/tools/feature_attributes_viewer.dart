@@ -340,11 +340,23 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     var srid = _srids[tablename];
     if (srid != null) {
       var checkGeom = _geometry.clone() as JTS.Geometry;
-      bool doRound = false;
+
+      String length;
+      String area;
       if (srid != SmashPrj.EPSG4326_INT) {
         var to = SmashPrj.fromSrid(srid);
         SmashPrj.transformGeometry(SmashPrj.EPSG4326, to!, checkGeom);
-        doRound = true;
+        length = checkGeom.getLength().toStringAsFixed(1);
+        // doRound
+        //     ? checkGeom.getLength().toStringAsFixed(1)
+        //     : checkGeom.getLength().toString();
+        area = checkGeom.getArea().toStringAsFixed(1);
+        // doRound
+        //     ? checkGeom.getArea().toStringAsFixed(1)
+        //     : checkGeom.getArea().toString();
+      } else {
+        area = JTS.Geodesy().area(checkGeom).toStringAsFixed(1);
+        length = JTS.Geodesy().length(checkGeom).toStringAsFixed(1);
       }
 
       rows.add(DataRow(
@@ -359,26 +371,20 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
         rows.add(DataRow(
           cells: [
             DataCell(SmashUI.normalText("Length")),
-            DataCell(SmashUI.normalText(doRound
-                ? checkGeom.getLength().toStringAsFixed(1)
-                : checkGeom.getLength().toString())),
+            DataCell(SmashUI.normalText(length)),
           ],
         ));
       } else if (gType.isPolygon()) {
         rows.add(DataRow(
           cells: [
             DataCell(SmashUI.normalText("Perimeter")),
-            DataCell(SmashUI.normalText(doRound
-                ? checkGeom.getLength().toStringAsFixed(1)
-                : checkGeom.getLength().toString())),
+            DataCell(SmashUI.normalText(length)),
           ],
         ));
         rows.add(DataRow(
           cells: [
             DataCell(SmashUI.normalText("Area")),
-            DataCell(SmashUI.normalText(doRound
-                ? checkGeom.getArea().toStringAsFixed(1)
-                : checkGeom.getArea().toString())),
+            DataCell(SmashUI.normalText(area)),
           ],
         ));
       }

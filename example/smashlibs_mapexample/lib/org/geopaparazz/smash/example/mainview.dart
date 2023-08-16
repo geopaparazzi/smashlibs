@@ -32,6 +32,13 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
     mapView = SmashMapWidget();
     mapView!.setInitParameters(
         canRotate: false, initZoom: 9, centerCoordinate: Coordinate(11, 46));
+    mapView!.setOnPositionChanged((newPosition, hasGest) {
+      SmashMapState mapState =
+          Provider.of<SmashMapState>(context, listen: false);
+      mapState.setLastPositionQuiet(
+          LatLngExt.fromLatLng(newPosition.center!).toCoordinate(),
+          newPosition.zoom!);
+    });
     mapView!.setTapHandlers(
       handleTap: (ll, zoom) async {
         SmashDialogs.showToast(
