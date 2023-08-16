@@ -843,6 +843,24 @@ class GeojsonSource extends VectorLayerSource
     if (geomEditState._editableItem != null) {
       print(geomEditState._editableItem!.id);
       var editedFeature = featuresMap[geomEditState._editableItem!.id];
+      if (editedFeature == null) {
+        // a new feature is added
+        int? newId = featuresMap.keys.maxOrNull;
+        if (newId == null) {
+          newId = 0;
+        } else {
+          newId = newId + 1;
+        }
+        editedFeature = HU.Feature()..fid = newId;
+        featuresMap[newId] = editedFeature;
+
+        // at the momento you can't create a new geojson,
+        // hence taking attributes from first
+        var firstFeature = featuresMap.values.first;
+        firstFeature.attributes.keys.forEach((key) {
+          editedFeature!.attributes[key] = null;
+        });
+      }
       var gf = JTS.GeometryFactory.defaultPrecision();
       if (geometryType!.isPoint()) {
         editedFeature!.geometry = gf.createPoint(

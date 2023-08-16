@@ -340,9 +340,11 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     var srid = _srids[tablename];
     if (srid != null) {
       var checkGeom = _geometry.clone() as JTS.Geometry;
+      var geometryType = checkGeom.getGeometryType();
+      var gType = JTS.EGeometryType.forTypeName(geometryType);
 
       String length;
-      String area;
+      String? area;
       if (srid != SmashPrj.EPSG4326_INT) {
         var to = SmashPrj.fromSrid(srid);
         SmashPrj.transformGeometry(SmashPrj.EPSG4326, to!, checkGeom);
@@ -355,7 +357,9 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
         //     ? checkGeom.getArea().toStringAsFixed(1)
         //     : checkGeom.getArea().toString();
       } else {
-        area = JTS.Geodesy().area(checkGeom).toStringAsFixed(1);
+        if (gType.isPolygon()) {
+          area = JTS.Geodesy().area(checkGeom).toStringAsFixed(1);
+        }
         length = JTS.Geodesy().length(checkGeom).toStringAsFixed(1);
       }
 
@@ -365,8 +369,6 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
           DataCell(SmashUI.normalText("")),
         ],
       ));
-      var geometryType = checkGeom.getGeometryType();
-      var gType = JTS.EGeometryType.forTypeName(geometryType);
       if (gType.isLine()) {
         rows.add(DataRow(
           cells: [
@@ -384,7 +386,7 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
         rows.add(DataRow(
           cells: [
             DataCell(SmashUI.normalText("Area")),
-            DataCell(SmashUI.normalText(area)),
+            DataCell(SmashUI.normalText(area!)),
           ],
         ));
       }
