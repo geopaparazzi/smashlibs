@@ -341,7 +341,7 @@ Tuple2<ListTile, bool>? getWidget(
 
   String label = TagsManager.getLabelFromFormItem(itemMap);
 
-  dynamic value = ""; //$NON-NLS-1$
+  dynamic value = "";
   if (itemMap.containsKey(TAG_VALUE)) {
     value = itemMap[TAG_VALUE].toString().trim();
   }
@@ -1827,7 +1827,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
   Widget build(BuildContext context) {
     String value = ""; //$NON-NLS-1$
     if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = widget._itemMap[TAG_VALUE].trim();
+      value = widget._itemMap[TAG_VALUE].toString().trim();
     }
     String? key;
     if (widget._itemMap.containsKey(TAG_KEY)) {
