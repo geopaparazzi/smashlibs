@@ -1822,76 +1822,8 @@ class MultiComboWidget<T> extends StatefulWidget {
   MultiComboWidgetState createState() => MultiComboWidgetState();
 }
 
-class MultiComboWidgetState<T> extends State<MultiComboWidget> {
-  @override
-  Widget build(BuildContext context) {
-    String value = ""; //$NON-NLS-1$
-    if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = widget._itemMap[TAG_VALUE].toString().trim();
-    }
-    String? key;
-    if (widget._itemMap.containsKey(TAG_KEY)) {
-      key = widget._itemMap[TAG_KEY].trim();
-    }
-
-    return Center(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
-            child: SmashUI.normalText(widget._label,
-                color: SmashColors.mainDecorationsDarker),
-          ),
-          TextButton(
-              key: key != null ? Key(key) : null,
-              onPressed: () async {
-                if (!widget._isReadOnly) {
-                  await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return MultiSelect(widget._itemMap, widget._label);
-                    },
-                  );
-                }
-              },
-              child: Center(
-                child: Padding(
-                  padding: SmashUI.defaultPadding(),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Padding(
-                        padding: SmashUI.defaultRigthPadding(),
-                        child: Icon(
-                          MdiIcons.clock,
-                          color: SmashColors.mainDecorations,
-                        ),
-                      ),
-                      SmashUI.normalText(value.isNotEmpty ? "$value" : "...",
-                          color: SmashColors.mainDecorations, bold: true),
-                    ],
-                  ),
-                ),
-              )),
-        ],
-      ),
-    );
-  }
-}
-
-class MultiSelect<T> extends StatefulWidget {
-  final Map<String, dynamic> _itemMap;
-  final String _label;
-  MultiSelect(this._itemMap, this._label, {key})
-      : super(
-          key: key,
-        );
-
-  @override
-  State<StatefulWidget> createState() => _MultiSelectState<T>();
-}
-
-class _MultiSelectState<T> extends State<MultiSelect> with AfterLayoutMixin {
+class MultiComboWidgetState<T> extends State<MultiComboWidget>
+    with AfterLayoutMixin {
   String? url;
   List<dynamic>? urlComboItems;
 
@@ -1911,13 +1843,24 @@ class _MultiSelectState<T> extends State<MultiSelect> with AfterLayoutMixin {
 
   @override
   Widget build(BuildContext context) {
-    String? key;
+    // String value = ""; //$NON-NLS-1$
+    // if (widget._itemMap.containsKey(TAG_VALUE)) {
+    //   value = widget._itemMap[TAG_VALUE].toString().trim();
+    // }
+    // String? key;
+    // if (widget._itemMap.containsKey(TAG_KEY)) {
+    //   key = widget._itemMap[TAG_KEY].trim();
+    // }
+
+    String? strKey;
     if (widget._itemMap.containsKey(TAG_KEY)) {
-      key = widget._itemMap[TAG_KEY].trim();
+      strKey = widget._itemMap[TAG_KEY].trim();
     }
     List<T> values = [];
     if (widget._itemMap.containsKey(TAG_VALUE)) {
-      String? value = widget._itemMap[TAG_VALUE];
+      dynamic valueTmp = widget._itemMap[TAG_VALUE];
+      String? value;
+      if (valueTmp != null) value = valueTmp.toString();
       if (value != null && value.isNotEmpty) {
         if (widget._itemMap[TAG_TYPE] == 'multiintcombo') {
           values = value
@@ -1935,25 +1878,36 @@ class _MultiSelectState<T> extends State<MultiSelect> with AfterLayoutMixin {
     }
 
     List<dynamic>? comboItems = TagsManager.getComboItems(widget._itemMap);
-    if (comboItems == null || comboItems.isEmpty) {
-      if (urlComboItems != null) {
-        // combo items from url have been retrived
-        // so just use that
-        comboItems = urlComboItems;
+    if (comboItems == null) {
+      comboItems = [];
+    }
+    if (urlComboItems != null) {
+      // combo items from url have been retrived
+      // so just use those
+
+      if (comboItems.length < urlComboItems!.length) {
+        comboItems.addAll(urlComboItems!);
       } else {
-        // check if it is url based
-        url = TagsManager.getComboUrl(widget._itemMap);
-        if (url != null) {
-          // we have a url, so
-          // return container and wait for afterFirstLayout to get url items
-          return Container();
+        // need to check if the item map is already present and add only if not
+        for (var urlComboItem in urlComboItems!) {
+          if (!comboItems.any(
+              (item) => DeepCollectionEquality().equals(item, urlComboItem))) {
+            comboItems.add(urlComboItem);
+          }
         }
-        // fallback on an empty list
-        comboItems = [];
+      }
+    } else {
+      // check if it is url based
+      url = TagsManager.getComboUrl(widget._itemMap);
+      if (url != null) {
+        // we have a url, so
+        // return container and wait for afterFirstLayout to get url items
+        return Container();
       }
     }
+
     List<ItemObject?> itemsArray =
-        TagsManager.comboItems2ObjectArray(comboItems!);
+        TagsManager.comboItems2ObjectArray(comboItems);
     List<ItemObject> selectedItems = [];
     for (ItemObject? item in itemsArray) {
       if (item != null && values.contains(item.value)) {
@@ -1961,28 +1915,98 @@ class _MultiSelectState<T> extends State<MultiSelect> with AfterLayoutMixin {
       }
     }
 
+    return Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
+            child: SmashUI.normalText(widget._label,
+                color: SmashColors.mainDecorationsDarker),
+          ),
+          TextButton(
+              style: SmashUI.defaultFlatButtonStyle(),
+              key: strKey != null ? Key(strKey) : null,
+              onPressed: () async {
+                if (!widget._isReadOnly) {
+                  await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return MultiSelect(
+                          itemsArray, selectedItems, widget._label, strKey);
+                    },
+                  );
+                  var selectedItemsString =
+                      selectedItems.map((i) => i.value.toString()).toList();
+                  widget._itemMap[TAG_VALUE] = selectedItemsString.join(";");
+                  setState(() {});
+                }
+              },
+              child: Center(
+                child: Padding(
+                  padding: SmashUI.defaultPadding(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Padding(
+                        padding: SmashUI.defaultRigthPadding(),
+                        child: Icon(
+                          MdiIcons.triangleDown,
+                          color: SmashColors.mainDecorations,
+                        ),
+                      ),
+                      SmashUI.normalText(
+                          selectedItems.isNotEmpty
+                              ? selectedItems.map((e) => e.label).join("; ")
+                              : "...",
+                          color: SmashColors.mainDecorations,
+                          bold: true),
+                    ],
+                  ),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class MultiSelect<T> extends StatefulWidget {
+  final List<ItemObject?> _itemsArray;
+  final List<ItemObject> _selectedItems;
+  final String _label;
+  final String? strKey;
+  MultiSelect(this._itemsArray, this._selectedItems, this._label, this.strKey,
+      {key})
+      : super(
+          key: key,
+        );
+
+  @override
+  State<StatefulWidget> createState() => _MultiSelectState<T>();
+}
+
+class _MultiSelectState<T> extends State<MultiSelect> {
+  @override
+  Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget._label),
       content: SingleChildScrollView(
         child: ListBody(
-          key: key != null ? Key(key) : null,
-          children: itemsArray
+          key: widget.strKey != null ? Key(widget.strKey!) : null,
+          children: widget._itemsArray
               .map((item) => CheckboxListTile(
-                    key: key != null ? Key("${key}_${item!.value}") : null,
-                    value: selectedItems.contains(item),
+                    key: widget.key != null
+                        ? Key("${widget.key}_${item!.value}")
+                        : null,
+                    value: widget._selectedItems.contains(item),
                     title: Text(item!.label),
                     controlAffinity: ListTileControlAffinity.leading,
                     onChanged: (isChecked) {
                       if (isChecked!) {
-                        selectedItems.add(item);
+                        widget._selectedItems.add(item);
                       } else {
-                        selectedItems.remove(item);
+                        widget._selectedItems.remove(item);
                       }
-
-                      var selectedItemsString =
-                          selectedItems.map((i) => i.value.toString()).toList();
-                      widget._itemMap[TAG_VALUE] =
-                          selectedItemsString.join(";");
                       setState(() {});
                     },
                   ))
