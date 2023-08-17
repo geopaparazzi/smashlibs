@@ -697,6 +697,7 @@ Tuple2<ListTile, bool>? getWidget(
       {
         if (itemReadonly &&
             presentationMode.detailMode != DetailMode.DETAILED) {
+          // ! TODO
           return Tuple2(
               ListTile(
                 leading: icon,
@@ -709,27 +710,17 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: MultiComboWidget<String>(
-                  widgetKey, itemMap, label, itemReadonly),
+                  widgetKey, itemMap, label, itemReadonly, presentationMode),
             ),
             false);
       }
     case TYPE_INTMULTIPLECHOICE:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
-          return Tuple2(
-              ListTile(
-                leading: icon,
-                title:
-                    getSimpleLabelValue(label, valueString, presentationMode),
-              ),
-              false);
-        }
         return Tuple2(
             ListTile(
               leading: icon,
               title: MultiComboWidget<int>(
-                  widgetKey, itemMap, label, itemReadonly),
+                  widgetKey, itemMap, label, itemReadonly, presentationMode),
             ),
             false);
       }
@@ -1812,8 +1803,9 @@ class MultiComboWidget<T> extends StatefulWidget {
   final _itemMap;
   final String _label;
   final bool _isReadOnly;
-  MultiComboWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+  final PresentationMode _presentationMode;
+  MultiComboWidget(String _widgetKey, this._itemMap, this._label,
+      this._isReadOnly, this._presentationMode)
       : super(
           key: ValueKey(_widgetKey + "_parent"),
         );
@@ -1843,15 +1835,6 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
 
   @override
   Widget build(BuildContext context) {
-    // String value = ""; //$NON-NLS-1$
-    // if (widget._itemMap.containsKey(TAG_VALUE)) {
-    //   value = widget._itemMap[TAG_VALUE].toString().trim();
-    // }
-    // String? key;
-    // if (widget._itemMap.containsKey(TAG_KEY)) {
-    //   key = widget._itemMap[TAG_KEY].trim();
-    // }
-
     String? strKey;
     if (widget._itemMap.containsKey(TAG_KEY)) {
       strKey = widget._itemMap[TAG_KEY].trim();
@@ -1859,19 +1842,26 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
     List<T> values = [];
     if (widget._itemMap.containsKey(TAG_VALUE)) {
       dynamic valueTmp = widget._itemMap[TAG_VALUE];
-      String? value;
-      if (valueTmp != null) value = valueTmp.toString();
-      if (value != null && value.isNotEmpty) {
-        if (widget._itemMap[TAG_TYPE] == 'multiintcombo') {
-          values = value
-              .split(";")
-              .map((e) => int.tryParse(e) as T)
-              .where((element) => element != null)
-              .toList();
-        } else {
-          List<String> valueSplit = value.split(";");
-          for (var v in valueSplit) {
-            values.add(v as T);
+      if (valueTmp is List) {
+        values = valueTmp
+            .map((e) => int.tryParse(e.toString()) as T)
+            .where((element) => element != null)
+            .toList();
+      } else {
+        String? value;
+        if (valueTmp != null) value = valueTmp.toString();
+        if (value != null && value.isNotEmpty) {
+          if (widget._itemMap[TAG_TYPE] == 'multiintcombo') {
+            values = value
+                .split(";")
+                .map((e) => int.tryParse(e) as T)
+                .where((element) => element != null)
+                .toList();
+          } else {
+            List<String> valueSplit = value.split(";");
+            for (var v in valueSplit) {
+              values.add(v as T);
+            }
           }
         }
       }
@@ -1913,6 +1903,14 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
       if (item != null && values.contains(item.value)) {
         selectedItems.add(item);
       }
+    }
+
+    if (widget._isReadOnly &&
+        widget._presentationMode.detailMode != DetailMode.DETAILED) {
+      return getSimpleLabelValue(
+          widget._label,
+          selectedItems.map((e) => e.label).join(";"),
+          widget._presentationMode);
     }
 
     return Center(
