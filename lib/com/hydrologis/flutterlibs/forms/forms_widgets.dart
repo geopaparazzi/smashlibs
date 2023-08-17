@@ -149,7 +149,7 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
       if (widgetTuple != null) {
         widgetsList.add(widgetTuple.item1);
         if (widgetTuple.item2) {
-          geomIndexes.add(i);
+          geomIndexes.add(widgetsList.length - 1);
         }
       }
     }
@@ -2211,7 +2211,11 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
           geomType = JTS.EGeometryType.forTypeName(typeName);
         }
       } else {
-        value = jsonEncode(widget._itemMap[TAG_VALUE]).trim();
+        if (tmpValue is String) {
+          value = tmpValue;
+        } else {
+          value = jsonEncode(tmpValue).trim();
+        }
       }
     }
 
