@@ -11,6 +11,7 @@ class TileSource extends TiledRasterLayerSource {
   String? url;
   int minZoom = DEFAULT_MINZOOM_INT;
   int maxZoom = DEFAULT_MAXZOOM_INT;
+  int maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT;
   String? attribution;
   LatLngBounds? bounds;
   List<String> subdomains = [];
@@ -41,6 +42,7 @@ class TileSource extends TiledRasterLayerSource {
     this.url,
     required this.minZoom,
     required this.maxZoom,
+    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
     this.attribution,
     this.subdomains = const <String>[],
     this.isVisible = true,
@@ -61,6 +63,8 @@ class TileSource extends TiledRasterLayerSource {
     this.url = map[LAYERSKEY_URL];
     this.minZoom = map[LAYERSKEY_MINZOOM] ?? DEFAULT_MINZOOM_INT;
     this.maxZoom = map[LAYERSKEY_MAXZOOM] ?? DEFAULT_MAXZOOM_INT;
+    this.maxNativeZoom =
+        map[LAYERSKEY_MAXNATIVEZOOM] ?? DEFAULT_MAXNATIVEZOOM_INT;
     this.attribution = map[LAYERSKEY_ATTRIBUTION];
     this.isVisible = map[LAYERSKEY_ISVISIBLE];
     this.opacityPercentage = (map[LAYERSKEY_OPACITY] ?? 100).toDouble();
@@ -91,6 +95,7 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = "OpenStreetMap, ODbL",
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.maxNativeZoom = 16,
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
@@ -104,6 +109,7 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = "OpenStreetMap, ODbL",
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
     this.isVisible = true,
     this.canDoProperties = true,
   }) {
@@ -117,6 +123,7 @@ class TileSource extends TiledRasterLayerSource {
     this.subdomains = const ['a', 'b'],
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
@@ -142,6 +149,7 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = "OpenStreetMap, ODbL",
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
@@ -155,6 +163,7 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = "OpenStreetMap contributors, under ODbL",
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
@@ -169,6 +178,7 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = "Esri",
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
+    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
     this.isVisible = true,
     this.isTms = true,
     this.canDoProperties = true,
@@ -183,6 +193,7 @@ class TileSource extends TiledRasterLayerSource {
         "Map tiles by Mapsforge, Data by OpenStreetMap, under ODbL";
     this.minZoom = DEFAULT_MINZOOM_INT;
     this.maxZoom = 22;
+    this.maxNativeZoom = 25;
     this.isVisible = true;
     this.isTms = false;
     this.canDoProperties = true;
@@ -233,6 +244,7 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = descr;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
+    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT;
     this.isVisible = true;
     this.isTms = type == "tms";
     this.canDoProperties = true;
@@ -245,6 +257,7 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = "";
     this.minZoom = DEFAULT_MINZOOM_INT;
     this.maxZoom = 22;
+    this.maxNativeZoom = maxZoom;
     this.isVisible = true;
     this.isTms = true;
     this.canDoProperties = true;
@@ -258,6 +271,7 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = "";
     this.minZoom = DEFAULT_MINZOOM_INT;
     this.maxZoom = 22;
+    this.maxNativeZoom = 22;
     this.isVisible = true;
     this.isTms = true;
     this.canDoProperties = true;
@@ -354,7 +368,8 @@ class TileSource extends TiledRasterLayerSource {
             tileProvider: mapsforgeTileProvider,
             tileSize: tileSize,
             keepBuffer: 2,
-            maxZoom: 21,
+            maxZoom: maxZoom.toDouble(),
+            maxNativeZoom: maxNativeZoom,
             tms: isTms,
             backgroundColor: Colors.transparent,
             retinaMode: false, // not supported
@@ -374,6 +389,7 @@ class TileSource extends TiledRasterLayerSource {
             key: ValueKey(name),
             tileProvider: tileProvider,
             maxZoom: maxZoom.toDouble(),
+            maxNativeZoom: maxNativeZoom,
             tms: true,
             backgroundColor: Colors.transparent,
             retinaMode: false, // not supported
@@ -423,6 +439,7 @@ class TileSource extends TiledRasterLayerSource {
               key: ValueKey(name),
               tileProvider: tileProvider,
               maxZoom: maxZoom.toDouble(),
+              maxNativeZoom: maxNativeZoom,
               tms: true,
               backgroundColor: Colors.transparent,
               retinaMode: false, // not supported
@@ -446,6 +463,7 @@ class TileSource extends TiledRasterLayerSource {
             ),
             backgroundColor: Colors.transparent,
             maxZoom: maxZoom.toDouble(),
+            maxNativeZoom: maxNativeZoom,
             retinaMode: retinaModeOn,
             tileProvider: tileProvider,
             // TODO  overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
@@ -463,6 +481,7 @@ class TileSource extends TiledRasterLayerSource {
               urlTemplate: url,
               backgroundColor: Colors.transparent,
               maxZoom: maxZoom.toDouble(),
+              maxNativeZoom: maxNativeZoom,
               subdomains: subdomains,
               retinaMode: retinaModeOn,
               tileProvider: tileProvider,
@@ -505,6 +524,7 @@ class TileSource extends TiledRasterLayerSource {
         $urlLine
         "$LAYERSKEY_MINZOOM": $minZoom,
         "$LAYERSKEY_MAXZOOM": $maxZoom,
+        "$LAYERSKEY_MAXNATIVEZOOM": $maxNativeZoom,
         "$LAYERSKEY_OPACITY": $opacityPercentage,
         "$LAYERSKEY_ATTRIBUTION": "$attribution",
         "$LAYERSKEY_SRID": $_srid,

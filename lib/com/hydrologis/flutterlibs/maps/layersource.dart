@@ -26,12 +26,14 @@ const LAYERSKEY_ATTRIBUTION = 'attribution';
 const LAYERSKEY_SUBDOMAINS = 'subdomains';
 const LAYERSKEY_MINZOOM = 'minzoom';
 const LAYERSKEY_MAXZOOM = 'maxzoom';
+const LAYERSKEY_MAXNATIVEZOOM = 'maxnativezoom';
 const LAYERSKEY_GPKG_DOOVERLAY = "geopackage_dooverlay";
 const double DEFAULT_MINZOOM = 1;
 const double DEFAULT_ZOOM = 16;
 const int DEFAULT_MINZOOM_INT = 1;
-const int DEFAULT_MAXZOOM_INT = 16;
-const double DEFAULT_MAXZOOM = 19;
+const int DEFAULT_MAXZOOM_INT = 21;
+const int DEFAULT_MAXNATIVEZOOM_INT = 19;
+const double DEFAULT_MAXZOOM = 21;
 
 const LAYERSTYPE_WMS = 'wms';
 const LAYERSTYPE_TMS = 'tms';

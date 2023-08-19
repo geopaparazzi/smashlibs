@@ -31,7 +31,9 @@ class FileManager {
     GPX_EXT,
     SHP_EXT,
     GEOPACKAGE_EXT,
-    GEOCACHE_EXT
+    GEOCACHE_EXT,
+    GEOJSON_EXT,
+    JSON_EXT,
   ];
   static const ALLOWED_RASTER_DATA_EXT = [TIF_EXT, TIFF_EXT, JPG_EXT, PNG_EXT];
   static const ALLOWED_TILE_DATA_EXT = [

@@ -61,6 +61,7 @@ class GeojsonSource extends VectorLayerSource
   @override
   Future<void> load(BuildContext? context) async {
     if (!isLoaded) {
+      _attribution = "";
       var gf = JTS.GeometryFactory.defaultPrecision();
       _featureTree = JTS.STRtree();
       if (_absolutePath != null) {
