@@ -2316,11 +2316,11 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         }
       },
     );
-    if (!widget._isReadOnly) {
-      GeometryEditorState geomEditorState =
-          Provider.of<GeometryEditorState>(context, listen: false);
-      geomEditorState.setEnabled(true);
-    }
+    // if (!widget._isReadOnly) {
+    //   GeometryEditorState geomEditorState =
+    //       Provider.of<GeometryEditorState>(context, listen: false);
+    //   geomEditorState.setEnabled(true);
+    // }
     // }
     _loading = false;
     setState(() {});
@@ -2348,6 +2348,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
     } else {
       GeometryEditorState geomEditorState =
           Provider.of<GeometryEditorState>(context, listen: false);
+      geomEditorState.setEnabledSilently(true);
       return Stack(
         children: [
           mapView!,

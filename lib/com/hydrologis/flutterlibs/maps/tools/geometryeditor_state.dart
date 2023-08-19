@@ -15,12 +15,15 @@ class GeometryEditorState extends ChangeNotifier {
   bool get isEnabled => _isEnabled;
 
   void setEnabled(bool isEnabled) {
-    this._isEnabled = isEnabled;
+    setEnabledSilently(isEnabled);
+    notifyListeners();
+  }
 
+  void setEnabledSilently(bool isEnabled) {
+    this._isEnabled = isEnabled;
     if (!_isEnabled) {
       _editableItem = null;
     }
-    notifyListeners();
   }
 
   EditableGeometry? get editableGeometry => _editableItem;
