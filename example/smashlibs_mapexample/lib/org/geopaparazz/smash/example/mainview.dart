@@ -104,7 +104,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
         actions: [
           TextButton(
             onPressed: () async {
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = onlinesTilesSources[1];
               await addLayerAndZoomTo(context);
             },
@@ -112,7 +112,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           ),
           TextButton(
             onPressed: () async {
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               var url = "https://geoservices.buergernetz.bz.it/mapproxy/wms";
               _currentLayerSource = WmsSource(
                   url, "p_bz-Orthoimagery:Aerial-2020-RGB",
@@ -126,7 +126,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               var gpxPath =
                   await copyToMapFolder("ciclabile_peschiera_mantova.gpx");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = GpxSource(gpxPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -136,7 +136,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var imgPath = await copyToMapFolder("testtiff.tif");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = GeoImageSource(imgPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -146,7 +146,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var dbPath = await copyToMapFolder("assisi.map");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = TileSource.Mapsforge(dbPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -156,7 +156,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var dbPath = await copyToMapFolder("world.mbtiles");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = TileSource.Mbtiles(dbPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -166,7 +166,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var dbPath = await copyToMapFolder("orthos.gpkg");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = TileSource.Geopackage(dbPath, "mebo2017");
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -176,7 +176,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var dbPath = await copyToMapFolder("vectors.gpkg");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource =
                   GeopackageSource(dbPath, "watercourses_small");
               if (context.mounted) await addLayerAndZoomTo(context);
@@ -191,7 +191,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               await copyToMapFolder("watercourses_small.prj");
               await copyToMapFolder("watercourses_small.dbf");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = ShapefileSource(shpPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -201,7 +201,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var geojsonPath = await copyToMapFolder("gjson_points.json");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = GeojsonSource(geojsonPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -211,7 +211,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var geojsonPath = await copyToMapFolder("gjson_lines.json");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = GeojsonSource(geojsonPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -221,7 +221,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var geojsonPath = await copyToMapFolder("gjson_polygons.json");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = GeojsonSource(geojsonPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
@@ -231,7 +231,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
             onPressed: () async {
               var shpPath = await copyToMapFolder("caldaro.geocaching");
 
-              mapView!.removeLayer(_currentLayerSource);
+              mapView!.removeLayerSource(_currentLayerSource);
               _currentLayerSource = GeocachingSource(shpPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },

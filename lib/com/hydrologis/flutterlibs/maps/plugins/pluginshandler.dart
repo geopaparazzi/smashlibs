@@ -79,8 +79,9 @@ class _PluginCheckboxWidgetState extends State<PluginCheckboxWidget> {
           setState(() {});
 
           // ! TODO check this commented
-          // var projectState = Provider.of<ProjectState>(context, listen: false);
-          // projectState.reloadProject(context);
+          var projectState =
+              Provider.of<SmashMapBuilder>(context, listen: false);
+          projectState.reBuild();
         },
       ),
       title: SmashUI.normalText(

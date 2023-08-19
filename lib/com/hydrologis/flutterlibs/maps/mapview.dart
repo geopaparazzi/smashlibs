@@ -16,6 +16,7 @@ class SmashMapWidget extends StatelessWidget {
   bool _useLayerManager = true;
   bool _addBorder = false;
   bool consumerBuild = false;
+  bool _isMapReady = false;
 
   MapController _mapController = MapController();
   List<Widget> preLayers = [];
@@ -62,29 +63,33 @@ class SmashMapWidget extends StatelessWidget {
     if (onMapReady != null) _onMapReady = onMapReady;
   }
 
+  bool isMapReady() {
+    return _isMapReady;
+  }
+
   void setOnPositionChanged(Function(MapPosition, bool)? onPositionChanged) {
     if (onPositionChanged != null) _onPositionChanged = onPositionChanged;
   }
 
-  void addPreLayer(Widget layer) {
-    int index = getLayerIndex(preLayers, layer);
-    if (index != -1) {
-      preLayers[index] = layer;
-    } else {
-      preLayers.add(layer);
+  /// Clear all layers list (pre, post and manual [LayerSource]s).
+  void clearLayers() {
+    preLayers.clear();
+    postLayers.clear();
+    layerSources.clear();
+  }
+
+  /// Add a [LayerSource]. If [_useLayerManager] is set to false,
+  /// this creates a custom datasource list to be used (in case the common
+  /// layers are not wanted in a different map view).
+  void addLayerSource(LayerSource layerSource) {
+    if (_useLayerManager) {
+      LayerManager().addLayerSource(layerSource);
+    } else if (!layerSources.contains(layerSource)) {
+      layerSources.add(layerSource);
     }
   }
 
-  void addPostLayer(Widget layer) {
-    int index = getLayerIndex(postLayers, layer);
-    if (index != -1) {
-      postLayers[index] = layer;
-    } else {
-      postLayers.add(layer);
-    }
-  }
-
-  void removeLayer(LayerSource layerSource) {
+  void removeLayerSource(LayerSource layerSource) {
     if (_useLayerManager) {
       LayerManager().removeLayerSource(layerSource);
     } else if (layerSources.contains(layerSource)) {
@@ -92,7 +97,29 @@ class SmashMapWidget extends StatelessWidget {
     }
   }
 
-  int getLayerIndex(List<Widget> list, Widget layer) {
+  /// Add a layer to the list of layers that is loaded before
+  /// the [LayerManager] layers.
+  void addPreLayer(Widget layer) {
+    int index = _getLayerIndex(preLayers, layer);
+    if (index != -1) {
+      preLayers[index] = layer;
+    } else {
+      preLayers.add(layer);
+    }
+  }
+
+  /// Add a layer to the list of layers that is loaded after
+  /// the [LayerManager] layers.
+  void addPostLayer(Widget layer) {
+    int index = _getLayerIndex(postLayers, layer);
+    if (index != -1) {
+      postLayers[index] = layer;
+    } else {
+      postLayers.add(layer);
+    }
+  }
+
+  int _getLayerIndex(List<Widget> list, Widget layer) {
     int i = 0;
     for (var item in list) {
       if (item.key == layer.key) {
@@ -103,17 +130,13 @@ class SmashMapWidget extends StatelessWidget {
     return -1;
   }
 
+  // Add a layer that is not subject to rotation.
   void addNonRotationLayer(Widget layer) {
-    if (!nonRotationLayers.contains(layer)) {
+    int index = _getLayerIndex(nonRotationLayers, layer);
+    if (index != -1) {
+      nonRotationLayers[index] = layer;
+    } else {
       nonRotationLayers.add(layer);
-    }
-  }
-
-  void addLayerSource(LayerSource layerSource) {
-    if (_useLayerManager) {
-      LayerManager().addLayerSource(layerSource);
-    } else if (!layerSources.contains(layerSource)) {
-      layerSources.add(layerSource);
     }
   }
 
@@ -188,7 +211,6 @@ class SmashMapWidget extends StatelessWidget {
           .toList());
     }
     layers.addAll(postLayers);
-    layers.addAll(nonRotationLayers);
 
     BuildContext context = mapBuilder.context!;
     var mapState = Provider.of<SmashMapState>(context, listen: false);
@@ -238,10 +260,13 @@ class SmashMapWidget extends StatelessWidget {
         onLongPress: (TapPosition tPos, LatLng point) =>
             _handleLongTap(point, _mapController.zoom),
         interactiveFlags: mapFlags,
-        onMapReady: _onMapReady,
+        onMapReady: () {
+          _isMapReady = true;
+          _onMapReady();
+        },
       ),
       children: layers,
-      nonRotatedChildren: [],
+      nonRotatedChildren: nonRotationLayers,
       mapController: _mapController,
     );
 

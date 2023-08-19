@@ -123,9 +123,6 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
         CustomPoint(pixelOrigin.x + _start!.dx, pixelOrigin.y + _start!.dy));
     var p2 = map.unproject(CustomPoint(
         pixelOrigin.x + _running!.dx, pixelOrigin.y + _running!.dy));
-    print("***");
-    print(p1);
-    print(p2);
     var envelope = JTS.Envelope.fromCoordinates(
         JTS.Coordinate(p1.longitude, p1.latitude),
         JTS.Coordinate(p2.longitude, p2.latitude));
@@ -139,9 +136,10 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
     _running = null;
   }
 
-  Future<void> queryLayers(JTS.Envelope env, BuildContext context) async {
+  Future<void> queryLayers(
+      JTS.Envelope envLatLong, BuildContext context) async {
     var boundsGeom =
-        GPKG.GeometryUtilities.fromEnvelope(env, makeCircle: false);
+        GPKG.GeometryUtilities.fromEnvelope(envLatLong, makeCircle: false);
     boundsGeom.setSRID(4326);
     var boundMap = {4326: boundsGeom};
 
@@ -157,6 +155,12 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
     totalQueryResult.edsList = [];
     for (var vLayer in visibleVectorLayers) {
       if (vLayer is EditableDataSource) {
+        var dataSrid = vLayer!.getSrid();
+        proj4dart.Projection? dataPrj;
+        if (dataSrid != null && dataSrid != SmashPrj.EPSG4326) {
+          dataPrj = SmashPrj.fromSrid(dataSrid)!;
+          SmashPrj.transformGeometry(SmashPrj.EPSG4326, dataPrj, boundsGeom);
+        }
         HU.FeatureCollection? fc = await (vLayer as EditableDataSource)
             .getFeaturesIntersecting(checkGeom: boundsGeom);
         if (fc != null) {
@@ -164,7 +168,11 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
             totalQueryResult.ids!.add(vLayer!.getName()!);
             totalQueryResult.primaryKeys?.add(null);
             totalQueryResult.editable!.add(false);
-            totalQueryResult.geoms.add(f.geometry!);
+            var g = f.geometry!;
+            if (dataSrid != null && dataSrid != SmashPrj.EPSG4326) {
+              SmashPrj.transformGeometry(dataPrj!, SmashPrj.EPSG4326, g);
+            }
+            totalQueryResult.geoms.add(g);
             totalQueryResult.data.add(f.attributes);
             totalQueryResult.edsList!.add(vLayer as EditableDataSource);
           });
@@ -176,7 +184,8 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
         var boundsGeomInSrid = boundMap[srid];
         if (boundsGeomInSrid == null) {
           // create the env
-          var tmp = GPKG.GeometryUtilities.fromEnvelope(env, makeCircle: true);
+          var tmp =
+              GPKG.GeometryUtilities.fromEnvelope(envLatLong, makeCircle: true);
           var dataPrj = SmashPrj.fromSrid(srid)!;
           SmashPrj.transformGeometry(SmashPrj.EPSG4326, dataPrj, tmp);
           boundsGeomInSrid = tmp;
