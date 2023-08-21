@@ -794,7 +794,7 @@ class GeojsonSource extends VectorLayerSource
     touchBufferLayerPrj.setSRID(_srid);
     var touchPointLayerPrj = JTS.GeometryFactory.defaultPrecision()
         .createPoint(JTS.Coordinate(pointLL.longitude, pointLL.latitude));
-    touchPointLayerPrj.setSRID(_srid!);
+    touchPointLayerPrj.setSRID(_srid);
     // if polygon, then it has to be inside,
     // for other types we use the buffer
     JTS.Geometry checkGeom;
@@ -864,10 +864,10 @@ class GeojsonSource extends VectorLayerSource
       }
       var gf = JTS.GeometryFactory.defaultPrecision();
       if (geometryType!.isPoint()) {
-        editedFeature!.geometry = gf.createPoint(
+        editedFeature.geometry = gf.createPoint(
             JTS.Coordinate(points[0].longitude, points[0].latitude));
       } else if (geometryType!.isLine()) {
-        editedFeature!.geometry = gf.createLineString(points
+        editedFeature.geometry = gf.createLineString(points
             .map((e) => JTS.Coordinate(e.longitude, e.latitude))
             .toList());
       } else if (geometryType!.isPolygon()) {
@@ -875,7 +875,7 @@ class GeojsonSource extends VectorLayerSource
             points.map((e) => JTS.Coordinate(e.longitude, e.latitude)).toList();
         pl.add(JTS.Coordinate(points[0].longitude, points[0].latitude));
         var lr = gf.createLinearRing(pl);
-        editedFeature!.geometry = gf.createPolygon(lr, null);
+        editedFeature.geometry = gf.createPolygon(lr, null);
       }
 
       dumpFeatureCollection();
@@ -890,21 +890,55 @@ class GeojsonSource extends VectorLayerSource
       if (geom != null) {
         var geojsonGeometry;
         if (geometryType!.isPoint()) {
-          JTS.Point p = geom as JTS.Point;
-          geojsonGeometry = GEOJSON.GeoJSONPoint([p.getX(), p.getY()]);
+          if (!geometryType!.isMulti()) {
+            JTS.Point p = geom as JTS.Point;
+            geojsonGeometry = GEOJSON.GeoJSONPoint([p.getX(), p.getY()]);
+          } else {
+            List<List<double>> coords = [];
+            for (var i = 0; i < geom.getNumGeometries(); i++) {
+              var coordinate = geom.getGeometryN(i).getCoordinate();
+              coords.add([coordinate!.x, coordinate.y]);
+            }
+            geojsonGeometry = GEOJSON.GeoJSONMultiPoint(coords);
+          }
         } else if (geometryType!.isLine()) {
-          JTS.LineString l = geom as JTS.LineString;
-          geojsonGeometry = GEOJSON.GeoJSONLineString(
-              l.getCoordinates().map((e) => [e.x, e.y]).toList());
+          if (!geometryType!.isMulti()) {
+            JTS.LineString l = geom as JTS.LineString;
+            geojsonGeometry = GEOJSON.GeoJSONLineString(
+                l.getCoordinates().map((e) => [e.x, e.y]).toList());
+          } else {
+            List<List<List<double>>> mLineCoords = [];
+            for (var i = 0; i < geom.getNumGeometries(); i++) {
+              var line = geom.getGeometryN(i) as JTS.LineString;
+              var lineCoords =
+                  line.getCoordinates().map((e) => [e.x, e.y]).toList();
+              mLineCoords.add(lineCoords);
+            }
+            geojsonGeometry = GEOJSON.GeoJSONMultiLineString(mLineCoords);
+          }
         } else if (geometryType!.isPolygon()) {
-          JTS.Polygon pl = geom as JTS.Polygon;
-          geojsonGeometry = GEOJSON.GeoJSONPolygon([
-            pl
-                .getExteriorRing()
-                .getCoordinates()
-                .map((e) => [e.x, e.y])
-                .toList()
-          ]);
+          if (!geometryType!.isMulti()) {
+            JTS.Polygon pl = geom as JTS.Polygon;
+            geojsonGeometry = GEOJSON.GeoJSONPolygon([
+              pl
+                  .getExteriorRing()
+                  .getCoordinates()
+                  .map((e) => [e.x, e.y])
+                  .toList()
+            ]);
+          } else {
+            List<List<List<List<double>>>> mPolygonCoords = [];
+            for (var i = 0; i < geom.getNumGeometries(); i++) {
+              var pl = geom.getGeometryN(i) as JTS.Polygon;
+              var polygonCoords = pl
+                  .getExteriorRing()
+                  .getCoordinates()
+                  .map((e) => [e.x, e.y])
+                  .toList();
+              mPolygonCoords.add([polygonCoords]);
+            }
+            geojsonGeometry = GEOJSON.GeoJSONMultiPolygon(mPolygonCoords);
+          }
         }
         final gjsonFeature = GEOJSON.GeoJSONFeature(
           geojsonGeometry,
