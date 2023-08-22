@@ -619,7 +619,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: ComboboxWidget<String>(
-                  widgetKey, itemMap, label, presentationMode),
+                  widgetKey, itemMap, label, presentationMode, constraints),
             ),
             false);
       }
@@ -629,7 +629,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: ComboboxWidget<int>(
-                  widgetKey, itemMap, label, presentationMode),
+                  widgetKey, itemMap, label, presentationMode, constraints),
             ),
             false);
       }
@@ -994,9 +994,10 @@ class ComboboxWidget<T> extends StatefulWidget {
   final _itemMap;
   final String _label;
   final PresentationMode _presentationMode;
+  final Constraints _constraints;
 
-  ComboboxWidget(
-      String _widgetKey, this._itemMap, this._label, this._presentationMode)
+  ComboboxWidget(String _widgetKey, this._itemMap, this._label,
+      this._presentationMode, this._constraints)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -1096,9 +1097,21 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
-          child: SmashUI.normalText(widget._label,
-              color: widget._presentationMode.labelTextColor,
-              bold: widget._presentationMode.doLabelBold),
+          child: Row(
+            children: [
+              SmashUI.normalText(widget._label,
+                  color: widget._presentationMode.labelTextColor,
+                  bold: widget._presentationMode.doLabelBold),
+              if (!widget._constraints.isValid(value))
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: SmashUI.normalText(
+                      widget._constraints.getDescription(context),
+                      bold: true,
+                      color: SmashColors.mainDanger),
+                ),
+            ],
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(left: SmashUI.DEFAULT_PADDING * 2),

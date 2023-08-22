@@ -322,10 +322,10 @@ class MandatoryConstraint implements IConstraint {
       _isValid = false;
     } else {
       String string = value.toString();
-      if (string.isNotEmpty) {
-        _isValid = true;
-      } else {
+      if (string.isEmpty) {
         _isValid = false;
+      } else {
+        _isValid = true;
       }
     }
   }
