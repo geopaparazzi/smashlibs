@@ -2371,7 +2371,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
               children: [
                 getCancelEditButton(geomEditorState),
                 getRemoveFeatureButton(geomEditorState),
-                // getInsertPointInCenterButton(geomEditorState),
+                getInsertPointInCenterButton(geomEditorState),
                 // if (Provider.of<GpsState>(context, listen: false).hasFix())
                 //   getInsertPointInGpsButton(geomEditorState),
                 getSaveFeatureButton(geomEditorState),
