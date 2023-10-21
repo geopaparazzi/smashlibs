@@ -228,8 +228,11 @@ class FileBrowserState extends State<FileBrowser> {
                         String labelName = name;
                         String addInfo = "";
                         if (removePrefix) {
-                          if (labelName.startsWith("smash_")) {
-                            labelName = labelName.replaceFirst("smash_", "");
+                          if (labelName.startsWith("smash_") ||
+                              labelName.startsWith("geopaparazzi_")) {
+                            labelName = labelName
+                                .replaceFirst("smash_", "")
+                                .replaceFirst("geopaparazzi_", "");
                             if (labelName.startsWith(RegExp(r'\d{8}_'))) {
                               addInfo +=
                                   "${labelName.substring(0, 4)}-${labelName.substring(4, 6)}-${labelName.substring(6, 8)}";
@@ -244,6 +247,11 @@ class FileBrowserState extends State<FileBrowser> {
                                     RegExp(r'\d{6}_'), "");
                               }
                             }
+                          }
+                          labelName = labelName.replaceAll("_", " ");
+                          if (labelName.endsWith(".gpap")) {
+                            labelName =
+                                labelName.substring(0, labelName.length - 5);
                           }
                         }
                         bool isDir = pathName[2];
