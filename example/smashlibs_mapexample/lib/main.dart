@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smashlibs/smashlibs.dart';
-import 'package:smashlibs_mapexample/org/geopaparazz/smash/example/mainview.dart';
+import './org/geopaparazz/smash/example/mainview.dart';
 import 'package:provider/provider.dart';
 import 'package:smashlibs/generated/l10n.dart';
 
