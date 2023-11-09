@@ -400,13 +400,13 @@ class ProjectionsSettingsState extends State<ProjectionsSettings>
         onPressed: () async {
           int? epsg = await SmashDialogs.showEpsgInputDialog(context);
           if (epsg != null) {
-            var existing = _infoList.firstWhere((pi) {
+            bool existing = _infoList.any((PrjInfo? pi) {
               if (pi == null) {
                 return false;
               }
               return pi.epsg == epsg;
-            }, orElse: () => null);
-            if (existing == null) {
+            });
+            if (!existing) {
               await downloadAndRegisterEpsg(epsg);
               await getData();
               setState(() {});
