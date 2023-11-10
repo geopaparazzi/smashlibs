@@ -115,7 +115,7 @@ class GeojsonSource extends VectorLayerSource
           }
 
           SMLogger().d(
-              "Loaded ${featuresMap.length} Geojson features of envelope: $_geojsonBounds");
+              "Loaded ${featuresMap.length} Geojson features of envelope: $llLatLng - $urLatLng");
 
           if (id > 0) {
             sldPath = HU.FileUtilities.joinPaths(parentFolder, _name! + ".sld");
