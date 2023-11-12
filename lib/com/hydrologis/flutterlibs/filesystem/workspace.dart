@@ -11,6 +11,7 @@ const CONFIG_FOLDER = "config";
 const FORMS_FOLDER = "forms";
 const PROJECTS_FOLDER = "projects";
 const EXPORT_FOLDER = "export";
+const GSS_FOLDER = "gss";
 
 const IOS_DOCUMENTSFOLDER = "Documents";
 

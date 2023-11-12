@@ -255,6 +255,14 @@ class SmashMapWidget extends StatelessWidget {
         onPositionChanged: (newPosition, hasGesture) {
           _onPositionChanged(newPosition, hasGesture);
         },
+        onMapEvent: (MapEvent mapEvent) {
+          if (mapEvent is MapEventDoubleTapZoom ||
+              mapEvent is MapEventScrollWheelZoom) {
+            SmashMapState mapState =
+                Provider.of<SmashMapState>(context, listen: false);
+            mapState.notifyListenersMsg("manual zoom");
+          }
+        },
         onTap: (TapPosition tPos, LatLng point) =>
             _handleTap(point, _mapController.zoom),
         onLongPress: (TapPosition tPos, LatLng point) =>

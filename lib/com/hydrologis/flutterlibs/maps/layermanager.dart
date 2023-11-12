@@ -84,14 +84,17 @@ class LayerManager {
   }
 
   /// Add a new layersource to the layer list.
-  ///
-  /// Returns true only if the layer was added.
-  bool addLayerSource(LayerSource layerData) {
-    if (!_layerSources.contains(layerData)) {
-      _layerSources.add(layerData);
-      return true;
+  void addLayerSource(LayerSource layerData) {
+    if (_layerSources.contains(layerData)) {
+      // if it is already there, remove the existing
+      // and add the new one
+      int index = _layerSources.indexOf(layerData);
+      var removedLayerSource = _layerSources.removeAt(index);
+      if (removedLayerSource != null) {
+        removedLayerSource.disposeSource();
+      }
     }
-    return false;
+    _layerSources.add(layerData);
   }
 
   /// Remove a layersource form the available layers list.

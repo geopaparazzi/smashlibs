@@ -63,12 +63,15 @@ import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:flutter_map_line_editor/flutter_map_line_editor.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:tuple/tuple.dart';
+import 'package:http/http.dart' as HTTP;
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
 part 'com/hydrologis/flutterlibs/gps/gps.dart';
 part 'com/hydrologis/flutterlibs/filesystem/filemanagement.dart';
 part 'com/hydrologis/flutterlibs/filesystem/workspace.dart';
+part 'com/hydrologis/flutterlibs/gss/gss_server_api.dart';
+part 'com/hydrologis/flutterlibs/gss/gss_utilities.dart';
 part 'com/hydrologis/flutterlibs/forms/forms.dart';
 part 'com/hydrologis/flutterlibs/forms/forms_widgets.dart';
 part 'com/hydrologis/flutterlibs/network/download_file_listtile.dart';

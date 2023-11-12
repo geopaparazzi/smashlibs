@@ -114,4 +114,49 @@ class SLLEn extends SLL {
 
   @override
   String get featureAttributesViewer_value => 'VALUE';
+
+  @override
+  String get network_cancelledByUser => 'Cancelled by user.';
+
+  @override
+  String get network_completed => 'Completed.';
+
+  @override
+  String get network_uploading => 'Uploading…';
+
+  @override
+  String get network_pleaseWait => 'please wait…';
+
+  @override
+  String get network_permissionOnServerDenied => 'Permission on server denied.';
+
+  @override
+  String get network_couldNotConnectToServer => 'Could not connect to the server. Is it online? Check your address.';
+
+  @override
+  String get settings_pleaseEnterValidPassword => 'Please enter a valid server password.';
+
+  @override
+  String get settings_gss => 'GSS';
+
+  @override
+  String get settings_geopaparazziSurveyServer => 'Geopaparazzi Survey Server';
+
+  @override
+  String get settings_serverUrl => 'Server URL';
+
+  @override
+  String get settings_serverUrlStartWithHttp => 'The server URL needs to start with HTTP or HTTPS.';
+
+  @override
+  String get settings_serverPassword => 'Server Password';
+
+  @override
+  String get settings_allowSelfSignedCert => 'Allow self signed certificates';
+
+  @override
+  String get settings_serverUsername => 'Server Username';
+
+  @override
+  String get settings_pleaseEnterValidUsername => 'Please enter a valid server username.';
 }

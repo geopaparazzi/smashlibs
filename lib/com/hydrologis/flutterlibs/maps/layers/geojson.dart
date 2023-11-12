@@ -6,7 +6,7 @@
 part of smashlibs;
 
 class GeojsonSource extends VectorLayerSource
-    implements SldLayerSource, EditableDataSource {
+    implements SldLayerSource, EditableDataSource, GssLayerSource {
   String? _absolutePath;
   String? _geojsonGeometryString;
 
@@ -76,6 +76,7 @@ class GeojsonSource extends VectorLayerSource
         var llLatLng = LatLng(bbox![1], bbox[0]);
         var urLatLng = LatLng(bbox[3], bbox[2]);
         _geojsonBounds = LatLngBounds.fromPoints([llLatLng, urLatLng]);
+        featuresMap.clear();
 
         if (fColl.features.length > 0) {
           var firstFeature = fColl.features[0];
@@ -412,37 +413,37 @@ class GeojsonSource extends VectorLayerSource
 
   void addMarkerLayer(
       List<List<Marker>> allPoints, List<Widget> layers, Color pointFillColor) {
-    if (allPoints.length == 1) {
-      var waypointsCluster = MarkerClusterLayerWidget(
-        options: MarkerClusterLayerOptions(
-          maxClusterRadius: 20,
-          size: Size(40, 40),
-          fitBoundsOptions: FitBoundsOptions(
-            padding: EdgeInsets.all(50),
-          ),
-          markers: allPoints[0],
-          polygonOptions: PolygonOptions(
-              borderColor: pointFillColor,
-              color: pointFillColor.withOpacity(0.2),
-              borderStrokeWidth: 3),
-          builder: (context, markers) {
-            return FloatingActionButton(
-              child: Text(markers.length.toString()),
-              onPressed: null,
-              backgroundColor: pointFillColor,
-              foregroundColor: SmashColors.mainBackground,
-              heroTag: null,
-            );
-          },
-        ),
-      );
-      layers.add(waypointsCluster);
-    } else {
-      // in case of multiple rules, we would not know the color for a mixed cluster.
-      List<Marker> points = [];
-      allPoints.forEach((p) => points.addAll(p));
-      layers.add(MarkerLayer(markers: points));
-    }
+    // if (allPoints.length == 1) {
+    //   var waypointsCluster = MarkerClusterLayerWidget(
+    //     options: MarkerClusterLayerOptions(
+    //       maxClusterRadius: 20,
+    //       size: Size(40, 40),
+    //       fitBoundsOptions: FitBoundsOptions(
+    //         padding: EdgeInsets.all(50),
+    //       ),
+    //       markers: allPoints[0],
+    //       polygonOptions: PolygonOptions(
+    //           borderColor: pointFillColor,
+    //           color: pointFillColor.withOpacity(0.2),
+    //           borderStrokeWidth: 3),
+    //       builder: (context, markers) {
+    //         return FloatingActionButton(
+    //           child: Text(markers.length.toString()),
+    //           onPressed: null,
+    //           backgroundColor: pointFillColor,
+    //           foregroundColor: SmashColors.mainBackground,
+    //           heroTag: null,
+    //         );
+    //       },
+    //     ),
+    //   );
+    //   layers.add(waypointsCluster);
+    // } else {
+    // in case of multiple rules, we would not know the color for a mixed cluster.
+    List<Marker> points = [];
+    allPoints.forEach((p) => points.addAll(p));
+    layers.add(MarkerLayer(markers: points));
+    // }
   }
 
   List<Polygon> makePolygonsForRule(HU.Rule rule) {
@@ -844,7 +845,7 @@ class GeojsonSource extends VectorLayerSource
     if (geomEditState._editableItem != null) {
       print(geomEditState._editableItem!.id);
       var editedFeature = featuresMap[geomEditState._editableItem!.id];
-      if (editedFeature == null) {
+      if (editedFeature == null || editedFeature.attributes.isEmpty) {
         // a new feature is added
         int? newId = featuresMap.keys.maxOrNull;
         if (newId == null) {
@@ -861,6 +862,22 @@ class GeojsonSource extends VectorLayerSource
         firstFeature.attributes.keys.forEach((key) {
           editedFeature!.attributes[key] = null;
         });
+
+        if (isGssSource()) {
+          if (editedFeature
+                  .attributes[EditableDataSource.EDITMODE_FIELD_NAME] !=
+              EditableDataSource.MODIFIED_FEATURE_EDITMODE)
+            // add the attribute that defines that the feature is new
+            editedFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
+                EditableDataSource.NEW_FEATURE_EDITMODE;
+        }
+      } else {
+        // modified
+        if (isGssSource()) {
+          // add the attribute that defines that the feature is modified
+          editedFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
+              EditableDataSource.MODIFIED_FEATURE_EDITMODE;
+        }
       }
       var gf = JTS.GeometryFactory.defaultPrecision();
       if (geometryType!.isPoint()) {
@@ -949,7 +966,7 @@ class GeojsonSource extends VectorLayerSource
     });
 
     if (_absolutePath != null) {
-      _geojsonGeometryString = featureCollection.toJSON();
+      _geojsonGeometryString = featureCollection.toJSON(indent: 4);
       HU.FileUtilities.writeStringToFile(
           _absolutePath!, _geojsonGeometryString!);
     } else {
@@ -961,5 +978,56 @@ class GeojsonSource extends VectorLayerSource
         _geojsonGeometryString = "";
       }
     }
+  }
+
+  bool isGssSource() {
+    return GssUtilities.isGssSource(_absolutePath);
+  }
+
+  @override
+  Future<void> download(BuildContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> upload(BuildContext context) async {
+    // find features with editmode marker
+    var featuresToUpload = featuresMap.values.where((f) {
+      return f.attributes[EditableDataSource.EDITMODE_FIELD_NAME] != null;
+    }).toList();
+
+    var newFeaturesToUpload = featuresToUpload.where((f) {
+      return f.attributes[EditableDataSource.EDITMODE_FIELD_NAME] ==
+          EditableDataSource.NEW_FEATURE_EDITMODE;
+    }).toList();
+
+    var modifiedFeaturesToUpload = featuresToUpload.where((f) {
+      return f.attributes[EditableDataSource.EDITMODE_FIELD_NAME] ==
+          EditableDataSource.MODIFIED_FEATURE_EDITMODE;
+    }).toList();
+
+    // TODO: implement upload
+    print(
+        "uploading ${newFeaturesToUpload.length} new and ${modifiedFeaturesToUpload.length} modified features");
+  }
+
+  @override
+  bool canDownload() {
+    return false;
+  }
+
+  @override
+  bool canSync() {
+    return false;
+  }
+
+  @override
+  bool canUpload() {
+    return isGssSource();
+  }
+
+  @override
+  Future<void> sync(BuildContext context) {
+    throw UnimplementedError();
   }
 }

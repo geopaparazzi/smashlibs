@@ -327,6 +327,96 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'VALUE'**
   String get featureAttributesViewer_value;
+
+  /// No description provided for @network_cancelledByUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled by user.'**
+  String get network_cancelledByUser;
+
+  /// No description provided for @network_completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed.'**
+  String get network_completed;
+
+  /// No description provided for @network_uploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading…'**
+  String get network_uploading;
+
+  /// No description provided for @network_pleaseWait.
+  ///
+  /// In en, this message translates to:
+  /// **'please wait…'**
+  String get network_pleaseWait;
+
+  /// No description provided for @network_permissionOnServerDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission on server denied.'**
+  String get network_permissionOnServerDenied;
+
+  /// No description provided for @network_couldNotConnectToServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect to the server. Is it online? Check your address.'**
+  String get network_couldNotConnectToServer;
+
+  /// No description provided for @settings_pleaseEnterValidPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid server password.'**
+  String get settings_pleaseEnterValidPassword;
+
+  /// No description provided for @settings_gss.
+  ///
+  /// In en, this message translates to:
+  /// **'GSS'**
+  String get settings_gss;
+
+  /// No description provided for @settings_geopaparazziSurveyServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Geopaparazzi Survey Server'**
+  String get settings_geopaparazziSurveyServer;
+
+  /// No description provided for @settings_serverUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Server URL'**
+  String get settings_serverUrl;
+
+  /// No description provided for @settings_serverUrlStartWithHttp.
+  ///
+  /// In en, this message translates to:
+  /// **'The server URL needs to start with HTTP or HTTPS.'**
+  String get settings_serverUrlStartWithHttp;
+
+  /// No description provided for @settings_serverPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Password'**
+  String get settings_serverPassword;
+
+  /// No description provided for @settings_allowSelfSignedCert.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow self signed certificates'**
+  String get settings_allowSelfSignedCert;
+
+  /// No description provided for @settings_serverUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Username'**
+  String get settings_serverUsername;
+
+  /// No description provided for @settings_pleaseEnterValidUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid server username.'**
+  String get settings_pleaseEnterValidUsername;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

@@ -47,6 +47,10 @@ class EditableGeometry {
 
 /// Parent class for editable data sources.
 abstract class EditableDataSource {
+  static final String EDITMODE_FIELD_NAME = "smasheditmode";
+  static final String NEW_FEATURE_EDITMODE = "new";
+  static final String MODIFIED_FEATURE_EDITMODE = "modified";
+
   String getName();
 
   /// Get the name of the field holding the id/primary key.

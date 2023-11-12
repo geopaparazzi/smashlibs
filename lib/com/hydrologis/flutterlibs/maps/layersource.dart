@@ -280,6 +280,20 @@ abstract class DbVectorLayerSource extends EditableVectorLayerSource {
 
 abstract class EditableVectorLayerSource extends VectorLayerSource {}
 
+abstract class GssLayerSource {
+  bool canUpload();
+
+  bool canDownload();
+
+  bool canSync();
+
+  Future<void> upload(BuildContext context);
+
+  Future<void> download(BuildContext context);
+
+  Future<void> sync(BuildContext context);
+}
+
 /// Interface for raster data based layersources.
 abstract class RasterLayerSource extends LoadableLayerSource {}
 
