@@ -78,21 +78,52 @@ class GeojsonSource extends VectorLayerSource
         _geojsonBounds = LatLngBounds.fromPoints([llLatLng, urLatLng]);
         featuresMap.clear();
 
+        // check if there is a tags fiel and in case use it
+        var tagsPath =
+            HU.FileUtilities.joinPaths(parentFolder, _name! + ".tags");
+        var tagsFile = File(tagsPath);
+        if (tagsFile.existsSync()) {
+          var tm = TagsManager();
+          tm.readTags(tagsFilePath: tagsPath);
+          var sectionsMap = tm.getSectionsMap();
+          var formNames =
+              TagsManager.getFormNames4Section(sectionsMap.values.first);
+          var form4name =
+              TagsManager.getForm4Name(formNames[0], sectionsMap.values.first);
+          var formItems = TagsManager.getFormItems(form4name);
+          for (var item in formItems) {
+            var label = TagsManager.getLabelFromFormItem(item);
+            var type = TagsManager.getTypeFromFormItem(item);
+            var fieldType = "TEXT";
+            if (type == "double") {
+              fieldType = "DOUBLE";
+            } else if (type == "int") {
+              fieldType = "INTEGER";
+            } else if (type == "boolean") {
+              fieldType = "BOOLEAN";
+            } else {
+              SLogger().w("Unknown type: $type");
+            }
+            fieldsAndTypesMap[label] = fieldType;
+          }
+        }
+
         if (fColl.features.length > 0) {
           var firstFeature = fColl.features[0];
-          firstFeature!.properties!.entries.forEach((entry) {
-            // check type from first record
-            var fieldType = "TEXT";
-            if (entry.value is double) {
-              fieldType = "DOUBLE";
-            } else if (entry.value is int) {
-              fieldType = "INTEGER";
-            } else if (entry.value is bool) {
-              fieldType = "BOOLEAN";
-            }
-            fieldsAndTypesMap[entry.key] = fieldType;
-          });
-
+          if (fieldsAndTypesMap.isEmpty) {
+            firstFeature!.properties!.entries.forEach((entry) {
+              // check type from first record
+              var fieldType = "TEXT";
+              if (entry.value is double) {
+                fieldType = "DOUBLE";
+              } else if (entry.value is int) {
+                fieldType = "INTEGER";
+              } else if (entry.value is bool) {
+                fieldType = "BOOLEAN";
+              }
+              fieldsAndTypesMap[entry.key] = fieldType;
+            });
+          }
           int id = 0;
           for (var jsonFeature in fColl.features) {
             if (jsonFeature != null) {
@@ -843,25 +874,25 @@ class GeojsonSource extends VectorLayerSource
   Future<void> saveCurrentEdit(
       GeometryEditorState geomEditState, List<LatLng> points) async {
     if (geomEditState._editableItem != null) {
-      print(geomEditState._editableItem!.id);
       var editedFeature = featuresMap[geomEditState._editableItem!.id];
       if (editedFeature == null || editedFeature.attributes.isEmpty) {
         // a new feature is added
-        int? newId = featuresMap.keys.maxOrNull;
-        if (newId == null) {
-          newId = 0;
-        } else {
-          newId = newId + 1;
+        if (editedFeature == null) {
+          editedFeature = HU.Feature();
         }
-        editedFeature = HU.Feature()..fid = newId;
-        featuresMap[newId] = editedFeature;
+        if (editedFeature.fid == null) {
+          int? newId = featuresMap.keys.maxOrNull;
+          newId = newId ?? 0; // If newId is null, assign 0 to it
+          newId = newId + 1;
+          editedFeature.fid = newId;
+        }
+        featuresMap[editedFeature.fid!] = editedFeature;
 
-        // at the momento you can't create a new geojson,
-        // hence taking attributes from first
-        var firstFeature = featuresMap.values.first;
-        firstFeature.attributes.keys.forEach((key) {
-          editedFeature!.attributes[key] = null;
-        });
+        if (fieldsAndTypesMap.isNotEmpty) {
+          fieldsAndTypesMap.forEach((key, value) {
+            editedFeature!.attributes[key] = null;
+          });
+        }
 
         if (isGssSource()) {
           if (editedFeature

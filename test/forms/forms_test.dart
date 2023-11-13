@@ -713,9 +713,9 @@ class TestFormHelper extends AFormhelper {
   late Map<String, dynamic> sectionMap;
 
   TestFormHelper(String formName) {
-    TagsManager().reset();
-    TagsManager().readTags(tagsFilePath: "./test/forms/examples/$formName");
-    var sectionsMap = TagsManager().getSectionsMap();
+    var tm = TagsManager();
+    tm.readTags(tagsFilePath: "./test/forms/examples/$formName");
+    var sectionsMap = tm.getSectionsMap();
     sectionMap = sectionsMap.values.first;
   }
 

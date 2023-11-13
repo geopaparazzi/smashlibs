@@ -727,29 +727,13 @@ class FormUtilities {
 //}
 }
 
-/// Singleton that takes care of tags.
-/// <p/>
-/// <p>The tags are looked for in the following places:</p>
-/// <ul>
-/// <li>a file named <b>tags.json</b> inside the application folder (Which
-/// is retrieved via {@link ResourcesManager#getApplicationSupporterDir()} </li>
-/// <li>or, if the above is missing, a file named <b>tags/tags.json</b> in
-/// the asset folder of the project. In that case the file is copied over
-/// to the file in the first point.</li>
-/// </ul>
-/// @author Andrea Antonello (www.hydrologis.com)
+/// Class that takes care of tags.
 class TagsManager {
   /// The tags file name end pattern. All files that end with this are ligible as tags.
   static const String TAGSFILENAME_ENDPATTERN = "tags.json";
 
   List<String>? _tagsFileArray;
   List<String>? _tagsJsonDataArray;
-
-  static final TagsManager _instance = TagsManager._internal();
-
-  factory TagsManager() => _instance;
-
-  TagsManager._internal();
 
   /// Creates a new sectionsmap from the tags file
   LinkedHashMap<String, Map<String, dynamic>> getSectionsMap() {

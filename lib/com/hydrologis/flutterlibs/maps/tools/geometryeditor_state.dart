@@ -333,6 +333,7 @@ class GeometryEditManager {
         Provider.of<GeometryEditorState>(context, listen: false);
     if (_isEditing && geomEditorState.editableGeometry != null) {
       if (polyEditor != null && !_polygonInWork) {
+        print("adding point");
         addPoint(point);
       } else {
         resetToNulls();

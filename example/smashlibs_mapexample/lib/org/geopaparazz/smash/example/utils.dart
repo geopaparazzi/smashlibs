@@ -8,15 +8,14 @@ import 'package:after_layout/after_layout.dart';
 class DemoAppFormHelper extends AFormhelper {
   late Map<String, dynamic> sectionMap;
 
-  DemoAppFormHelper() {
-    TagsManager().reset();
-  }
+  DemoAppFormHelper() {}
 
   @override
   Future<bool> init() async {
     var tagsJson = await rootBundle.loadString("assets/tags.json");
-    TagsManager().readTags(tagsString: tagsJson);
-    var sectionsMap = TagsManager().getSectionsMap();
+    var tm = TagsManager();
+    tm.readTags(tagsString: tagsJson);
+    var sectionsMap = tm.getSectionsMap();
     sectionMap = sectionsMap.values.toList()[0];
     return Future.value(true);
   }
