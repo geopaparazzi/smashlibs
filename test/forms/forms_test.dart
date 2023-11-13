@@ -26,12 +26,12 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('text', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'new1changed'); // changed
-    expect(formItems[1]['value'], 'new2'); // as set by the setData
-    expect(formItems[3]['value'], 'new2Changes'); // changed
+    var section = helper.getSection();
+    var form = section.getFormByName('text');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'new1changed'); // changed
+    expect(formItems[1].value, 'new2'); // as set by the setData
+    expect(formItems[3].value, 'new2Changes'); // changed
   });
 
   testWidgets('Numeric Widgets Test', (tester) async {
@@ -51,12 +51,12 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('numeric text', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 2.6);
-    expect(formItems[1]['value'], 2);
-    expect(formItems[2]['value'], 2.3);
+    var section = helper.getSection();
+    var form = section.getFormByName('numeric text');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 2.6);
+    expect(formItems[1].value, 2);
+    expect(formItems[2].value, 2.3);
   });
 
   testWidgets('Date and Time Widgets Test', (tester) async {
@@ -73,11 +73,11 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('date and time', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], dateValue);
-    expect(formItems[1]['value'], timeValue);
+    var section = helper.getSection();
+    var form = section.getFormByName('date and time');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, dateValue);
+    expect(formItems[1].value, timeValue);
 
     // do one also with changing only one
     helper = TestFormHelper("date_and_time_widgets.json");
@@ -90,11 +90,11 @@ void main() {
 
     await tapBackIcon(tester);
 
-    sectionMap = helper.getSectionMap();
-    form = TagsManager.getForm4Name('date and time', sectionMap);
-    formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], dateValue);
-    expect(formItems[1]['value'], "");
+    section = helper.getSection();
+    form = section.getFormByName('date and time');
+    formItems = form!.getFormItems();
+    expect(formItems[0].value, dateValue);
+    expect(formItems[1].value, "");
   });
 
   testWidgets('Label Widgets Test', (tester) async {
@@ -127,10 +127,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('boolean', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'true');
+    var section = helper.getSection();
+    var form = section.getFormByName('boolean');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'true');
   });
 
   testWidgets('Single Choice Combo Widgets Test', (tester) async {
@@ -147,10 +147,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'choice 3');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'choice 3');
   });
 
   testWidgets('Integer Single Choice Combo Widgets Test', (tester) async {
@@ -167,10 +167,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 3);
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 3);
   });
 
   testWidgets('Multi Choice Combo Widgets Test', (tester) async {
@@ -186,10 +186,10 @@ void main() {
     await changeMultiCombo(
         tester, "a multiple choice combo", ['choice 3', 'choice 4']);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'choice 1;choice 3;choice 4');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'choice 1;choice 3;choice 4');
   });
 
   testWidgets('Integer Multi Choice Combo Widgets Test', (tester) async {
@@ -204,10 +204,10 @@ void main() {
 
     await changeMultiCombo(tester, "an int multiple choice combo", [3, 4]);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], "1;3;4");
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, "1;3;4");
   });
 
   testWidgets('Single Choice Combo UrlBased Widgets Test', (tester) async {
@@ -248,10 +248,10 @@ void main() {
     await pumpForm(helper, newValues, tester);
 
     // check change of setData
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], '2');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, '2');
 
     // now do a change
     // // TODO activate once figured out to trick AfterLayout to finish brfore going on
@@ -303,10 +303,10 @@ void main() {
     await pumpForm(helper, newValues, tester);
 
     // check change of setData
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], '2');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, '2');
 
     // now do a change
     // // TODO activate once figured out to trick AfterLayout to finish brfore going on
@@ -361,10 +361,10 @@ void main() {
     await pumpForm(helper, newValues, tester);
 
     // check change of setData
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 2);
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 2);
 
     // now do a change
     // TODO activate once figured out to trick AfterLayout to finish brfore going on
@@ -393,10 +393,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], '3');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, '3');
   });
 
   testWidgets('Multi Label-Value Choice Combo Widgets Test', (tester) async {
@@ -412,10 +412,10 @@ void main() {
     await changeMultiCombo(tester, "a multiple choice combo with item labels",
         ['choice 3', 'choice 4']);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], "1;3;4");
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, "1;3;4");
   });
 
   testWidgets('Integer Multi Label-Value Choice Combo Widgets Test',
@@ -436,10 +436,10 @@ void main() {
         "an int multiple choice combo with item labels",
         ['choice 3', 'choice 4']);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], "1;3;4");
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, "1;3;4");
   });
 
   testWidgets('Integer Single Label-Value Choice Combo Widgets Test',
@@ -459,10 +459,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 3);
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 3);
   });
 
   testWidgets('Two Connected Combo Widgets Test', (tester) async {
@@ -476,10 +476,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'items 2#choice 3 of 2');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'items 2#choice 3 of 2');
   });
 
   testWidgets('Two Connected Combo Widgets, Default Selected Test',
@@ -495,10 +495,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'items 2#choice 3 of 2');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'items 2#choice 3 of 2');
   });
 
   testWidgets('Two Connected Autocomplete Combo Widgets Test', (tester) async {
@@ -513,10 +513,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'items 2#choice 3 of 2');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'items 2#choice 3 of 2');
   });
 
   testWidgets('Autocomplete Combo Widgets Test', (tester) async {
@@ -530,10 +530,10 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('combos', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'choice 2');
+    var section = helper.getSection();
+    var form = section.getFormByName('combos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'choice 2');
   });
 
   testWidgets('Missing Section Form Widgets Test', (tester) async {
@@ -554,11 +554,11 @@ void main() {
 
     await tapBackIcon(tester);
 
-    var sectionMap = helper.getSectionMap();
-    var form = TagsManager.getForm4Name('text', sectionMap);
-    var formItems = TagsManager.getFormItems(form);
-    expect(formItems[0]['value'], 'new1changed');
-    expect(formItems[1]['value'], 'new2'); // as set by the setData
+    var section = helper.getSection();
+    var form = section.getFormByName('text');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 'new1changed');
+    expect(formItems[1].value, 'new2'); // as set by the setData
   });
 }
 
@@ -710,13 +710,13 @@ Future<void> changeAutocompletes(
 }
 
 class TestFormHelper extends AFormhelper {
-  late Map<String, dynamic> sectionMap;
+  late SmashSection section;
 
   TestFormHelper(String formName) {
     var tm = TagsManager();
     tm.readTags(tagsFilePath: "./test/forms/examples/$formName");
-    var sectionsMap = tm.getSectionsMap();
-    sectionMap = sectionsMap.values.first;
+    var tags = tm.getTags();
+    section = tags.getSections().first;
   }
 
   @override
@@ -735,18 +735,18 @@ class TestFormHelper extends AFormhelper {
   }
 
   @override
-  Map<String, dynamic> getSectionMap() {
-    return sectionMap;
+  SmashSection getSection() {
+    return section;
   }
 
   @override
   String getSectionName() {
-    return sectionMap['sectionname'];
+    return section.sectionName!;
   }
 
   @override
-  Future<List<Widget>> getThumbnailsFromDb(BuildContext context,
-      Map<String, dynamic> itemsMap, List<String> imageSplit) {
+  Future<List<Widget>> getThumbnailsFromDb(
+      BuildContext context, SmashFormItem formItem, List<String> imageSplit) {
     // TODO: implement getThumbnailsFromDb
     throw UnimplementedError();
   }

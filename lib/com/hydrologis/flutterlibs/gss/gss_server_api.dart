@@ -144,7 +144,7 @@ class ServerApi {
     }
   }
 
-  static Future<Map<String, dynamic>?> getDynamicLayers() async {
+  static Future<List<dynamic>?> getDynamicLayers() async {
     Project? project = getCurrentGssProject();
     if (project == null) {
       throw StateError("No project was selected.");
@@ -155,15 +155,15 @@ class ServerApi {
 
     var response = await HTTP.get(uri, headers: requestHeaders);
     if (response.statusCode == 200) {
-      Map<String, dynamic> layersMap = jsonDecode(response.body);
-      return layersMap;
+      List<dynamic> layersList = jsonDecode(response.body);
+      return layersList;
     } else {
       return null;
     }
   }
 
-  static Future<String?> downloadDynamicLayerToDevice(
-      String layerName, dynamic formDefinition) async {
+  static Future<String?> downloadDynamicLayerToDevice(String layerName,
+      dynamic formDefinition, JTS.EGeometryType geometryType) async {
     Project? project = getCurrentGssProject();
     if (project == null) {
       throw StateError("No project was selected.");
@@ -174,6 +174,8 @@ class ServerApi {
         HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".geojson");
     var layerTagsFilePath =
         HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".tags");
+    var layerPropertiesFilePath =
+        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".properties");
 
     var uri = Uri.parse("${getBaseUrl()}$API_DYNAMICLAYERS_DATA$layerName" +
         "?$API_PROJECT_PARAM${project.id}");
@@ -185,6 +187,10 @@ class ServerApi {
 
       var formString = jsonEncode(formDefinition);
       HU.FileUtilities.writeStringToFile(layerTagsFilePath, formString);
+
+      HU.FileUtilities.writeStringToFile(layerPropertiesFilePath,
+          "geometrytype=${geometryType.typeName}\nlayername=$layerName\nlayerfile=$layerFilePath\nlayertagsfile=$layerTagsFilePath");
+
       return layerFilePath;
     } else {
       return null;

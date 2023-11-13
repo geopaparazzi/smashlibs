@@ -85,26 +85,46 @@ class GeojsonSource extends VectorLayerSource
         if (tagsFile.existsSync()) {
           var tm = TagsManager();
           tm.readTags(tagsFilePath: tagsPath);
-          var sectionsMap = tm.getSectionsMap();
-          var formNames =
-              TagsManager.getFormNames4Section(sectionsMap.values.first);
-          var form4name =
-              TagsManager.getForm4Name(formNames[0], sectionsMap.values.first);
-          var formItems = TagsManager.getFormItems(form4name);
-          for (var item in formItems) {
-            var label = TagsManager.getLabelFromFormItem(item);
-            var type = TagsManager.getTypeFromFormItem(item);
-            var fieldType = "TEXT";
-            if (type == "double") {
-              fieldType = "DOUBLE";
-            } else if (type == "int") {
-              fieldType = "INTEGER";
-            } else if (type == "boolean") {
-              fieldType = "BOOLEAN";
-            } else {
-              SLogger().w("Unknown type: $type");
+          var section = tm.getTags().getSections().first;
+          var forms = section.getForms();
+          for (var form in forms) {
+            List<SmashFormItem> formItems = form.getFormItems();
+            for (var formItem in formItems) {
+              var label = formItem.label;
+              var type = formItem.type;
+              var fieldType = "TEXT";
+              if (type == "double") {
+                fieldType = "DOUBLE";
+              } else if (type == "int") {
+                fieldType = "INTEGER";
+              } else if (type == "boolean") {
+                fieldType = "BOOLEAN";
+              } else if (type == "date" || type == "time") {
+                fieldType = "TEXT";
+              } else if (type.startsWith("string")) {
+                fieldType = "TEXT";
+              } else {
+                SLogger().w("Unknown type: $type");
+              }
+              fieldsAndTypesMap[label] = fieldType;
             }
-            fieldsAndTypesMap[label] = fieldType;
+          }
+        }
+
+        var propertiesPath =
+            HU.FileUtilities.joinPaths(parentFolder, _name! + ".properties");
+        var propertiesFile = File(propertiesPath);
+        if (propertiesFile.existsSync()) {
+          var properties = HU.FileUtilities.readFileToHashMap(propertiesPath);
+          if (properties.containsKey("geometrytype")) {
+            var geometryTypeString = properties["geometrytype"];
+            if (geometryTypeString != null) {
+              JTS.EGeometryType? gType =
+                  JTS.EGeometryType.forWktName(geometryTypeString.toString());
+              if (gType != JTS.EGeometryType.UNKNOWN) {
+                geometryType = gType;
+              }
+            }
           }
         }
 
@@ -149,40 +169,43 @@ class GeojsonSource extends VectorLayerSource
           SMLogger().d(
               "Loaded ${featuresMap.length} Geojson features of envelope: $llLatLng - $urLatLng");
 
-          if (id > 0) {
-            sldPath = HU.FileUtilities.joinPaths(parentFolder, _name! + ".sld");
-            var sldFile = File(sldPath!);
+          _attribution = _attribution +
+              "${featuresMap.values.first.geometry!.getGeometryType()} (${featuresMap.length}) ";
+        }
+        if (geometryType == null) {
+          // no way to know the type, fallback on point
+          geometryType = JTS.EGeometryType.POINT;
+        }
 
-            if (_sldString == null) {
-              _sldString = getCustomStyle(geometryType!);
+        // add read existing or add some default style
+        sldPath = HU.FileUtilities.joinPaths(parentFolder, _name! + ".sld");
+        var sldFile = File(sldPath!);
+
+        if (_sldString == null) {
+          _sldString = getCustomStyle(geometryType!);
+        }
+
+        if (sldFile.existsSync() && _sldString == null) {
+          _sldString = HU.FileUtilities.readFile(sldPath!);
+          _style = HU.SldObjectParser.fromString(_sldString!);
+          _style.parse();
+        } else {
+          if (_sldString == null) {
+            if (geometryType!.isPoint()) {
+              _sldString = HU.DefaultSlds.simplePointSld();
+            } else if (geometryType!.isLine()) {
+              _sldString = HU.DefaultSlds.simpleLineSld();
+            } else if (geometryType!.isPolygon()) {
+              _sldString = HU.DefaultSlds.simplePolygonSld();
             }
-
-            if (sldFile.existsSync() && _sldString == null) {
-              _sldString = HU.FileUtilities.readFile(sldPath!);
-              _style = HU.SldObjectParser.fromString(_sldString!);
-              _style.parse();
-            } else {
-              if (_sldString == null) {
-                if (geometryType!.isPoint()) {
-                  _sldString = HU.DefaultSlds.simplePointSld();
-                } else if (geometryType!.isLine()) {
-                  _sldString = HU.DefaultSlds.simpleLineSld();
-                } else if (geometryType!.isPolygon()) {
-                  _sldString = HU.DefaultSlds.simplePolygonSld();
-                }
-              }
-              if (_sldString != null) {
-                HU.FileUtilities.writeStringToFile(sldPath!, _sldString!);
-                _style = HU.SldObjectParser.fromString(_sldString!);
-                _style.parse();
-              }
-            }
-            _textStyle = _style.getFirstTextStyle(false);
-
-            _attribution = _attribution +
-                "${featuresMap.values.first.geometry!.getGeometryType()} (${featuresMap.length}) ";
+          }
+          if (_sldString != null) {
+            HU.FileUtilities.writeStringToFile(sldPath!, _sldString!);
+            _style = HU.SldObjectParser.fromString(_sldString!);
+            _style.parse();
           }
         }
+        _textStyle = _style.getFirstTextStyle(false);
       } else {
         if (_geojsonGeometryString != null &&
             _geojsonGeometryString!.trim().length != 0) {

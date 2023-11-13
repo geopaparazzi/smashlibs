@@ -61,8 +61,7 @@ class FormSectionsWidgetState extends State<FormSectionsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var formNames4Section =
-        TagsManager.getFormNames4Section(widget._formHelper.getSectionMap());
+    var formNames4Section = widget._formHelper.getSection().getFormNames();
 
     return ListView.builder(
       itemCount: formNames4Section.length,
@@ -121,8 +120,7 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 
   @override
   void initState() {
-    formNames =
-        TagsManager.getFormNames4Section(widget.formHelper.getSectionMap());
+    formNames = widget.formHelper.getSection().getFormNames();
 
     super.initState();
   }
@@ -135,9 +133,8 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
       // pick the first of the section
       formName = formNames[0];
     }
-    var form4name =
-        TagsManager.getForm4Name(formName, widget.formHelper.getSectionMap());
-    List<dynamic> formItems = TagsManager.getFormItems(form4name);
+    var form4name = widget.formHelper.getSection().getFormByName(formName);
+    List<SmashFormItem> formItems = form4name!.getFormItems();
 
     var noteId = widget.formHelper.getId();
 
@@ -247,8 +244,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    var formNames =
-        TagsManager.getFormNames4Section(_formHelper.getSectionMap());
+    var formNames = _formHelper.getSection().getFormNames();
 
     // in case of single tab, display detail directly
     bool onlyDetail = formNames.length == 1;
@@ -326,29 +322,16 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 Tuple2<ListTile, bool>? getWidget(
   BuildContext context,
   String widgetKey,
-  final Map<String, dynamic> itemMap,
+  final SmashFormItem formItem,
   PresentationMode presentationMode,
   AFormhelper formHelper,
 ) {
-  String key = "-";
-  if (itemMap.containsKey(TAG_KEY)) {
-    key = itemMap[TAG_KEY].trim();
-  }
-  String type = TYPE_STRING;
-  if (itemMap.containsKey(TAG_TYPE)) {
-    type = itemMap[TAG_TYPE].trim();
-  }
-
-  String label = TagsManager.getLabelFromFormItem(itemMap);
-
-  dynamic value = "";
-  if (itemMap.containsKey(TAG_VALUE)) {
-    value = itemMap[TAG_VALUE].toString().trim();
-  }
-  String? iconStr;
-  if (itemMap.containsKey(TAG_ICON)) {
-    iconStr = itemMap[TAG_ICON].trim();
-  }
+  String key = formItem.key;
+  String type = formItem.type;
+  String label = formItem.label;
+  dynamic value = formItem.value;
+  String? iconStr = formItem.iconStr;
+  bool itemReadonly = formItem.isReadOnly;
 
   Icon? icon;
   if (iconStr != null) {
@@ -357,18 +340,6 @@ Tuple2<ListTile, bool>? getWidget(
       iconData,
       color: SmashColors.mainDecorations,
     );
-  }
-
-  bool itemReadonly = false;
-  if (itemMap.containsKey(TAG_READONLY)) {
-    var readonlyObj = itemMap[TAG_READONLY].trim();
-    if (readonlyObj is String) {
-      itemReadonly = readonlyObj == 'true';
-    } else if (readonlyObj is bool) {
-      itemReadonly = readonlyObj;
-    } else if (readonlyObj is num) {
-      itemReadonly = readonlyObj.toDouble() == 1.0;
-    }
   }
 
   if (presentationMode.isReadOnly) {
@@ -382,7 +353,7 @@ Tuple2<ListTile, bool>? getWidget(
   var valueBold = presentationMode.doValueBold;
 
   Constraints constraints = new Constraints();
-  FormUtilities.handleConstraints(itemMap, constraints);
+  formItem.handleConstraints(constraints);
 //    key2ConstraintsMap.put(key, constraints);
 //    String constraintDescription = constraints.getDescription();
 
@@ -481,7 +452,7 @@ Tuple2<ListTile, bool>? getWidget(
                 ],
               ),
             ),
-            initialValue: value,
+            initialValue: value?.toString() ?? "",
             onChanged: (text) {
               dynamic result = text;
               if (type == TYPE_INTEGER) {
@@ -489,7 +460,7 @@ Tuple2<ListTile, bool>? getWidget(
               } else if (type == TYPE_DOUBLE) {
                 result = double.tryParse(text);
               }
-              itemMap[TAG_VALUE] = result;
+              formItem.setValue(result);
             },
             enabled: !itemReadonly,
             minLines: minLines,
@@ -511,14 +482,9 @@ Tuple2<ListTile, bool>? getWidget(
     TYPE_LABEL:
     case TYPE_LABEL:
       {
-        String sizeStr = "20";
-        if (itemMap.containsKey(TAG_SIZE)) {
-          sizeStr = itemMap[TAG_SIZE];
-        }
-        double size = double.parse(sizeStr);
-        String? url;
-        if (itemMap.containsKey(TAG_URL)) {
-          url = itemMap[TAG_URL];
+        double size = formItem.getSize();
+        String? url = formItem.getUrl();
+        if (url != null) {
           textDecoration = TextDecoration.underline;
         }
 
@@ -543,7 +509,7 @@ Tuple2<ListTile, bool>? getWidget(
             leading: icon,
             title: GestureDetector(
               onTap: () async {
-                if (await canLaunchUrlString(url!)) {
+                if (await canLaunchUrlString(url)) {
                   await launchUrlString(url);
                 } else {
                   SmashDialogs.showErrorDialog(
@@ -562,7 +528,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title:
-                  DynamicStringWidget(widgetKey, itemMap, label, itemReadonly),
+                  DynamicStringWidget(widgetKey, formItem, label, itemReadonly),
             ),
             false);
       }
@@ -581,7 +547,7 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: DatePickerWidget(widgetKey, itemMap, label, itemReadonly),
+              title: DatePickerWidget(widgetKey, formItem, label, itemReadonly),
             ),
             false);
       }
@@ -600,7 +566,7 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: TimePickerWidget(widgetKey, itemMap, label, itemReadonly),
+              title: TimePickerWidget(widgetKey, formItem, label, itemReadonly),
             ),
             false);
       }
@@ -609,7 +575,7 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: CheckboxWidget(widgetKey, itemMap, label, itemReadonly),
+              title: CheckboxWidget(widgetKey, formItem, label, itemReadonly),
             ),
             false);
       }
@@ -619,7 +585,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: ComboboxWidget<String>(
-                  widgetKey, itemMap, label, presentationMode, constraints),
+                  widgetKey, formItem, label, presentationMode, constraints),
             ),
             false);
       }
@@ -629,7 +595,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: ComboboxWidget<int>(
-                  widgetKey, itemMap, label, presentationMode, constraints),
+                  widgetKey, formItem, label, presentationMode, constraints),
             ),
             false);
       }
@@ -649,7 +615,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: AutocompleteStringComboWidget(
-                  widgetKey, itemMap, label, itemReadonly),
+                  widgetKey, formItem, label, itemReadonly),
             ),
             false);
       }
@@ -674,7 +640,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: ConnectedComboboxWidget(
-                  widgetKey, itemMap, label, itemReadonly),
+                  widgetKey, formItem, label, itemReadonly),
             ),
             false);
       }
@@ -684,7 +650,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: AutocompleteStringConnectedComboboxWidget(
-                  widgetKey, itemMap, label, itemReadonly),
+                  widgetKey, formItem, label, itemReadonly),
             ),
             false);
       }
@@ -710,7 +676,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: MultiComboWidget<String>(
-                  widgetKey, itemMap, label, itemReadonly, presentationMode),
+                  widgetKey, formItem, label, itemReadonly, presentationMode),
             ),
             false);
       }
@@ -720,7 +686,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: MultiComboWidget<int>(
-                  widgetKey, itemMap, label, itemReadonly, presentationMode),
+                  widgetKey, formItem, label, itemReadonly, presentationMode),
             ),
             false);
       }
@@ -730,7 +696,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: PicturesWidget(
-                  label, widgetKey, formHelper, itemMap, itemReadonly),
+                  label, widgetKey, formHelper, formItem, itemReadonly),
             ),
             false);
       }
@@ -740,7 +706,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: PicturesWidget(
-                  label, widgetKey, formHelper, itemMap, itemReadonly,
+                  label, widgetKey, formHelper, formItem, itemReadonly,
                   fromGallery: true),
             ),
             false);
@@ -751,7 +717,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: SketchWidget(
-                  label, widgetKey, formHelper, itemMap, itemReadonly),
+                  label, widgetKey, formHelper, formItem, itemReadonly),
             ),
             false);
       }
@@ -788,7 +754,7 @@ Tuple2<ListTile, bool>? getWidget(
             title: SizedBox(
                 height: h,
                 child: GeometryWidget(
-                    label, widgetKey, formHelper, itemMap, itemReadonly)),
+                    label, widgetKey, formHelper, formItem, itemReadonly)),
           ),
           true);
     case TYPE_HIDDEN:
@@ -836,12 +802,12 @@ Widget getSimpleLabelValue(String label, String value, PresentationMode pm) {
 }
 
 class CheckboxWidget extends StatefulWidget {
-  final _itemMap;
+  SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
 
   CheckboxWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      String _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -854,8 +820,8 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
   @override
   Widget build(BuildContext context) {
     dynamic value = ""; //$NON-NLS-1$
-    if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = widget._itemMap[TAG_VALUE].trim();
+    if (widget._formItem.value != null) {
+      value = widget._formItem.value;
     }
     bool selected = value == 'true';
 
@@ -866,7 +832,7 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
       onChanged: (value) {
         if (!widget._isReadOnly) {
           setState(() {
-            widget._itemMap[TAG_VALUE] = "$value";
+            widget._formItem.setValue("$value");
           });
         }
       },
@@ -877,12 +843,12 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
 }
 
 class AutocompleteStringComboWidget extends StatelessWidget {
-  final _itemMap;
+  SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
 
   AutocompleteStringComboWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      String _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -890,15 +856,12 @@ class AutocompleteStringComboWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String value = "";
-    if (_itemMap.containsKey(TAG_VALUE)) {
-      value = _itemMap[TAG_VALUE].trim();
+    if (_formItem.value != null) {
+      value = _formItem.value;
     }
-    String? key;
-    if (_itemMap.containsKey(TAG_KEY)) {
-      key = _itemMap[TAG_KEY].trim();
-    }
+    String? key = _formItem.key;
 
-    var comboItems = TagsManager.getComboItems(_itemMap);
+    var comboItems = TagsManager.getComboItems(_formItem.map);
     if (comboItems == null) {
       comboItems = [];
     }
@@ -979,7 +942,7 @@ class AutocompleteStringComboWidget extends StatelessWidget {
                   }
                 },
                 onSelected: (String selection) {
-                  _itemMap[TAG_VALUE] = selection;
+                  _formItem.setValue(selection);
                 },
               ),
             ),
@@ -991,12 +954,12 @@ class AutocompleteStringComboWidget extends StatelessWidget {
 }
 
 class ComboboxWidget<T> extends StatefulWidget {
-  final _itemMap;
+  SmashFormItem _formItem;
   final String _label;
   final PresentationMode _presentationMode;
   final Constraints _constraints;
 
-  ComboboxWidget(String _widgetKey, this._itemMap, this._label,
+  ComboboxWidget(String _widgetKey, this._formItem, this._label,
       this._presentationMode, this._constraints)
       : super(
           key: ValueKey(_widgetKey),
@@ -1026,15 +989,12 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
   @override
   Widget build(BuildContext context) {
     T? value;
-    if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = widget._itemMap[TAG_VALUE];
+    if (widget._formItem.value != null) {
+      value = widget._formItem.value;
     }
-    String? key;
-    if (widget._itemMap.containsKey(TAG_KEY)) {
-      key = widget._itemMap[TAG_KEY].trim();
-    }
+    String? key = widget._formItem.key;
 
-    List<dynamic>? comboItems = TagsManager.getComboItems(widget._itemMap);
+    List<dynamic>? comboItems = TagsManager.getComboItems(widget._formItem.map);
     if (comboItems == null) {
       comboItems = [];
     }
@@ -1055,7 +1015,7 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
       }
     } else {
       // check if it is url based
-      url = TagsManager.getComboUrl(widget._itemMap);
+      url = TagsManager.getComboUrl(widget._formItem.map);
       if (url != null) {
         // we have a url, so
         // return container and wait for afterFirstLayout to get url items
@@ -1127,13 +1087,13 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
             child: IgnorePointer(
               ignoring: widget._presentationMode.isReadOnly,
               child: DropdownButton<T>(
-                key: key != null ? Key(key) : null,
+                key: Key(key),
                 value: value,
                 isExpanded: true,
                 items: items,
                 onChanged: (selected) {
                   setState(() {
-                    widget._itemMap[TAG_VALUE] = selected;
+                    widget._formItem.setValue(selected);
                   });
                 },
               ),
@@ -1146,12 +1106,12 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
 }
 
 class ConnectedComboboxWidget extends StatefulWidget {
-  final _itemMap;
+  SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
 
   ConnectedComboboxWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      String _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -1169,8 +1129,8 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
 
   @override
   void initState() {
-    if (widget._itemMap.containsKey(TAG_VALUES)) {
-      Map<String, dynamic> valuesObj = widget._itemMap[TAG_VALUES];
+    if (widget._formItem.map.containsKey(TAG_VALUES)) {
+      Map<String, dynamic> valuesObj = widget._formItem.map[TAG_VALUES];
 
       bool hasEmpty = false;
       valuesObj.forEach((key, value) {
@@ -1220,10 +1180,10 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var formItem = widget._itemMap;
+    var formItem = widget._formItem;
 
-    if (formItem.containsKey(TAG_VALUE)) {
-      String value = formItem[TAG_VALUE].trim();
+    if (formItem.value != null) {
+      String value = formItem.value;
       var split = value.split(SEP);
       if (split.length == 2) {
         currentMain = split[0];
@@ -1231,10 +1191,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
       }
     }
 
-    String? key;
-    if (widget._itemMap.containsKey(TAG_KEY)) {
-      key = widget._itemMap[TAG_KEY].trim();
-    }
+    String? key = widget._formItem.key;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1246,7 +1203,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
               color: SmashColors.mainDecorationsDarker),
         ),
         Container(
-          key: key != null ? Key(key) : null,
+          key: Key(key),
           decoration: currentMain.trim().isNotEmpty
               ? BoxDecoration(
                   shape: BoxShape.rectangle,
@@ -1285,7 +1242,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                         onChanged: (selected) {
                           if (selected != null) {
                             setState(() {
-                              formItem[TAG_VALUE] = selected + SEP;
+                              formItem.setValue(selected + SEP);
                             });
                           }
                         },
@@ -1318,9 +1275,11 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                               items: secondaryCombos[currentMain],
                               onChanged: (selected) {
                                 setState(() {
-                                  var str = widget._itemMap[TAG_VALUE];
-                                  widget._itemMap[TAG_VALUE] =
-                                      str.split("#")[0] + SEP + selected;
+                                  if (selected != null) {
+                                    var str = widget._formItem.value.toString();
+                                    widget._formItem.setValue(
+                                        str.split("#")[0] + SEP + selected);
+                                  }
                                 });
                               },
                             ),
@@ -1337,12 +1296,12 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
 }
 
 class AutocompleteStringConnectedComboboxWidget extends StatefulWidget {
-  final _itemMap;
+  SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
 
   AutocompleteStringConnectedComboboxWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      String _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -1362,8 +1321,8 @@ class AutocompleteStringConnectedComboboxWidgetState
 
   @override
   void initState() {
-    if (widget._itemMap.containsKey(TAG_VALUES)) {
-      Map<String, dynamic> valuesObj = widget._itemMap[TAG_VALUES];
+    if (widget._formItem.map.containsKey(TAG_VALUES)) {
+      Map<String, dynamic> valuesObj = widget._formItem.map[TAG_VALUES];
 
       bool hasEmpty = false;
       valuesObj.forEach((key, value) {
@@ -1397,10 +1356,10 @@ class AutocompleteStringConnectedComboboxWidgetState
 
   @override
   Widget build(BuildContext context) {
-    var formItem = widget._itemMap;
+    var formItem = widget._formItem;
 
-    if (formItem.containsKey(TAG_VALUE)) {
-      String value = formItem[TAG_VALUE].trim();
+    if (formItem.value != null) {
+      String value = formItem.value.toString();
       var split = value.split(SEP);
       if (split.length == 2) {
         currentMain = split[0];
@@ -1408,10 +1367,7 @@ class AutocompleteStringConnectedComboboxWidgetState
       }
     }
 
-    String? key;
-    if (widget._itemMap.containsKey(TAG_KEY)) {
-      key = widget._itemMap[TAG_KEY].trim();
-    }
+    String key = widget._formItem.key;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1482,7 +1438,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                         },
                         onSelected: (String selection) {
                           setState(() {
-                            formItem[TAG_VALUE] = selection + SEP;
+                            formItem.setValue(selection + SEP);
                           });
                         },
                       ),
@@ -1535,10 +1491,10 @@ class AutocompleteStringConnectedComboboxWidgetState
                                   );
                                 }
                               },
-                              onSelected: (String selection) {
-                                var str = widget._itemMap[TAG_VALUE];
-                                widget._itemMap[TAG_VALUE] =
-                                    str.split("#")[0] + SEP + selection;
+                              onSelected: (selection) {
+                                var str = widget._formItem.value.toString();
+                                widget._formItem.setValue(
+                                    str.split("#")[0] + SEP + selection);
                               },
                             ),
                           ),
@@ -1554,12 +1510,12 @@ class AutocompleteStringConnectedComboboxWidgetState
 }
 
 class DynamicStringWidget extends StatefulWidget {
-  final Map<String, dynamic> _itemMap;
+  final SmashFormItem _fomrItem;
   final String _label;
   final bool _isReadOnly;
 
   DynamicStringWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      String _widgetKey, this._fomrItem, this._label, this._isReadOnly)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -1572,8 +1528,8 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
   @override
   Widget build(BuildContext context) {
     String value = ""; //$NON-NLS-1$
-    if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = widget._itemMap[TAG_VALUE].trim();
+    if (widget._fomrItem.value != null) {
+      value = widget._fomrItem.value;
     }
     List<String> valuesSplit = value.trim().split(";");
     valuesSplit.removeWhere((s) => s.trim().isEmpty);
@@ -1588,7 +1544,7 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
               onSubmitted: (String str) {
                 valuesSplit.add(str);
                 setState(() {
-                  widget._itemMap[TAG_VALUE] = valuesSplit.join(";");
+                  widget._fomrItem.setValue(valuesSplit.join(";"));
                 });
               },
             ),
@@ -1626,7 +1582,7 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
                 setState(() {
                   valuesSplit.removeAt(index);
                   String saveValue = valuesSplit.join(";");
-                  widget._itemMap[TAG_VALUE] = saveValue;
+                  widget._fomrItem.setValue(saveValue);
                 });
               }
               return true;
@@ -1648,12 +1604,12 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
 }
 
 class DatePickerWidget extends StatefulWidget {
-  final _itemMap;
+  SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
 
   DatePickerWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      String _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -1666,8 +1622,8 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
   @override
   Widget build(BuildContext context) {
     String value = ""; //$NON-NLS-1$
-    if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = widget._itemMap[TAG_VALUE].trim();
+    if (widget._formItem.value != null) {
+      value = widget._formItem.value;
     }
     DateTime? dateTime;
     if (value.isNotEmpty) {
@@ -1694,7 +1650,7 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
                   String day =
                       HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(value);
                   setState(() {
-                    widget._itemMap[TAG_VALUE] = day;
+                    widget._formItem.setValue(day);
                   });
                 },
               );
@@ -1733,12 +1689,12 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
 }
 
 class TimePickerWidget extends StatefulWidget {
-  final _itemMap;
+  final SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
 
   TimePickerWidget(
-      String _widgetKey, this._itemMap, this._label, this._isReadOnly)
+      String _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
           key: ValueKey(_widgetKey),
         );
@@ -1751,8 +1707,8 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
   @override
   Widget build(BuildContext context) {
     String value = ""; //$NON-NLS-1$
-    if (widget._itemMap.containsKey(TAG_VALUE)) {
-      value = widget._itemMap[TAG_VALUE].trim();
+    if (widget._formItem.value != null) {
+      value = widget._formItem.value;
     }
     DateTime? dateTime;
     if (value.isNotEmpty) {
@@ -1779,7 +1735,7 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
                   var minute = value.minute;
                   var iso = "$hour:$minute:00";
                   setState(() {
-                    widget._itemMap[TAG_VALUE] = iso;
+                    widget._formItem.setValue(iso);
                   });
                 },
               );
@@ -1813,11 +1769,11 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
 }
 
 class MultiComboWidget<T> extends StatefulWidget {
-  final _itemMap;
+  SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
   final PresentationMode _presentationMode;
-  MultiComboWidget(String _widgetKey, this._itemMap, this._label,
+  MultiComboWidget(String _widgetKey, this._formItem, this._label,
       this._isReadOnly, this._presentationMode)
       : super(
           key: ValueKey(_widgetKey + "_parent"),
@@ -1848,13 +1804,11 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
 
   @override
   Widget build(BuildContext context) {
-    String? strKey;
-    if (widget._itemMap.containsKey(TAG_KEY)) {
-      strKey = widget._itemMap[TAG_KEY].trim();
-    }
+    String strKey = widget._formItem.key;
+
     List<T> values = [];
-    if (widget._itemMap.containsKey(TAG_VALUE)) {
-      dynamic valueTmp = widget._itemMap[TAG_VALUE];
+    if (widget._formItem.value != null) {
+      dynamic valueTmp = widget._formItem.value;
       if (valueTmp is List) {
         values = valueTmp
             .map((e) => int.tryParse(e.toString()) as T)
@@ -1864,7 +1818,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
         String? value;
         if (valueTmp != null) value = valueTmp.toString();
         if (value != null && value.isNotEmpty) {
-          if (widget._itemMap[TAG_TYPE] == 'multiintcombo') {
+          if (widget._formItem.type == 'multiintcombo') {
             values = value
                 .split(";")
                 .map((e) => int.tryParse(e) as T)
@@ -1880,7 +1834,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
       }
     }
 
-    List<dynamic>? comboItems = TagsManager.getComboItems(widget._itemMap);
+    List<dynamic>? comboItems = TagsManager.getComboItems(widget._formItem.map);
     if (comboItems == null) {
       comboItems = [];
     }
@@ -1901,7 +1855,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
       }
     } else {
       // check if it is url based
-      url = TagsManager.getComboUrl(widget._itemMap);
+      url = TagsManager.getComboUrl(widget._formItem.map);
       if (url != null) {
         // we have a url, so
         // return container and wait for afterFirstLayout to get url items
@@ -1936,7 +1890,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
           ),
           TextButton(
               style: SmashUI.defaultFlatButtonStyle(),
-              key: strKey != null ? Key(strKey) : null,
+              key: Key(strKey),
               onPressed: () async {
                 if (!widget._isReadOnly) {
                   await showDialog(
@@ -1948,7 +1902,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
                   );
                   var selectedItemsString =
                       selectedItems.map((i) => i.value.toString()).toList();
-                  widget._itemMap[TAG_VALUE] = selectedItemsString.join(";");
+                  widget._formItem.setValue(selectedItemsString.join(";"));
                   setState(() {});
                 }
               },
@@ -2033,9 +1987,9 @@ class PicturesWidget extends StatefulWidget {
   final bool fromGallery;
   final AFormhelper formHelper;
   final bool _isReadOnly;
-  final _itemMap;
+  SmashFormItem _formItem;
 
-  PicturesWidget(this._label, String widgetKey, this.formHelper, this._itemMap,
+  PicturesWidget(this._label, String widgetKey, this.formHelper, this._formItem,
       this._isReadOnly,
       {this.fromGallery = false})
       : super(key: ValueKey(widgetKey));
@@ -2051,7 +2005,7 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
 
   Future<void> getThumbnails(BuildContext context) async {
     images = await widget.formHelper
-        .getThumbnailsFromDb(context, widget._itemMap, imageSplit);
+        .getThumbnailsFromDb(context, widget._formItem, imageSplit);
   }
 
   @override
@@ -2079,7 +2033,7 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
                           if (value != null) {
                             await getThumbnails(context);
                             setState(() {
-                              widget._itemMap[TAG_VALUE] = value;
+                              widget._formItem.setValue(value);
                             });
                           }
                         },
@@ -2129,9 +2083,9 @@ class SketchWidget extends StatefulWidget {
   final bool fromGallery;
   final AFormhelper formHelper;
   final bool _isReadOnly;
-  final _itemMap;
+  SmashFormItem _formItem;
 
-  SketchWidget(this._label, String widgetKey, this.formHelper, this._itemMap,
+  SketchWidget(this._label, String widgetKey, this.formHelper, this._formItem,
       this._isReadOnly,
       {this.fromGallery = false})
       : super(key: ValueKey(widgetKey));
@@ -2147,7 +2101,7 @@ class SketchWidgetState extends State<SketchWidget> with AfterLayoutMixin {
 
   Future<void> getThumbnails(BuildContext context) async {
     images = await widget.formHelper
-        .getThumbnailsFromDb(context, widget._itemMap, imageSplit);
+        .getThumbnailsFromDb(context, widget._formItem, imageSplit);
   }
 
   @override
@@ -2174,7 +2128,7 @@ class SketchWidgetState extends State<SketchWidget> with AfterLayoutMixin {
                           if (value != null) {
                             await getThumbnails(context);
                             setState(() {
-                              widget._itemMap[TAG_VALUE] = value;
+                              widget._formItem.setValue(value);
                             });
                           }
                         },
@@ -2216,9 +2170,9 @@ class GeometryWidget extends StatefulWidget {
   final String _label;
   final AFormhelper formHelper;
   final bool _isReadOnly;
-  final _itemMap;
+  SmashFormItem _formItem;
 
-  GeometryWidget(this._label, String widgetKey, this.formHelper, this._itemMap,
+  GeometryWidget(this._label, String widgetKey, this.formHelper, this._formItem,
       this._isReadOnly)
       : super(key: ValueKey(widgetKey)) {}
 
@@ -2237,14 +2191,12 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
   void afterFirstLayout(BuildContext context) async {
     String value = ""; //$NON-NLS-1$
     JTS.EGeometryType? geomType;
-    if (widget._itemMap.containsKey(TAG_VALUE)) {
-      var tmpValue = widget._itemMap[TAG_VALUE];
+    if (widget._formItem.value != null) {
+      var tmpValue = widget._formItem.value;
       if (tmpValue is String && tmpValue.trim().length == 0) {
         value = "";
-        if (widget._itemMap.containsKey(TAG_TYPE)) {
-          var typeName = widget._itemMap[TAG_TYPE].trim();
-          geomType = JTS.EGeometryType.forTypeName(typeName);
-        }
+        var typeName = widget._formItem.type;
+        geomType = JTS.EGeometryType.forTypeName(typeName);
       } else {
         if (tmpValue is String) {
           value = tmpValue;
@@ -2255,9 +2207,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
     }
 
     keyStr = "SMASH_GEOMWIDGETSTATE_KEY_";
-    if (widget._itemMap.containsKey(TAG_KEY)) {
-      keyStr += widget._itemMap[TAG_KEY].trim();
-    }
+    keyStr += widget._formItem.key;
 
     // if (value.trim().isEmpty) {
     //   mapView = SmashUI.errorWidget("Not loading empty geojson.");
@@ -2266,8 +2216,8 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
     geojsonSource!.setGeometryType(geomType);
 
     // check if there is style
-    if (widget._itemMap.containsKey(TAG_STYLE)) {
-      Map<String, dynamic> styleMap = widget._itemMap[TAG_STYLE];
+    if (widget._formItem.map.containsKey(TAG_STYLE)) {
+      Map<String, dynamic> styleMap = widget._formItem.map[TAG_STYLE];
       geojsonSource!.setStyle(styleMap);
     }
 
@@ -2446,12 +2396,12 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         ),
         onTap: () async {
           await GeometryEditManager().saveCurrentEdit(geomEditState);
-          if (widget._itemMap.containsKey(TAG_VALUE)) {
+          if (widget._formItem.value != null) {
             var jsonString = geojsonSource!.toJson();
             var jsonMap = jsonDecode(jsonString);
             var geojson = jsonMap[LAYERSKEY_GEOJSON];
 
-            widget._itemMap[TAG_VALUE] = geojson;
+            widget._formItem.setValue(geojson);
           }
 
           // stop editing
@@ -2560,14 +2510,14 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
           var eds = geomEditState.editableGeometry!.editableDataSource;
           bool hasDeleted = await GeometryEditManager()
               .deleteCurrentSelection(context, geomEditState);
-          if (widget._itemMap.containsKey(TAG_VALUE)) {
+          if (widget._formItem.value != null) {
             if (geojsonSource != null) {
               var jsonString = geojsonSource!.toJson();
               var jsonMap = jsonDecode(jsonString);
               var geojson = jsonMap[LAYERSKEY_GEOJSON];
-              widget._itemMap[TAG_VALUE] = geojson ?? "";
+              widget._formItem.setValue(geojson ?? "");
             } else {
-              widget._itemMap[TAG_VALUE] = "";
+              widget._formItem.setValue("");
             }
           }
           // stop editing

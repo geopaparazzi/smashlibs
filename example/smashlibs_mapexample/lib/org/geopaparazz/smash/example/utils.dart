@@ -6,7 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:after_layout/after_layout.dart';
 
 class DemoAppFormHelper extends AFormhelper {
-  late Map<String, dynamic> sectionMap;
+  late SmashSection section;
 
   DemoAppFormHelper() {}
 
@@ -15,8 +15,7 @@ class DemoAppFormHelper extends AFormhelper {
     var tagsJson = await rootBundle.loadString("assets/tags.json");
     var tm = TagsManager();
     tm.readTags(tagsString: tagsJson);
-    var sectionsMap = tm.getSectionsMap();
-    sectionMap = sectionsMap.values.toList()[0];
+    section = tm.getTags().getSections()[0];
     return Future.value(true);
   }
 
@@ -36,18 +35,18 @@ class DemoAppFormHelper extends AFormhelper {
   }
 
   @override
-  Map<String, dynamic> getSectionMap() {
-    return sectionMap;
+  SmashSection getSection() {
+    return section;
   }
 
   @override
   String getSectionName() {
-    return sectionMap['sectionname'];
+    return section.sectionName ?? "unknown section name";
   }
 
   @override
-  Future<List<Widget>> getThumbnailsFromDb(BuildContext context,
-      Map<String, dynamic> itemsMap, List<String> imageSplit) {
+  Future<List<Widget>> getThumbnailsFromDb(
+      BuildContext context, SmashFormItem formItem, List<String> imageSplit) {
     return Future.value([]);
   }
 

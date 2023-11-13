@@ -612,7 +612,7 @@ class SmashDatabaseFormHelper extends AFormhelper {
   var _titleWidget;
   var _sectionName;
   EditableDataSource? _eds;
-  List<Map<String, dynamic>> sectionMapList = [];
+  List<SmashSection> sectionList = [];
   late String _tableName;
   dynamic _db;
 
@@ -639,25 +639,20 @@ class SmashDatabaseFormHelper extends AFormhelper {
           "select $FORMS_FIELD from $HM_FORMS_TABLE where $FORMS_TABLENAME_FIELD='$_tableName'");
       if (result.length == 1) {
         String formJsonString = result.first.get(FORMS_FIELD);
-        List<dynamic> tmpList = jsonDecode(formJsonString);
-        tmpList.forEach((element) {
-          if (element is Map<String, dynamic>) {
-            sectionMapList.add(element);
-          }
-        });
-        _sectionName = sectionMapList.first[ATTR_SECTIONNAME];
+        var tm = TagsManager();
+        tm.readTags(tagsString: formJsonString);
+        var tags = tm.getTags();
+        // this should contain one single section
+        SmashSection section = tags.getSections()[0];
 
-        List<Map<String, dynamic>> formsList = [];
-        formsList = (sectionMapList.first[ATTR_FORMS] as List<dynamic>)
-            .map((e) => e as Map<String, dynamic>)
-            .toList();
+        _sectionName = section.sectionName;
+        var forms = section.getForms();
 
         var data = _queryResult.data.first;
         data.forEach((key, value) {
           if (value != null) {
-            formsList.forEach((form) {
-              var formItems = TagsManager.getFormItems(form);
-              FormUtilities.update(formItems, key, value);
+            forms.forEach((form) {
+              form.update(key, value);
             });
           }
         });
@@ -670,7 +665,7 @@ class SmashDatabaseFormHelper extends AFormhelper {
 
   @override
   bool hasForm() {
-    return sectionMapList.isNotEmpty;
+    return sectionList.isNotEmpty;
   }
 
   @override
@@ -692,8 +687,8 @@ class SmashDatabaseFormHelper extends AFormhelper {
   }
 
   @override
-  Map<String, dynamic> getSectionMap() {
-    return sectionMapList.first;
+  SmashSection getSection() {
+    return sectionList.first;
   }
 
   @override
@@ -704,18 +699,16 @@ class SmashDatabaseFormHelper extends AFormhelper {
   /// Save data on form exit.
   Future<void> onSaveFunction(BuildContext context) async {
     if (_db != null) {
-      List<Map<String, dynamic>> formsList = [];
-      formsList = (sectionMapList.first[ATTR_FORMS] as List<dynamic>)
-          .map((e) => e as Map<String, dynamic>)
-          .toList();
+      SmashSection section = sectionList.first;
+      var forms = section.getForms();
 
       var data = _queryResult.data.first;
 
-      formsList.forEach((form) {
-        var formItems = TagsManager.getFormItems(form);
+      forms.forEach((form) {
+        var formItems = form.getFormItems();
         formItems.forEach((element) {
-          String key = element[TAG_KEY].toString();
-          dynamic value = element[TAG_VALUE];
+          String key = element.key;
+          dynamic value = element.value;
           if (value != null) {
             // TODO check type and convert string to that type (value is always a string)
             // also booleans need to be checked etc (true doesn't resolve to 1)
@@ -787,7 +780,7 @@ class SmashDatabaseFormHelper extends AFormhelper {
 
   /// Get thumbnails from the database
   Future<List<Widget>> getThumbnailsFromDb(BuildContext context,
-      Map<String, dynamic> itemsMap, List<String> imageSplit) async {
+      SmashFormItem formItem, List<String> imageSplit) async {
     // ProjectState projectState =
     //     Provider.of<ProjectState>(context, listen: false);
 

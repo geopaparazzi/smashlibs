@@ -162,7 +162,7 @@ abstract class AFormhelper {
   String getSectionName();
 
   /// The section form.
-  Map<String, dynamic> getSectionMap();
+  SmashSection getSection();
 
   /// A title widget for the form view.
   Widget getFormTitleWidget();
@@ -174,13 +174,13 @@ abstract class AFormhelper {
 
   /// Get the images from the source and return them as widgets.
   ///
-  /// The form map [itemsMap] is searched for image ids
+  /// The form item is searched for image ids
   /// and the ids also need to be placed in [imageSplit]
   /// in case of further use.
   ///
   /// This should return an empty widgets list if it is not supported.
-  Future<List<Widget>> getThumbnailsFromDb(BuildContext context,
-      Map<String, dynamic> itemsMap, List<String> imageSplit);
+  Future<List<Widget>> getThumbnailsFromDb(
+      BuildContext context, SmashFormItem formItem, List<String> imageSplit);
 
   /// Take a picture for a given form identified by the helper's [getId()].
   ///
@@ -202,29 +202,20 @@ abstract class AFormhelper {
 
   /// update the form hashmap with the data from the given [newValues].
   void setData(Map<String, dynamic> newValues) {
-    var sectionMap = getSectionMap();
-    var formNames = TagsManager.getFormNames4Section(sectionMap);
-    for (var formName in formNames) {
-      var form = TagsManager.getForm4Name(formName, sectionMap);
-      if (form != null) {
-        var formItems = TagsManager.getFormItems(form);
-        FormUtilities.updateFromMap(formItems, newValues);
-      }
-    }
+    var section = getSection();
+    section.updateFromMap(newValues);
     dataUsed = newValues;
   }
 
   /// get the initial data map, changed by the interaction with the form.
   Map<String, dynamic> getFormChangedData() {
-    var sectionMap = getSectionMap();
-    var formNames = TagsManager.getFormNames4Section(sectionMap);
-    for (var formName in formNames) {
-      var form = TagsManager.getForm4Name(formName, sectionMap);
-      if (form != null) {
-        var formItems = TagsManager.getFormItems(form);
-        FormUtilities.updateToMap(formItems, dataUsed);
-      }
-    }
+    var section = getSection();
+    section.getForms().forEach((form) {
+      var formItems = form.getFormItems();
+      formItems.forEach((formItem) {
+        formItem.update(dataUsed);
+      });
+    });
     return dataUsed;
   }
 }
@@ -734,10 +725,20 @@ class TagsManager {
 
   List<String>? _tagsFileArray;
   List<String>? _tagsJsonDataArray;
+  LinkedHashMap<String, Map<String, dynamic>>? _sectionsMap;
+
+  /// Get the forms
+  SmashTags getTags() {
+    _getSectionsMap();
+    return SmashTags(_sectionsMap!);
+  }
 
   /// Creates a new sectionsmap from the tags file
-  LinkedHashMap<String, Map<String, dynamic>> getSectionsMap() {
-    LinkedHashMap<String, Map<String, dynamic>> _sectionsMap = LinkedHashMap();
+  LinkedHashMap<String, Map<String, dynamic>>? _getSectionsMap() {
+    if (_sectionsMap != null) {
+      return _sectionsMap;
+    }
+    _sectionsMap = LinkedHashMap();
     for (int j = 0; j < _tagsJsonDataArray!.length; j++) {
       String tagsFileString = _tagsJsonDataArray![j];
       try {
@@ -773,7 +774,7 @@ class TagsManager {
           Map<String, dynamic> jsonObject = sectionsArrayObj[i];
           if (jsonObject.containsKey(ATTR_SECTIONNAME)) {
             String sectionName = jsonObject[ATTR_SECTIONNAME];
-            _sectionsMap[sectionName] = jsonObject;
+            _sectionsMap![sectionName] = jsonObject;
           }
         }
       } on Exception catch (e, s) {
@@ -793,6 +794,8 @@ class TagsManager {
   ///
   /// The 3 options are mutually exclusive.
   Future<void> readTags({String? tagsFilePath, String? tagsString}) async {
+    _sectionsMap = null;
+
     if (_tagsFileArray == null) {
       _tagsFileArray = [];
       _tagsJsonDataArray = [];
@@ -880,16 +883,6 @@ class TagsManager {
       }
     }
     return names;
-  }
-
-  /// get icon from a section obj.
-  ///
-  static String getIcon4Section(Map<String, dynamic> section) {
-    if (section.containsKey(ATTR_SECTIONICON)) {
-      return section[ATTR_SECTIONICON];
-    } else {
-      return "fileAlt";
-    }
   }
 
   /// Get the form for a name.
@@ -1114,6 +1107,277 @@ class TagsManager {
 //}
 //return valuesMap;
 //}
+}
+
+/// A SMASH FormItem, which represents the single widget.
+class SmashFormItem {
+  String key = "-";
+  String type = TYPE_STRING;
+  late String label;
+  dynamic value;
+  String? iconStr;
+  bool isReadOnly = false;
+
+  late Map<String, dynamic> map;
+
+  SmashFormItem(Map<String, dynamic> map) {
+    this.map = map;
+
+    readData();
+  }
+
+  void readData() {
+    if (map.containsKey(TAG_KEY)) {
+      key = map[TAG_KEY].trim();
+    }
+    if (map.containsKey(TAG_TYPE)) {
+      type = map[TAG_TYPE].trim();
+    }
+
+    label = TagsManager.getLabelFromFormItem(map);
+
+    if (map.containsKey(TAG_VALUE)) {
+      value = map[TAG_VALUE];
+    }
+    if (map.containsKey(TAG_ICON)) {
+      iconStr = map[TAG_ICON].trim();
+    }
+
+    if (map.containsKey(TAG_READONLY)) {
+      var readonlyObj = map[TAG_READONLY].trim();
+      if (readonlyObj is String) {
+        isReadOnly = readonlyObj == 'true';
+      } else if (readonlyObj is bool) {
+        isReadOnly = readonlyObj;
+      } else if (readonlyObj is num) {
+        isReadOnly = readonlyObj.toDouble() == 1.0;
+      }
+    }
+  }
+
+  void update(Map<String, dynamic> newValues) {
+    if (map.containsKey(TAG_KEY)) {
+      String objKey = map[TAG_KEY].trim();
+      var newValue = newValues[objKey];
+      if (newValue != null) {
+        map[TAG_VALUE] = newValue;
+        value = newValue;
+      }
+    }
+  }
+
+  void handleConstraints(Constraints constraints) {
+    FormUtilities.handleConstraints(map, constraints);
+  }
+
+  void setValue(result) {
+    if (map.containsKey(TAG_VALUE.trim())) {
+      map[TAG_VALUE.trim()] = result;
+      // re-read data
+      readData();
+    }
+  }
+
+  double getSize() {
+    String sizeStr = "20";
+    if (map.containsKey(TAG_SIZE)) {
+      sizeStr = map[TAG_SIZE];
+    }
+    double size = double.parse(sizeStr);
+    return size;
+  }
+
+  String? getUrl() {
+    String? url;
+    if (map.containsKey(TAG_URL)) {
+      url = map[TAG_URL];
+    }
+    return url;
+  }
+
+  String toString() {
+    String str = "FormItem " +
+        key +
+        " = " +
+        value.toString() +
+        " (" +
+        type +
+        "," +
+        isReadOnly.toString() +
+        ")";
+    return str;
+  }
+}
+
+/// A SMASH Form object, which represents a logical grouping
+/// of items. For example the each tab in a SMASH note view is a form.
+class SmashForm {
+  String? formName;
+  List<SmashFormItem> formItems = [];
+  late Map<String, dynamic> map;
+
+  SmashForm(Map<String, dynamic> map) {
+    this.map = map;
+    readData();
+  }
+
+  void readData() {
+    formName = map[ATTR_FORMNAME];
+    var formItemsList = TagsManager.getFormItems(map);
+    for (var formItem in formItemsList) {
+      this.formItems.add(SmashFormItem(formItem));
+    }
+  }
+
+  List<SmashFormItem> getFormItems() {
+    return formItems;
+  }
+
+  void update(String key, dynamic value) {
+    formItems.forEach((formItem) {
+      if (formItem.key == key) {
+        formItem.setValue(value);
+      }
+    });
+  }
+
+  String toString() {
+    String str = "Form: " + (formName ?? "no name form");
+    var formItemIndex = 0;
+    getFormItems().forEach((formItem) {
+      str += "\n\t\tFormitem $formItemIndex: " +
+          formItem.key +
+          " = " +
+          formItem.value.toString();
+      formItemIndex++;
+    });
+    return str;
+  }
+}
+
+/// A SMASH Section object, which represents a complete
+/// object type. For example in SMASH, for esach section, a
+/// button is created.
+class SmashSection {
+  String? sectionName;
+  String? sectionDescription;
+  String? sectionIcon;
+  Map<String, SmashForm> forms = {};
+  late Map<String, dynamic> sectionMap;
+
+  SmashSection(Map<String, dynamic> map) {
+    this.sectionMap = map;
+    sectionName = map[ATTR_SECTIONNAME];
+    sectionDescription = map[ATTR_SECTIONDESCRIPTION];
+    sectionIcon = map[ATTR_SECTIONICON];
+
+    var formNames = TagsManager.getFormNames4Section(map);
+    for (var formName in formNames) {
+      var form = TagsManager.getForm4Name(formName, map);
+      if (form != null) {
+        forms[formName] = SmashForm(form);
+      }
+    }
+  }
+
+  List<String> getFormNames() {
+    return forms.keys.toList();
+  }
+
+  SmashForm? getFormByName(String name) {
+    return forms[name];
+  }
+
+  List<SmashForm> getForms() {
+    return forms.values.toList();
+  }
+
+  String getIcon() {
+    return sectionIcon ?? "fileAlt";
+  }
+
+  String toJson() {
+    return jsonEncode(sectionMap);
+  }
+
+  void updateFromMap(Map<String, dynamic> newValues) {
+    forms.forEach((name, form) {
+      var formItems = form.getFormItems();
+      // FormUtilities.updateFromMap(formItems, newValues);
+      formItems.forEach((formItem) {
+        // print(formItem.toString());
+        formItem.update(newValues);
+        // print(formItem.toString());
+      });
+    });
+  }
+
+  String toString() {
+    String str = "Section: " + sectionName!;
+    var formIndex = 0;
+    getForms().forEach((form) {
+      str += "\n\tForm $formIndex: " + (form.formName ?? "no name form");
+      formIndex++;
+      var formItemIndex = 0;
+      form.getFormItems().forEach((formItem) {
+        str += "\n\t\tFormitem $formItemIndex: " +
+            formItem.key +
+            " = " +
+            formItem.value.toString();
+        formItemIndex++;
+      });
+    });
+    return str;
+  }
+}
+
+/// A SMASH Tags object, which represents the complete tags file.
+class SmashTags {
+  Map<String, SmashSection> sections = {};
+  late LinkedHashMap<String, Map<String, dynamic>> sectionsMap;
+
+  SmashTags(LinkedHashMap<String, Map<String, dynamic>> sectionsMap) {
+    this.sectionsMap = sectionsMap;
+    sectionsMap.forEach((key, value) {
+      var section = SmashSection(value);
+      sections[key] = section;
+    });
+  }
+
+  List<SmashSection> getSections() {
+    return sections.values.toList();
+  }
+
+  List<String> getSectionNames() {
+    return sections.keys.toList();
+  }
+
+  SmashSection? getSectionByName(String name) {
+    return sections[name];
+  }
+
+  @override
+  String toString() {
+    String str = "Smash Tags";
+    sections.forEach((sectionName, section) {
+      str += "\nSection: " + sectionName;
+      var formIndex = 0;
+      section.getForms().forEach((form) {
+        str += "\n\tForm $formIndex: " + (form.formName ?? "no name form");
+        formIndex++;
+        var formItemIndex = 0;
+        form.getFormItems().forEach((formItem) {
+          str += "\n\t\tFormitem $formItemIndex: " +
+              formItem.key +
+              " = " +
+              formItem.value.toString();
+          formItemIndex++;
+        });
+      });
+    });
+
+    return str;
+  }
 }
 
 /// The tag object.
