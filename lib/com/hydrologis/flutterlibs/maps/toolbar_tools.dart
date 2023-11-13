@@ -368,7 +368,18 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
                 SmashPrj.transformGeometryToWgs84(from, feature.geometry!);
               }
               totalQueryResult.geoms.add(feature.geometry!);
-              totalQueryResult.data.add(feature.attributes);
+
+              var attributes = feature.attributes;
+              if (eds is GeojsonSource) {
+                if (eds.isGssSource()) {
+                  // need to add id and remove editmode
+                  // clone attributes map
+                  attributes = Map.from(attributes);
+                  attributes.remove(EditableDataSource.EDITMODE_FIELD_NAME);
+                  attributes["id"] = id;
+                }
+              }
+              totalQueryResult.data.add(attributes);
 
               var formHelper = SmashDatabaseFormHelper(totalQueryResult);
               await formHelper.init();

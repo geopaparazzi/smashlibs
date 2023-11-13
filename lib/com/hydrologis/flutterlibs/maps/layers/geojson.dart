@@ -1084,4 +1084,17 @@ class GeojsonSource extends VectorLayerSource
   Future<void> sync(BuildContext context) {
     throw UnimplementedError();
   }
+
+  void updateFeature(pkValue, Map<String, dynamic> data) {
+    var feature = featuresMap[pkValue];
+    if (feature != null) {
+      data.forEach((key, value) {
+        if (feature.attributes.containsKey(key)) {
+          feature.attributes[key] = value;
+        }
+      });
+      dumpFeatureCollection();
+      isLoaded = false;
+    }
+  }
 }

@@ -173,7 +173,17 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
               SmashPrj.transformGeometry(dataPrj!, SmashPrj.EPSG4326, g);
             }
             totalQueryResult.geoms.add(g);
-            totalQueryResult.data.add(f.attributes);
+
+            var attributes = f.attributes;
+            if (vLayer is GeojsonSource) {
+              if (vLayer.isGssSource()) {
+                // need to add id and remove editmode
+                // clone attributes map
+                attributes = Map.from(attributes);
+                attributes.remove(EditableDataSource.EDITMODE_FIELD_NAME);
+              }
+            }
+            totalQueryResult.data.add(attributes);
             totalQueryResult.edsList!.add(vLayer as EditableDataSource);
           });
         }

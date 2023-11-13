@@ -84,11 +84,11 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     Map<String, dynamic> data = f.data[_index];
     Map<String, String>? typesMap;
     var primaryKey;
-    var db;
+    var eds;
     if (f.editable![_index]) {
       typesMap = f.fieldAndTypemap![_index];
       primaryKey = f.primaryKeys![_index];
-      db = f.edsList![_index];
+      eds = f.edsList![_index];
     }
 
     var centroid = _geometry.getCentroid().getCoordinate();
@@ -229,8 +229,8 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
                   flex: 1,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child:
-                        getDataTable(tableName, data, primaryKey, db, typesMap),
+                    child: getDataTable(
+                        tableName, data, primaryKey, eds, typesMap),
                   ),
                 ),
               ],
@@ -258,7 +258,7 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: getDataTable(
-                          tableName, data, primaryKey, db, typesMap!),
+                          tableName, data, primaryKey, eds, typesMap!),
                     ),
                   ),
                 ),
@@ -268,13 +268,13 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
   }
 
   Widget getDataTable(String tablename, Map<String, dynamic> data,
-      String? primaryKey, dynamic db, Map<String, String>? typesMap) {
+      String? primaryKey, dynamic eds, Map<String, String>? typesMap) {
     List<DataRow> rows = [];
 
     data.forEach((key, value) {
       bool editable = !widget.readOnly &&
           primaryKey != null &&
-          db != null &&
+          eds != null &&
           key != primaryKey;
       var row = DataRow(
         cells: [
@@ -319,13 +319,18 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
                   key: data[key],
                 };
                 var where = "$primaryKey=$pkValue";
-                await db.updateMap(
-                    TableName(tablename,
-                        schemaSupported: db is PostgisDb || db is PostgresqlDb
-                            ? true
-                            : false),
-                    map,
-                    where);
+                if (eds is GeojsonSource) {
+                  eds.updateFeature(pkValue, map);
+                } else {
+                  await eds.updateMap(
+                      TableName(tablename,
+                          schemaSupported:
+                              eds is PostgisDb || eds is PostgresqlDb
+                                  ? true
+                                  : false),
+                      map,
+                      where);
+                }
                 setState(() {});
               }
             }
