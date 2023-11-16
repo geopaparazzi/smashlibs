@@ -160,6 +160,44 @@ class GssUtilities {
     }
     return false;
   }
+
+  static Future<String> getGssGeojsonLayerFilePath(String layerName) async {
+    var gssFolder = await getGssFolder();
+    var layerFilePath =
+        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".geojson");
+    return layerFilePath;
+  }
+
+  static Future<String> getGssGeojsonLayerStyleFilePath(
+      String layerName) async {
+    var gssFolder = await getGssFolder();
+    var layerFilePath =
+        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".sld");
+    return layerFilePath;
+  }
+
+  static Future<String> getGssGeojsonLayerPropertiesFilePath(
+      String layerName) async {
+    var gssFolder = await getGssFolder();
+    var layerFilePath =
+        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".properties");
+    return layerFilePath;
+  }
+
+  static Future<String> getGssGeojsonLayerTagsFilePath(String layerName) async {
+    var gssFolder = await getGssFolder();
+    var layerFilePath =
+        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".tags");
+    return layerFilePath;
+  }
+
+  static Future<String> getGssGeojsonLayerDeletedFilePath(
+      String layerName) async {
+    var gssFolder = await getGssFolder();
+    var layerFilePath =
+        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".deleted");
+    return layerFilePath;
+  }
 }
 
 /// Widget to trace upload of geopaparazzi items upload.

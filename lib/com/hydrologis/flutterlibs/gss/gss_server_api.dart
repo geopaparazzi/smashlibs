@@ -170,13 +170,12 @@ class ServerApi {
       throw StateError("No project was selected.");
     }
 
-    var gssFolder = await GssUtilities.getGssFolder();
     var layerFilePath =
-        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".geojson");
+        await GssUtilities.getGssGeojsonLayerFilePath(layerName);
     var layerTagsFilePath =
-        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".tags");
+        await GssUtilities.getGssGeojsonLayerTagsFilePath(layerName);
     var layerPropertiesFilePath =
-        HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".properties");
+        await GssUtilities.getGssGeojsonLayerPropertiesFilePath(layerName);
 
     var uri = Uri.parse("${getBaseUrl()}$API_DYNAMICLAYERS_DATA$layerName" +
         "?$API_PROJECT_PARAM${project.id}");
@@ -191,6 +190,12 @@ class ServerApi {
 
       HU.FileUtilities.writeStringToFile(layerPropertiesFilePath,
           "geometrytype=${geometryType.typeName}\nlayername=$layerName\nlayerfile=$layerFilePath\nlayertagsfile=$layerTagsFilePath");
+
+      var deleteFilePath =
+          await GssUtilities.getGssGeojsonLayerDeletedFilePath(layerName);
+      if (File(deleteFilePath).existsSync()) {
+        File(deleteFilePath).deleteSync();
+      }
 
       return layerFilePath;
     } else {

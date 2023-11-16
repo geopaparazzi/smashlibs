@@ -808,19 +808,6 @@ class GeojsonSource extends VectorLayerSource
   }
 
   @override
-  Future<bool> deleteCurrentSelection(GeometryEditorState geomEditState) async {
-    if (geomEditState._editableItem != null) {
-      var idToRemove = geomEditState._editableItem!.id;
-      featuresMap.remove(idToRemove);
-
-      dumpFeatureCollection();
-      isLoaded = false;
-      return true;
-    }
-    return false;
-  }
-
-  @override
   Future<HU.Feature?> getFeatureById(int id) async {
     return featuresMap[id];
   }
@@ -891,6 +878,44 @@ class GeojsonSource extends VectorLayerSource
   @override
   Future<Map<String, String>> getTypesMap() async {
     return fieldsAndTypesMap;
+  }
+
+  @override
+  Future<bool> deleteCurrentSelection(GeometryEditorState geomEditState) async {
+    if (geomEditState._editableItem != null) {
+      var idToRemove = geomEditState._editableItem!.id;
+      var removeFeature = featuresMap.remove(idToRemove);
+
+      dumpFeatureCollection();
+
+      if (isGssSource()) {
+        // make sure it is not a new added feature (i.e. is not yet on the server)
+        if (removeFeature != null &&
+            removeFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] !=
+                EditableDataSource.NEW_FEATURE_EDITMODE) {
+          // also make sure to put the the feature to the deleted list for the server
+          var deletedPath =
+              await GssUtilities.getGssGeojsonLayerDeletedFilePath(_name!);
+          // if it does not exist, create it
+          var deletedFile = File(deletedPath);
+          if (!deletedFile.existsSync()) {
+            deletedFile.createSync();
+          }
+
+          var deletedIdsString = deletedFile.readAsStringSync();
+          if (deletedIdsString.trim().length > 0) {
+            deletedIdsString = deletedIdsString + "," + idToRemove.toString();
+          } else {
+            deletedIdsString = idToRemove.toString();
+          }
+          File(deletedPath).writeAsStringSync(deletedIdsString);
+        }
+      }
+
+      isLoaded = false;
+      return true;
+    }
+    return false;
   }
 
   @override
