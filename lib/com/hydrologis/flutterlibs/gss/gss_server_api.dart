@@ -22,6 +22,7 @@ const API_USERS = "api/users/";
 
 const API_PROJECTNAMES = "api/projectnames/";
 const API_PROJECTDATA = "api/projectdatas/";
+const API_FORMS = "api/forms/";
 const API_RENDERNOTES = "api/rendernotes/";
 const API_LASTUSERPOSITIONS = "api/lastuserpositions/";
 const API_NOTES = "api/notes/";
@@ -226,6 +227,23 @@ class ServerApi {
     if (response.statusCode == 200) {
       var projectDataList = jsonDecode(response.body);
       return projectDataList;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<List<dynamic>?> getForms() async {
+    var tokenHeader = getTokenHeader();
+    Project? project = getCurrentGssProject();
+    if (project == null) {
+      throw StateError("No project was selected.");
+    }
+    var uri =
+        Uri.parse("${getBaseUrl()}$API_FORMS?$API_PROJECT_PARAM${project.id}");
+    var response = await HTTP.get(uri, headers: tokenHeader);
+    if (response.statusCode == 200) {
+      var formsList = jsonDecode(response.body);
+      return formsList;
     } else {
       return null;
     }

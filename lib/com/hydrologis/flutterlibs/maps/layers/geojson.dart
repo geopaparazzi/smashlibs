@@ -918,9 +918,8 @@ class GeojsonSource extends VectorLayerSource
         }
 
         if (isGssSource()) {
-          if (editedFeature
-                  .attributes[EditableDataSource.EDITMODE_FIELD_NAME] !=
-              EditableDataSource.MODIFIED_FEATURE_EDITMODE)
+          if (!editedFeature.attributes
+              .containsKey(EditableDataSource.EDITMODE_FIELD_NAME))
             // add the attribute that defines that the feature is new
             editedFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
                 EditableDataSource.NEW_FEATURE_EDITMODE;
@@ -928,9 +927,20 @@ class GeojsonSource extends VectorLayerSource
       } else {
         // modified
         if (isGssSource()) {
-          // add the attribute that defines that the feature is modified
-          editedFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
-              EditableDataSource.MODIFIED_FEATURE_EDITMODE;
+          if (!editedFeature.attributes
+              .containsKey(EditableDataSource.EDITMODE_FIELD_NAME)) {
+            // add the attribute that defines that the feature is new
+            editedFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
+                EditableDataSource.NEW_FEATURE_EDITMODE;
+          } else {
+            if (editedFeature
+                    .attributes[EditableDataSource.EDITMODE_FIELD_NAME] ==
+                null) {
+              // only set it if it was not set already
+              editedFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
+                  EditableDataSource.MODIFIED_FEATURE_EDITMODE;
+            }
+          }
         }
       }
       var gf = JTS.GeometryFactory.defaultPrecision();
@@ -1063,6 +1073,8 @@ class GeojsonSource extends VectorLayerSource
     // TODO: implement upload
     print(
         "uploading ${newFeaturesToUpload.length} new and ${modifiedFeaturesToUpload.length} modified features");
+
+    // TODO at the end upon success reset the editmode field in the gjosn file
   }
 
   @override

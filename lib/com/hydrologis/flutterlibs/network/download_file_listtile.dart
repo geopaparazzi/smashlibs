@@ -11,11 +11,12 @@ class FileDownloadListTileProgressWidget extends StatefulWidget {
   final String? _name;
   final bool showUrl;
   final String? authHeader;
+  final String? textData;
   final Map<String, dynamic>? tokenHeader;
 
   FileDownloadListTileProgressWidget(
       this._downloadUrl, this._destinationFilePath, this._name,
-      {this.showUrl = false, this.authHeader, this.tokenHeader});
+      {this.showUrl = false, this.authHeader, this.tokenHeader, this.textData});
 
   @override
   State<StatefulWidget> createState() {
@@ -151,7 +152,19 @@ class FileDownloadListTileProgressWidgetState
             "Download",
             "Download file $name to the device? This can take some time.");
         if (doDownload != null && doDownload) {
-          await downloadFile();
+          if (widget.textData != null) {
+            await dFile.writeAsString(widget.textData!);
+            SmashDialogs.showToast(context, "File saved to ${dFile.path}");
+            setState(() {
+              _downloading = false;
+              _downloadFinished = true;
+              _progressString =
+                  cancelToken.isCancelled ? "Cancelled by user." : "Completed.";
+            });
+            return;
+          } else {
+            await downloadFile();
+          }
         }
       },
     );
