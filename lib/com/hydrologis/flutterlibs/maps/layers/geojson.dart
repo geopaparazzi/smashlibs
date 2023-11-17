@@ -91,7 +91,7 @@ class GeojsonSource extends VectorLayerSource
           for (var form in forms) {
             List<SmashFormItem> formItems = form.getFormItems();
             for (var formItem in formItems) {
-              var label = formItem.label;
+              var label = formItem.key;
               var type = formItem.type;
               var fieldType = "TEXT";
               if (type == "double") {
@@ -1168,6 +1168,8 @@ class GeojsonSource extends VectorLayerSource
         }
         dumpFeatureCollection();
         isLoaded = false;
+
+        SmashDialogs.showInfoDialog(context, "Upload completed.");
       }
     } on Error catch (e) {
       SmashDialogs.showErrorDialog(context, e.toString());
