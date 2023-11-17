@@ -64,6 +64,8 @@ import 'package:flutter_map_line_editor/flutter_map_line_editor.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:tuple/tuple.dart';
 import 'package:http/http.dart' as HTTP;
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
+    hide ImageSource;
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';

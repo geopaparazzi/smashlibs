@@ -76,7 +76,7 @@ dependencies:
   mapsforge_flutter: #^2.0.1
     # path: /home/hydrologis/development/SMASH/mapsforge_flutter_moovida/mapsforge_flutter
     git:
-    #   url: https://github.com/mikes222/mapsforge_flutter.git
+      # url: https://github.com/mikes222/mapsforge_flutter.git
       url: https://github.com/moovida/mapsforge_flutter.git
       path: mapsforge_flutter
       ref: smash_compats
@@ -164,6 +164,9 @@ dependencies:
   badges: ^3.0.2
   # git:
   #   url: https://github.com/yako-dev/flutter_badges.git
+
+  # MIT
+  flutter_widget_from_html: ^0.14.6
 
 dev_dependencies:
   lints: ^1.0.1

@@ -90,7 +90,28 @@ class SmashDialogs {
 
   /// Show an error dialog, adding an optional [title] and a [prompt] for the user.
   static Future<void> showErrorDialog(BuildContext context, String prompt,
-      {String title: "Error"}) async {
+      {String title = "Error"}) async {
+    var pattern = "<!DOCTYPE html>";
+    var indexOf = prompt.indexOf(pattern);
+    Widget widget = Text(prompt);
+    if (indexOf >= 0) {
+      // try to render in html
+      var html = prompt.substring(indexOf);
+      widget = HtmlWidget(
+        html,
+        renderMode: RenderMode.column,
+        textStyle: TextStyle(fontSize: 14),
+      );
+      var h = ScreenUtilities.getHeight(context);
+      var w = ScreenUtilities.getWidth(context);
+
+      widget = SizedBox(
+        height: h * 0.5,
+        width: w * 0.8,
+        child: SingleChildScrollView(child: widget),
+      );
+    }
+
     await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
@@ -103,16 +124,24 @@ class SmashDialogs {
               children: <Widget>[
                 Container(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Icon(
-                          Icons.error_outline,
-                          color: Colors.red,
-                          size: SIMPLE_DIALOGS_ICONSIZE,
+                      Flexible(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: SIMPLE_DIALOGS_ICONSIZE,
+                          ),
                         ),
                       ),
-                      Text(prompt),
+                      Flexible(
+                        fit: FlexFit.loose,
+                        flex: 3,
+                        child: widget,
+                      ),
                     ],
                   ),
                 ),

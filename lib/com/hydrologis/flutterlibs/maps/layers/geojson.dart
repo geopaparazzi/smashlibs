@@ -27,6 +27,7 @@ class GeojsonSource extends VectorLayerSource
   String? _sldString;
   JTS.EGeometryType? geometryType;
   Map<String, dynamic> _styleMap = {};
+  bool? _isGssSource;
 
   GeojsonSource.fromMap(Map<String, dynamic> map) {
     _name = map[LAYERSKEY_LABEL];
@@ -150,15 +151,19 @@ class GeojsonSource extends VectorLayerSource
               GEOJSON.GeoJSONGeometry jsonGeometry = jsonFeature.geometry;
               JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
               if (geometry != null) {
+                int idToUse = id;
+                if (jsonFeature.id != null) {
+                  idToUse = int.parse(jsonFeature.id!.toString());
+                }
                 HU.Feature f = HU.Feature()
-                  ..fid = id
+                  ..fid = idToUse
                   ..geometry = geometry
                   ..attributes = jsonFeature.properties != null
                       ? jsonFeature.properties!
                       : {};
 
                 var envLL = geometry.getEnvelopeInternal();
-                featuresMap[id] = f;
+                featuresMap[f.fid!] = f;
                 _featureTree!.insert(envLL, f);
 
                 id++;
@@ -792,9 +797,21 @@ class GeojsonSource extends VectorLayerSource
       newId = newId + 1;
     }
     if (gType.isPoint()) {
-      featuresMap[newId] = HU.Feature()
+      var newFeature = HU.Feature()
         ..fid = newId
         ..geometry = geometry;
+      featuresMap[newId] = newFeature;
+      if (fieldsAndTypesMap.isNotEmpty) {
+        fieldsAndTypesMap.forEach((key, value) {
+          newFeature.attributes[key] = null;
+        });
+      }
+      if (isGssSource()) {
+        // add the attribute that defines that the feature is new
+        newFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
+            EditableDataSource.NEW_FEATURE_EDITMODE;
+      }
+
       dumpFeatureCollection();
       isLoaded = false;
     }
@@ -952,19 +969,12 @@ class GeojsonSource extends VectorLayerSource
       } else {
         // modified
         if (isGssSource()) {
-          if (!editedFeature.attributes
-              .containsKey(EditableDataSource.EDITMODE_FIELD_NAME)) {
-            // add the attribute that defines that the feature is new
+          if (editedFeature
+                  .attributes[EditableDataSource.EDITMODE_FIELD_NAME] ==
+              null) {
+            // only set it if it was not set already
             editedFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
-                EditableDataSource.NEW_FEATURE_EDITMODE;
-          } else {
-            if (editedFeature
-                    .attributes[EditableDataSource.EDITMODE_FIELD_NAME] ==
-                null) {
-              // only set it if it was not set already
-              editedFeature.attributes[EditableDataSource.EDITMODE_FIELD_NAME] =
-                  EditableDataSource.MODIFIED_FEATURE_EDITMODE;
-            }
+                EditableDataSource.MODIFIED_FEATURE_EDITMODE;
           }
         }
       }
@@ -990,8 +1000,28 @@ class GeojsonSource extends VectorLayerSource
   }
 
   void dumpFeatureCollection() {
+    GEOJSON.GeoJSONFeatureCollection featureCollection =
+        toFeatureCollection(featuresMap.values.toList());
+
+    if (_absolutePath != null) {
+      _geojsonGeometryString = featureCollection.toJSON(indent: 4);
+      HU.FileUtilities.writeStringToFile(
+          _absolutePath!, _geojsonGeometryString!);
+    } else {
+      // we need to extract the single geometry
+      if (featureCollection.features.length > 0) {
+        _geojsonGeometryString =
+            featureCollection.features[0]!.geometry.toJSON();
+      } else {
+        _geojsonGeometryString = "";
+      }
+    }
+  }
+
+  GEOJSON.GeoJSONFeatureCollection toFeatureCollection(
+      List<HU.Feature> features) {
     final featureCollection = GEOJSON.GeoJSONFeatureCollection([]);
-    featuresMap.forEach((id, feature) {
+    features.forEach((feature) {
       var geom = feature.geometry;
       if (geom != null) {
         var geojsonGeometry;
@@ -1005,7 +1035,9 @@ class GeojsonSource extends VectorLayerSource
               var coordinate = geom.getGeometryN(i).getCoordinate();
               coords.add([coordinate!.x, coordinate.y]);
             }
+            print(coords);
             geojsonGeometry = GEOJSON.GeoJSONMultiPoint(coords);
+            print("passed");
           }
         } else if (geometryType!.isLine()) {
           if (!geometryType!.isMulti()) {
@@ -1049,28 +1081,19 @@ class GeojsonSource extends VectorLayerSource
         final gjsonFeature = GEOJSON.GeoJSONFeature(
           geojsonGeometry,
           properties: feature.attributes,
+          id: feature.fid,
         );
         featureCollection.features.add(gjsonFeature);
       }
     });
-
-    if (_absolutePath != null) {
-      _geojsonGeometryString = featureCollection.toJSON(indent: 4);
-      HU.FileUtilities.writeStringToFile(
-          _absolutePath!, _geojsonGeometryString!);
-    } else {
-      // we need to extract the single geometry
-      if (featureCollection.features.length > 0) {
-        _geojsonGeometryString =
-            featureCollection.features[0]!.geometry.toJSON();
-      } else {
-        _geojsonGeometryString = "";
-      }
-    }
+    return featureCollection;
   }
 
   bool isGssSource() {
-    return GssUtilities.isGssSource(_absolutePath);
+    if (_isGssSource == null) {
+      _isGssSource = GssUtilities.isGssSource(_absolutePath);
+    }
+    return _isGssSource!;
   }
 
   @override
@@ -1085,21 +1108,70 @@ class GeojsonSource extends VectorLayerSource
       return f.attributes[EditableDataSource.EDITMODE_FIELD_NAME] != null;
     }).toList();
 
-    var newFeaturesToUpload = featuresToUpload.where((f) {
+    List<HU.Feature> newFeaturesToUpload = featuresToUpload.where((f) {
       return f.attributes[EditableDataSource.EDITMODE_FIELD_NAME] ==
           EditableDataSource.NEW_FEATURE_EDITMODE;
     }).toList();
 
-    var modifiedFeaturesToUpload = featuresToUpload.where((f) {
+    List<HU.Feature> modifiedFeaturesToUpload = featuresToUpload.where((f) {
       return f.attributes[EditableDataSource.EDITMODE_FIELD_NAME] ==
           EditableDataSource.MODIFIED_FEATURE_EDITMODE;
     }).toList();
 
-    // TODO: implement upload
-    print(
-        "uploading ${newFeaturesToUpload.length} new and ${modifiedFeaturesToUpload.length} modified features");
+    // get features to delete
+    var deletedPath =
+        await GssUtilities.getGssGeojsonLayerDeletedFilePath(_name!);
+    var deletedFile = File(deletedPath);
+    String? deletedIdsString;
+    if (deletedFile.existsSync()) {
+      deletedIdsString = deletedFile.readAsStringSync();
+      if (deletedIdsString.trim().length == 0) {
+        deletedIdsString = null;
+      }
+    }
+    int deleted =
+        deletedIdsString == null ? 0 : deletedIdsString.split(",").length;
 
-    // TODO at the end upon success reset the editmode field in the gjosn file
+    var message =
+        "This will upload ${newFeaturesToUpload.length} new, modifiy " +
+            "${modifiedFeaturesToUpload.length} and delete $deleted features.";
+    var doUpload = await SmashDialogs.showConfirmDialog(
+        context, "Upload", message,
+        trueText: "Upload", falseText: "Cancel");
+
+    try {
+      if (doUpload != null && doUpload) {
+        if (newFeaturesToUpload.isNotEmpty) {
+          var newFC = toFeatureCollection(newFeaturesToUpload);
+          var newFCString = newFC.toJSON(indent: 4);
+          await ServerApi.postNewDynamicLayerData(_name!, newFCString);
+          newFeaturesToUpload.forEach((f) {
+            f.attributes.remove(EditableDataSource.EDITMODE_FIELD_NAME);
+          });
+        }
+        if (modifiedFeaturesToUpload.isNotEmpty) {
+          var modFC = toFeatureCollection(modifiedFeaturesToUpload);
+          var modFCString = modFC.toJSON(indent: 4);
+          await ServerApi.postModifiedDynamicLayerData(_name!, modFCString);
+          modifiedFeaturesToUpload.forEach((f) {
+            f.attributes.remove(EditableDataSource.EDITMODE_FIELD_NAME);
+          });
+        }
+        if (deleted > 0) {
+          var deletedIds = [];
+          deletedIdsString!.split(",").forEach((id) {
+            deletedIds.add({"id": int.parse(id)});
+          });
+          await ServerApi.postDeletedDynamicLayerData(
+              _name!, jsonEncode(deletedIds));
+          deletedFile.writeAsStringSync("");
+        }
+        dumpFeatureCollection();
+        isLoaded = false;
+      }
+    } on Error catch (e) {
+      SmashDialogs.showErrorDialog(context, e.toString());
+    }
   }
 
   @override

@@ -203,6 +203,60 @@ class ServerApi {
     }
   }
 
+  static Future<void> postNewDynamicLayerData(
+      String layerName, String dataJson) async {
+    var tokenHeader = getTokenHeader();
+    Project? project = getCurrentGssProject();
+    if (project == null) {
+      throw StateError("No project was selected.");
+    }
+    var uri = Uri.parse("${getBaseUrl()}$API_DYNAMICLAYERS_DATA$layerName/" +
+        "?$API_PROJECT_PARAM${project.id}");
+
+    var headers = {'Content-Type': 'application/json; charset=UTF-8'}
+      ..addAll(tokenHeader);
+    var response = await HTTP.post(uri, body: dataJson, headers: headers);
+    if (response.statusCode != 201) {
+      throw new StateError(response.body);
+    }
+  }
+
+  static Future<void> postModifiedDynamicLayerData(
+      String layerName, String dataJson) async {
+    var tokenHeader = getTokenHeader();
+    Project? project = getCurrentGssProject();
+    if (project == null) {
+      throw StateError("No project was selected.");
+    }
+    var uri = Uri.parse("${getBaseUrl()}$API_DYNAMICLAYERS_DATA$layerName/" +
+        "?$API_PROJECT_PARAM${project.id}");
+
+    var headers = {'Content-Type': 'application/json; charset=UTF-8'}
+      ..addAll(tokenHeader);
+    var response = await HTTP.put(uri, body: dataJson, headers: headers);
+    if (response.statusCode != 200) {
+      throw new StateError(response.body);
+    }
+  }
+
+  static Future<void> postDeletedDynamicLayerData(
+      String layerName, String dataJson) async {
+    var tokenHeader = getTokenHeader();
+    Project? project = getCurrentGssProject();
+    if (project == null) {
+      throw StateError("No project was selected.");
+    }
+    var uri = Uri.parse("${getBaseUrl()}$API_DYNAMICLAYERS_DATA$layerName/" +
+        "?$API_PROJECT_PARAM${project.id}");
+
+    var headers = {'Content-Type': 'application/json; charset=UTF-8'}
+      ..addAll(tokenHeader);
+    var response = await HTTP.delete(uri, body: dataJson, headers: headers);
+    if (response.statusCode != 200) {
+      throw new StateError(response.body);
+    }
+  }
+
   static Future<dynamic> getRenderNotes() async {
     var tokenHeader = getTokenHeader();
     Project? project = getCurrentGssProject();
