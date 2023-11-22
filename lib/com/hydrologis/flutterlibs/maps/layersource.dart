@@ -309,7 +309,6 @@ abstract class TiledRasterLayerSource extends RasterLayerSource {}
 /// List of default online tile layer sources.
 final List<TileSource> onlinesTilesSources = [
   TileSource.Open_Street_Map_Standard(),
-  TileSource.Wikimedia_Map(),
   TileSource.Opnvkarte_Transport(),
   TileSource.OpenTopoMap(),
   TileSource.Esri_Satellite(),
