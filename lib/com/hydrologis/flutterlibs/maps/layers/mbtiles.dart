@@ -74,8 +74,8 @@ class SmashMBTileImage extends ImageProvider<SmashMBTileImage> {
   SmashMBTileImage(this.database, this.coords);
 
   @override
-  ImageStreamCompleter load(SmashMBTileImage key, DecoderCallback decoder) {
-    // TODo check on new DecoderCallBack that was added ( PaintingBinding.instance.instantiateImageCodec ? )
+  ImageStreamCompleter loadImage(
+      SmashMBTileImage key, ImageDecoderCallback decoder) {
     return MultiFrameImageStreamCompleter(
         codec: _loadAsync(key),
         scale: 1,
@@ -104,8 +104,9 @@ class SmashMBTileImage extends ImageProvider<SmashMBTileImage> {
             'Failed to load tile for coords: $coords');
       }
     }
-    return await PaintingBinding.instance
-        .instantiateImageCodec(bytes! as Uint8List);
+    ui.ImmutableBuffer buffer =
+        await ui.ImmutableBuffer.fromUint8List(bytes! as Uint8List);
+    return await PaintingBinding.instance.instantiateImageCodecWithSize(buffer);
   }
 
   @override

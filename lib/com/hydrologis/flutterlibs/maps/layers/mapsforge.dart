@@ -235,8 +235,8 @@ class MapsforgeImageProvider extends ImageProvider<MapsforgeImageProvider> {
       this._tile, this._bitmapCache);
 
   @override
-  ImageStreamCompleter load(
-      MapsforgeImageProvider key, DecoderCallback decoder) {
+  ImageStreamCompleter loadImage(
+      MapsforgeImageProvider key, ImageDecoderCallback decoder) {
     // TODo check on new DecoderCallBack that was added ( PaintingBinding.instance.instantiateImageCodec ? )
     return MultiFrameImageStreamCompleter(
       codec: loadAsync(key),
@@ -255,8 +255,10 @@ class MapsforgeImageProvider extends ImageProvider<MapsforgeImageProvider> {
       List<int>? tileData =
           _bitmapCache.getTile(_tile.tileX, _tile.tileY, _tile.zoomLevel);
       if (tileData != null) {
+        ui.ImmutableBuffer buffer =
+            await ui.ImmutableBuffer.fromUint8List(tileData as Uint8List);
         return await PaintingBinding.instance
-            .instantiateImageCodec(tileData as Uint8List);
+            .instantiateImageCodecWithSize(buffer);
       }
     } catch (e) {
       print("ERROR");
@@ -298,7 +300,10 @@ class MapsforgeImageProvider extends ImageProvider<MapsforgeImageProvider> {
       }
 
       if (bytes != null) {
-        var codec = await PaintingBinding.instance.instantiateImageCodec(bytes);
+        ui.ImmutableBuffer buffer =
+            await ui.ImmutableBuffer.fromUint8List(bytes!);
+        var codec = await PaintingBinding.instance
+            .instantiateImageCodecWithSize(buffer);
         return codec;
       }
     } catch (ex, stacktrace) {

@@ -751,8 +751,8 @@ class GeopackageLazyTileImageProvider
   GeopackageLazyTileImageProvider(this._tile, this._rgbToHide);
 
   @override
-  ImageStreamCompleter load(
-      GeopackageLazyTileImageProvider key, DecoderCallback decoder) {
+  ImageStreamCompleter loadImage(
+      GeopackageLazyTileImageProvider key, ImageDecoderCallback decoder) {
     return MultiFrameImageStreamCompleter(
       codec: loadAsync(key),
       scale: 1.0,
@@ -778,8 +778,10 @@ class GeopackageLazyTileImageProvider
               image!, _rgbToHide![0], _rgbToHide![1], _rgbToHide![2]);
           finalBytes = IMG.encodePng(image);
         }
+        ui.ImmutableBuffer buffer =
+            await ui.ImmutableBuffer.fromUint8List(finalBytes! as Uint8List);
         return await PaintingBinding.instance
-            .instantiateImageCodec(finalBytes! as Uint8List);
+            .instantiateImageCodecWithSize(buffer);
       }
     } catch (e) {
       print(e); // ignore later
@@ -849,7 +851,8 @@ class GeopackageTileImage extends ImageProvider<GeopackageTileImage> {
   GeopackageTileImage(this.database, this.tableName, this.coords);
 
   @override
-  ImageStreamCompleter load(GeopackageTileImage key, DecoderCallback decoder) {
+  ImageStreamCompleter loadImage(
+      GeopackageTileImage key, ImageDecoderCallback decoder) {
     return MultiFrameImageStreamCompleter(
         codec: _loadAsync(key),
         scale: 1,

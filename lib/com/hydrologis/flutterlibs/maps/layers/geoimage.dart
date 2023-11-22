@@ -430,7 +430,7 @@ class MyMemoryImage extends ImageProvider<MyMemoryImage> {
 
   /// The bytes to decode into an image.
   final Uint8List? bytes;
-  final List<int?> rgbToHide;
+  final List<int?>? rgbToHide;
 
   /// The scale to place in the [ImageInfo] object of the image.
   final double scale = 1.0;
@@ -441,7 +441,8 @@ class MyMemoryImage extends ImageProvider<MyMemoryImage> {
   }
 
   @override
-  ImageStreamCompleter load(MyMemoryImage key, DecoderCallback decode) {
+  ImageStreamCompleter loadImage(
+      MyMemoryImage key, ImageDecoderCallback decode) {
     return MultiFrameImageStreamCompleter(
       codec: _loadAsync(key, decode),
       scale: key.scale,
@@ -449,10 +450,12 @@ class MyMemoryImage extends ImageProvider<MyMemoryImage> {
     );
   }
 
-  Future<ui.Codec> _loadAsync(MyMemoryImage key, DecoderCallback decode) async {
+  Future<ui.Codec> _loadAsync(
+      MyMemoryImage key, ImageDecoderCallback decode) async {
     assert(key == this);
 
-    return await PaintingBinding.instance.instantiateImageCodec(bytes!);
+    ui.ImmutableBuffer buffer = await ui.ImmutableBuffer.fromUint8List(bytes!);
+    return await PaintingBinding.instance.instantiateImageCodecWithSize(buffer);
   }
 
   @override
@@ -467,10 +470,10 @@ class MyMemoryImage extends ImageProvider<MyMemoryImage> {
   @override
   int get hashCode {
     if (rgbToHide != null) {
-      return hashValues(
-          bytes.hashCode, scale, rgbToHide[0], rgbToHide[1], rgbToHide[2]);
+      return Object.hash(
+          bytes.hashCode, scale, rgbToHide![0], rgbToHide![1], rgbToHide![2]);
     }
-    return hashValues(bytes.hashCode, scale);
+    return Object.hash(bytes.hashCode, scale);
   }
 
   @override
