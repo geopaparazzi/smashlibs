@@ -157,25 +157,11 @@ class TileSource extends TiledRasterLayerSource {
     isLoaded = true;
   }
 
-  TileSource.Wikimedia_Map({
-    this.name = "Wikimedia Map",
-    this.url = "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
-    this.attribution = "OpenStreetMap contributors, under ODbL",
-    this.minZoom = DEFAULT_MINZOOM_INT,
-    this.maxZoom = DEFAULT_MAXZOOM_INT,
-    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
-    this.isVisible = true,
-    this.isTms = false,
-    this.canDoProperties = true,
-  }) {
-    isLoaded = true;
-  }
-
   TileSource.Esri_Satellite({
     this.name = "Esri Satellite",
     this.url:
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    this.attribution = "Esri",
+    this.attribution = "Copyright Esri",
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
     this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,

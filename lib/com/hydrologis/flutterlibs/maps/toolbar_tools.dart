@@ -31,7 +31,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
         builder: (context, geomEditState, child) {
       if (geomEditState.editableGeometry == null) {
         return BottomAppBar(
-          color: SmashColors.mainDecorations,
+          // color: SmashColors.mainDecorations,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[

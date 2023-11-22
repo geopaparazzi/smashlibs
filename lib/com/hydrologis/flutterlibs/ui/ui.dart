@@ -20,10 +20,10 @@ class SmashPlatform {
 
 /// Helper class to keep UI always the same.
 class SmashUI {
-  static const double SMALL_SIZE = 14;
-  static const double NORMAL_SIZE = 18;
-  static const double MEDIUM_SIZE = 22;
-  static const double BIG_SIZE = 26;
+  static const double SMALL_SIZE = 12;
+  static const double NORMAL_SIZE = 16;
+  static const double MEDIUM_SIZE = 18;
+  static const double BIG_SIZE = 20;
 
   static const double DEFAULT_PADDING = 8.0;
   static const double DEFAULT_ELEVATION = 5.0;
