@@ -259,7 +259,8 @@ class FileBrowserState extends State<FileBrowser> {
                             HU.FileUtilities.joinPaths(parentPath, name);
 
                         IconData iconData = SmashIcons.forPath(fullPath);
-                        Widget trailingWidget;
+                        Widget? trailingWidget;
+                        var tapFunction;
                         if (isDir) {
                           if (widget._doFolderMode) {
                             // if folder you can enter or select it
@@ -291,41 +292,47 @@ class FileBrowserState extends State<FileBrowser> {
                               ],
                             );
                           } else {
-                            trailingWidget = IconButton(
-                              icon: Icon(Icons.arrow_right),
-                              tooltip: "Enter folder",
-                              onPressed: () {
-                                setState(() {
-                                  currentPath = HU.FileUtilities.joinPaths(
-                                      parentPath, name);
-                                });
-                              },
-                            );
+                            tapFunction = () {
+                              setState(() {
+                                currentPath = HU.FileUtilities.joinPaths(
+                                    parentPath, name);
+                              });
+                            };
                           }
                         } else {
                           // if it gets here, then it is sure no folder mode
-                          trailingWidget = IconButton(
-                            icon: Icon(MdiIcons.checkCircleOutline,
-                                color: SmashColors.mainDecorations),
-                            tooltip: "Select file",
-                            onPressed: () async {
-                              await Workspace.setLastUsedFolder(parentPath);
-                              var resultPath =
-                                  HU.FileUtilities.joinPaths(parentPath, name);
-                              Navigator.pop(context, resultPath);
-                            },
-                          );
+                          tapFunction = () async {
+                            await Workspace.setLastUsedFolder(parentPath);
+                            var resultPath =
+                                HU.FileUtilities.joinPaths(parentPath, name);
+                            Navigator.pop(context, resultPath);
+                          };
                         }
 
-                        return ListTile(
-                          leading: Icon(
-                            iconData,
-                            color: SmashColors.mainDecorations,
-                          ),
-                          title: Text(labelName),
-                          subtitle: addInfo.isNotEmpty ? Text(addInfo) : null,
-                          trailing: trailingWidget,
-                        );
+                        if (trailingWidget != null) {
+                          return ListTile(
+                            leading: Icon(
+                              iconData,
+                              color: SmashColors.mainDecorations,
+                            ),
+                            title: Text(labelName),
+                            subtitle: addInfo.isNotEmpty ? Text(addInfo) : null,
+                            trailing: trailingWidget,
+                          );
+                        } else {
+                          return InkWell(
+                            onTap: tapFunction,
+                            child: ListTile(
+                              leading: Icon(
+                                iconData,
+                                color: SmashColors.mainDecorations,
+                              ),
+                              title: Text(labelName),
+                              subtitle:
+                                  addInfo.isNotEmpty ? Text(addInfo) : null,
+                            ),
+                          );
+                        }
                       }).toList(),
                     ),
                   ),
