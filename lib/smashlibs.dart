@@ -66,6 +66,7 @@ import 'package:tuple/tuple.dart';
 import 'package:http/http.dart' as HTTP;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
     hide ImageSource;
+import 'package:painter/painter.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
@@ -76,6 +77,7 @@ part 'com/hydrologis/flutterlibs/gss/gss_server_api.dart';
 part 'com/hydrologis/flutterlibs/gss/gss_utilities.dart';
 part 'com/hydrologis/flutterlibs/forms/forms.dart';
 part 'com/hydrologis/flutterlibs/forms/forms_widgets.dart';
+part 'com/hydrologis/flutterlibs/forms/form_sketch.dart';
 part 'com/hydrologis/flutterlibs/network/download_file_listtile.dart';
 part 'com/hydrologis/flutterlibs/network/download_file_progress.dart';
 part 'com/hydrologis/flutterlibs/network/network_helper.dart';

@@ -168,6 +168,9 @@ dependencies:
   # MIT
   flutter_widget_from_html: ^0.14.6
 
+  #BSD
+  painter: ^2.0.0
+
 dev_dependencies:
   lints: ^1.0.1
   test: ^1.20.1

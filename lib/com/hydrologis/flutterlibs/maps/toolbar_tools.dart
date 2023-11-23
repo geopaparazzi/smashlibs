@@ -366,6 +366,7 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
               totalQueryResult.geoms.add(feature.geometry!);
 
               var attributes = feature.attributes;
+              AFormhelper formHelper;
               if (eds is GeojsonSource) {
                 if (eds.isGssSource()) {
                   // need to add id and remove editmode
@@ -374,10 +375,12 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
                   attributes.remove(EditableDataSource.EDITMODE_FIELD_NAME);
                   attributes["id"] = id;
                 }
+                formHelper = SmashGeojsonFormHelper(totalQueryResult);
+              } else {
+                formHelper = SmashDatabaseFormHelper(totalQueryResult);
               }
               totalQueryResult.data.add(attributes);
 
-              var formHelper = SmashDatabaseFormHelper(totalQueryResult);
               await formHelper.init();
               if (formHelper.hasForm()) {
                 await Navigator.push(
@@ -860,5 +863,275 @@ class SmashDatabaseFormHelper extends AFormhelper {
     // // TODO: implement takeSketchForForms
     // throw UnimplementedError();
     return Future.value(null);
+  }
+}
+
+class SmashGeojsonFormHelper extends AFormhelper {
+  final EditableQueryResult _queryResult;
+  var _titleWidget;
+  var _sectionName;
+  EditableDataSource? _eds;
+  List<SmashSection> sectionList = [];
+  late String _tableName;
+  dynamic _db;
+
+  SmashGeojsonFormHelper(this._queryResult);
+
+  @override
+  Future<bool> init() async {
+    _eds = _queryResult.edsList?[0];
+
+    var title = _queryResult.ids?.first ?? "No title";
+    if (_queryResult.primaryKeys != null &&
+        _queryResult.primaryKeys!.length == 1) {
+      // add also the primary key value
+      var pkValue = _queryResult.data[0][_queryResult.primaryKeys!.first];
+      if (pkValue != null) {
+        title = "$title ($pkValue)";
+      }
+    }
+
+    _titleWidget =
+        SmashUI.titleText(title, color: SmashColors.mainBackground, bold: true);
+
+    _tableName = _queryResult.ids!.first;
+
+    if (_eds is DbVectorLayerSource) {
+      _db = (_eds as DbVectorLayerSource).db;
+    }
+    if (_db != null &&
+        await _db.hasTable(TableName(HM_FORMS_TABLE,
+            schemaSupported:
+                _db is PostgisDb || _db is PostgresqlDb ? true : false))) {
+      HU.QueryResult result = await _db.select(
+          "select $FORMS_FIELD from $HM_FORMS_TABLE where $FORMS_TABLENAME_FIELD='$_tableName'");
+      if (result.length == 1) {
+        String formJsonString = result.first.get(FORMS_FIELD);
+        var tm = TagsManager();
+        tm.readTags(tagsString: formJsonString);
+        var tags = tm.getTags();
+        // this should contain one single section
+        SmashSection section = tags.getSections()[0];
+        sectionList.add(section);
+
+        _sectionName = section.sectionName;
+        var forms = section.getForms();
+
+        var data = _queryResult.data.first;
+        data.forEach((key, value) {
+          if (value != null) {
+            forms.forEach((form) {
+              form.update(key, value);
+            });
+          }
+        });
+
+        return true;
+      }
+    }
+    if (_eds is GeojsonSource) {
+      var geojsonSource = _eds as GeojsonSource;
+      var tagsPath = geojsonSource.getTagsPath();
+      if (tagsPath != null) {
+        var tm = TagsManager();
+        tm.readTags(tagsFilePath: tagsPath);
+        var section = tm.getTags().getSections().first;
+        sectionList.add(section);
+
+        _sectionName = section.sectionName;
+        var forms = section.getForms();
+
+        var data = _queryResult.data.first;
+        data.forEach((key, value) {
+          if (value != null) {
+            forms.forEach((form) {
+              form.update(key, value);
+            });
+          }
+        });
+      }
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  bool hasForm() {
+    return sectionList.isNotEmpty;
+  }
+
+  @override
+  Widget getFormTitleWidget() {
+    return _titleWidget;
+  }
+
+  @override
+  int getId() {
+    var pk = _queryResult.primaryKeys!.first;
+    var id = _queryResult.data.first[pk];
+    return id;
+  }
+
+  @override
+  getPosition() {
+    // TODO: implement getPosition
+    throw UnimplementedError();
+  }
+
+  @override
+  SmashSection getSection() {
+    return sectionList.first;
+  }
+
+  @override
+  String getSectionName() {
+    return _sectionName;
+  }
+
+  /// Save data on form exit.
+  Future<void> onSaveFunction(BuildContext context) async {
+    SmashSection section = sectionList.first;
+    var forms = section.getForms();
+
+    var data = _queryResult.data.first;
+
+    forms.forEach((form) {
+      var formItems = form.getFormItems();
+      formItems.forEach((element) {
+        String key = element.key;
+        dynamic value = element.value;
+        if (value != null) {
+          // TODO check type and convert string to that type (value is always a string)
+          // also booleans need to be checked etc (true doesn't resolve to 1)
+          data[key] = value;
+        }
+      });
+    });
+
+    var pk = _queryResult.primaryKeys!.first;
+    var id = _queryResult.data.first[pk];
+    if (_db != null) {
+      var where = "$pk=$id";
+      await _db.updateMap(
+          TableName(_tableName,
+              schemaSupported:
+                  _db is PostgisDb || _db is PostgresqlDb ? true : false),
+          data,
+          where);
+    }
+    if (_eds is GeojsonSource) {
+      var geojsonSource = _eds as GeojsonSource;
+      geojsonSource.updateFeature(id, data);
+    }
+  }
+
+  /// Take a picture for forms
+  Future<String?> takePictureForForms(
+      BuildContext context, bool fromGallery, List<String> imageSplit) async {
+    print("bah");
+    // DbImage dbImage = DbImage()
+    //   ..timeStamp = DateTime.now().millisecondsSinceEpoch
+    //   ..isDirty = 1;
+
+    // dbImage.lon = position.longitude;
+    // dbImage.lat = position.latitude;
+    // try {
+    //   dbImage.altim = position.altitude;
+    //   dbImage.azim = position.heading;
+    // } catch (e) {
+    //   dbImage.altim = -1;
+    //   dbImage.azim = -1;
+    // }
+    // if (noteId != null) {
+    //   dbImage.noteId = noteId;
+    // }
+
+    // int imageId;
+    // var imagePath = fromGallery
+    //     ? await Camera.loadImageFromGallery()
+    //     : await Camera.takePicture();
+    // if (imagePath != null) {
+    //   var imageName = FileUtilities.nameFromFile(imagePath, true);
+    //   dbImage.text =
+    //       "IMG_${TimeUtilities.DATE_TS_FORMATTER.format(DateTime.fromMillisecondsSinceEpoch(dbImage.timeStamp))}.jpg";
+    //   imageId =
+    //       ImageWidgetUtilities.saveImageToSmashDb(context, imagePath, dbImage);
+    //   if (imageId != null) {
+    //     imageSplit.add(imageId.toString());
+    //     var value = imageSplit.join(IMAGE_ID_SEPARATOR);
+
+    //     File file = File(imagePath);
+    //     if (file.existsSync()) {
+    //       await file.delete();
+    //     }
+    //     return value;
+    //   } else {
+    //     SmashDialogs.showWarningDialog(
+    //         context, "Could not save image in database.");
+    //     return null;
+    //   }
+    // }
+    return null;
+  }
+
+  /// Get thumbnails from the database
+  Future<List<Widget>> getThumbnailsFromDb(BuildContext context,
+      SmashFormItem formItem, List<String> imageSplit) async {
+    // ProjectState projectState =
+    //     Provider.of<ProjectState>(context, listen: false);
+
+    // String value = ""; //$NON-NLS-1$
+    // if (itemMap.containsKey(TAG_VALUE)) {
+    //   value = itemMap[TAG_VALUE].trim();
+    // }
+    // if (value.isNotEmpty) {
+    //   var split = value.split(IMAGE_ID_SEPARATOR);
+    //   split.forEach((v) {
+    //     if (!imageSplit.contains(v)) {
+    //       imageSplit.add(v);
+    //     }
+    //   });
+    // }
+
+    // List<Widget> thumbList = [];
+    // for (int i = 0; i < imageSplit.length; i++) {
+    //   var id = int.parse(imageSplit[i]);
+    //   Widget thumbnail = projectState.projectDb.getThumbnail(id);
+    //   Widget withBorder = Container(
+    //     padding: SmashUI.defaultPadding(),
+    //     child: thumbnail,
+    //   );
+    //   thumbList.add(withBorder);
+    // }
+    // return thumbList;
+    return [];
+  }
+
+  @override
+  Future<String?> takeSketchForForms(
+      BuildContext context, List<String> imageSplit) async {
+    var imageBytes = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => SketchPage(),
+          fullscreenDialog: true,
+        ));
+    if (imageBytes != null) {
+      // dbImage.text =
+      //     "SKETCH_${HU.TimeUtilities.DATE_TS_FORMATTER.format(DateTime.fromMillisecondsSinceEpoch(dbImage.timeStamp))}.png";
+      // imageId = ImageWidgetUtilities.saveImageBytesToSmashDb(
+      //     imageBytes, context, dbImage, dbImage.text);
+      // if (imageId != null) {
+      //   imageSplit.add(imageId.toString());
+      //   var value = imageSplit.join(IMAGE_ID_SEPARATOR);
+      //   return value;
+      // } else {
+      //   SmashDialogs.showWarningDialog(
+      //       context, SL.of(context).form_smash_cantSaveImageDb);
+      //   return null;
+      // }
+    }
+
+    return null;
   }
 }

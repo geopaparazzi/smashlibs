@@ -417,6 +417,72 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Please enter a valid server username.'**
   String get settings_pleaseEnterValidUsername;
+
+  /// No description provided for @form_sketch_newSketch.
+  ///
+  /// In en, this message translates to:
+  /// **'New Sketch'**
+  String get form_sketch_newSketch;
+
+  /// No description provided for @form_sketch_undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get form_sketch_undo;
+
+  /// No description provided for @form_sketch_noUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to undo'**
+  String get form_sketch_noUndo;
+
+  /// No description provided for @form_sketch_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get form_sketch_clear;
+
+  /// No description provided for @form_sketch_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get form_sketch_save;
+
+  /// No description provided for @form_sketch_sketcher.
+  ///
+  /// In en, this message translates to:
+  /// **'Sketcher'**
+  String get form_sketch_sketcher;
+
+  /// No description provided for @form_sketch_enableDrawing.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on drawing'**
+  String get form_sketch_enableDrawing;
+
+  /// No description provided for @form_sketch_enableEraser.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on eraser'**
+  String get form_sketch_enableEraser;
+
+  /// No description provided for @form_sketch_backColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Background color'**
+  String get form_sketch_backColor;
+
+  /// No description provided for @form_sketch_strokeColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Stroke color'**
+  String get form_sketch_strokeColor;
+
+  /// No description provided for @form_sketch_pickColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick color'**
+  String get form_sketch_pickColor;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {
