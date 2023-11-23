@@ -117,75 +117,25 @@ class DrawBar extends StatelessWidget {
                 });
               });
         }),
-        new ColorPickerButton(_controller.backgroundColor, (newColor) {
-          _controller.backgroundColor = newColor;
-        }),
-        new ColorPickerButton(_controller.drawColor, (newColor) {
-          _controller.drawColor = newColor;
-        }),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 4.0),
+          child: Tooltip(
+            message: SLL.of(context).form_sketch_backColor,
+            child: ColorPickerButton(_controller.backgroundColor, (newColor) {
+              _controller.backgroundColor = newColor;
+            }),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 4.0, right: 8.0),
+          child: Tooltip(
+            message: SLL.of(context).form_sketch_strokeColor,
+            child: ColorPickerButton(_controller.drawColor, (newColor) {
+              _controller.drawColor = newColor;
+            }),
+          ),
+        ),
       ],
     );
   }
 }
-
-// class SketchColorPickerButton extends StatefulWidget {
-//   final PainterController _controller;
-//   final bool _background;
-
-//   SketchColorPickerButton(this._controller, this._background);
-
-//   @override
-//   _SketchColorPickerButtonState createState() =>
-//       new _SketchColorPickerButtonState();
-// }
-
-// class _SketchColorPickerButtonState extends State<SketchColorPickerButton> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return new IconButton(
-//         icon: new Icon(_iconData, color: _color),
-//         tooltip: widget._background
-//             ? SLL.of(context).form_sketch_backColor
-//             : SLL.of(context).form_sketch_strokeColor,
-//         onPressed: _pickColor);
-//   }
-
-//   void _pickColor() {
-//     Color pickerColor = _color;
-//     Navigator.of(context)
-//         .push(new MaterialPageRoute(
-//             fullscreenDialog: true,
-//             builder: (BuildContext context) {
-//               return new Scaffold(
-//                   appBar: new AppBar(
-//                     title: Text(SLL.of(context).form_sketch_pickColor),
-//                   ),
-//                   body: new Container(
-//                       alignment: Alignment.center,
-//                       child: new ColorPicker(
-//                         pickerColor: pickerColor,
-//                         onColorChanged: (Color c) => pickerColor = c,
-//                       )));
-//             }))
-//         .then((_) {
-//       setState(() {
-//         _color = pickerColor;
-//       });
-//     });
-//   }
-
-//   Color get _color => widget._background
-//       ? widget._controller.backgroundColor
-//       : widget._controller.drawColor;
-
-//   IconData get _iconData =>
-//       widget._background ? Icons.format_color_fill : Icons.brush;
-
-//   set _color(Color color) {
-//     if (widget._background) {
-//       widget._controller.backgroundColor = color;
-//     } else {
-//       widget._controller.drawColor = color;
-//     }
-//   }
-// }
