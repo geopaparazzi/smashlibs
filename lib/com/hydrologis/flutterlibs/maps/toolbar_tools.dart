@@ -629,8 +629,18 @@ class SmashDatabaseFormHelper extends AFormhelper {
   Future<bool> init() async {
     _eds = _queryResult.edsList?[0];
 
-    _titleWidget = SmashUI.titleText(_queryResult.ids!.first,
-        color: SmashColors.mainBackground, bold: true);
+    var title = _queryResult.ids?.first ?? "No title";
+    if (_queryResult.primaryKeys != null &&
+        _queryResult.primaryKeys!.length == 1) {
+      // add also the primary key value
+      var pkValue = _queryResult.data[0][_queryResult.primaryKeys!.first];
+      if (pkValue != null) {
+        title = "$title ($pkValue)";
+      }
+    }
+
+    _titleWidget =
+        SmashUI.titleText(title, color: SmashColors.mainBackground, bold: true);
 
     _tableName = _queryResult.ids!.first;
 

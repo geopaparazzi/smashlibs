@@ -165,8 +165,7 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
             .getFeaturesIntersecting(checkGeom: boundsGeom);
         if (fc != null) {
           fc.features.forEach((f) {
-            totalQueryResult.ids!.add(vLayer!.getName()!);
-            totalQueryResult.primaryKeys?.add(null);
+            totalQueryResult.ids!.add(vLayer.getName()!);
             totalQueryResult.editable!.add(false);
             var g = f.geometry!;
             if (dataSrid != null && dataSrid != SmashPrj.EPSG4326) {
@@ -175,13 +174,15 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
             totalQueryResult.geoms.add(g);
 
             var attributes = f.attributes;
-            if (vLayer is GeojsonSource) {
-              if (vLayer.isGssSource()) {
-                // need to add id and remove editmode
-                // clone attributes map
-                attributes = Map.from(attributes);
-                attributes.remove(EditableDataSource.EDITMODE_FIELD_NAME);
-              }
+            if (vLayer is GeojsonSource && vLayer.isGssSource()) {
+              // need to add id and remove editmode
+              // clone attributes map
+              attributes = Map.from(attributes);
+              attributes.remove(EditableDataSource.EDITMODE_FIELD_NAME);
+              attributes["id"] = f.fid;
+              totalQueryResult.primaryKeys?.add("id");
+            } else {
+              totalQueryResult.primaryKeys?.add(null);
             }
             totalQueryResult.data.add(attributes);
             totalQueryResult.edsList!.add(vLayer as EditableDataSource);

@@ -85,11 +85,12 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     Map<String, String>? typesMap;
     var primaryKey;
     var eds;
-    if (f.editable![_index]) {
+    bool isEditable = f.editable?[_index] ?? false;
+    if (isEditable) {
       typesMap = f.fieldAndTypemap![_index];
-      primaryKey = f.primaryKeys![_index];
       eds = f.edsList![_index];
     }
+    primaryKey = f.primaryKeys?[_index] ?? null;
 
     var centroid = _geometry.getCentroid().getCoordinate();
 
@@ -171,9 +172,18 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     }
 
     var tableName = widget.features.ids![_index];
+
+    var title = tableName;
+    if (primaryKey != null && widget.features.data.length == 1) {
+      // add also the primary key value
+      var pkValue = widget.features.data[0][primaryKey];
+      if (pkValue != null) {
+        title = "$title ($pkValue)";
+      }
+    }
     return Scaffold(
       appBar: AppBar(
-        title: Text(tableName),
+        title: Text(title),
         actions: _total > 1
             ? <Widget>[
                 IconButton(

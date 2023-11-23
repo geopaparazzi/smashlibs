@@ -164,7 +164,7 @@ class ServerApi {
   }
 
   static Future<String?> downloadDynamicLayerToDevice(String layerName,
-      dynamic formDefinition, JTS.EGeometryType geometryType) async {
+      {dynamic formDefinition, JTS.EGeometryType? geometryType}) async {
     Project? project = getCurrentGssProject();
     if (project == null) {
       throw StateError("No project was selected.");
@@ -185,11 +185,17 @@ class ServerApi {
     if (response.statusCode == 200) {
       HU.FileUtilities.writeStringToFile(layerFilePath, response.body);
 
-      var formString = jsonEncode(formDefinition);
-      HU.FileUtilities.writeStringToFile(layerTagsFilePath, formString);
+      String info = "layername=$layerName\nlayerfile=$layerFilePath\n";
+      if (geometryType != null) {
+        info += "geometrytype=${geometryType.typeName}\n";
+      }
+      if (formDefinition != null) {
+        var formString = jsonEncode(formDefinition);
+        HU.FileUtilities.writeStringToFile(layerTagsFilePath, formString);
+        info += "layertagsfile=$layerTagsFilePath\n";
+      }
 
-      HU.FileUtilities.writeStringToFile(layerPropertiesFilePath,
-          "geometrytype=${geometryType.typeName}\nlayername=$layerName\nlayerfile=$layerFilePath\nlayertagsfile=$layerTagsFilePath");
+      HU.FileUtilities.writeStringToFile(layerPropertiesFilePath, info);
 
       var deleteFilePath =
           await GssUtilities.getGssGeojsonLayerDeletedFilePath(layerName);

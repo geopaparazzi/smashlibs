@@ -1152,7 +1152,8 @@ class GeojsonSource extends VectorLayerSource
 
     try {
       if (doUpload != null && doUpload) {
-        if (newFeaturesToUpload.isNotEmpty) {
+        bool hasNew = newFeaturesToUpload.isNotEmpty;
+        if (hasNew) {
           var newFC = toFeatureCollection(newFeaturesToUpload);
           var newFCString = newFC.toJSON(indent: 4);
           await ServerApi.postNewDynamicLayerData(_name!, newFCString);
@@ -1177,7 +1178,14 @@ class GeojsonSource extends VectorLayerSource
               _name!, jsonEncode(deletedIds));
           deletedFile.writeAsStringSync("");
         }
-        dumpFeatureCollection();
+
+        // if a new feature was added, we need to update the geojson file
+        // to reflect the rigth ids (the server assigns them)
+        if (hasNew) {
+          await ServerApi.downloadDynamicLayerToDevice(_name!);
+        } else {
+          dumpFeatureCollection();
+        }
         isLoaded = false;
 
         SmashDialogs.showInfoDialog(context, "Upload completed.");
