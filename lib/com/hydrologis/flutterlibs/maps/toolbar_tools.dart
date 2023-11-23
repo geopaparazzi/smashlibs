@@ -5,13 +5,13 @@
  */
 part of smashlibs;
 
-class BottomToolsBar extends StatefulWidget {
+class SmashToolsBar extends StatefulWidget {
   final _iconSize;
   final doZoom;
   final doRuler;
   final doQuery;
   final doEdit;
-  BottomToolsBar(
+  SmashToolsBar(
     this._iconSize, {
     Key? key,
     this.doZoom = true,
@@ -21,35 +21,34 @@ class BottomToolsBar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BottomToolsBarState createState() => _BottomToolsBarState();
+  _SmashToolsBarState createState() => _SmashToolsBarState();
 }
 
-class _BottomToolsBarState extends State<BottomToolsBar> {
+class _SmashToolsBarState extends State<SmashToolsBar> {
   @override
   Widget build(BuildContext context) {
     return Consumer<GeometryEditorState>(
         builder: (context, geomEditState, child) {
       if (geomEditState.editableGeometry == null) {
-        return BottomAppBar(
-          // color: SmashColors.mainDecorations,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+        return Card(
+          color: SmashColors.mainDecorations,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               if (widget.doEdit) GeomEditorButton(widget._iconSize),
               if (widget.doQuery) FeatureQueryButton(widget._iconSize),
               if (widget.doRuler) RulerButton(widget._iconSize),
               // ! TODO FenceButton(widget._iconSize),
-              Spacer(),
-              if (widget.doZoom) getZoomIn(),
-              if (widget.doZoom) getZoomOut(),
             ],
           ),
         );
       } else {
-        return BottomAppBar(
-          color: SmashColors.mainDecorations,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+        return Card(
+          color: GeometryEditManager.editBorder,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               getRemoveFeatureButton(geomEditState),
               getOpenFeatureAttributesButton(geomEditState),
@@ -58,9 +57,6 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
               getInsertPointInCenterButton(geomEditState),
               getSaveFeatureButton(geomEditState),
               getCancelEditButton(geomEditState),
-              Spacer(),
-              getZoomIn(),
-              getZoomOut(),
             ],
           ),
         );
@@ -204,7 +200,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           child: InkWell(
             child: Icon(
               SmashIcons.iconInMapCenter,
-              color: SmashColors.mainBackground,
+              color: SmashColors.mainDecorations,
               size: widget._iconSize,
             ),
           ),
@@ -231,7 +227,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           child: InkWell(
             child: Icon(
               SmashIcons.iconInGps,
-              color: SmashColors.mainBackground,
+              color: SmashColors.mainDecorations,
               size: widget._iconSize,
             ),
           ),
@@ -287,7 +283,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           child: InkWell(
             child: Icon(
               MdiIcons.trashCan,
-              color: SmashColors.mainBackground,
+              color: SmashColors.mainSelection,
               size: widget._iconSize,
             ),
           ),
@@ -338,7 +334,7 @@ class _BottomToolsBarState extends State<BottomToolsBar> {
           child: InkWell(
             child: Icon(
               MdiIcons.tableEdit,
-              color: SmashColors.mainBackground,
+              color: SmashColors.mainDecorations,
               size: widget._iconSize,
             ),
           ),

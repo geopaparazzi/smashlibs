@@ -90,9 +90,9 @@ abstract class EditableDataSource {
 class GeometryEditManager {
   static final GeometryEditManager _singleton = GeometryEditManager._internal();
 
-  static final Color editBorder = Colors.yellow;
+  static final Color editBorder = ColorExt(SmashColorPalette.YELLOW.colorHex);
   static final Color editBackBorder = Colors.black;
-  static final Color editFill = Colors.yellow.withOpacity(0.3);
+  static final Color editFill = editBorder.withOpacity(0.3);
   static final double editStrokeWidth = 3.0;
 
   static const List<double> ZOOM2TOUCHRADIUS = [
