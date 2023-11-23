@@ -257,10 +257,11 @@ class SmashMapWidget extends StatelessWidget {
         },
         onMapEvent: (MapEvent mapEvent) {
           if (mapEvent is MapEventDoubleTapZoom ||
-              mapEvent is MapEventScrollWheelZoom) {
+              mapEvent is MapEventScrollWheelZoom ||
+              mapEvent is MapEventMove) {
             SmashMapState mapState =
                 Provider.of<SmashMapState>(context, listen: false);
-            mapState.notifyListenersMsg("manual zoom");
+            mapState.notifyListenersMsg("manual zoom update");
           }
         },
         onTap: (TapPosition tPos, LatLng point) =>

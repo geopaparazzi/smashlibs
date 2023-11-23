@@ -54,11 +54,13 @@ class SmashMapState extends ChangeNotifierPlus {
   ///
   /// Notify anyone that needs to act accordingly.
   set zoom(double newZoom) {
-    _zoom = newZoom;
-    if (mapView != null) {
-      mapView!.zoomTo(newZoom);
+    if (_zoom != newZoom) {
+      _zoom = newZoom;
+      if (mapView != null) {
+        mapView!.zoomTo(newZoom);
+      }
+      notifyListenersMsg("set zoom");
     }
-    notifyListenersMsg("set zoom");
   }
 
   /// Set the center and zoom of the map.

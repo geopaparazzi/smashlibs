@@ -28,6 +28,7 @@ class GeojsonSource extends VectorLayerSource
   JTS.EGeometryType? geometryType;
   Map<String, dynamic> _styleMap = {};
   bool? _isGssSource;
+  File? tagsFile;
 
   GeojsonSource.fromMap(Map<String, dynamic> map) {
     _name = map[LAYERSKEY_LABEL];
@@ -59,6 +60,15 @@ class GeojsonSource extends VectorLayerSource
     geometryType = gType;
   }
 
+  String? getTagsPath() {
+    var parentFolder = HU.FileUtilities.parentFolderFromFile(_absolutePath!);
+    var tagsPath = HU.FileUtilities.joinPaths(parentFolder, _name! + ".tags");
+    if (File(tagsPath).existsSync()) {
+      return tagsPath;
+    }
+    return null;
+  }
+
   @override
   Future<void> load(BuildContext? context) async {
     if (!isLoaded) {
@@ -82,8 +92,9 @@ class GeojsonSource extends VectorLayerSource
         // check if there is a tags fiel and in case use it
         var tagsPath =
             HU.FileUtilities.joinPaths(parentFolder, _name! + ".tags");
-        var tagsFile = File(tagsPath);
-        if (tagsFile.existsSync()) {
+
+        tagsFile = File(tagsPath);
+        if (tagsFile!.existsSync()) {
           var tm = TagsManager();
           tm.readTags(tagsFilePath: tagsPath);
           var section = tm.getTags().getSections().first;
@@ -1172,6 +1183,8 @@ class GeojsonSource extends VectorLayerSource
         SmashDialogs.showInfoDialog(context, "Upload completed.");
       }
     } on Error catch (e) {
+      SmashDialogs.showErrorDialog(context, e.toString());
+    } on Exception catch (e) {
       SmashDialogs.showErrorDialog(context, e.toString());
     }
   }

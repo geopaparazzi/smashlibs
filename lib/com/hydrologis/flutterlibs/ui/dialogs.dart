@@ -48,6 +48,26 @@ class SmashDialogs {
   /// Show a warning dialog, adding an optional [title] and a [prompt] for the user.
   static Future<void> showWarningDialog(BuildContext context, String prompt,
       {String title: "Warning"}) async {
+    var htmlPattern = "<!DOCTYPE html>";
+    Widget widget = SmashUI.normalText(prompt);
+    var indexOf = prompt.indexOf(htmlPattern);
+    if (indexOf >= 0) {
+      // try to render in html
+      var html = prompt.substring(indexOf);
+      widget = HtmlWidget(
+        html,
+        renderMode: RenderMode.column,
+        textStyle: TextStyle(fontSize: 14),
+      );
+      var h = ScreenUtilities.getHeight(context);
+      var w = ScreenUtilities.getWidth(context);
+
+      widget = SizedBox(
+        height: h * 0.5,
+        width: w * 0.8,
+        child: SingleChildScrollView(child: widget),
+      );
+    }
     await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
@@ -56,23 +76,25 @@ class SmashDialogs {
               title,
               textAlign: TextAlign.center,
             ),
-            content: Wrap(
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Container(
-//            height: SIMPLE_DIALOGS_HEIGHT,
-                  child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Icon(
-                          Icons.warning,
-                          color: Colors.orange,
-                          size: SIMPLE_DIALOGS_ICONSIZE,
-                        ),
-                      ),
-                      Text(prompt),
-                    ],
+                Flexible(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Icon(
+                      Icons.warning,
+                      color: Colors.orange,
+                      size: SIMPLE_DIALOGS_ICONSIZE,
+                    ),
                   ),
+                ),
+                Flexible(
+                  fit: FlexFit.loose,
+                  flex: 3,
+                  child: widget,
                 ),
               ],
             ),
@@ -91,9 +113,9 @@ class SmashDialogs {
   /// Show an error dialog, adding an optional [title] and a [prompt] for the user.
   static Future<void> showErrorDialog(BuildContext context, String prompt,
       {String title = "Error"}) async {
-    var pattern = "<!DOCTYPE html>";
-    var indexOf = prompt.indexOf(pattern);
-    Widget widget = Text(prompt);
+    var htmlPattern = "<!DOCTYPE html>";
+    Widget widget = SmashUI.normalText(prompt);
+    var indexOf = prompt.indexOf(htmlPattern);
     if (indexOf >= 0) {
       // try to render in html
       var html = prompt.substring(indexOf);
@@ -120,30 +142,25 @@ class SmashDialogs {
               title,
               textAlign: TextAlign.center,
             ),
-            content: Wrap(
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Container(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Icon(
-                            Icons.error_outline,
-                            color: Colors.red,
-                            size: SIMPLE_DIALOGS_ICONSIZE,
-                          ),
-                        ),
-                      ),
-                      Flexible(
-                        fit: FlexFit.loose,
-                        flex: 3,
-                        child: widget,
-                      ),
-                    ],
+                Flexible(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: SIMPLE_DIALOGS_ICONSIZE,
+                    ),
                   ),
+                ),
+                Flexible(
+                  fit: FlexFit.loose,
+                  flex: 3,
+                  child: widget,
                 ),
               ],
             ),
@@ -162,7 +179,7 @@ class SmashDialogs {
   /// Show an info dialog, adding an optional [title] and a [prompt] for the user.
   static Future<void> showInfoDialog(BuildContext context, String prompt,
       {String? title,
-      double dialogHeight: SIMPLE_DIALOGS_HEIGHT,
+      double dialogHeight = SIMPLE_DIALOGS_HEIGHT,
       List<Widget>? widgets,
       bool doLandscape = false}) async {
     Widget widget;
@@ -526,7 +543,8 @@ class SmashDialogs {
         builder: (BuildContext context) {
           return SimpleDialog(
             title: title is String
-                ? SmashUI.normalText(title,
+                ? SmashUI.titleText(title,
+                    bold: true,
                     textAlign: TextAlign.center,
                     color: SmashColors.mainDecorationsDarker)
                 : title,

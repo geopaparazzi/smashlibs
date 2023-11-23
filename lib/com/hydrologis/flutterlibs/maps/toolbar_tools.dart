@@ -641,7 +641,6 @@ class SmashDatabaseFormHelper extends AFormhelper {
     if (_eds is DbVectorLayerSource) {
       _db = (_eds as DbVectorLayerSource).db;
     }
-
     if (_db != null &&
         await _db.hasTable(TableName(HM_FORMS_TABLE,
             schemaSupported:
@@ -655,6 +654,7 @@ class SmashDatabaseFormHelper extends AFormhelper {
         var tags = tm.getTags();
         // this should contain one single section
         SmashSection section = tags.getSections()[0];
+        sectionList.add(section);
 
         _sectionName = section.sectionName;
         var forms = section.getForms();
@@ -670,6 +670,29 @@ class SmashDatabaseFormHelper extends AFormhelper {
 
         return true;
       }
+    }
+    if (_eds is GeojsonSource) {
+      var geojsonSource = _eds as GeojsonSource;
+      var tagsPath = geojsonSource.getTagsPath();
+      if (tagsPath != null) {
+        var tm = TagsManager();
+        tm.readTags(tagsFilePath: tagsPath);
+        var section = tm.getTags().getSections().first;
+        sectionList.add(section);
+
+        _sectionName = section.sectionName;
+        var forms = section.getForms();
+
+        var data = _queryResult.data.first;
+        data.forEach((key, value) {
+          if (value != null) {
+            forms.forEach((form) {
+              form.update(key, value);
+            });
+          }
+        });
+      }
+      return true;
     }
     return false;
   }
@@ -709,28 +732,27 @@ class SmashDatabaseFormHelper extends AFormhelper {
 
   /// Save data on form exit.
   Future<void> onSaveFunction(BuildContext context) async {
-    if (_db != null) {
-      SmashSection section = sectionList.first;
-      var forms = section.getForms();
+    SmashSection section = sectionList.first;
+    var forms = section.getForms();
 
-      var data = _queryResult.data.first;
+    var data = _queryResult.data.first;
 
-      forms.forEach((form) {
-        var formItems = form.getFormItems();
-        formItems.forEach((element) {
-          String key = element.key;
-          dynamic value = element.value;
-          if (value != null) {
-            // TODO check type and convert string to that type (value is always a string)
-            // also booleans need to be checked etc (true doesn't resolve to 1)
-            data[key] = value;
-          }
-        });
+    forms.forEach((form) {
+      var formItems = form.getFormItems();
+      formItems.forEach((element) {
+        String key = element.key;
+        dynamic value = element.value;
+        if (value != null) {
+          // TODO check type and convert string to that type (value is always a string)
+          // also booleans need to be checked etc (true doesn't resolve to 1)
+          data[key] = value;
+        }
       });
+    });
 
-      var pk = _queryResult.primaryKeys!.first;
-      var id = _queryResult.data.first[pk];
-
+    var pk = _queryResult.primaryKeys!.first;
+    var id = _queryResult.data.first[pk];
+    if (_db != null) {
       var where = "$pk=$id";
       await _db.updateMap(
           TableName(_tableName,
@@ -738,6 +760,10 @@ class SmashDatabaseFormHelper extends AFormhelper {
                   _db is PostgisDb || _db is PostgresqlDb ? true : false),
           data,
           where);
+    }
+    if (_eds is GeojsonSource) {
+      var geojsonSource = _eds as GeojsonSource;
+      geojsonSource.updateFeature(id, data);
     }
   }
 
