@@ -680,29 +680,6 @@ class SmashDatabaseFormHelper extends AFormhelper {
         return true;
       }
     }
-    if (_eds is GeojsonSource) {
-      var geojsonSource = _eds as GeojsonSource;
-      var tagsPath = geojsonSource.getTagsPath();
-      if (tagsPath != null) {
-        var tm = TagsManager();
-        tm.readTags(tagsFilePath: tagsPath);
-        var section = tm.getTags().getSections().first;
-        sectionList.add(section);
-
-        _sectionName = section.sectionName;
-        var forms = section.getForms();
-
-        var data = _queryResult.data.first;
-        data.forEach((key, value) {
-          if (value != null) {
-            forms.forEach((form) {
-              form.update(key, value);
-            });
-          }
-        });
-      }
-      return true;
-    }
     return false;
   }
 
@@ -769,10 +746,6 @@ class SmashDatabaseFormHelper extends AFormhelper {
                   _db is PostgisDb || _db is PostgresqlDb ? true : false),
           data,
           where);
-    }
-    if (_eds is GeojsonSource) {
-      var geojsonSource = _eds as GeojsonSource;
-      geojsonSource.updateFeature(id, data);
     }
   }
 
@@ -873,7 +846,6 @@ class SmashGeojsonFormHelper extends AFormhelper {
   EditableDataSource? _eds;
   List<SmashSection> sectionList = [];
   late String _tableName;
-  dynamic _db;
 
   SmashGeojsonFormHelper(this._queryResult);
 
@@ -896,39 +868,6 @@ class SmashGeojsonFormHelper extends AFormhelper {
 
     _tableName = _queryResult.ids!.first;
 
-    if (_eds is DbVectorLayerSource) {
-      _db = (_eds as DbVectorLayerSource).db;
-    }
-    if (_db != null &&
-        await _db.hasTable(TableName(HM_FORMS_TABLE,
-            schemaSupported:
-                _db is PostgisDb || _db is PostgresqlDb ? true : false))) {
-      HU.QueryResult result = await _db.select(
-          "select $FORMS_FIELD from $HM_FORMS_TABLE where $FORMS_TABLENAME_FIELD='$_tableName'");
-      if (result.length == 1) {
-        String formJsonString = result.first.get(FORMS_FIELD);
-        var tm = TagsManager();
-        tm.readTags(tagsString: formJsonString);
-        var tags = tm.getTags();
-        // this should contain one single section
-        SmashSection section = tags.getSections()[0];
-        sectionList.add(section);
-
-        _sectionName = section.sectionName;
-        var forms = section.getForms();
-
-        var data = _queryResult.data.first;
-        data.forEach((key, value) {
-          if (value != null) {
-            forms.forEach((form) {
-              form.update(key, value);
-            });
-          }
-        });
-
-        return true;
-      }
-    }
     if (_eds is GeojsonSource) {
       var geojsonSource = _eds as GeojsonSource;
       var tagsPath = geojsonSource.getTagsPath();
@@ -1010,15 +949,6 @@ class SmashGeojsonFormHelper extends AFormhelper {
 
     var pk = _queryResult.primaryKeys!.first;
     var id = _queryResult.data.first[pk];
-    if (_db != null) {
-      var where = "$pk=$id";
-      await _db.updateMap(
-          TableName(_tableName,
-              schemaSupported:
-                  _db is PostgisDb || _db is PostgresqlDb ? true : false),
-          data,
-          where);
-    }
     if (_eds is GeojsonSource) {
       var geojsonSource = _eds as GeojsonSource;
       geojsonSource.updateFeature(id, data);
@@ -1028,7 +958,8 @@ class SmashGeojsonFormHelper extends AFormhelper {
   /// Take a picture for forms
   Future<String?> takePictureForForms(
       BuildContext context, bool fromGallery, List<String> imageSplit) async {
-    print("bah");
+    // TODO implement
+
     // DbImage dbImage = DbImage()
     //   ..timeStamp = DateTime.now().millisecondsSinceEpoch
     //   ..isDirty = 1;

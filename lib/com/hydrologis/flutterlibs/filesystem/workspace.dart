@@ -301,9 +301,7 @@ class Workspace {
   }
 
   static bool isDesktop() {
-    if (_isDesktop == null) {
-      _isDesktop = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
-    }
+    _isDesktop = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
     return _isDesktop;
   }
 
