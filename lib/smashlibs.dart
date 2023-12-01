@@ -109,6 +109,7 @@ part 'com/hydrologis/flutterlibs/projectdb/othertables.dart';
 part 'com/hydrologis/flutterlibs/maps/mapview.dart';
 part 'com/hydrologis/flutterlibs/maps/toolbar_tools.dart';
 part 'com/hydrologis/flutterlibs/maps/models/map_state.dart';
+part 'com/hydrologis/flutterlibs/maps/models/preferences_state.dart';
 part 'com/hydrologis/flutterlibs/maps/tools/ruler_state.dart';
 part 'com/hydrologis/flutterlibs/maps/tools/info_tool_state.dart';
 part 'com/hydrologis/flutterlibs/maps/tools/geometryeditor_state.dart';
