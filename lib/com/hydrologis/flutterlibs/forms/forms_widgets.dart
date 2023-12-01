@@ -2126,10 +2126,9 @@ class SketchWidgetState extends State<SketchWidget> with AfterLayoutMixin {
                           String? value = await widget.formHelper
                               .takeSketchForForms(context, imageSplit);
                           if (value != null) {
+                            widget._formItem.setValue(value);
                             await getThumbnails(context);
-                            setState(() {
-                              widget._formItem.setValue(value);
-                            });
+                            setState(() {});
                           }
                         },
                         child: Center(

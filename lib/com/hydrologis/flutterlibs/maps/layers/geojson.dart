@@ -111,6 +111,9 @@ class GeojsonSource extends VectorLayerSource
                 fieldType = "INTEGER";
               } else if (type == "boolean") {
                 fieldType = "BOOLEAN";
+              } else if (type == "sketch" || type == "pictures") {
+                // we keep images in base64 as text
+                fieldType = "TEXT";
               } else if (type == "date" || type == "time") {
                 fieldType = "TEXT";
               } else if (type.startsWith("string")) {

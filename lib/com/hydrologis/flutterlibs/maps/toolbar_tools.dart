@@ -843,15 +843,14 @@ class SmashGeojsonFormHelper extends AFormhelper {
   final EditableQueryResult _queryResult;
   var _titleWidget;
   var _sectionName;
-  EditableDataSource? _eds;
+  GeojsonSource? _eds;
   List<SmashSection> sectionList = [];
-  late String _tableName;
 
   SmashGeojsonFormHelper(this._queryResult);
 
   @override
   Future<bool> init() async {
-    _eds = _queryResult.edsList?[0];
+    _eds = _queryResult.edsList?[0] as GeojsonSource;
 
     var title = _queryResult.ids?.first ?? "No title";
     if (_queryResult.primaryKeys != null &&
@@ -866,32 +865,27 @@ class SmashGeojsonFormHelper extends AFormhelper {
     _titleWidget =
         SmashUI.titleText(title, color: SmashColors.mainBackground, bold: true);
 
-    _tableName = _queryResult.ids!.first;
+    var geojsonSource = _eds as GeojsonSource;
+    var tagsPath = geojsonSource.getTagsPath();
+    if (tagsPath != null) {
+      var tm = TagsManager();
+      tm.readTags(tagsFilePath: tagsPath);
+      var section = tm.getTags().getSections().first;
+      sectionList.add(section);
 
-    if (_eds is GeojsonSource) {
-      var geojsonSource = _eds as GeojsonSource;
-      var tagsPath = geojsonSource.getTagsPath();
-      if (tagsPath != null) {
-        var tm = TagsManager();
-        tm.readTags(tagsFilePath: tagsPath);
-        var section = tm.getTags().getSections().first;
-        sectionList.add(section);
+      _sectionName = section.sectionName;
+      var forms = section.getForms();
 
-        _sectionName = section.sectionName;
-        var forms = section.getForms();
-
-        var data = _queryResult.data.first;
-        data.forEach((key, value) {
-          if (value != null) {
-            forms.forEach((form) {
-              form.update(key, value);
-            });
-          }
-        });
-      }
-      return true;
+      var data = _queryResult.data.first;
+      data.forEach((key, value) {
+        if (value != null) {
+          forms.forEach((form) {
+            form.update(key, value);
+          });
+        }
+      });
     }
-    return false;
+    return true;
   }
 
   @override
@@ -949,9 +943,8 @@ class SmashGeojsonFormHelper extends AFormhelper {
 
     var pk = _queryResult.primaryKeys!.first;
     var id = _queryResult.data.first[pk];
-    if (_eds is GeojsonSource) {
-      var geojsonSource = _eds as GeojsonSource;
-      geojsonSource.updateFeature(id, data);
+    if (_eds != null) {
+      _eds!.updateFeature(id, data);
     }
   }
 
@@ -1008,39 +1001,23 @@ class SmashGeojsonFormHelper extends AFormhelper {
   /// Get thumbnails from the database
   Future<List<Widget>> getThumbnailsFromDb(BuildContext context,
       SmashFormItem formItem, List<String> imageSplit) async {
-    // ProjectState projectState =
-    //     Provider.of<ProjectState>(context, listen: false);
-
-    // String value = ""; //$NON-NLS-1$
-    // if (itemMap.containsKey(TAG_VALUE)) {
-    //   value = itemMap[TAG_VALUE].trim();
-    // }
-    // if (value.isNotEmpty) {
-    //   var split = value.split(IMAGE_ID_SEPARATOR);
-    //   split.forEach((v) {
-    //     if (!imageSplit.contains(v)) {
-    //       imageSplit.add(v);
-    //     }
-    //   });
-    // }
-
-    // List<Widget> thumbList = [];
-    // for (int i = 0; i < imageSplit.length; i++) {
-    //   var id = int.parse(imageSplit[i]);
-    //   Widget thumbnail = projectState.projectDb.getThumbnail(id);
-    //   Widget withBorder = Container(
-    //     padding: SmashUI.defaultPadding(),
-    //     child: thumbnail,
-    //   );
-    //   thumbList.add(withBorder);
-    // }
-    // return thumbList;
+    // note that gjson stores images diurectly in the file
+    // as base64 strings
+    if (formItem.value is String) {
+      // convert from base64 to bytes
+      var base64Image = formItem.value;
+      var bytes = base64Decode(base64Image);
+      var image = Image.memory(bytes);
+      return [image];
+    }
     return [];
   }
 
   @override
   Future<String?> takeSketchForForms(
       BuildContext context, List<String> imageSplit) async {
+    // note that gjson stores images diurectly in the file
+    // as base64 strings
     var imageBytes = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -1048,19 +1025,9 @@ class SmashGeojsonFormHelper extends AFormhelper {
           fullscreenDialog: true,
         ));
     if (imageBytes != null) {
-      // dbImage.text =
-      //     "SKETCH_${HU.TimeUtilities.DATE_TS_FORMATTER.format(DateTime.fromMillisecondsSinceEpoch(dbImage.timeStamp))}.png";
-      // imageId = ImageWidgetUtilities.saveImageBytesToSmashDb(
-      //     imageBytes, context, dbImage, dbImage.text);
-      // if (imageId != null) {
-      //   imageSplit.add(imageId.toString());
-      //   var value = imageSplit.join(IMAGE_ID_SEPARATOR);
-      //   return value;
-      // } else {
-      //   SmashDialogs.showWarningDialog(
-      //       context, SL.of(context).form_smash_cantSaveImageDb);
-      //   return null;
-      // }
+      // convert image to base64 string
+      var base64Image = base64Encode(imageBytes);
+      return base64Image;
     }
 
     return null;
