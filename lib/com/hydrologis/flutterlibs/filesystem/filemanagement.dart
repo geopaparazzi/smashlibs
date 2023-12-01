@@ -151,10 +151,8 @@ class FileBrowserState extends State<FileBrowser> {
       tooltip: "Go back up one folder.",
       child: Icon(MdiIcons.folderUpload),
       onPressed: () async {
-        var rootDir = await Workspace.getRootFolder();
-        if (rootDir != null &&
-            currentPath == rootDir.path &&
-            !Workspace.isDesktop()) {
+        var rootDir = Workspace.rootFolder;
+        if (currentPath == rootDir && !Workspace.isDesktop()) {
           SmashDialogs.showWarningDialog(
               context, "The top level folder has already been reached.");
         } else {

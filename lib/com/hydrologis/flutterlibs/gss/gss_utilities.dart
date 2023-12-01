@@ -147,15 +147,17 @@ class GssUtilities {
   static bool isGssSource(String? path) {
     if (path != null) {
       var relPath = Workspace.makeRelative(path);
-      // remove initial slash if there is
-      if (relPath.startsWith("/")) {
-        relPath = relPath.substring(1);
-      }
       // replace backslash with slash
       relPath = relPath.replaceAll("\\", "/");
+      // remove initial slash if there is
+      if (relPath.startsWith("/") && !Workspace.isDesktop()) {
+        relPath = relPath.substring(1);
+      }
       // to be gss it needs to be in the gss folder
-      if (relPath.startsWith("smash/gss/")) {
-        return true;
+      if (!Workspace.isDesktop()) {
+        return relPath.startsWith("smash/gss/");
+      } else {
+        return relPath.startsWith("${Workspace.rootFolder}/smash/gss/");
       }
     }
     return false;

@@ -19,7 +19,7 @@ const IOS_DOCUMENTSFOLDER = "Documents";
 class Workspace {
   static String APP_NAME =
       "smash"; // change this if you are customizing the app
-  static String? _rootFolder;
+  static late String _rootFolder;
 
   static bool _isDesktop = false;
   static bool _doSafeMode = false;
@@ -28,8 +28,8 @@ class Workspace {
   /// the internal storage is used to ensure write permissions without issues.
   static Future<void> init({bool doSafeMode = false}) async {
     _doSafeMode = doSafeMode;
-    var rootDir = await getRootFolder();
-    _rootFolder = rootDir?.path;
+    var rootDir = await _getRootFolder();
+    _rootFolder = rootDir.path;
     _isDesktop = isDesktop();
   }
 
@@ -38,10 +38,7 @@ class Workspace {
     if (_isDesktop) {
       return absolutePath;
     }
-    if (_rootFolder == null) {
-      return absolutePath;
-    }
-    var relativePath = absolutePath.replaceFirst(_rootFolder!, "");
+    var relativePath = absolutePath.replaceFirst(_rootFolder, "");
     return relativePath;
   }
 
@@ -50,11 +47,8 @@ class Workspace {
     if (_isDesktop) {
       return relativePath;
     }
-    if (_rootFolder == null) {
-      return relativePath;
-    }
-    if (relativePath.startsWith(_rootFolder!)) return relativePath;
-    var absolutePath = HU.FileUtilities.joinPaths(_rootFolder!, relativePath);
+    if (relativePath.startsWith(_rootFolder)) return relativePath;
+    var absolutePath = HU.FileUtilities.joinPaths(_rootFolder, relativePath);
     return absolutePath;
   }
 
@@ -65,26 +59,27 @@ class Workspace {
   ///
   /// On Android this will be the internal sdcard storage,
   /// while on IOS that will be the Documents folder.
-  static Future<Directory?> getRootFolder() async {
+  static Future<Directory> _getRootFolder() async {
+    Directory? dir;
     if (_doSafeMode) {
-      var dir = await getApplicationDocumentsDirectory();
-      return dir;
+      dir = await getApplicationDocumentsDirectory();
     } else {
       if (Platform.isIOS || Platform.isMacOS) {
-        var dir = await getApplicationDocumentsDirectory();
-        return dir;
+        dir = await getApplicationDocumentsDirectory();
       } else if (Platform.isLinux) {
-        var dir = await getApplicationDocumentsDirectory();
-        return dir;
+        dir = await getApplicationDocumentsDirectory();
       } else if (Platform.isAndroid) {
-        var dir = await _getAndroidStorageFolder();
-        return dir;
-      } else {
-        // TODO
-        return null;
+        dir = await _getAndroidStorageFolder();
       }
     }
+    if (dir == null) {
+      throw Exception(
+          "Could not define rootfolder on device. Impossible to continue.");
+    }
+    return dir;
   }
+
+  static String get rootFolder => _rootFolder;
 
   /// Get the temporary or cache folder.
   ///
@@ -100,7 +95,6 @@ class Workspace {
   ///
   /// Returns the file of the folder to use.
   static Future<Directory> getApplicationFolder() async {
-    var rootFolder = await getRootFolder();
     String applicationFolderPath;
     // if (Platform.isAndroid) {
     //   applicationFolderPath =
@@ -108,12 +102,11 @@ class Workspace {
     //   applicationFolderPath = HU.FileUtilities.joinPaths(
     //       applicationFolderPath, "eu.hydrologis.smash");
     // } else {
-    if (rootFolder == null) {
-      applicationFolderPath = APP_NAME;
-    } else {
-      applicationFolderPath =
-          HU.FileUtilities.joinPaths(rootFolder.path, APP_NAME);
-    }
+    // if (_rootFolder == null) {
+    //   applicationFolderPath = APP_NAME;
+    // } else {
+    applicationFolderPath = HU.FileUtilities.joinPaths(_rootFolder, APP_NAME);
+    // }
     // }
     Directory configFolder = Directory(applicationFolderPath);
     if (!configFolder.existsSync()) {
@@ -264,40 +257,29 @@ class Workspace {
   /// changes at every application launch and the ApplicationDocumentsDirectory
   /// changes.
   static Future<String> getLastUsedFolder() async {
-    var rootDir = await getRootFolder();
-    var rootPath = rootDir?.path;
     String? lastFolder = await GpPreferences()
         .getString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, "");
     if (lastFolder!.length == 0) {
-      lastFolder = rootPath;
-    } else {
-      if (!_isDesktop || !Directory(lastFolder).existsSync()) {
-        // add the root folder if we are on mobile (IOS needs that)
-        if (rootPath != null) {
-          lastFolder = HU.FileUtilities.joinPaths(rootPath, lastFolder);
-        }
-      }
+      lastFolder = _rootFolder;
+    } else {}
+    if (_isDesktop && Directory(lastFolder).existsSync()) {
+      return lastFolder;
     }
-    if (rootPath != null &&
-        lastFolder != null &&
-        !Directory(lastFolder).existsSync()) {
-      return rootPath;
+    if (!_isDesktop || !Directory(lastFolder).existsSync()) {
+      // add the root folder if we are on mobile (IOS needs that)
+      return HU.FileUtilities.joinPaths(_rootFolder, lastFolder);
     }
-    if (lastFolder == null) {
-      Directory appFolder = await getApplicationFolder();
-      lastFolder = appFolder.path;
+    if (!Directory(lastFolder).existsSync()) {
+      return _rootFolder;
     }
-    return lastFolder;
+    Directory appFolder = await getApplicationFolder();
+    return appFolder.path;
   }
 
   static Future<void> setLastUsedFolder(String absolutePath) async {
-    var rootDir = await getRootFolder();
-    var rootPath = rootDir?.path;
-    if (rootPath != null) {
-      String relativePath = absolutePath.replaceFirst(rootPath, "");
-      await GpPreferences()
-          .setString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, relativePath);
-    }
+    String relativePath = makeRelative(absolutePath);
+    await GpPreferences()
+        .setString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, relativePath);
   }
 
   static bool isDesktop() {
