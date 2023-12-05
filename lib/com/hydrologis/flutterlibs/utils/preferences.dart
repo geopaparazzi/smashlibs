@@ -6,21 +6,11 @@ part of smashlibs;
  */
 
 class SmashPreferencesKeys {
-  static const KEY_LAST_USED_FOLDER = "KEY_LAST_USED_FOLDER";
-
-  static const KEY_LAST_GPAPPROJECT = "lastgpapProject";
-  static const KEY_LAST_LAT = "lastgpap_lat";
-  static const KEY_LAST_LON = "lastgpap_lon";
-  static const KEY_LAST_ZOOM = "lastgpap_zoom";
+  // settings that can be piloted through configuration
   static const KEY_CENTER_ON_GPS = "center_on_gps";
-  static const KEY_ROTATE_ON_HEADING = "rotate_on_heading";
-  static const KEY_LAST_BASEMAP = "lastbasemapinfo";
-  static const KEY_LAYERINFO_LIST = 'KEY_LAYERINFO_LIST';
-  static const KEY_MBTILES_LIST = 'KEY_MBTILES_LIST';
   static const KEY_KEEP_SCREEN_ON = 'KEY_KEEP_SCREEN_ON';
   static const KEY_RETINA_MODE_ON = 'KEY_RETINA_MOPDE_ON';
   static const KEY_CAMERA_RESOLUTION = 'KEY_CAMERA_RESOLUTION';
-  static const KEY_RECENTSPROJECTS_LIST = 'KEY_RECENTSPROJECTS_LIST';
 
   static const KEY_SCREEN_TOOLBAR_SHOW_ZOOM = 'KEY_SCREEN_TOOLBAR_SHOW_ZOOM';
   static const KEY_SCREEN_TOOLBAR_SHOW_LAYERS =
@@ -36,17 +26,38 @@ class SmashPreferencesKeys {
   static const KEY_SCREEN_TOOLBAR_SHOW_EDITING =
       'KEY_SCREEN_TOOLBAR_SHOW_EDITING';
 
-  static const KEY_SAVED_TMS_LIST = 'KEY_SAVED_TMS_LIST';
-  static const KEY_SAVED_WMS_LIST = 'KEY_SAVED_WMS_LIST';
-
   static const KEY_GPS_MIN_DISTANCE = 'KEY_GPS_MIN_DISTANCE';
   static const KEY_GPS_MAX_DISTANCE = 'KEY_GPS_MAX_DISTANCE';
   static const KEY_GPS_TIMEINTERVAL = 'KEY_GPS_TIMEINTERVAL';
-  static const KEY_GPS_TESTLOG = 'KEY_GPS_TESTLOG';
-  static const KEY_GPS_LOG_VIEW_MODE = 'KEY_GPS_LOG_VIEW_MODE';
   static const KEY_GPS_USE_FILTER_GENERALLY = 'KEY_GPS_USE_FILTER_GENERALLY';
-  static const KEY_GPS_USE_GOOGLE_SERVICES = 'KEY_GPS_USE_GOOGLE_SERVICES';
+
+  static const KEY_GPS_LOG_VIEW_MODE = 'KEY_GPS_LOG_VIEW_MODE';
   static const KEY_NOTES_VIEW_MODE = 'KEY_NOTES_VIEW_MODE';
+
+  static const KEY_MAPTOOLS_ICON_SIZE = 'KEY_MAPTOOLS_ICON_SIZE';
+
+  static const KEY_LATLONG_DECIMALS = 6;
+  static const KEY_ELEV_DECIMALS = 0;
+
+  // other settings
+  static const KEY_LAST_USED_FOLDER = "KEY_LAST_USED_FOLDER";
+
+  static const KEY_LAST_GPAPPROJECT = "lastgpapProject";
+  static const KEY_LAST_LAT = "lastgpap_lat";
+  static const KEY_LAST_LON = "lastgpap_lon";
+  static const KEY_LAST_ZOOM = "lastgpap_zoom";
+
+  static const KEY_ROTATE_ON_HEADING = "rotate_on_heading";
+  static const KEY_LAST_BASEMAP = "lastbasemapinfo";
+  static const KEY_LAYERINFO_LIST = 'KEY_LAYERINFO_LIST';
+  static const KEY_MBTILES_LIST = 'KEY_MBTILES_LIST';
+  static const KEY_RECENTSPROJECTS_LIST = 'KEY_RECENTSPROJECTS_LIST';
+
+  static const KEY_SAVED_TMS_LIST = 'KEY_SAVED_TMS_LIST';
+  static const KEY_SAVED_WMS_LIST = 'KEY_SAVED_WMS_LIST';
+
+  static const KEY_GPS_TESTLOG = 'KEY_GPS_TESTLOG';
+  static const KEY_GPS_USE_GOOGLE_SERVICES = 'KEY_GPS_USE_GOOGLE_SERVICES';
 
   static const KEY_VECTOR_MAX_FEATURES = 'KEY_VECTOR_MAX_FEATURES';
   static const KEY_VECTOR_LOAD_ONLY_VISIBLE = 'KEY_VECTOR_LOAD_ONLY_VISIBLE';
@@ -55,7 +66,6 @@ class SmashPreferencesKeys {
   static const KEY_THEME = 'KEY_THEME';
 
   static const KEY_CENTERCROSS_STYLE = 'KEY_CENTERCROSS_STYLE';
-  static const KEY_MAPTOOLS_ICON_SIZE = 'KEY_MAPTOOLS_ICON_SIZE';
   static const KEY_ICONS_LIST = 'KEY_ICONS_LIST';
 
   static const DEVICE_ID = 'DEVICE_ID';
@@ -79,9 +89,6 @@ class SmashPreferencesKeys {
   static const KEY_PROJECTIONS = 'KEY_PROJECTIONS';
 
   static const KEY_GPS_ACCURACY = 'KEY_GPS_ACCURACY';
-
-  static const KEY_LATLONG_DECIMALS = 6;
-  static const KEY_ELEV_DECIMALS = 0;
 
   static const TIMEINTERVALS = [0, 1, 3, 5, 10, 15, 20, 30, 60];
   static const MINDISTANCES = [0, 1, 3, 5, 10, 15, 20, 50, 100];
