@@ -166,7 +166,7 @@ dependencies:
   #   url: https://github.com/yako-dev/flutter_badges.git
 
   # MIT
-  flutter_widget_from_html: ^0.14.6
+  flutter_widget_from_html: ^0.14.9
 
   #BSD
   painter: ^2.0.0
