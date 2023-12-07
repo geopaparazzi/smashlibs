@@ -1003,7 +1003,7 @@ class SmashGeojsonFormHelper extends AFormhelper {
       SmashFormItem formItem, List<String> imageSplit) async {
     // note that gjson stores images diurectly in the file
     // as base64 strings
-    if (formItem.value is String) {
+    if (formItem.value is String && formItem.value.isNotEmpty) {
       // convert from base64 to bytes
       var base64Image = formItem.value;
       var bytes = base64Decode(base64Image);
