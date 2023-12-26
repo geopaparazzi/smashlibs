@@ -6,13 +6,24 @@ part of smashlibs;
  */
 
 class SmashCircularProgress extends StatelessWidget {
-  String? label;
+  final String? label;
+  final bool doTitle;
+  final bool doBold;
 
-  SmashCircularProgress({this.label, Key? key}) : super(key: key);
+  SmashCircularProgress(
+      {this.label, Key? key, this.doTitle = false, this.doBold = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     if (label != null) {
+      Widget textWidget;
+      if (doTitle) {
+        textWidget = SmashUI.titleText(label!, bold: doBold);
+      } else {
+        textWidget = SmashUI.normalText(label!, bold: doBold);
+      }
+
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -21,7 +32,7 @@ class SmashCircularProgress extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            SmashUI.normalText(label!),
+            textWidget,
           ],
         ),
       );
