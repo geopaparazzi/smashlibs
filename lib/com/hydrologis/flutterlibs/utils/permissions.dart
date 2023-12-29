@@ -37,15 +37,30 @@ class PermissionManager {
   }
 
   Future<bool> _checkStoragePermissions(BuildContext context) async {
-    var status = await Permission.storage.status;
-    if (status != PermissionStatus.granted) {
-      var permissionStatus = await Permission.storage.request();
-      if (permissionStatus.isGranted) {
-        SMLogger().i("Storage permission granted.");
-        return true;
-      } else {
-        SMLogger().w("Storage permission is not granted.");
-        return false;
+    final deviceInfo = await DeviceInfoPlugin().androidInfo;
+    if (deviceInfo.version.sdkInt > 32) {
+      var status = await Permission.photos.status;
+      if (status != PermissionStatus.granted) {
+        var permissionStatus = await Permission.photos.request();
+        if (permissionStatus.isGranted) {
+          SMLogger().i("Storage permission granted.");
+          return true;
+        } else {
+          SMLogger().w("Storage permission is not granted.");
+          return false;
+        }
+      }
+    } else {
+      var status = await Permission.storage.status;
+      if (status != PermissionStatus.granted) {
+        var permissionStatus = await Permission.storage.request();
+        if (permissionStatus.isGranted) {
+          SMLogger().i("Storage permission granted.");
+          return true;
+        } else {
+          SMLogger().w("Storage permission is not granted.");
+          return false;
+        }
       }
     }
     return true;
