@@ -23,6 +23,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
   SmashMapWidget? mapView;
   final LayerSource _backgroundLayerSource = onlinesTilesSources[0];
   LayerSource _currentLayerSource = onlinesTilesSources[1];
+  DemoAppFormHelper? formHelper;
 
   @override
   FutureOr<void> afterFirstLayout(BuildContext context) async {
@@ -92,6 +93,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
     mapView!.addPostLayer(RulerPluginLayer(tapAreaPixelSize: 1));
 
+    formHelper = DemoAppFormHelper();
+    await formHelper!.init();
+
     setState(() {});
   }
 
@@ -107,7 +111,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = onlinesTilesSources[1];
               await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("WTS"),
+            child: SmashUI.normalText("WTS", color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -118,7 +122,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
                   imageFormat: "image/png");
               await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("WMS"),
+            child: SmashUI.normalText("WMS", color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -129,7 +133,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = GpxSource(gpxPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("GPX"),
+            child: SmashUI.normalText("GPX", color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -139,7 +143,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = GeoImageSource(imgPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("IMG"),
+            child: SmashUI.normalText("IMG", color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -149,7 +153,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = TileSource.Mapsforge(dbPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("Mapsforge"),
+            child: SmashUI.normalText("Mapsforge",
+                color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -159,7 +164,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = TileSource.Mbtiles(dbPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("MBTiles"),
+            child: SmashUI.normalText("MBTiles",
+                color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -169,7 +175,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = TileSource.Geopackage(dbPath, "mebo2017");
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("GPKG-rast"),
+            child: SmashUI.normalText("GPKG-rast",
+                color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -180,7 +187,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
                   GeopackageSource(dbPath, "watercourses_small");
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("GPKG-vect"),
+            child: SmashUI.normalText("GPKG-vect",
+                color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -194,7 +202,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = ShapefileSource(shpPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("SHP"),
+            child: SmashUI.normalText("SHP", color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -204,7 +212,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = GeojsonSource(geojsonPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("JSON pt"),
+            child: SmashUI.normalText("JSON pt",
+                color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -214,7 +223,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = GeojsonSource(geojsonPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("JSON ln"),
+            child: SmashUI.normalText("JSON ln",
+                color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -224,7 +234,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = GeojsonSource(geojsonPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("JSON pl"),
+            child: SmashUI.normalText("JSON pl",
+                color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -234,7 +245,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               _currentLayerSource = GeocachingSource(shpPath);
               if (context.mounted) await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("GCaching"),
+            child: SmashUI.normalText("GCaching",
+                color: SmashColors.mainBackground),
           ),
           TextButton(
             onPressed: () async {
@@ -253,7 +265,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
               //     useSSL: false);
               // await addLayerAndZoomTo(context);
             },
-            child: SmashUI.normalText("PostGIS"),
+            child: SmashUI.normalText("PostGIS",
+                color: SmashColors.mainBackground),
           ),
         ],
       ),
@@ -265,6 +278,32 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           child: SmashToolsBar(48),
         )
       ]),
+      drawer: Drawer(
+          child: ListView(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            color: SmashColors.mainBackground,
+            child: DrawerHeader(child: Image.asset("assets/smash_icon.png")),
+          ),
+          Column(
+            children: [
+              ListTile(
+                title: SmashUI.normalText("Form Builder", bold: true),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MainFormWidget(
+                                formHelper!,
+                                doScaffold: true,
+                              )));
+                },
+              ),
+            ],
+          ),
+        ],
+      )),
       // bottomNavigationBar: SmashToolsBar(48.0),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: _incrementCounter,

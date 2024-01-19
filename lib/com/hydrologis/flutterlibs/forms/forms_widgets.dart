@@ -93,7 +93,6 @@ class FormDetailWidget extends StatefulWidget {
   final AFormhelper formHelper;
   final bool doScaffold;
   PresentationMode presentationMode = PresentationMode();
-  final bool isCompact;
 
   FormDetailWidget(
     this.formName,
@@ -101,7 +100,6 @@ class FormDetailWidget extends StatefulWidget {
     this.onlyDetail,
     this.formHelper, {
     presentationMode,
-    this.isCompact = false,
     this.doScaffold = true,
   }) {
     if (presentationMode != null) {

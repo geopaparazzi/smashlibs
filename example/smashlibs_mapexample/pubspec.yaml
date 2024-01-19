@@ -73,7 +73,7 @@ flutter:
     # - assets/tags.json
     # - assets/emptytile256.png
     # - assets/maptools_icon.png
-    # - assets/smash_icon.png
+    - assets/smash_icon.png
     # - assets/smash_logo_64.png
     # - assets/smash_text.png
     - assets/tags.json

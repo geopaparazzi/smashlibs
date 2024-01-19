@@ -908,6 +908,31 @@ class TagsManager {
     return null;
   }
 
+  /// Reorder a form in a section from an index position to another.
+  static void reorderFormInSection(
+      Map<String, dynamic> section, int oldIndex, int newIndex) {
+    List<dynamic>? jsonArray = section[ATTR_FORMS];
+    if (jsonArray != null && jsonArray.isNotEmpty) {
+      if (oldIndex < newIndex) {
+        var toMove = jsonArray.elementAt(oldIndex);
+        jsonArray.insert(newIndex, toMove);
+        jsonArray.removeAt(oldIndex);
+      } else {
+        var toMove = jsonArray.removeAt(oldIndex);
+        jsonArray.insert(newIndex, toMove);
+      }
+    }
+  }
+
+  /// Remove a form from a section at an index position.
+  static void removeFormFromSection(
+      Map<String, dynamic> section, int removeIndex) {
+    List<dynamic>? jsonArray = section[ATTR_FORMS];
+    if (jsonArray != null && jsonArray.isNotEmpty) {
+      jsonArray.removeAt(removeIndex);
+    }
+  }
+
   ///**
 // * Convert a string to a {@link TagObject}.
 // *
@@ -1210,7 +1235,7 @@ class SmashFormItem {
 }
 
 /// A SMASH Form object, which represents a logical grouping
-/// of items. For example the each tab in a SMASH note view is a form.
+/// of items. For example each tab in a SMASH note view is a form.
 class SmashForm {
   String? formName;
   List<SmashFormItem> formItems = [];
@@ -1227,6 +1252,11 @@ class SmashForm {
     for (var formItem in formItemsList) {
       this.formItems.add(SmashFormItem(formItem));
     }
+  }
+
+  void setName(String newFormName) {
+    map[ATTR_FORMNAME] = newFormName;
+    formName = newFormName;
   }
 
   List<SmashFormItem> getFormItems() {
@@ -1262,18 +1292,23 @@ class SmashSection {
   String? sectionName;
   String? sectionDescription;
   String? sectionIcon;
+  List<String> formNames = [];
   Map<String, SmashForm> forms = {};
   late Map<String, dynamic> sectionMap;
 
   SmashSection(Map<String, dynamic> map) {
     this.sectionMap = map;
-    sectionName = map[ATTR_SECTIONNAME];
-    sectionDescription = map[ATTR_SECTIONDESCRIPTION];
-    sectionIcon = map[ATTR_SECTIONICON];
+    readData();
+  }
 
-    var formNames = TagsManager.getFormNames4Section(map);
+  void readData() {
+    sectionName = sectionMap[ATTR_SECTIONNAME];
+    sectionDescription = sectionMap[ATTR_SECTIONDESCRIPTION];
+    sectionIcon = sectionMap[ATTR_SECTIONICON];
+
+    formNames = TagsManager.getFormNames4Section(sectionMap);
     for (var formName in formNames) {
-      var form = TagsManager.getForm4Name(formName, map);
+      var form = TagsManager.getForm4Name(formName, sectionMap);
       if (form != null) {
         forms[formName] = SmashForm(form);
       }
@@ -1281,7 +1316,7 @@ class SmashSection {
   }
 
   List<String> getFormNames() {
-    return forms.keys.toList();
+    return formNames;
   }
 
   SmashForm? getFormByName(String name) {
@@ -1289,7 +1324,15 @@ class SmashSection {
   }
 
   List<SmashForm> getForms() {
-    return forms.values.toList();
+    List<SmashForm> formsList = [];
+    formNames.forEach((formName) {
+      var form = forms[formName];
+      if (form != null) {
+        formsList.add(form);
+      }
+    });
+
+    return formsList;
   }
 
   String getIcon() {
@@ -1310,6 +1353,26 @@ class SmashSection {
         // print(formItem.toString());
       });
     });
+  }
+
+  void reorderForm(int oldIndex, int newIndex) {
+    TagsManager.reorderFormInSection(sectionMap, oldIndex, newIndex);
+    readData();
+  }
+
+  void removeForm(int index) {
+    TagsManager.removeFormFromSection(sectionMap, index);
+    readData();
+  }
+
+  void renameForm(int position, String newFormName) {
+    var formNames = getFormNames();
+    var oldFormName = formNames[position];
+    var form = getFormByName(oldFormName);
+    if (form != null) {
+      form.setName(newFormName);
+    }
+    readData();
   }
 
   String toString() {

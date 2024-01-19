@@ -167,3 +167,98 @@ class _FormsExamplePageState extends State<FormsExamplePage>
     );
   }
 }
+
+class FormBuilderExamplePage extends StatefulWidget {
+  const FormBuilderExamplePage({Key? key}) : super(key: key);
+
+  @override
+  State<FormBuilderExamplePage> createState() => _FormBuilderExamplePageState();
+}
+
+class _FormBuilderExamplePageState extends State<FormBuilderExamplePage>
+    with AfterLayoutMixin {
+  PresentationMode mode = PresentationMode(
+    isReadOnly: true,
+    doIgnoreEmpties: false,
+    detailMode: DetailMode.NORMAL,
+    labelTextColor: SmashColors.mainTextColor,
+    doLabelBold: true,
+    valueTextColor: SmashColors.mainTextColorNeutral,
+    doValueBold: false,
+  );
+  DemoAppFormHelper? helper;
+  List<DetailMode> detailModes = <DetailMode>[
+    DetailMode.DETAILED,
+    DetailMode.NORMAL,
+    DetailMode.COMPACT
+  ];
+  DetailMode dropdownValue = DetailMode.NORMAL;
+
+  @override
+  FutureOr<void> afterFirstLayout(BuildContext context) async {
+    helper = DemoAppFormHelper();
+    await helper!.init();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text("Form examples"),
+        actions: [
+          Tooltip(
+            message: "Toggle readonly",
+            child: Switch(
+              value: mode.isReadOnly,
+              onChanged: (bool value) {
+                setState(() {
+                  mode.isReadOnly = value;
+                });
+              },
+            ),
+          ),
+          mode.isReadOnly
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: DropdownButton<DetailMode>(
+                    value: mode.detailMode,
+                    onChanged: (DetailMode? value) {
+                      setState(() {
+                        mode.detailMode = value!;
+                      });
+                    },
+                    items: detailModes
+                        .map<DropdownMenuItem<DetailMode>>((DetailMode value) {
+                      return DropdownMenuItem<DetailMode>(
+                        value: value,
+                        child: Text(value.value),
+                      );
+                    }).toList(),
+                  ),
+                )
+              : Container(),
+          Tooltip(
+            message: "Toggle ignore empties",
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Switch(
+                value: mode.doIgnoreEmpties,
+                onChanged: (bool value) {
+                  setState(() {
+                    mode.doIgnoreEmpties = value;
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: helper == null
+          ? SmashCircularProgress(label: "Loading...")
+          : MasterDetailPage(helper!,
+              doScaffold: false, presentationMode: mode),
+    );
+  }
+}

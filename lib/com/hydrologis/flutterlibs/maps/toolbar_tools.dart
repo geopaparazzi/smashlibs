@@ -6,7 +6,7 @@
 part of smashlibs;
 
 class SmashToolsBar extends StatefulWidget {
-  final _iconSize;
+  final double _iconSize;
   final doZoom;
   final doRuler;
   final doQuery;

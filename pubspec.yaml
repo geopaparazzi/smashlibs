@@ -171,6 +171,9 @@ dependencies:
   #BSD
   painter: ^2.0.0
 
+  # MIT
+  flutter_slidable: ^3.0.1
+
 dev_dependencies:
   lints: ^1.0.1
   test: ^1.20.1
