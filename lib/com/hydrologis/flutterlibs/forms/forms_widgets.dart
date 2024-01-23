@@ -15,11 +15,13 @@ class PresentationMode {
   bool doLabelBold;
   Color valueTextColor = SmashColors.mainTextColorNeutral;
   bool doValueBold;
+  bool isFormbuilder = false;
 
   PresentationMode({
     this.isReadOnly = false,
     this.doIgnoreEmpties = false,
     this.detailMode = DetailMode.DETAILED,
+    this.isFormbuilder = false,
     Color? labelTextColor,
     this.doLabelBold = true,
     Color? valueTextColor,

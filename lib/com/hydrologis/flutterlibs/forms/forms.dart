@@ -933,6 +933,18 @@ class TagsManager {
     }
   }
 
+  static void addFormToSection(
+      Map<String, dynamic> section, String newFormName) {
+    List<dynamic>? jsonArray = section[ATTR_FORMS];
+    if (jsonArray != null && jsonArray.isNotEmpty) {
+      Map<String, dynamic> newForm = {
+        ATTR_FORMNAME: newFormName,
+        ATTR_FORMITEMS: [],
+      };
+      jsonArray.add(newForm);
+    }
+  }
+
   ///**
 // * Convert a string to a {@link TagObject}.
 // *
@@ -1346,11 +1358,8 @@ class SmashSection {
   void updateFromMap(Map<String, dynamic> newValues) {
     forms.forEach((name, form) {
       var formItems = form.getFormItems();
-      // FormUtilities.updateFromMap(formItems, newValues);
       formItems.forEach((formItem) {
-        // print(formItem.toString());
         formItem.update(newValues);
-        // print(formItem.toString());
       });
     });
   }
@@ -1372,6 +1381,11 @@ class SmashSection {
     if (form != null) {
       form.setName(newFormName);
     }
+    readData();
+  }
+
+  void addForm(String newFormName) {
+    TagsManager.addFormToSection(sectionMap, newFormName);
     readData();
   }
 

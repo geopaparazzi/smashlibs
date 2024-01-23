@@ -28,9 +28,9 @@ class _MainFormWidgetState extends State<MainFormWidget> {
     isLargeScreen = ScreenUtilities.isLargeScreen(context);
     double ratio = isLandscape || isLargeScreen ? 0.3 : 0;
 
-    var tabPart = TabPart(widget.formHelper);
+    var tabPart = TabPart(widget.formHelper, widget.presentationMode);
 
-    var detailPart = DetailPart(widget.formHelper);
+    var detailPart = DetailPart(widget.formHelper, widget.presentationMode);
 
     var body = VerticalSplitView(
       left: tabPart,
@@ -53,7 +53,8 @@ class _MainFormWidgetState extends State<MainFormWidget> {
 
 class TabPart extends StatefulWidget {
   AFormhelper formHelper;
-  TabPart(this.formHelper, {Key? key}) : super(key: key);
+  PresentationMode presentationMode;
+  TabPart(this.formHelper, this.presentationMode, {Key? key}) : super(key: key);
 
   @override
   State<TabPart> createState() => TabPartState();
@@ -66,62 +67,62 @@ class TabPartState extends State<TabPart> {
   Widget build(BuildContext context) {
     var section = widget.formHelper.getSection();
     var formNames4Section = section.getFormNames();
+    var presentationMode = widget.presentationMode;
 
     if (formNames4Section.length == 0) {
       return Container();
+    }
+
+    FormHandlerState formHandler =
+        Provider.of<FormHandlerState>(context, listen: false);
+    if (formHandler.selectedTabName != null) {
+      // find the position and set the selected to that
+      var indexOf = formNames4Section.indexOf(formHandler.selectedTabName!);
+      if (indexOf != -1) {
+        _selectedPosition = indexOf;
+      }
     }
 
     List<Widget> listItems = [];
     for (var position = 0; position < formNames4Section.length; position++) {
       String formName = formNames4Section[position];
 
-      List<Widget> endActions = [
-        SlidableAction(
-            label: "Remove",
-            backgroundColor: SmashColors.mainDanger,
-            foregroundColor: SmashColors.mainBackground,
-            icon: MdiIcons.trashCan,
-            onPressed: (context) async {
-              section.removeForm(position);
-              setState(() {
-                // reset position to avoid caos
-                _selectedPosition = 0;
-              });
-            })
-      ];
-      List<Widget> startActions = [
-        SlidableAction(
-            label: "Edit",
-            backgroundColor: SmashColors.mainDecorations,
-            foregroundColor: SmashColors.mainBackground,
-            icon: MdiIcons.pencil,
-            onPressed: (context) async {
-              String? newFormName = await SmashDialogs.showInputDialog(
-                context,
-                "Edit form name",
-                "Enter a unique name for the form",
-                defaultText: formName,
-                validationFunction: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter a name";
-                  }
-                  // the name can't already exist in the section
-                  if (formNames4Section.contains(value)) {
-                    return "The name already exists";
-                  }
-
-                  return null;
-                },
-              );
-              if (newFormName != null) {
-                section.renameForm(position, newFormName);
+      List<Widget> endActions = [];
+      List<Widget> startActions = [];
+      if (presentationMode.isFormbuilder) {
+        endActions = [
+          SlidableAction(
+              label: "Remove",
+              backgroundColor: SmashColors.mainDanger,
+              foregroundColor: SmashColors.mainBackground,
+              icon: MdiIcons.trashCan,
+              onPressed: (context) async {
+                section.removeForm(position);
                 setState(() {
                   // reset position to avoid caos
                   _selectedPosition = 0;
                 });
-              }
-            })
-      ];
+              })
+        ];
+        startActions = [
+          SlidableAction(
+              label: "Edit",
+              backgroundColor: SmashColors.mainDecorations,
+              foregroundColor: SmashColors.mainBackground,
+              icon: MdiIcons.pencil,
+              onPressed: (context) async {
+                String? newFormName =
+                    await nameForm(context, formName, formNames4Section);
+                if (newFormName != null) {
+                  section.renameForm(position, newFormName);
+                  setState(() {
+                    // reset position to avoid caos
+                    _selectedPosition = 0;
+                  });
+                }
+              })
+        ];
+      }
 
       listItems.add(Ink(
           key: UniqueKey(),
@@ -166,29 +167,108 @@ class TabPartState extends State<TabPart> {
           )));
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: SlidableAutoCloseBehavior(
-        child: ReorderableListView(
-          children: listItems,
-          onReorder: (oldIndex, newIndex) {
-            if (oldIndex != newIndex) {
-              section.reorderForm(oldIndex, newIndex);
-              setState(() {
-                // reset position to avoid caos
-                _selectedPosition = 0;
-              });
-            }
-          },
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      Expanded(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (presentationMode.isFormbuilder)
+              Container(
+                height: 60,
+                width: double.infinity,
+                color: SmashColors.mainDecorationsDarker,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: SmashUI.normalText("Form tabs",
+                            bold: true,
+                            color: SmashColors.mainBackground,
+                            textAlign: TextAlign.center),
+                      ),
+                    ),
+                    Spacer(
+                      flex: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: IconButton(
+                        tooltip: "Add a new form tab",
+                        icon: Icon(
+                          MdiIcons.plus,
+                          color: SmashColors.mainBackground,
+                        ),
+                        onPressed: () async {
+                          String? newFormName =
+                              await nameForm(context, null, formNames4Section);
+                          if (newFormName != null) {
+                            section.addForm(newFormName);
+                            setState(() {
+                              // reset position to avoid caos
+                              _selectedPosition = formNames4Section.length;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            Expanded(
+              child: SlidableAutoCloseBehavior(
+                  child: presentationMode.isFormbuilder
+                      ? ReorderableListView(
+                          children: listItems,
+                          onReorder: (oldIndex, newIndex) {
+                            if (oldIndex != newIndex) {
+                              section.reorderForm(oldIndex, newIndex);
+                              setState(() {
+                                // reset position to avoid caos
+                                _selectedPosition = 0;
+                              });
+                            }
+                          },
+                        )
+                      : ListView(
+                          children: listItems,
+                        )),
+            ),
+          ],
         ),
       ),
+    ]);
+  }
+
+  Future<String?> nameForm(BuildContext context, String? defaultValue,
+      List<String> formNames4Section) async {
+    String? newFormName = await SmashDialogs.showInputDialog(
+      context,
+      "New form name",
+      "Enter a unique name for the form",
+      defaultText: defaultValue,
+      validationFunction: (String? value) {
+        if (value == null || value.isEmpty) {
+          return "Please enter a name";
+        }
+        // the name can't already exist in the section
+        if (formNames4Section.contains(value)) {
+          return "The name already exists";
+        }
+        return null;
+      },
     );
+    return newFormName;
   }
 }
 
 class DetailPart extends StatefulWidget {
   AFormhelper formHelper;
-  DetailPart(this.formHelper, {Key? key}) : super(key: key);
+  PresentationMode presentationMode;
+  DetailPart(this.formHelper, this.presentationMode, {Key? key})
+      : super(key: key);
 
   @override
   State<DetailPart> createState() => _DetailPartState();
@@ -197,7 +277,154 @@ class DetailPart extends StatefulWidget {
 class _DetailPartState extends State<DetailPart> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Consumer<FormHandlerState>(
+        builder: (context, formHandlerState, child) {
+      var section = widget.formHelper.getSection();
+      String? selectedTabName = formHandlerState.selectedTabName;
+      if (selectedTabName == null) {
+        var formNames4Section = section.getFormNames();
+        if (formNames4Section.length > 0) {
+          selectedTabName = formNames4Section[0];
+        } else {
+          return Container();
+        }
+      }
+
+      var presentationMode = widget.presentationMode;
+
+      SmashForm? form = section.getFormByName(selectedTabName);
+      if (form == null) {
+        return Container();
+      }
+
+      List<SmashFormItem> formItems = form.getFormItems();
+      List<Widget> listItems = [];
+      for (var position = 0; position < formItems.length; position++) {
+        SmashFormItem formItem = formItems[position];
+        String key = "form${selectedTabName}_item$position";
+        Tuple2<ListTile, bool>? widgetTuple = getWidget(
+            context, key, formItem, widget.presentationMode, widget.formHelper);
+        if (widgetTuple != null) {
+          Widget itemWidget = widgetTuple.item1;
+          List<Widget> endActions = [];
+          List<Widget> startActions = [];
+          if (presentationMode.isFormbuilder) {
+            endActions = [
+              SlidableAction(
+                  label: "Remove",
+                  backgroundColor: SmashColors.mainDanger,
+                  foregroundColor: SmashColors.mainBackground,
+                  icon: MdiIcons.trashCan,
+                  onPressed: (context) async {
+                    // TODO section.removeForm(position);
+                    setState(() {});
+                  })
+            ];
+            startActions = [
+              SlidableAction(
+                  label: "Edit",
+                  backgroundColor: SmashColors.mainDecorations,
+                  foregroundColor: SmashColors.mainBackground,
+                  icon: MdiIcons.pencil,
+                  onPressed: (context) async {
+                    // TODO
+                    // String? newFormName =
+                    //     await nameForm(context, formName, formNames4Section);
+                    // if (newFormName != null) {
+                    //   section.renameForm(position, newFormName);
+                    //   setState(() {
+                    //     // reset position to avoid caos
+                    //     _selectedPosition = 0;
+                    //   });
+                    // }
+                  })
+            ];
+          }
+
+          listItems.add(Slidable(
+            groupTag: "0",
+            key: Key("widget-$position-$selectedTabName-slide"),
+            closeOnScroll: true,
+            startActionPane: ActionPane(
+              extentRatio: 0.35,
+              dragDismissible: false,
+              motion: const ScrollMotion(),
+              dismissible: DismissiblePane(onDismissed: () {}),
+              children: startActions,
+            ),
+            endActionPane: ActionPane(
+              extentRatio: 0.35,
+              dragDismissible: false,
+              motion: const ScrollMotion(),
+              dismissible: DismissiblePane(onDismissed: () {}),
+              children: endActions,
+            ),
+            child: itemWidget,
+          ));
+        }
+      }
+
+      return Row(mainAxisSize: MainAxisSize.min, children: [
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (presentationMode.isFormbuilder)
+                Container(
+                  height: 60,
+                  width: double.infinity,
+                  color: SmashColors.mainDecorationsDarker,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: SmashUI.normalText("Form widgets",
+                              bold: true,
+                              color: SmashColors.mainBackground,
+                              textAlign: TextAlign.center),
+                        ),
+                      ),
+                      Spacer(
+                        flex: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: IconButton(
+                          tooltip: "Add a new widget",
+                          icon: Icon(
+                            MdiIcons.plus,
+                            color: SmashColors.mainBackground,
+                          ),
+                          onPressed: () async {},
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: SlidableAutoCloseBehavior(
+                    child: presentationMode.isFormbuilder
+                        ? ReorderableListView(
+                            children: listItems,
+                            onReorder: (oldIndex, newIndex) {
+                              if (oldIndex != newIndex) {
+                                // TODO section.reorderForm(oldIndex, newIndex);
+                                // setState(() {});
+                              }
+                            },
+                          )
+                        : ListView(
+                            children: listItems,
+                          )),
+              ),
+            ],
+          ),
+        ),
+      ]);
+    });
   }
 }
 

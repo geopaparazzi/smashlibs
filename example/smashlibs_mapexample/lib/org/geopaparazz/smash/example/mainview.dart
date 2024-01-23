@@ -296,6 +296,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
                       MaterialPageRoute(
                           builder: (context) => MainFormWidget(
                                 formHelper!,
+                                presentationMode:
+                                    PresentationMode(isFormbuilder: true),
                                 doScaffold: true,
                               )));
                 },
