@@ -15,9 +15,11 @@ const String ARG_LATITUDE_FILTERED = 'latitude_filtered';
 const String ARG_LONGITUDE_FILTERED = 'longitude_filtered';
 const String ARG_ACCURACY_FILTERED = 'accuracy_filtered';
 
-const String KEY_DO_NOTE_IN_GPS = "KEY_DO_NOTE_IN_GPS_MODE";
+const String KEY_DO_NOTE_IN_GPS =
+    "KEY_DO_NOTE_IN_GPS_MODE"; // TODO this should be renamed to KEY_NOTE_INSERT_MODE
 const int POINT_INSERTION_MODE_GPS = 0;
 const int POINT_INSERTION_MODE_MAPCENTER = 1;
+const int POINT_INSERTION_MODE_TAPPOSITION = 2;
 
 class SmashPosition {
   bool mocked = false;
