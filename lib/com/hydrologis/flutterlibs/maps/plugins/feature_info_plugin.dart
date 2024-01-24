@@ -157,7 +157,7 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
       if (vLayer is EditableDataSource) {
         var dataSrid = vLayer!.getSrid();
         proj4dart.Projection? dataPrj;
-        if (dataSrid != null && dataSrid != SmashPrj.EPSG4326) {
+        if (dataSrid != null && dataSrid != SmashPrj.EPSG4326_INT) {
           dataPrj = SmashPrj.fromSrid(dataSrid)!;
           SmashPrj.transformGeometry(SmashPrj.EPSG4326, dataPrj, boundsGeom);
         }
@@ -168,7 +168,7 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
             totalQueryResult.ids!.add(vLayer.getName()!);
             totalQueryResult.editable!.add(false);
             var g = f.geometry!;
-            if (dataSrid != null && dataSrid != SmashPrj.EPSG4326) {
+            if (dataSrid != null && dataSrid != SmashPrj.EPSG4326_INT) {
               SmashPrj.transformGeometry(dataPrj!, SmashPrj.EPSG4326, g);
             }
             totalQueryResult.geoms.add(g);
