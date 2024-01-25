@@ -78,6 +78,7 @@ part 'com/hydrologis/flutterlibs/gss/gss_server_api.dart';
 part 'com/hydrologis/flutterlibs/gss/gss_utilities.dart';
 part 'com/hydrologis/flutterlibs/forms/forms.dart';
 part 'com/hydrologis/flutterlibs/forms/forms_widgets.dart';
+part 'com/hydrologis/flutterlibs/forms/form_item_widgets.dart';
 part 'com/hydrologis/flutterlibs/forms/form_sketch.dart';
 part 'com/hydrologis/flutterlibs/forms/models.dart';
 part 'com/hydrologis/flutterlibs/forms/formbuilder.dart';

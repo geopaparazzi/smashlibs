@@ -539,8 +539,8 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title:
-                    getSimpleLabelValue(label, valueString, presentationMode),
+                title: AFormitem.getSimpleLabelValue(
+                    label, valueString, presentationMode),
               ),
               false);
         }
@@ -558,8 +558,8 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title:
-                    getSimpleLabelValue(label, valueString, presentationMode),
+                title: AFormitem.getSimpleLabelValue(
+                    label, valueString, presentationMode),
               ),
               false);
         }
@@ -606,8 +606,8 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title:
-                    getSimpleLabelValue(label, valueString, presentationMode),
+                title: AFormitem.getSimpleLabelValue(
+                    label, valueString, presentationMode),
               ),
               false);
         }
@@ -631,8 +631,8 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title:
-                    getSimpleLabelValue(label, finalString, presentationMode),
+                title: AFormitem.getSimpleLabelValue(
+                    label, finalString, presentationMode),
               ),
               false);
         }
@@ -667,8 +667,8 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title:
-                    getSimpleLabelValue(label, valueString, presentationMode),
+                title: AFormitem.getSimpleLabelValue(
+                    label, valueString, presentationMode),
               ),
               false);
         }
@@ -765,40 +765,6 @@ Tuple2<ListTile, bool>? getWidget(
   }
 
   return null;
-}
-
-Widget getSimpleLabelValue(String label, String value, PresentationMode pm) {
-  Widget field;
-  if (pm.detailMode == DetailMode.NORMAL) {
-    field = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SmashUI.normalText(label,
-            color: pm.labelTextColor, bold: pm.doLabelBold),
-        Padding(
-          padding: const EdgeInsets.only(left: 12.0, top: 8),
-          child: SmashUI.normalText(value,
-              color: pm.valueTextColor, bold: pm.doValueBold),
-        ),
-      ],
-    );
-  } else {
-    field = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SmashUI.normalText(label,
-            color: pm.labelTextColor, bold: pm.doLabelBold),
-        Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: SmashUI.normalText(value,
-              color: pm.valueTextColor, bold: pm.doValueBold),
-        ),
-      ],
-    );
-  }
-  return field;
 }
 
 class CheckboxWidget extends StatefulWidget {
@@ -1046,7 +1012,7 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
 
     if (widget._presentationMode.isReadOnly &&
         widget._presentationMode.detailMode != DetailMode.DETAILED) {
-      return getSimpleLabelValue(
+      return AFormitem.getSimpleLabelValue(
           widget._label,
           found != null ? found.label : value.toString(),
           widget._presentationMode);
@@ -1874,7 +1840,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
 
     if (widget._isReadOnly &&
         widget._presentationMode.detailMode != DetailMode.DETAILED) {
-      return getSimpleLabelValue(
+      return AFormitem.getSimpleLabelValue(
           widget._label,
           selectedItems.map((e) => e.label).join(";"),
           widget._presentationMode);
