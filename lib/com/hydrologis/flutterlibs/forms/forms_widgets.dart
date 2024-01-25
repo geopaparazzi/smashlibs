@@ -2250,17 +2250,26 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         if (geomEditorState.isEnabled) {
           if (geomEditorState.editableGeometry == null &&
               geojsonSource!.getFeatureCount() != 0) {
-            SmashDialogs.showWarningDialog(
-              context,
-              "At the moment editing is supported only for single geometries.",
-            );
+            // if there is already a feature available, try to select it
+            // by redirecting to thelong tap. Once multigeometries
+            // will be supported, this will have to be rethinked
+            if (!widget._isReadOnly) {
+              GeometryEditorState geomEditorState =
+                  Provider.of<GeometryEditorState>(context, listen: false);
+              if (geomEditorState.isEnabled) {
+                await GeometryEditManager().onMapLongTap(
+                    context, ll, zoom.round(),
+                    eds: geojsonSource);
+              }
+            }
             return;
+          } else {
+            await GeometryEditManager().onMapTap(
+              context,
+              ll,
+              eds: geojsonSource,
+            );
           }
-          await GeometryEditManager().onMapTap(
-            context,
-            ll,
-            eds: geojsonSource,
-          );
         } else {
           SmashDialogs.showToast(
               context, "Tapped: ${ll.longitude}, ${ll.latitude}",
