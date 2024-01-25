@@ -214,7 +214,7 @@ abstract class AFormhelper {
     section.getForms().forEach((form) {
       var formItems = form.getFormItems();
       formItems.forEach((formItem) {
-        formItem.update(dataUsed);
+        formItem.saveToDataMap(dataUsed);
       });
     });
     return dataUsed;
@@ -1167,16 +1167,22 @@ class SmashFormItem {
     }
   }
 
-  // ! TODO remember this!!!!
-  void update(Map<String, dynamic> dataValuesToUpdate) {
+  /// Update a given hashmap with the values of the current item.
+  void saveToDataMap(Map<String, dynamic> dataValuesToUpdate) {
     if (map.containsKey(TAG_KEY)) {
       dataValuesToUpdate[key] = value;
-      // String objKey = map[TAG_KEY].trim();
-      // var newValue = dataValuesToUpdate[objKey];
-      // if (newValue != null) {
-      //   map[TAG_VALUE] = newValue;
-      //   value = newValue;
-      // }
+    }
+  }
+
+  /// Update the internal values of the item with the values of the given hashmap.
+  void setFromDataMap(Map<String, dynamic> dataMapToUse) {
+    if (map.containsKey(TAG_KEY)) {
+      String objKey = map[TAG_KEY].trim();
+      var newValue = dataMapToUse[objKey];
+      if (newValue != null) {
+        map[TAG_VALUE] = newValue;
+        value = newValue;
+      }
     }
   }
 
@@ -1320,7 +1326,7 @@ class SmashSection {
       // FormUtilities.updateFromMap(formItems, newValues);
       formItems.forEach((formItem) {
         // print(formItem.toString());
-        formItem.update(newValues);
+        formItem.setFromDataMap(newValues);
         // print(formItem.toString());
       });
     });
