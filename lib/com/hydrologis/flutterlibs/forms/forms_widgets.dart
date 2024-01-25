@@ -2414,6 +2414,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
 
           // stop editing
           geomEditState.editableGeometry = null;
+          geomEditState.setEnabledSilently(false);
           GeometryEditManager().stopEditing();
 
           // reload layer geoms

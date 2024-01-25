@@ -210,6 +210,7 @@ abstract class AFormhelper {
   /// get the initial data map, changed by the interaction with the form.
   Map<String, dynamic> getFormChangedData() {
     var section = getSection();
+    print("SECTION: $section");
     section.getForms().forEach((form) {
       var formItems = form.getFormItems();
       formItems.forEach((formItem) {
@@ -1166,14 +1167,16 @@ class SmashFormItem {
     }
   }
 
-  void update(Map<String, dynamic> newValues) {
+  // ! TODO remember this!!!!
+  void update(Map<String, dynamic> dataValuesToUpdate) {
     if (map.containsKey(TAG_KEY)) {
-      String objKey = map[TAG_KEY].trim();
-      var newValue = newValues[objKey];
-      if (newValue != null) {
-        map[TAG_VALUE] = newValue;
-        value = newValue;
-      }
+      dataValuesToUpdate[key] = value;
+      // String objKey = map[TAG_KEY].trim();
+      // var newValue = dataValuesToUpdate[objKey];
+      // if (newValue != null) {
+      //   map[TAG_VALUE] = newValue;
+      //   value = newValue;
+      // }
     }
   }
 
