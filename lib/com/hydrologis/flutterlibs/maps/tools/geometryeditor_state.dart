@@ -152,6 +152,9 @@ class GeometryEditManager {
 
   void startEditing(EditableGeometry? editGeometry, Function callbackRefresh,
       {JTS.EGeometryType? geomType}) {
+    if (editGeometry == null) {
+      return;
+    }
     _callbackRefresh = callbackRefresh;
     _handleIconSize = GpPreferences()
         .getIntSync(SLSettings.SETTINGS_KEY_EDIT_HANLDE_ICON_SIZE, 25)!
