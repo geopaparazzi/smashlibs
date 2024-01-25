@@ -1154,6 +1154,7 @@ class SmashFormItem {
   dynamic value;
   String? iconStr;
   bool isReadOnly = false;
+  bool isGeometric = false;
 
   late Map<String, dynamic> map;
 
@@ -1169,6 +1170,16 @@ class SmashFormItem {
     }
     if (map.containsKey(TAG_TYPE)) {
       type = map[TAG_TYPE].trim();
+      if ([
+        TYPE_POINT,
+        TYPE_MULTIPOINT,
+        TYPE_LINESTRING,
+        TYPE_MULTILINESTRING,
+        TYPE_POLYGON,
+        TYPE_MULTIPOLYGON
+      ].contains(type)) {
+        isGeometric = true;
+      }
     }
 
     label = TagsManager.getLabelFromFormItem(map);
