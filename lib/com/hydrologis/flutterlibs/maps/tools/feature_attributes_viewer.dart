@@ -239,8 +239,11 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
                   flex: 1,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child: getDataTable(
-                        tableName, data, primaryKey, eds, typesMap),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: getDataTable(
+                          tableName, data, primaryKey, eds, typesMap),
+                    ),
                   ),
                 ),
               ],
