@@ -157,12 +157,13 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
       if (vLayer is EditableDataSource) {
         var dataSrid = vLayer!.getSrid();
         proj4dart.Projection? dataPrj;
+        var boundsGeomPrj = boundsGeom.copy();
         if (dataSrid != null && dataSrid != SmashPrj.EPSG4326_INT) {
           dataPrj = SmashPrj.fromSrid(dataSrid)!;
-          SmashPrj.transformGeometry(SmashPrj.EPSG4326, dataPrj, boundsGeom);
+          SmashPrj.transformGeometry(SmashPrj.EPSG4326, dataPrj, boundsGeomPrj);
         }
         HU.FeatureCollection? fc = await (vLayer as EditableDataSource)
-            .getFeaturesIntersecting(checkGeom: boundsGeom);
+            .getFeaturesIntersecting(checkGeom: boundsGeomPrj);
         if (fc != null) {
           fc.features.forEach((f) {
             totalQueryResult.ids!.add(vLayer.getName()!);
