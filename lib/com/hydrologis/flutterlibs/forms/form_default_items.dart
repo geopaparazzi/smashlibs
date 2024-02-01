@@ -178,7 +178,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
               }
           }
         ],
-        "url": "https://www.mydataproviderurl.com/api/v1/data.json"
+        "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/feature-fb/example/smashlibs_mapexample/assets/combo_string_items_example.json"
       },
       "value": "",
       "type": "$TYPE_STRINGCOMBO"
@@ -236,7 +236,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
     {
       "key": "int_single_choice_combo_urlbased_key",
       "values": {
-        "url": "https://www.mydataproviderurl.com/api/v1/data.json"
+        "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/feature-fb/example/smashlibs_mapexample/assets/combo_int_items_example.json"
       },
       "value": 0,
       "type": "intcombo"
