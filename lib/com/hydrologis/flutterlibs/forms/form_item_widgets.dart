@@ -1,6 +1,6 @@
 part of smashlibs;
 
-abstract class AFormitem {
+abstract class AFormWidget {
   late String key;
   late String type;
   late String label;
@@ -26,318 +26,11 @@ abstract class AFormitem {
   bool isGeometric();
 
   static Map<String, String> getDefaultJson(String typeName) {
-    switch (typeName) {
-      case TYPE_STRING:
-        return {
-          "string": """
-          {
-            "key": "string_key",
-            "label": "string label",
-            "value": "default value",
-            "icon": "font",
-            "type": "$TYPE_STRING"
-          }""",
-          "string as map label": """
-          {
-            "key": "string_key",
-            "label": "string label",
-            "islabel": "true",
-            "value": "default value",
-            "icon": "font",
-            "type": "$TYPE_STRING"
-          }""",
-        };
-      case TYPE_STRINGAREA:
-        return {
-          "text area": """
-          {
-            "key": "text_area_key",
-            "label": "text area label",
-            "value": "default value 1\ndefault value 2",
-            "icon": "scroll",
-            "type": "$TYPE_STRINGAREA"
-          }"""
-        };
-      case TYPE_DOUBLE:
-        return {
-          TYPE_DOUBLE: """
-          {
-            "key": "double_key",
-            "label": "double label",
-            "value": "123.45",
-            "type": "$TYPE_DOUBLE"
-          }"""
-        };
-      case TYPE_INTEGER:
-        return {
-          TYPE_INTEGER: """
-          {
-            "key": "integer_key",
-            "label": "integer label",
-            "value": "12345",
-            "type": "$TYPE_INTEGER"
-          }"""
-        };
-      case TYPE_LABELWITHLINE:
-        return {
-          "label with line": """
-          {
-            "key": "labelwithline_key",
-            "value": "default underlined label value",
-            "size": "24",
-            "type": "$TYPE_LABELWITHLINE"
-          }""",
-          "label with tappable url": """
-          {
-            "value": "a label with link to the geopaparazzi homepage",
-            "url": "http://www.geopaparazzi.eu",
-            "size": "20",
-            "type": "labelwithline"
-          }"""
-        };
-      case TYPE_LABEL:
-        return {
-          TYPE_LABEL: """
-          {
-            "key": "label_key",
-            "value": "default label value",
-            "size": "20",
-            "type": "$TYPE_LABEL"
-          }"""
-        };
-      case TYPE_DYNAMICSTRING:
-        return {
-          TYPE_DYNAMICSTRING: """
-          {
-            "key": "dynamicstring_key",
-            "value": "text1; text2; text3",
-            "type": "$TYPE_DYNAMICSTRING"
-          }"""
-        };
-      case TYPE_DATE:
-        return {
-          TYPE_DATE: """
-          {
-            "key": "date_key",
-            "value": "2023-06-29",
-            "type": "$TYPE_DATE"
-          }"""
-        };
-      case TYPE_TIME:
-        return {
-          TYPE_TIME: """
-          {
-            "key": "time_key",
-            "value": "08:38:00",
-            "type": "$TYPE_TIME"
-          }"""
-        };
-      case TYPE_BOOLEAN:
-        return {
-          TYPE_BOOLEAN: """
-          {
-            "key": "boolean_key",
-            "value": "",
-            "icon": "questionCircle",
-            "type": "$TYPE_BOOLEAN"
-          }"""
-        };
-      case TYPE_STRINGCOMBO:
-        return {
-          "string combo": """
-          {
-            "key": "string_combo_key",
-            "values": {
-              "items": [
-                {
-                  "item": "choice 1"
-                },
-                {
-                  "item": "default choice 2"
-                },
-                {
-                  "item": "choice 3"
-                }
-              ]
-            },
-            "value": "default choice 2",
-            "type": "$TYPE_STRINGCOMBO"
-          }""",
-          "string combo with item labels": """
-          {
-            "key": "string_combo_with_labels_key",
-            "values": {
-              "items": [
-                {
-                  "item": {
-                    "label": "",
-                    "value": "0"
-                  }
-                },
-                {
-                  "item": {
-                    "label": "choice 1",
-                    "value": "1"
-                  }
-                },
-                {
-                  "item": {
-                    "label": "choice 2",
-                    "value": "2"
-                  }
-                }
-              ]
-            },
-            "value": "1",
-            "type": "$TYPE_STRINGCOMBO"
-          }"""
-        };
-      case TYPE_INTCOMBO:
-        return {
-          "int combo": """
-            "key": "int_single_choice_combo_key",
-            "values": {
-              "items": [
-                {
-                  "item": 0
-                },
-                {
-                  "item": 1
-                },
-                {
-                  "item": 2
-                }
-              ]
-            },
-            "value": 1,
-            "type": "$TYPE_INTCOMBO"
-          }""",
-          "int combo with item labels": """          {
-            "key": "int_single_choice_combo_with_labels_key",
-            "values": {
-              "items": [
-                {
-                  "item": {
-                    "label": "",
-                    "value": 0
-                  }
-                },
-                {
-                  "item": {
-                    "label": "choice 1",
-                    "value": 1
-                  }
-                },
-                {
-                  "item": {
-                    "label": "choice 2",
-                    "value": 2
-                  }
-                }
-              ]
-            },
-            "value": 1,
-            "type": "$TYPE_INTCOMBO"
-          }"""
-        };
-      case TYPE_CONNECTEDSTRINGCOMBO:
-        return {
-          "connected string combo": """
-          {
-            "key": "two_connected_combos_key",
-            "values": {
-              "items 1": [
-                {
-                  "item": ""
-                },
-                {
-                  "item": "choice 1 of 1"
-                },
-                {
-                  "item": "choice 2 of 1"
-                },
-                {
-                  "item": "choice 3 of 1"
-                },
-                {
-                  "item": "choice 4 of 1"
-                },
-                {
-                  "item": "choice 5 of 1"
-                }
-              ],
-              "items 2": [
-                {
-                  "item": ""
-                },
-                {
-                  "item": "choice 1 of 2"
-                },
-                {
-                  "item": "choice 2 of 2"
-                },
-                {
-                  "item": "choice 3 of 2"
-                },
-                {
-                  "item": "choice 4 of 2"
-                },
-                {
-                  "item": "choice 5 of 2"
-                }
-              ]
-            },
-            "value": "items 2#choice 4 of 2",
-            "type": "connectedstringcombo"
-          }"""
-        };
-      case TYPE_AUTOCOMPLETESTRINGCOMBO:
-        return AutoCompleteStringComboItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO:
-        return AutocompleteConnectedStringComboItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_STRINGMULTIPLECHOICE:
-        return MultiStringComboItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_INTMULTIPLECHOICE:
-        return MultiIntComboItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_PICTURES:
-        return PicturesItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_IMAGELIB:
-        return PicturesItem(
-            context, widgetKey, formItem, presentationMode, formHelper,
-            fromGallery: true);
-      case TYPE_SKETCH:
-        return SketchItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_POINT:
-        return PointItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_MULTIPOINT:
-        return MultiPointItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_LINESTRING:
-        return LineStringItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_MULTILINESTRING:
-        return MultiLineStringItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_POLYGON:
-        return PolygonItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_MULTIPOLYGON:
-        return MultiPolygonItem(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_HIDDEN:
-        return null; // TODO Container();
-      default:
-        print("Type non implemented yet: $typeName");
-        return null; // TODO Container();
+    var defaultJson = DEFAULT_FORM_ITEMS[typeName];
+    if (defaultJson == null) {
+      throw Exception("No default json for type $typeName");
     }
-    return "";
+    return defaultJson!;
   }
 
   void initItem(SmashFormItem formItem, PresentationMode presentationMode) {
@@ -453,13 +146,13 @@ abstract class AFormitem {
     ];
   }
 
-  static AFormitem? forTypeName(
-      String typeName,
+  static AFormWidget? forFormItem(
       BuildContext context,
       String widgetKey,
       final SmashFormItem formItem,
       PresentationMode presentationMode,
       AFormhelper formHelper) {
+    String typeName = formItem.type;
     switch (typeName) {
       case TYPE_STRINGAREA:
         return StringAreaWidget(
@@ -481,31 +174,31 @@ abstract class AFormitem {
         return LabelWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_DYNAMICSTRING:
-        return DynamicStringItem(
+        return MultipleTextWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_DATE:
-        return DateItem(
+        return DateWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_TIME:
-        return TimeItem(
+        return TimeWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_BOOLEAN:
-        return BooleanItem(
+        return BooleanWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_STRINGCOMBO:
-        return StringComboItem(
+        return StringComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_INTCOMBO:
-        return IntComboItem(
+        return IntComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_AUTOCOMPLETESTRINGCOMBO:
-        return AutoCompleteStringComboItem(
+        return AutoCompleteStringComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_CONNECTEDSTRINGCOMBO:
-        return ConnectedStringComboItem(
+        return ConnectedStringComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO:
-        return AutocompleteConnectedStringComboItem(
+        return AutoCompleteConnectedStringComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
 //      case TYPE_ONETOMANYSTRINGCOMBO:
 //        LinkedHashMap<String, List<NamedList<String>>> oneToManyValuesMap = TagsManager.extractOneToManyComboValuesMap(jsonObject);
@@ -513,20 +206,20 @@ abstract class AFormitem {
 //            constraintDescription);
 //        break;
       case TYPE_STRINGMULTIPLECHOICE:
-        return MultiStringComboItem(
+        return MultiStringComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_INTMULTIPLECHOICE:
-        return MultiIntComboItem(
+        return MultiIntComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_PICTURES:
-        return PicturesItem(
+        return PicturesAndImagesWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_IMAGELIB:
-        return PicturesItem(
+        return PicturesAndImagesWidget(
             context, widgetKey, formItem, presentationMode, formHelper,
             fromGallery: true);
       case TYPE_SKETCH:
-        return SketchItem(
+        return DrawingWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
 //      case TYPE_MAP:
 //        if (value.length() <= 0) {
@@ -549,22 +242,22 @@ abstract class AFormitem {
 //        addedView = new GNfcUidView(this, null, requestCode, mainView, label, value, constraintDescription);
 //        break;
       case TYPE_POINT:
-        return PointItem(
+        return PointGeometryWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_MULTIPOINT:
-        return MultiPointItem(
+        return MultiPointGeometryWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_LINESTRING:
-        return LineStringItem(
+        return LinestringGeometryWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_MULTILINESTRING:
-        return MultiLineStringItem(
+        return MultiLinestringGeometryWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_POLYGON:
-        return PolygonItem(
+        return PolygonGeometryWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_MULTIPOLYGON:
-        return MultiPolygonItem(
+        return MultiPolygonGeometryWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_HIDDEN:
         return null; // TODO Container();
@@ -575,7 +268,7 @@ abstract class AFormitem {
   }
 }
 
-class StringWidget extends AFormitem {
+class StringWidget extends AFormWidget {
   var minLines = 1;
   var maxLines = 1;
   var keyboardType = TextInputType.text;
@@ -592,12 +285,6 @@ class StringWidget extends AFormitem {
     initItem(formItem, presentationMode);
 
     valueString = value.toString();
-  }
-
-  @override
-  static String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -729,11 +416,6 @@ class StringAreaWidget extends StringWidget {
   }
 
   @override
-  String getDefaultJson() {
-    return "";
-  }
-
-  @override
   bool isGeometric() {
     return false;
   }
@@ -759,11 +441,6 @@ class DoubleWidget extends StringWidget {
   @override
   Widget getConfigurationWidget() {
     return Container();
-  }
-
-  @override
-  String getDefaultJson() {
-    return "";
   }
 
   @override
@@ -795,17 +472,12 @@ class IntegerWidget extends StringWidget {
   }
 
   @override
-  String getDefaultJson() {
-    return "";
-  }
-
-  @override
   bool isGeometric() {
     return false;
   }
 }
 
-class LabelWidget extends AFormitem {
+class LabelWidget extends AFormWidget {
   var textDecoration = TextDecoration.none;
   BuildContext context;
   String widgetKey;
@@ -818,12 +490,6 @@ class LabelWidget extends AFormitem {
       this.presentationMode, this.formHelper,
       {this.withLine = false}) {
     initItem(formItem, presentationMode);
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -887,14 +553,14 @@ class LabelWidget extends AFormitem {
   }
 }
 
-class DynamicStringItem extends AFormitem {
+class MultipleTextWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
   PresentationMode presentationMode;
   AFormhelper formHelper;
 
-  DynamicStringItem(
+  MultipleTextWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -902,12 +568,6 @@ class DynamicStringItem extends AFormitem {
     this.formHelper,
   ) {
     initItem(formItem, presentationMode);
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -937,7 +597,7 @@ class DynamicStringItem extends AFormitem {
   }
 }
 
-class DateItem extends AFormitem {
+class DateWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -945,7 +605,7 @@ class DateItem extends AFormitem {
   AFormhelper formHelper;
   late String valueString;
 
-  DateItem(
+  DateWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -954,12 +614,6 @@ class DateItem extends AFormitem {
   ) {
     initItem(formItem, presentationMode);
     valueString = value.toString();
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -986,8 +640,8 @@ class DateItem extends AFormitem {
     if (itemReadonly && presentationMode.detailMode != DetailMode.DETAILED) {
       widget = ListTile(
         leading: icon,
-        title:
-            AFormitem.getSimpleLabelValue(label, valueString, presentationMode),
+        title: AFormWidget.getSimpleLabelValue(
+            label, valueString, presentationMode),
       );
     } else {
       widget = ListTile(
@@ -1000,7 +654,7 @@ class DateItem extends AFormitem {
   }
 }
 
-class TimeItem extends AFormitem {
+class TimeWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -1008,7 +662,7 @@ class TimeItem extends AFormitem {
   AFormhelper formHelper;
   late String valueString;
 
-  TimeItem(
+  TimeWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1017,12 +671,6 @@ class TimeItem extends AFormitem {
   ) {
     initItem(formItem, presentationMode);
     valueString = value.toString();
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1049,8 +697,8 @@ class TimeItem extends AFormitem {
     if (itemReadonly && presentationMode.detailMode != DetailMode.DETAILED) {
       widget = ListTile(
         leading: icon,
-        title:
-            AFormitem.getSimpleLabelValue(label, valueString, presentationMode),
+        title: AFormWidget.getSimpleLabelValue(
+            label, valueString, presentationMode),
       );
     } else {
       widget = ListTile(
@@ -1063,14 +711,14 @@ class TimeItem extends AFormitem {
   }
 }
 
-class BooleanItem extends AFormitem {
+class BooleanWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
   PresentationMode presentationMode;
   AFormhelper formHelper;
 
-  BooleanItem(
+  BooleanWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1078,12 +726,6 @@ class BooleanItem extends AFormitem {
     this.formHelper,
   ) {
     initItem(formItem, presentationMode);
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1115,14 +757,14 @@ class BooleanItem extends AFormitem {
   }
 }
 
-class StringComboItem extends AFormitem {
+class StringComboWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
   PresentationMode presentationMode;
   AFormhelper formHelper;
 
-  StringComboItem(
+  StringComboWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1130,12 +772,6 @@ class StringComboItem extends AFormitem {
     this.formHelper,
   ) {
     initItem(formItem, presentationMode);
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1168,14 +804,14 @@ class StringComboItem extends AFormitem {
   }
 }
 
-class IntComboItem extends AFormitem {
+class IntComboWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
   PresentationMode presentationMode;
   AFormhelper formHelper;
 
-  IntComboItem(
+  IntComboWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1183,12 +819,6 @@ class IntComboItem extends AFormitem {
     this.formHelper,
   ) {
     initItem(formItem, presentationMode);
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1221,7 +851,7 @@ class IntComboItem extends AFormitem {
   }
 }
 
-class AutoCompleteStringComboItem extends AFormitem {
+class AutoCompleteStringComboWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -1229,7 +859,7 @@ class AutoCompleteStringComboItem extends AFormitem {
   AFormhelper formHelper;
   late String valueString;
 
-  AutoCompleteStringComboItem(
+  AutoCompleteStringComboWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1238,12 +868,6 @@ class AutoCompleteStringComboItem extends AFormitem {
   ) {
     initItem(formItem, presentationMode);
     valueString = value.toString();
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1270,8 +894,8 @@ class AutoCompleteStringComboItem extends AFormitem {
     if (itemReadonly && presentationMode.detailMode != DetailMode.DETAILED) {
       widget = ListTile(
         leading: icon,
-        title:
-            AFormitem.getSimpleLabelValue(label, valueString, presentationMode),
+        title: AFormWidget.getSimpleLabelValue(
+            label, valueString, presentationMode),
       );
     } else {
       widget = ListTile(
@@ -1285,7 +909,7 @@ class AutoCompleteStringComboItem extends AFormitem {
   }
 }
 
-class ConnectedStringComboItem extends AFormitem {
+class ConnectedStringComboWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -1293,7 +917,7 @@ class ConnectedStringComboItem extends AFormitem {
   AFormhelper formHelper;
   late String valueString;
 
-  ConnectedStringComboItem(
+  ConnectedStringComboWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1302,12 +926,6 @@ class ConnectedStringComboItem extends AFormitem {
   ) {
     initItem(formItem, presentationMode);
     valueString = value.toString();
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1339,8 +957,8 @@ class ConnectedStringComboItem extends AFormitem {
       }
       widget = ListTile(
         leading: icon,
-        title:
-            AFormitem.getSimpleLabelValue(label, finalString, presentationMode),
+        title: AFormWidget.getSimpleLabelValue(
+            label, finalString, presentationMode),
       );
     } else {
       widget = ListTile(
@@ -1354,7 +972,7 @@ class ConnectedStringComboItem extends AFormitem {
   }
 }
 
-class AutocompleteConnectedStringComboItem extends AFormitem {
+class AutoCompleteConnectedStringComboWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -1362,7 +980,7 @@ class AutocompleteConnectedStringComboItem extends AFormitem {
   AFormhelper formHelper;
   late String valueString;
 
-  AutocompleteConnectedStringComboItem(
+  AutoCompleteConnectedStringComboWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1371,12 +989,6 @@ class AutocompleteConnectedStringComboItem extends AFormitem {
   ) {
     initItem(formItem, presentationMode);
     valueString = value.toString();
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1410,7 +1022,7 @@ class AutocompleteConnectedStringComboItem extends AFormitem {
   }
 }
 
-class MultiStringComboItem extends AFormitem {
+class MultiStringComboWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -1418,7 +1030,7 @@ class MultiStringComboItem extends AFormitem {
   AFormhelper formHelper;
   late String valueString;
 
-  MultiStringComboItem(
+  MultiStringComboWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1427,12 +1039,6 @@ class MultiStringComboItem extends AFormitem {
   ) {
     initItem(formItem, presentationMode);
     valueString = value.toString();
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1460,8 +1066,8 @@ class MultiStringComboItem extends AFormitem {
       // ! TODO
       widget = ListTile(
         leading: icon,
-        title:
-            AFormitem.getSimpleLabelValue(label, valueString, presentationMode),
+        title: AFormWidget.getSimpleLabelValue(
+            label, valueString, presentationMode),
       );
     } else {
       widget = ListTile(
@@ -1475,7 +1081,7 @@ class MultiStringComboItem extends AFormitem {
   }
 }
 
-class MultiIntComboItem extends AFormitem {
+class MultiIntComboWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -1483,7 +1089,7 @@ class MultiIntComboItem extends AFormitem {
   AFormhelper formHelper;
   late String valueString;
 
-  MultiIntComboItem(
+  MultiIntComboWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1492,12 +1098,6 @@ class MultiIntComboItem extends AFormitem {
   ) {
     initItem(formItem, presentationMode);
     valueString = value.toString();
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1531,7 +1131,7 @@ class MultiIntComboItem extends AFormitem {
   }
 }
 
-class PicturesItem extends AFormitem {
+class PicturesAndImagesWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -1539,16 +1139,10 @@ class PicturesItem extends AFormitem {
   AFormhelper formHelper;
   bool fromGallery;
 
-  PicturesItem(this.context, this.widgetKey, this.formItem,
+  PicturesAndImagesWidget(this.context, this.widgetKey, this.formItem,
       this.presentationMode, this.formHelper,
       {this.fromGallery = false}) {
     initItem(formItem, presentationMode);
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1583,7 +1177,7 @@ class PicturesItem extends AFormitem {
   }
 }
 
-class SketchItem extends AFormitem {
+class DrawingWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
@@ -1591,7 +1185,7 @@ class SketchItem extends AFormitem {
   AFormhelper formHelper;
   late String valueString;
 
-  SketchItem(
+  DrawingWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1600,12 +1194,6 @@ class SketchItem extends AFormitem {
   ) {
     initItem(formItem, presentationMode);
     valueString = value.toString();
-  }
-
-  @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
   }
 
   @override
@@ -1639,14 +1227,14 @@ class SketchItem extends AFormitem {
   }
 }
 
-abstract class GeometryItem extends AFormitem {
+abstract class InFormGeometryWidget extends AFormWidget {
   BuildContext context;
   String widgetKey;
   final SmashFormItem formItem;
   PresentationMode presentationMode;
   AFormhelper formHelper;
 
-  GeometryItem(
+  InFormGeometryWidget(
     this.context,
     this.widgetKey,
     this.formItem,
@@ -1679,21 +1267,19 @@ abstract class GeometryItem extends AFormitem {
   }
 
   @override
-  String getDefaultJson() {
-    // TODO: implement getDefaultJson
-    throw UnimplementedError();
-  }
-
-  @override
   Widget getConfigurationWidget() {
     // TODO: implement getConfigurationWidget
     throw UnimplementedError();
   }
 }
 
-class PointItem extends GeometryItem {
-  PointItem(BuildContext context, String widgetKey, SmashFormItem formItem,
-      PresentationMode presentationMode, AFormhelper formHelper)
+class PointGeometryWidget extends InFormGeometryWidget {
+  PointGeometryWidget(
+      BuildContext context,
+      String widgetKey,
+      SmashFormItem formItem,
+      PresentationMode presentationMode,
+      AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1702,9 +1288,13 @@ class PointItem extends GeometryItem {
   }
 }
 
-class MultiPointItem extends GeometryItem {
-  MultiPointItem(BuildContext context, String widgetKey, SmashFormItem formItem,
-      PresentationMode presentationMode, AFormhelper formHelper)
+class MultiPointGeometryWidget extends InFormGeometryWidget {
+  MultiPointGeometryWidget(
+      BuildContext context,
+      String widgetKey,
+      SmashFormItem formItem,
+      PresentationMode presentationMode,
+      AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1713,9 +1303,13 @@ class MultiPointItem extends GeometryItem {
   }
 }
 
-class LineStringItem extends GeometryItem {
-  LineStringItem(BuildContext context, String widgetKey, SmashFormItem formItem,
-      PresentationMode presentationMode, AFormhelper formHelper)
+class LinestringGeometryWidget extends InFormGeometryWidget {
+  LinestringGeometryWidget(
+      BuildContext context,
+      String widgetKey,
+      SmashFormItem formItem,
+      PresentationMode presentationMode,
+      AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1724,8 +1318,8 @@ class LineStringItem extends GeometryItem {
   }
 }
 
-class MultiLineStringItem extends GeometryItem {
-  MultiLineStringItem(
+class MultiLinestringGeometryWidget extends InFormGeometryWidget {
+  MultiLinestringGeometryWidget(
       BuildContext context,
       String widgetKey,
       SmashFormItem formItem,
@@ -1739,9 +1333,13 @@ class MultiLineStringItem extends GeometryItem {
   }
 }
 
-class PolygonItem extends GeometryItem {
-  PolygonItem(BuildContext context, String widgetKey, SmashFormItem formItem,
-      PresentationMode presentationMode, AFormhelper formHelper)
+class PolygonGeometryWidget extends InFormGeometryWidget {
+  PolygonGeometryWidget(
+      BuildContext context,
+      String widgetKey,
+      SmashFormItem formItem,
+      PresentationMode presentationMode,
+      AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1750,8 +1348,8 @@ class PolygonItem extends GeometryItem {
   }
 }
 
-class MultiPolygonItem extends GeometryItem {
-  MultiPolygonItem(
+class MultiPolygonGeometryWidget extends InFormGeometryWidget {
+  MultiPolygonGeometryWidget(
       BuildContext context,
       String widgetKey,
       SmashFormItem formItem,

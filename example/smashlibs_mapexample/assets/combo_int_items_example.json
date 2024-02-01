@@ -1,0 +1,20 @@
+[
+    {
+        "item": {
+            "label": "Cat",
+            "value": 1
+        }
+    },
+    {
+        "item": {
+            "label": "Mouse",
+            "value": 2
+        }
+    },
+    {
+        "item": {
+            "label": "Dog",
+            "value": 3
+        }
+    }
+]

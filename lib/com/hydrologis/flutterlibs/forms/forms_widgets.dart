@@ -539,7 +539,7 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title: AFormitem.getSimpleLabelValue(
+                title: AFormWidget.getSimpleLabelValue(
                     label, valueString, presentationMode),
               ),
               false);
@@ -559,7 +559,7 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title: AFormitem.getSimpleLabelValue(
+                title: AFormWidget.getSimpleLabelValue(
                     label, valueString, presentationMode),
               ),
               false);
@@ -609,7 +609,7 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title: AFormitem.getSimpleLabelValue(
+                title: AFormWidget.getSimpleLabelValue(
                     label, valueString, presentationMode),
               ),
               false);
@@ -634,7 +634,7 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title: AFormitem.getSimpleLabelValue(
+                title: AFormWidget.getSimpleLabelValue(
                     label, finalString, presentationMode),
               ),
               false);
@@ -670,7 +670,7 @@ Tuple2<ListTile, bool>? getWidget(
           return Tuple2(
               ListTile(
                 leading: icon,
-                title: AFormitem.getSimpleLabelValue(
+                title: AFormWidget.getSimpleLabelValue(
                     label, valueString, presentationMode),
               ),
               false);
@@ -1014,7 +1014,7 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
 
     if (widget._presentationMode.isReadOnly &&
         widget._presentationMode.detailMode != DetailMode.DETAILED) {
-      return AFormitem.getSimpleLabelValue(
+      return AFormWidget.getSimpleLabelValue(
           widget._label,
           found != null ? found.label : value.toString(),
           widget._presentationMode);
@@ -1840,7 +1840,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
 
     if (widget._isReadOnly &&
         widget._presentationMode.detailMode != DetailMode.DETAILED) {
-      return AFormitem.getSimpleLabelValue(
+      return AFormWidget.getSimpleLabelValue(
           widget._label,
           selectedItems.map((e) => e.label).join(";"),
           widget._presentationMode);

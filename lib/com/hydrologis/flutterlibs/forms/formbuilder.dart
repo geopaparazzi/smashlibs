@@ -298,14 +298,16 @@ class _DetailPartState extends State<DetailPart> {
       }
 
       List<SmashFormItem> formItems = form.getFormItems();
+
       List<Widget> listItems = [];
       for (var position = 0; position < formItems.length; position++) {
         SmashFormItem formItem = formItems[position];
         String key = "form${selectedTabName}_item$position";
-        Tuple2<ListTile, bool>? widgetTuple = getWidget(
-            context, key, formItem, widget.presentationMode, widget.formHelper);
-        if (widgetTuple != null) {
-          Widget itemWidget = widgetTuple.item1;
+
+        AFormWidget? formWidget = AFormWidget.forFormItem(
+            context, key, formItem, presentationMode, widget.formHelper);
+        if (formWidget != null) {
+          Widget itemWidget = formWidget.getWidget();
           List<Widget> endActions = [];
           List<Widget> startActions = [];
           if (presentationMode.isFormbuilder) {
@@ -316,7 +318,7 @@ class _DetailPartState extends State<DetailPart> {
                   foregroundColor: SmashColors.mainBackground,
                   icon: MdiIcons.trashCan,
                   onPressed: (context) async {
-                    // TODO section.removeForm(position);
+                    form.removeFormItem(position);
                     setState(() {});
                   })
             ];
@@ -398,7 +400,17 @@ class _DetailPartState extends State<DetailPart> {
                             MdiIcons.plus,
                             color: SmashColors.mainBackground,
                           ),
-                          onPressed: () async {},
+                          onPressed: () async {
+                            List<String>? newFormWidgetJsonList =
+                                await getNewFormWidgetJson(context);
+                            if (newFormWidgetJsonList != null) {
+                              for (var newFormWidgetJson
+                                  in newFormWidgetJsonList) {
+                                form.addFormItem(newFormWidgetJson);
+                              }
+                              setState(() {});
+                            }
+                          },
                         ),
                       ),
                     ],
@@ -425,6 +437,79 @@ class _DetailPartState extends State<DetailPart> {
         ),
       ]);
     });
+  }
+
+  Future<List<String>?> getNewFormWidgetJson(BuildContext context) async {
+    String okText = 'Ok';
+    String cancelText = 'Cancel';
+    List<Widget> widgets = [];
+    List<String> selected = [];
+    for (var entry in DEFAULT_FORM_ITEMS.entries) {
+      // String name = entry.key;
+      Map<String, String> items = entry.value;
+
+      for (var itemEntry in items.entries) {
+        // bool itemSelected = false;
+        // if (selectedItems != null && selectedItems.contains(items[i])) {
+        //   itemSelected = true;
+        // }
+        String name = itemEntry.key;
+        String jsonString = itemEntry.value;
+        widgets.add(DialogCheckBoxTile(
+          false,
+          name,
+          (isSelected, item) {
+            if (isSelected) {
+              selected.add(jsonString);
+            } else {
+              selected.remove(jsonString);
+            }
+          },
+          iconData: null,
+        ));
+      }
+    }
+
+    List<String>? selection = await showDialog<List<String>>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: SmashUI.normalText("Select Widgets",
+                textAlign: TextAlign.center,
+                color: SmashColors.mainDecorationsDarker),
+            content: Builder(builder: (context) {
+              var width = MediaQuery.of(context).size.width;
+              return Container(
+                width: width,
+                child: ListView(
+                  shrinkWrap: true,
+                  children:
+                      ListTile.divideTiles(context: context, tiles: widgets)
+                          .toList(),
+                ),
+              );
+            }),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            actions: <Widget>[
+              TextButton(
+                child: Text(cancelText),
+                onPressed: () {
+                  Navigator.of(context).pop(null);
+                },
+              ),
+              TextButton(
+                child: Text(okText),
+                onPressed: () {
+                  Navigator.of(context).pop(selected);
+                },
+              ),
+            ],
+          );
+        });
+
+    return selection;
   }
 }
 

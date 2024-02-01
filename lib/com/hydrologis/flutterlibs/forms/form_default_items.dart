@@ -82,15 +82,27 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
     }"""
   },
   TYPE_DATE: {
-    TYPE_DATE: """
+    "simple date": """
     {
       "key": "date_key",
+      "value": "",
+      "type": "$TYPE_DATE"
+    }""",
+    "date with default set": """
+    {
+      "key": "date_with_default_key",
       "value": "2023-06-29",
       "type": "$TYPE_DATE"
     }"""
   },
   TYPE_TIME: {
-    TYPE_TIME: """
+    "simple time": """
+    {
+      "key": "time_key",
+      "value": "simple",
+      "type": "$TYPE_TIME"
+    }""",
+    "time with default set": """
     {
       "key": "time_key",
       "value": "08:38:00",
@@ -162,7 +174,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
           {
               "item": {
                   "label": "No data",
-                  "value": -1
+                  "value": "-1"
               }
           }
         ],
@@ -436,41 +448,95 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "type": "$TYPE_INTMULTIPLECHOICE"
     }""",
   },
-  //      MultiIntComboItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_PICTURES:
-  //      PicturesItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_IMAGELIB:
-  //      PicturesItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper,
-  //         fromGallery: true);
-  //   TYPE_SKETCH:
-  //      SketchItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_POINT:
-  //      PointItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_MULTIPOINT:
-  //      MultiPointItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_LINESTRING:
-  //      LineStringItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_MULTILINESTRING:
-  //      MultiLineStringItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_POLYGON:
-  //      PolygonItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_MULTIPOLYGON:
-  //      MultiPolygonItem(
-  //         context, widgetKey, formItem, presentationMode, formHelper);
-  //   TYPE_HIDDEN:
-  //      null; // TODO Container();
-  //   default:
-  //     print("Type non implemented yet: $typeName");
-  //      null; // TODO Container();
-  // }
-  //  "";
+  TYPE_PICTURES: {
+    "a camera picture": """
+    {
+      "key": "pictures_key",
+      "value": "",
+      "type": "$TYPE_PICTURES"
+    }""",
+    "a picture from the gallery": """
+    {
+      "key": "pictures_from_lib_key",
+      "value": "",
+      "type": "$TYPE_IMAGELIB"
+    }"""
+  },
+  TYPE_SKETCH: {
+    "a sketch": """
+    {
+      "key": "sketch_key",
+      "value": "",
+      "type": "$TYPE_SKETCH"
+    }"""
+  },
+  TYPE_POINT: {
+    "an existing point with style": """
+    {
+      "key": "a point geometry",
+      "value": {
+        "type": "Point",
+        "coordinates": [11.66, 46.5]
+      },
+      "style": {
+        "icon": "tree",
+        "color": "#FF0000",
+        "size": 15
+      },
+      "type": "$TYPE_POINT"
+    }""",
+    "an empty point with style": """
+    {
+      "key": "a point geometry",
+      "value": "",
+      "style": {
+        "icon": "tree",
+        "color": "#FF0000",
+        "size": 15
+      },
+      "type": "$TYPE_POINT"
+    }"""
+  },
+  TYPE_LINESTRING: {
+    "an existing linestring with style": """
+    {
+      "key": "a line geometry",
+      "value": {
+        "type": "LineString",
+        "coordinates": [
+          [11.66, 46.5],
+          [11.76, 46.6],
+          [11.56, 46.7]
+        ]
+      },
+      "style": {
+        "color": "#0000FF",
+        "width": 4
+      },
+      "type": "$TYPE_LINESTRING"
+    }""",
+  },
+  TYPE_POLYGON: {
+    "an existing polygon with style": """
+    {
+      "key": "a polygon geometry",
+      "value": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [11.66, 46.5],
+            [11.76, 46.6],
+            [11.56, 46.7],
+            [11.66, 46.5]
+          ]
+        ]
+      },
+      "style": {
+        "color": "#FF0000",
+        "width": 2,
+        "opacity": 0.2
+      },
+      "type": "$TYPE_POLYGON"
+    }""",
+  },
 };

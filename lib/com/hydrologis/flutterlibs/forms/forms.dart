@@ -953,7 +953,7 @@ class TagsManager {
   /// Remove a formitem from a form map at an index position.
   static void removeFormitemFromForm(
       Map<String, dynamic> formMap, int removeIndex) {
-    List<dynamic>? jsonArray = formMap[ATTR_FORMS];
+    List<dynamic>? jsonArray = formMap[ATTR_FORMITEMS];
     if (jsonArray != null && jsonArray.isNotEmpty) {
       jsonArray.removeAt(removeIndex);
     }
@@ -1336,6 +1336,15 @@ class SmashForm {
 
   void removeFormItem(int index) {
     TagsManager.removeFormitemFromForm(formMap, index);
+    readData();
+  }
+
+  void addFormItem(String jsonString) {
+    var defaultMap = jsonDecode(jsonString);
+    List<dynamic>? jsonArray = formMap[ATTR_FORMITEMS];
+    if (jsonArray != null) {
+      jsonArray.add(defaultMap);
+    }
     readData();
   }
 

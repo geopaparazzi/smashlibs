@@ -77,6 +77,7 @@ flutter:
     # - assets/smash_logo_64.png
     # - assets/smash_text.png
     - assets/tags.json
+    - assets/tags_single.json
     - assets/gjson_points.json
     - assets/gjson_lines.json
     - assets/gjson_polygons.json

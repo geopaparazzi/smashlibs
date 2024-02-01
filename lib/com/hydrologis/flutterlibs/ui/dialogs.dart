@@ -446,8 +446,8 @@ class SmashDialogs {
   static Future<List<String>?> showMultiSelectionComboDialog(
       BuildContext context, dynamic title, List<String> items,
       {List<String>? selectedItems,
-      String okText: 'Ok',
-      String cancelText: 'Cancel',
+      String okText = 'Ok',
+      String cancelText = 'Cancel',
       List<IconData>? iconDataList}) async {
     List<Widget> widgets = [];
     List<String> selected = [];
