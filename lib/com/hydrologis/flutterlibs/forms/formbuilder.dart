@@ -411,8 +411,8 @@ class _DetailPartState extends State<DetailPart> {
                             children: listItems,
                             onReorder: (oldIndex, newIndex) {
                               if (oldIndex != newIndex) {
-                                // TODO section.reorderForm(oldIndex, newIndex);
-                                // setState(() {});
+                                form.reorderFormItem(oldIndex, newIndex);
+                                setState(() {});
                               }
                             },
                           )

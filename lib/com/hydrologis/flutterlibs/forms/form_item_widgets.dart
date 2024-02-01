@@ -15,6 +15,7 @@ abstract class AFormitem {
   late Constraints constraints;
   Widget? widget;
   Widget? configWidget;
+  bool isFormBuilder = false;
 
   String getName();
 
@@ -24,7 +25,320 @@ abstract class AFormitem {
 
   bool isGeometric();
 
-  String getDefaultJson();
+  static Map<String, String> getDefaultJson(String typeName) {
+    switch (typeName) {
+      case TYPE_STRING:
+        return {
+          "string": """
+          {
+            "key": "string_key",
+            "label": "string label",
+            "value": "default value",
+            "icon": "font",
+            "type": "$TYPE_STRING"
+          }""",
+          "string as map label": """
+          {
+            "key": "string_key",
+            "label": "string label",
+            "islabel": "true",
+            "value": "default value",
+            "icon": "font",
+            "type": "$TYPE_STRING"
+          }""",
+        };
+      case TYPE_STRINGAREA:
+        return {
+          "text area": """
+          {
+            "key": "text_area_key",
+            "label": "text area label",
+            "value": "default value 1\ndefault value 2",
+            "icon": "scroll",
+            "type": "$TYPE_STRINGAREA"
+          }"""
+        };
+      case TYPE_DOUBLE:
+        return {
+          TYPE_DOUBLE: """
+          {
+            "key": "double_key",
+            "label": "double label",
+            "value": "123.45",
+            "type": "$TYPE_DOUBLE"
+          }"""
+        };
+      case TYPE_INTEGER:
+        return {
+          TYPE_INTEGER: """
+          {
+            "key": "integer_key",
+            "label": "integer label",
+            "value": "12345",
+            "type": "$TYPE_INTEGER"
+          }"""
+        };
+      case TYPE_LABELWITHLINE:
+        return {
+          "label with line": """
+          {
+            "key": "labelwithline_key",
+            "value": "default underlined label value",
+            "size": "24",
+            "type": "$TYPE_LABELWITHLINE"
+          }""",
+          "label with tappable url": """
+          {
+            "value": "a label with link to the geopaparazzi homepage",
+            "url": "http://www.geopaparazzi.eu",
+            "size": "20",
+            "type": "labelwithline"
+          }"""
+        };
+      case TYPE_LABEL:
+        return {
+          TYPE_LABEL: """
+          {
+            "key": "label_key",
+            "value": "default label value",
+            "size": "20",
+            "type": "$TYPE_LABEL"
+          }"""
+        };
+      case TYPE_DYNAMICSTRING:
+        return {
+          TYPE_DYNAMICSTRING: """
+          {
+            "key": "dynamicstring_key",
+            "value": "text1; text2; text3",
+            "type": "$TYPE_DYNAMICSTRING"
+          }"""
+        };
+      case TYPE_DATE:
+        return {
+          TYPE_DATE: """
+          {
+            "key": "date_key",
+            "value": "2023-06-29",
+            "type": "$TYPE_DATE"
+          }"""
+        };
+      case TYPE_TIME:
+        return {
+          TYPE_TIME: """
+          {
+            "key": "time_key",
+            "value": "08:38:00",
+            "type": "$TYPE_TIME"
+          }"""
+        };
+      case TYPE_BOOLEAN:
+        return {
+          TYPE_BOOLEAN: """
+          {
+            "key": "boolean_key",
+            "value": "",
+            "icon": "questionCircle",
+            "type": "$TYPE_BOOLEAN"
+          }"""
+        };
+      case TYPE_STRINGCOMBO:
+        return {
+          "string combo": """
+          {
+            "key": "string_combo_key",
+            "values": {
+              "items": [
+                {
+                  "item": "choice 1"
+                },
+                {
+                  "item": "default choice 2"
+                },
+                {
+                  "item": "choice 3"
+                }
+              ]
+            },
+            "value": "default choice 2",
+            "type": "$TYPE_STRINGCOMBO"
+          }""",
+          "string combo with item labels": """
+          {
+            "key": "string_combo_with_labels_key",
+            "values": {
+              "items": [
+                {
+                  "item": {
+                    "label": "",
+                    "value": "0"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 1",
+                    "value": "1"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 2",
+                    "value": "2"
+                  }
+                }
+              ]
+            },
+            "value": "1",
+            "type": "$TYPE_STRINGCOMBO"
+          }"""
+        };
+      case TYPE_INTCOMBO:
+        return {
+          "int combo": """
+            "key": "int_single_choice_combo_key",
+            "values": {
+              "items": [
+                {
+                  "item": 0
+                },
+                {
+                  "item": 1
+                },
+                {
+                  "item": 2
+                }
+              ]
+            },
+            "value": 1,
+            "type": "$TYPE_INTCOMBO"
+          }""",
+          "int combo with item labels": """          {
+            "key": "int_single_choice_combo_with_labels_key",
+            "values": {
+              "items": [
+                {
+                  "item": {
+                    "label": "",
+                    "value": 0
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 1",
+                    "value": 1
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 2",
+                    "value": 2
+                  }
+                }
+              ]
+            },
+            "value": 1,
+            "type": "$TYPE_INTCOMBO"
+          }"""
+        };
+      case TYPE_CONNECTEDSTRINGCOMBO:
+        return {
+          "connected string combo": """
+          {
+            "key": "two_connected_combos_key",
+            "values": {
+              "items 1": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 1"
+                },
+                {
+                  "item": "choice 2 of 1"
+                },
+                {
+                  "item": "choice 3 of 1"
+                },
+                {
+                  "item": "choice 4 of 1"
+                },
+                {
+                  "item": "choice 5 of 1"
+                }
+              ],
+              "items 2": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "choice 1 of 2"
+                },
+                {
+                  "item": "choice 2 of 2"
+                },
+                {
+                  "item": "choice 3 of 2"
+                },
+                {
+                  "item": "choice 4 of 2"
+                },
+                {
+                  "item": "choice 5 of 2"
+                }
+              ]
+            },
+            "value": "items 2#choice 4 of 2",
+            "type": "connectedstringcombo"
+          }"""
+        };
+      case TYPE_AUTOCOMPLETESTRINGCOMBO:
+        return AutoCompleteStringComboItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO:
+        return AutocompleteConnectedStringComboItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_STRINGMULTIPLECHOICE:
+        return MultiStringComboItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_INTMULTIPLECHOICE:
+        return MultiIntComboItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_PICTURES:
+        return PicturesItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_IMAGELIB:
+        return PicturesItem(
+            context, widgetKey, formItem, presentationMode, formHelper,
+            fromGallery: true);
+      case TYPE_SKETCH:
+        return SketchItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_POINT:
+        return PointItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_MULTIPOINT:
+        return MultiPointItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_LINESTRING:
+        return LineStringItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_MULTILINESTRING:
+        return MultiLineStringItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_POLYGON:
+        return PolygonItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_MULTIPOLYGON:
+        return MultiPolygonItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_HIDDEN:
+        return null; // TODO Container();
+      default:
+        print("Type non implemented yet: $typeName");
+        return null; // TODO Container();
+    }
+    return "";
+  }
 
   void initItem(SmashFormItem formItem, PresentationMode presentationMode) {
     key = formItem.key;
@@ -41,6 +355,8 @@ abstract class AFormitem {
         color: SmashColors.mainDecorations,
       );
     }
+
+    isFormBuilder = presentationMode.isFormbuilder;
 
     if (presentationMode.isReadOnly) {
       // global readonly overrides the item one
@@ -61,6 +377,13 @@ abstract class AFormitem {
       widget = Container();
       configWidget = Container();
     }
+  }
+
+  Key getKey(String? keyString) {
+    if (isFormBuilder || keyString == null) {
+      return UniqueKey();
+    }
+    return ValueKey(keyString);
   }
 
   static Widget getSimpleLabelValue(
@@ -96,6 +419,38 @@ abstract class AFormitem {
       );
     }
     return field;
+  }
+
+  static List<String> getSupportedTypes() {
+    return [
+      TYPE_STRING,
+      TYPE_STRINGAREA,
+      TYPE_DOUBLE,
+      TYPE_INTEGER,
+      TYPE_LABEL,
+      TYPE_LABELWITHLINE,
+      TYPE_DYNAMICSTRING,
+      TYPE_DATE,
+      TYPE_TIME,
+      TYPE_BOOLEAN,
+      TYPE_STRINGCOMBO,
+      TYPE_INTCOMBO,
+      TYPE_AUTOCOMPLETESTRINGCOMBO,
+      TYPE_CONNECTEDSTRINGCOMBO,
+      TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO,
+      TYPE_STRINGMULTIPLECHOICE,
+      TYPE_INTMULTIPLECHOICE,
+      TYPE_PICTURES,
+      TYPE_IMAGELIB,
+      TYPE_SKETCH,
+      TYPE_POINT,
+      // TYPE_MULTIPOINT,
+      TYPE_LINESTRING,
+      // TYPE_MULTILINESTRING,
+      TYPE_POLYGON,
+      // TYPE_MULTIPOLYGON,
+      // TYPE_HIDDEN,
+    ];
   }
 
   static AFormitem? forTypeName(
@@ -240,7 +595,7 @@ class StringWidget extends AFormitem {
   }
 
   @override
-  String getDefaultJson() {
+  static String getDefaultJson() {
     // TODO: implement getDefaultJson
     throw UnimplementedError();
   }
@@ -297,7 +652,7 @@ class StringWidget extends AFormitem {
       }
     } else {
       field = TextFormField(
-        key: ValueKey(widgetKey),
+        key: getKey(widgetKey),
         validator: (value) {
           if (value != null && !constraints.isValid(value)) {
             return constraints.getDescription(context);
@@ -500,7 +855,7 @@ class LabelWidget extends AFormitem {
 
     var text = Text(
       label,
-      key: ValueKey(widgetKey),
+      key: getKey(widgetKey),
       style: TextStyle(
           fontSize: size,
           decoration: textDecoration,
@@ -576,7 +931,8 @@ class DynamicStringItem extends AFormitem {
     if (widget != null) {
       return widget!;
     }
-    widget = DynamicStringWidget(widgetKey, formItem, label, itemReadonly);
+    widget =
+        DynamicStringWidget(getKey(widgetKey), formItem, label, itemReadonly);
     return widget!;
   }
 }
@@ -636,7 +992,8 @@ class DateItem extends AFormitem {
     } else {
       widget = ListTile(
         leading: icon,
-        title: DatePickerWidget(widgetKey, formItem, label, itemReadonly),
+        title:
+            DatePickerWidget(getKey(widgetKey), formItem, label, itemReadonly),
       );
     }
     return widget!;
@@ -698,7 +1055,8 @@ class TimeItem extends AFormitem {
     } else {
       widget = ListTile(
         leading: icon,
-        title: TimePickerWidget(widgetKey, formItem, label, itemReadonly),
+        title:
+            TimePickerWidget(getKey(widgetKey), formItem, label, itemReadonly),
       );
     }
     return widget!;
@@ -751,7 +1109,7 @@ class BooleanItem extends AFormitem {
     }
     widget = ListTile(
       leading: icon,
-      title: CheckboxWidget(widgetKey, formItem, label, itemReadonly),
+      title: CheckboxWidget(getKey(widgetKey), formItem, label, itemReadonly),
     );
     return widget!;
   }
@@ -804,7 +1162,7 @@ class StringComboItem extends AFormitem {
     widget = ListTile(
       leading: icon,
       title: ComboboxWidget<String>(
-          widgetKey, formItem, label, presentationMode, constraints),
+          getKey(widgetKey), formItem, label, presentationMode, constraints),
     );
     return widget!;
   }
@@ -857,7 +1215,7 @@ class IntComboItem extends AFormitem {
     widget = ListTile(
       leading: icon,
       title: ComboboxWidget<int>(
-          widgetKey, formItem, label, presentationMode, constraints),
+          getKey(widgetKey), formItem, label, presentationMode, constraints),
     );
     return widget!;
   }
@@ -919,7 +1277,7 @@ class AutoCompleteStringComboItem extends AFormitem {
       widget = ListTile(
         leading: icon,
         title: AutocompleteStringComboWidget(
-            widgetKey, formItem, label, itemReadonly),
+            getKey(widgetKey), formItem, label, itemReadonly),
       );
     }
 
@@ -987,8 +1345,8 @@ class ConnectedStringComboItem extends AFormitem {
     } else {
       widget = ListTile(
         leading: icon,
-        title:
-            ConnectedComboboxWidget(widgetKey, formItem, label, itemReadonly),
+        title: ConnectedComboboxWidget(
+            getKey(widgetKey), formItem, label, itemReadonly),
       );
     }
 
@@ -1045,7 +1403,7 @@ class AutocompleteConnectedStringComboItem extends AFormitem {
     widget = ListTile(
       leading: icon,
       title: AutocompleteStringConnectedComboboxWidget(
-          widgetKey, formItem, label, itemReadonly),
+          getKey(widgetKey), formItem, label, itemReadonly),
     );
 
     return widget!;
@@ -1108,8 +1466,8 @@ class MultiStringComboItem extends AFormitem {
     } else {
       widget = ListTile(
         leading: icon,
-        title: MultiComboWidget<String>(
-            widgetKey, formItem, label, itemReadonly, presentationMode),
+        title: MultiComboWidget<String>(getKey(widgetKey + "_parent"), formItem,
+            label, itemReadonly, presentationMode),
       );
     }
 
@@ -1166,7 +1524,7 @@ class MultiIntComboItem extends AFormitem {
     widget = ListTile(
       leading: icon,
       title: MultiComboWidget<int>(
-          widgetKey, formItem, label, itemReadonly, presentationMode),
+          getKey(widgetKey), formItem, label, itemReadonly, presentationMode),
     );
 
     return widget!;
@@ -1217,7 +1575,7 @@ class PicturesItem extends AFormitem {
     widget = ListTile(
       leading: icon,
       title: PicturesWidget(
-          label, widgetKey, formHelper, formItem, itemReadonly,
+          label, getKey(widgetKey), formHelper, formItem, itemReadonly,
           fromGallery: true),
     );
 
@@ -1273,7 +1631,8 @@ class SketchItem extends AFormitem {
     }
     widget = ListTile(
       leading: icon,
-      title: SketchWidget(label, widgetKey, formHelper, formItem, itemReadonly),
+      title: SketchWidget(
+          label, getKey(widgetKey), formHelper, formItem, itemReadonly),
     );
 
     return widget!;
@@ -1313,7 +1672,7 @@ abstract class GeometryItem extends AFormitem {
       title: SizedBox(
           height: h,
           child: GeometryWidget(
-              label, widgetKey, formHelper, formItem, itemReadonly)),
+              label, getKey(widgetKey), formHelper, formItem, itemReadonly)),
     );
 
     return widget!;
@@ -1333,7 +1692,8 @@ abstract class GeometryItem extends AFormitem {
 }
 
 class PointItem extends GeometryItem {
-  PointItem(context, widgetKey, formItem, presentationMode, formHelper)
+  PointItem(BuildContext context, String widgetKey, SmashFormItem formItem,
+      PresentationMode presentationMode, AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1343,7 +1703,8 @@ class PointItem extends GeometryItem {
 }
 
 class MultiPointItem extends GeometryItem {
-  MultiPointItem(context, widgetKey, formItem, presentationMode, formHelper)
+  MultiPointItem(BuildContext context, String widgetKey, SmashFormItem formItem,
+      PresentationMode presentationMode, AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1353,7 +1714,8 @@ class MultiPointItem extends GeometryItem {
 }
 
 class LineStringItem extends GeometryItem {
-  LineStringItem(context, widgetKey, formItem, presentationMode, formHelper)
+  LineStringItem(BuildContext context, String widgetKey, SmashFormItem formItem,
+      PresentationMode presentationMode, AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1364,7 +1726,11 @@ class LineStringItem extends GeometryItem {
 
 class MultiLineStringItem extends GeometryItem {
   MultiLineStringItem(
-      context, widgetKey, formItem, presentationMode, formHelper)
+      BuildContext context,
+      String widgetKey,
+      SmashFormItem formItem,
+      PresentationMode presentationMode,
+      AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1374,7 +1740,8 @@ class MultiLineStringItem extends GeometryItem {
 }
 
 class PolygonItem extends GeometryItem {
-  PolygonItem(context, widgetKey, formItem, presentationMode, formHelper)
+  PolygonItem(BuildContext context, String widgetKey, SmashFormItem formItem,
+      PresentationMode presentationMode, AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override
@@ -1384,7 +1751,12 @@ class PolygonItem extends GeometryItem {
 }
 
 class MultiPolygonItem extends GeometryItem {
-  MultiPolygonItem(context, widgetKey, formItem, presentationMode, formHelper)
+  MultiPolygonItem(
+      BuildContext context,
+      String widgetKey,
+      SmashFormItem formItem,
+      PresentationMode presentationMode,
+      AFormhelper formHelper)
       : super(context, widgetKey, formItem, presentationMode, formHelper);
 
   @override

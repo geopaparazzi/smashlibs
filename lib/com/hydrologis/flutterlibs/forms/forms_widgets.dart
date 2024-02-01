@@ -527,8 +527,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title:
-                  DynamicStringWidget(widgetKey, formItem, label, itemReadonly),
+              title: DynamicStringWidget(
+                  ValueKey(widgetKey), formItem, label, itemReadonly),
             ),
             false);
       }
@@ -547,7 +547,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: DatePickerWidget(widgetKey, formItem, label, itemReadonly),
+              title: DatePickerWidget(
+                  ValueKey(widgetKey), formItem, label, itemReadonly),
             ),
             false);
       }
@@ -566,7 +567,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: TimePickerWidget(widgetKey, formItem, label, itemReadonly),
+              title: TimePickerWidget(
+                  ValueKey(widgetKey), formItem, label, itemReadonly),
             ),
             false);
       }
@@ -575,7 +577,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: CheckboxWidget(widgetKey, formItem, label, itemReadonly),
+              title: CheckboxWidget(
+                  ValueKey(widgetKey), formItem, label, itemReadonly),
             ),
             false);
       }
@@ -584,8 +587,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: ComboboxWidget<String>(
-                  widgetKey, formItem, label, presentationMode, constraints),
+              title: ComboboxWidget<String>(ValueKey(widgetKey), formItem,
+                  label, presentationMode, constraints),
             ),
             false);
       }
@@ -594,8 +597,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: ComboboxWidget<int>(
-                  widgetKey, formItem, label, presentationMode, constraints),
+              title: ComboboxWidget<int>(ValueKey(widgetKey), formItem, label,
+                  presentationMode, constraints),
             ),
             false);
       }
@@ -615,7 +618,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: AutocompleteStringComboWidget(
-                  widgetKey, formItem, label, itemReadonly),
+                  ValueKey(widgetKey), formItem, label, itemReadonly),
             ),
             false);
       }
@@ -640,7 +643,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: ConnectedComboboxWidget(
-                  widgetKey, formItem, label, itemReadonly),
+                  ValueKey(widgetKey), formItem, label, itemReadonly),
             ),
             false);
       }
@@ -650,7 +653,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: AutocompleteStringConnectedComboboxWidget(
-                  widgetKey, formItem, label, itemReadonly),
+                  ValueKey(widgetKey), formItem, label, itemReadonly),
             ),
             false);
       }
@@ -675,8 +678,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: MultiComboWidget<String>(
-                  widgetKey, formItem, label, itemReadonly, presentationMode),
+              title: MultiComboWidget<String>(ValueKey(widgetKey), formItem,
+                  label, itemReadonly, presentationMode),
             ),
             false);
       }
@@ -685,8 +688,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: MultiComboWidget<int>(
-                  widgetKey, formItem, label, itemReadonly, presentationMode),
+              title: MultiComboWidget<int>(ValueKey(widgetKey), formItem, label,
+                  itemReadonly, presentationMode),
             ),
             false);
       }
@@ -695,8 +698,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: PicturesWidget(
-                  label, widgetKey, formHelper, formItem, itemReadonly),
+              title: PicturesWidget(label, ValueKey(widgetKey), formHelper,
+                  formItem, itemReadonly),
             ),
             false);
       }
@@ -705,8 +708,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: PicturesWidget(
-                  label, widgetKey, formHelper, formItem, itemReadonly,
+              title: PicturesWidget(label, ValueKey(widgetKey), formHelper,
+                  formItem, itemReadonly,
                   fromGallery: true),
             ),
             false);
@@ -716,8 +719,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: SketchWidget(
-                  label, widgetKey, formHelper, formItem, itemReadonly),
+              title: SketchWidget(label, ValueKey(widgetKey), formHelper,
+                  formItem, itemReadonly),
             ),
             false);
       }
@@ -753,8 +756,8 @@ Tuple2<ListTile, bool>? getWidget(
             leading: icon,
             title: SizedBox(
                 height: h,
-                child: GeometryWidget(
-                    label, widgetKey, formHelper, formItem, itemReadonly)),
+                child: GeometryWidget(label, ValueKey(widgetKey), formHelper,
+                    formItem, itemReadonly)),
           ),
           true);
     case TYPE_HIDDEN:
@@ -772,10 +775,9 @@ class CheckboxWidget extends StatefulWidget {
   final String _label;
   final bool _isReadOnly;
 
-  CheckboxWidget(
-      String _widgetKey, this._formItem, this._label, this._isReadOnly)
+  CheckboxWidget(Key _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
-          key: ValueKey(_widgetKey),
+          key: _widgetKey,
         );
 
   @override
@@ -814,9 +816,9 @@ class AutocompleteStringComboWidget extends StatelessWidget {
   final bool _isReadOnly;
 
   AutocompleteStringComboWidget(
-      String _widgetKey, this._formItem, this._label, this._isReadOnly)
+      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
-          key: ValueKey(_widgetKey),
+          key: _widgetKey,
         );
 
   @override
@@ -925,10 +927,10 @@ class ComboboxWidget<T> extends StatefulWidget {
   final PresentationMode _presentationMode;
   final Constraints _constraints;
 
-  ComboboxWidget(String _widgetKey, this._formItem, this._label,
+  ComboboxWidget(Key _widgetKey, this._formItem, this._label,
       this._presentationMode, this._constraints)
       : super(
-          key: ValueKey(_widgetKey),
+          key: _widgetKey,
         );
 
   @override
@@ -1077,9 +1079,9 @@ class ConnectedComboboxWidget extends StatefulWidget {
   final bool _isReadOnly;
 
   ConnectedComboboxWidget(
-      String _widgetKey, this._formItem, this._label, this._isReadOnly)
+      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
-          key: ValueKey(_widgetKey),
+          key: _widgetKey,
         );
 
   @override
@@ -1267,9 +1269,9 @@ class AutocompleteStringConnectedComboboxWidget extends StatefulWidget {
   final bool _isReadOnly;
 
   AutocompleteStringConnectedComboboxWidget(
-      String _widgetKey, this._formItem, this._label, this._isReadOnly)
+      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
-          key: ValueKey(_widgetKey),
+          key: _widgetKey,
         );
 
   @override
@@ -1476,14 +1478,14 @@ class AutocompleteStringConnectedComboboxWidgetState
 }
 
 class DynamicStringWidget extends StatefulWidget {
-  final SmashFormItem _fomrItem;
+  final SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
 
   DynamicStringWidget(
-      String _widgetKey, this._fomrItem, this._label, this._isReadOnly)
+      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
-          key: ValueKey(_widgetKey),
+          key: _widgetKey,
         );
 
   @override
@@ -1494,8 +1496,8 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
   @override
   Widget build(BuildContext context) {
     String value = ""; //$NON-NLS-1$
-    if (widget._fomrItem.value != null) {
-      value = widget._fomrItem.value;
+    if (widget._formItem.value != null) {
+      value = widget._formItem.value;
     }
     List<String> valuesSplit = value.trim().split(";");
     valuesSplit.removeWhere((s) => s.trim().isEmpty);
@@ -1510,7 +1512,7 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
               onSubmitted: (String str) {
                 valuesSplit.add(str);
                 setState(() {
-                  widget._fomrItem.setValue(valuesSplit.join(";"));
+                  widget._formItem.setValue(valuesSplit.join(";"));
                 });
               },
             ),
@@ -1548,7 +1550,7 @@ class DynamicStringWidgetState extends State<DynamicStringWidget> {
                 setState(() {
                   valuesSplit.removeAt(index);
                   String saveValue = valuesSplit.join(";");
-                  widget._fomrItem.setValue(saveValue);
+                  widget._formItem.setValue(saveValue);
                 });
               }
               return true;
@@ -1575,9 +1577,9 @@ class DatePickerWidget extends StatefulWidget {
   final bool _isReadOnly;
 
   DatePickerWidget(
-      String _widgetKey, this._formItem, this._label, this._isReadOnly)
+      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
-          key: ValueKey(_widgetKey),
+          key: _widgetKey,
         );
 
   @override
@@ -1660,9 +1662,9 @@ class TimePickerWidget extends StatefulWidget {
   final bool _isReadOnly;
 
   TimePickerWidget(
-      String _widgetKey, this._formItem, this._label, this._isReadOnly)
+      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
       : super(
-          key: ValueKey(_widgetKey),
+          key: _widgetKey,
         );
 
   @override
@@ -1739,11 +1741,9 @@ class MultiComboWidget<T> extends StatefulWidget {
   final String _label;
   final bool _isReadOnly;
   final PresentationMode _presentationMode;
-  MultiComboWidget(String _widgetKey, this._formItem, this._label,
+  MultiComboWidget(Key _widgetKey, this._formItem, this._label,
       this._isReadOnly, this._presentationMode)
-      : super(
-          key: ValueKey(_widgetKey + "_parent"),
-        );
+      : super(key: _widgetKey);
 
   @override
   MultiComboWidgetState createState() => MultiComboWidgetState();
@@ -1955,10 +1955,10 @@ class PicturesWidget extends StatefulWidget {
   final bool _isReadOnly;
   SmashFormItem _formItem;
 
-  PicturesWidget(this._label, String widgetKey, this.formHelper, this._formItem,
+  PicturesWidget(this._label, Key widgetKey, this.formHelper, this._formItem,
       this._isReadOnly,
       {this.fromGallery = false})
-      : super(key: ValueKey(widgetKey));
+      : super(key: widgetKey);
 
   @override
   PicturesWidgetState createState() => PicturesWidgetState();
@@ -2051,10 +2051,10 @@ class SketchWidget extends StatefulWidget {
   final bool _isReadOnly;
   SmashFormItem _formItem;
 
-  SketchWidget(this._label, String widgetKey, this.formHelper, this._formItem,
+  SketchWidget(this._label, Key widgetKey, this.formHelper, this._formItem,
       this._isReadOnly,
       {this.fromGallery = false})
-      : super(key: ValueKey(widgetKey));
+      : super(key: widgetKey);
 
   @override
   SketchWidgetState createState() => SketchWidgetState();
@@ -2137,9 +2137,9 @@ class GeometryWidget extends StatefulWidget {
   final bool _isReadOnly;
   SmashFormItem _formItem;
 
-  GeometryWidget(this._label, String widgetKey, this.formHelper, this._formItem,
+  GeometryWidget(this._label, Key widgetKey, this.formHelper, this._formItem,
       this._isReadOnly)
-      : super(key: ValueKey(widgetKey)) {}
+      : super(key: widgetKey);
 
   @override
   GeometryWidgetState createState() => GeometryWidgetState();

@@ -911,8 +911,8 @@ class TagsManager {
 
   /// Reorder a form in a section from an index position to another.
   static void reorderFormInSection(
-      Map<String, dynamic> section, int oldIndex, int newIndex) {
-    List<dynamic>? jsonArray = section[ATTR_FORMS];
+      Map<String, dynamic> sectionMap, int oldIndex, int newIndex) {
+    List<dynamic>? jsonArray = sectionMap[ATTR_FORMS];
     if (jsonArray != null && jsonArray.isNotEmpty) {
       if (oldIndex < newIndex) {
         var toMove = jsonArray.elementAt(oldIndex);
@@ -927,8 +927,33 @@ class TagsManager {
 
   /// Remove a form from a section at an index position.
   static void removeFormFromSection(
-      Map<String, dynamic> section, int removeIndex) {
-    List<dynamic>? jsonArray = section[ATTR_FORMS];
+      Map<String, dynamic> sectionMap, int removeIndex) {
+    List<dynamic>? jsonArray = sectionMap[ATTR_FORMS];
+    if (jsonArray != null && jsonArray.isNotEmpty) {
+      jsonArray.removeAt(removeIndex);
+    }
+  }
+
+  /// Reorder a formitem in a form map from an index position to another.
+  static void reorderFormitemsInForm(
+      Map<String, dynamic> formMap, int oldIndex, int newIndex) {
+    List<dynamic>? formItemsArray = formMap[TAG_FORMITEMS];
+    if (formItemsArray != null && formItemsArray.isNotEmpty) {
+      if (oldIndex < newIndex) {
+        var toMove = formItemsArray.elementAt(oldIndex);
+        formItemsArray.insert(newIndex, toMove);
+        formItemsArray.removeAt(oldIndex);
+      } else {
+        var toMove = formItemsArray.removeAt(oldIndex);
+        formItemsArray.insert(newIndex, toMove);
+      }
+    }
+  }
+
+  /// Remove a formitem from a form map at an index position.
+  static void removeFormitemFromForm(
+      Map<String, dynamic> formMap, int removeIndex) {
+    List<dynamic>? jsonArray = formMap[ATTR_FORMS];
     if (jsonArray != null && jsonArray.isNotEmpty) {
       jsonArray.removeAt(removeIndex);
     }
@@ -1271,23 +1296,24 @@ class SmashFormItem {
 class SmashForm {
   String? formName;
   List<SmashFormItem> formItems = [];
-  late Map<String, dynamic> map;
+  late Map<String, dynamic> formMap;
 
   SmashForm(Map<String, dynamic> map) {
-    this.map = map;
+    this.formMap = map;
     readData();
   }
 
   void readData() {
-    formName = map[ATTR_FORMNAME];
-    var formItemsList = TagsManager.getFormItems(map);
+    formItems = [];
+    formName = formMap[ATTR_FORMNAME];
+    var formItemsList = TagsManager.getFormItems(formMap);
     for (var formItem in formItemsList) {
       this.formItems.add(SmashFormItem(formItem));
     }
   }
 
   void setName(String newFormName) {
-    map[ATTR_FORMNAME] = newFormName;
+    formMap[ATTR_FORMNAME] = newFormName;
     formName = newFormName;
   }
 
@@ -1301,6 +1327,16 @@ class SmashForm {
         formItem.setValue(value);
       }
     });
+  }
+
+  void reorderFormItem(int oldIndex, int newIndex) {
+    TagsManager.reorderFormitemsInForm(formMap, oldIndex, newIndex);
+    readData();
+  }
+
+  void removeFormItem(int index) {
+    TagsManager.removeFormitemFromForm(formMap, index);
+    readData();
   }
 
   String toString() {
