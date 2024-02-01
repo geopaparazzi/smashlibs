@@ -483,6 +483,36 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Pick color'**
   String get form_sketch_pickColor;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @set_as_Label.
+  ///
+  /// In en, this message translates to:
+  /// **'set as label'**
+  String get set_as_Label;
+
+  /// No description provided for @set_as_mandatory.
+  ///
+  /// In en, this message translates to:
+  /// **'set mandatory'**
+  String get set_as_mandatory;
+
+  /// No description provided for @configure_widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Widget'**
+  String get configure_widget;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

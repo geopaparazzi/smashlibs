@@ -88,5 +88,15 @@
   "form_sketch_strokeColor": "Stroke color",
   "@form_sketch_strokeColor": {},
   "form_sketch_pickColor": "Pick color",
-  "@form_sketch_pickColor": {}
+  "@form_sketch_pickColor": {},
+  "cancel": "Cancel",
+  "@cancel": {},
+  "ok": "OK",
+  "@ok": {},
+  "set_as_Label": "set as label",
+  "@set_as_Label": {},
+  "set_as_mandatory": "set mandatory",
+  "@set_as_mandatory": {},
+  "configure_widget": "Configure Widget",
+  "@configure_widget": {}
 }

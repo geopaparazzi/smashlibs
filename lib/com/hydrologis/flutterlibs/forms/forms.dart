@@ -467,8 +467,8 @@ class FormUtilities {
     if (constraints == null) constraints = new Constraints();
 
     if (jsonObject.containsKey(CONSTRAINT_MANDATORY)) {
-      String mandatory = jsonObject[CONSTRAINT_MANDATORY].trim();
-      if (mandatory.trim() == "yes") {
+      dynamic mandatory = jsonObject[CONSTRAINT_MANDATORY];
+      if (isTrue(mandatory)) {
         constraints.addConstraint(MandatoryConstraint());
       }
     }
@@ -487,6 +487,20 @@ class FormUtilities {
       }
     }
     return constraints;
+  }
+
+  static bool isTrue(dynamic value) {
+    if (value == null) {
+      return false;
+    } else if (value is bool) {
+      return value;
+    } else if (value is String) {
+      String v = value.toLowerCase().trim();
+      return (v == "true" || v == "yes" || v == "y" || v == "1");
+    } else if (value is int) {
+      return value == 1;
+    }
+    return false;
   }
 
   /// Updates a form items array with the given kay/value pair.

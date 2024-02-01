@@ -192,6 +192,21 @@ class SLLNb extends SLL {
 
   @override
   String get form_sketch_pickColor => 'Pick color';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get set_as_Label => 'set as label';
+
+  @override
+  String get set_as_mandatory => 'set mandatory';
+
+  @override
+  String get configure_widget => 'Configure Widget';
 }
 
 /// The translations for Norwegian Bokmål, as used in Norway (`nb_NO`).

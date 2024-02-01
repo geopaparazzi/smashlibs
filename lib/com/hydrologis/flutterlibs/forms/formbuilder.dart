@@ -329,6 +329,7 @@ class _DetailPartState extends State<DetailPart> {
                   foregroundColor: SmashColors.mainBackground,
                   icon: MdiIcons.pencil,
                   onPressed: (context) async {
+                    formWidget.configureFormItem(context, formItem);
                     // TODO
                     // String? newFormName =
                     //     await nameForm(context, formName, formNames4Section);
@@ -447,6 +448,8 @@ class _DetailPartState extends State<DetailPart> {
     for (var entry in DEFAULT_FORM_ITEMS.entries) {
       // String name = entry.key;
       Map<String, String> items = entry.value;
+      widgets.add(SmashUI.titleText(entry.key,
+          color: SmashColors.mainSelection, bold: true));
 
       for (var itemEntry in items.entries) {
         // bool itemSelected = false;
@@ -475,7 +478,8 @@ class _DetailPartState extends State<DetailPart> {
         barrierDismissible: true,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: SmashUI.normalText("Select Widgets",
+            title: SmashUI.titleText("Select Widgets",
+                bold: true,
                 textAlign: TextAlign.center,
                 color: SmashColors.mainDecorationsDarker),
             content: Builder(builder: (context) {

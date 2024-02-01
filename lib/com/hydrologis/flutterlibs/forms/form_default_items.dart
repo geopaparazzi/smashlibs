@@ -58,8 +58,8 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
     }""",
     "label with tappable url": """
     {
-      "value": "a label with link to the geopaparazzi homepage",
-      "url": "http://www.geopaparazzi.eu",
+      "value": "a label with link to the smash homepage",
+      "url": "http://www.geopaparazzi.org",
       "size": "20",
       "type": "labelwithline"
     }"""

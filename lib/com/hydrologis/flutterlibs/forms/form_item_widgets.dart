@@ -21,8 +21,6 @@ abstract class AFormWidget {
 
   Widget getWidget();
 
-  Widget getConfigurationWidget();
-
   bool isGeometric();
 
   static Map<String, String> getDefaultJson(String typeName) {
@@ -266,6 +264,44 @@ abstract class AFormWidget {
         return null; // TODO Container();
     }
   }
+
+  Future<void> openConfigDialog(
+      BuildContext context, List<Widget> widgets) async {
+    await showDialog<List<String>>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: SmashUI.titleText(SLL.of(context).configure_widget,
+                textAlign: TextAlign.center,
+                color: SmashColors.mainDecorationsDarker),
+            content: Builder(builder: (context) {
+              var width = MediaQuery.of(context).size.width;
+              return Container(
+                width: width,
+                child: ListView(
+                  shrinkWrap: true,
+                  children:
+                      ListTile.divideTiles(context: context, tiles: widgets)
+                          .toList(),
+                ),
+              );
+            }),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            actions: <Widget>[
+              TextButton(
+                child: Text(SLL.of(context).ok),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void configureFormItem(BuildContext context, SmashFormItem formItem) {}
 }
 
 class StringWidget extends AFormWidget {
@@ -298,9 +334,15 @@ class StringWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormsCheckboxConfigWidget(
+        formItem, TAG_IS_RENDER_LABEL, SLL.of(context).set_as_Label));
+    widgets.add(FormsCheckboxConfigWidget(
+        formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
