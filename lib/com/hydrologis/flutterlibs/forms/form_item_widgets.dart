@@ -1253,9 +1253,18 @@ class PicturesAndImagesWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    // widgets.add(Divider(thickness: 3));
+    // widgets.add(StringFieldConfigWidget(
+    //     formItem, TAG_LABEL, SLL.of(context).set_label,
+    //     emptyIsNull: true));
+    // widgets.add(FormsBooleanConfigWidget(
+    //     formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -1304,9 +1313,18 @@ class DrawingWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    // widgets.add(Divider(thickness: 3));
+    // widgets.add(StringFieldConfigWidget(
+    //     formItem, TAG_LABEL, SLL.of(context).set_label,
+    //     emptyIsNull: true));
+    // widgets.add(FormsBooleanConfigWidget(
+    //     formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -1364,9 +1382,12 @@ abstract class InFormGeometryWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+
+    await openConfigDialog(context, widgets);
   }
 }
 

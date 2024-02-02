@@ -201,6 +201,30 @@
             "type": "stringcombo"
           },
           {
+            "values": {"items": [
+              {"item": ""},
+              {"item": "item1"},
+              {"item": "item2"},
+              {"item": "item3"}
+            ]},
+            "label": "Select multiple strings",
+            "type": "multistringcombo",
+            "value": "item2;item3",
+            "key": "a_multiple_choice_string_combo"
+          },
+          {
+            "values": {"items": [
+              {"item": -1},
+              {"item": 0},
+              {"item": 1},
+              {"item": 2}
+            ]},
+            "label": "Select multiple ints",
+            "type": "multiintcombo",
+            "value": "0;2",
+            "key": "a_multiple_choice_int_combo"
+          },
+          {
             "key": "two_connected_combos",
             "values": {
               "items 1": [

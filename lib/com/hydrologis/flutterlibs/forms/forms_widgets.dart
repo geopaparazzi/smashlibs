@@ -1724,6 +1724,11 @@ class TimePickerWidgetState extends State<TimePickerWidget> {
               showMaterialTimePicker(
                 context: context,
                 selectedTime: timeOfDay,
+                onCancelled: () {
+                  setState(() {
+                    widget._formItem.setValue(null);
+                  });
+                },
                 onChanged: (value) {
                   var hour = value.hour;
                   var minute = value.minute;
@@ -2181,13 +2186,12 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
   @override
   void afterFirstLayout(BuildContext context) async {
     String value = ""; //$NON-NLS-1$
-    JTS.EGeometryType? geomType;
+    JTS.EGeometryType? geomType =
+        JTS.EGeometryType.forTypeName(widget._formItem.type);
     if (widget._formItem.value != null) {
       var tmpValue = widget._formItem.value;
       if (tmpValue is String && tmpValue.trim().length == 0) {
         value = "";
-        var typeName = widget._formItem.type;
-        geomType = JTS.EGeometryType.forTypeName(typeName);
       } else {
         if (tmpValue is String) {
           value = tmpValue;
