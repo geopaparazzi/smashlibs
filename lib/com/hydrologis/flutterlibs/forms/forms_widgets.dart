@@ -793,20 +793,41 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
     }
     bool selected = value == 'true';
 
-    return CheckboxListTile(
-      title: SmashUI.normalText(widget._label,
-          color: SmashColors.mainDecorationsDarker),
-      value: selected,
-      onChanged: (value) {
-        if (!widget._isReadOnly) {
-          setState(() {
-            widget._formItem.setValue("$value");
-          });
-        }
-      },
-      controlAffinity:
-          ListTileControlAffinity.trailing, //  <-- leading Checkbox
+    return Row(
+      children: [
+        Switch(
+          value: selected,
+          activeColor: SmashColors.mainDecorations,
+          onChanged: (bool value) {
+            if (!widget._isReadOnly) {
+              setState(() {
+                widget._formItem.setValue("$value");
+              });
+            }
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: SmashUI.normalText(widget._label,
+              color: SmashColors.mainDecorationsDarker),
+        ),
+      ],
     );
+    // TODO remove below if decide to stick with switches
+    // return CheckboxListTile(
+    //   title: SmashUI.normalText(widget._label,
+    //       color: SmashColors.mainDecorationsDarker),
+    //   value: selected,
+    //   onChanged: (value) {
+    //     if (!widget._isReadOnly) {
+    //       setState(() {
+    //         widget._formItem.setValue("$value");
+    //       });
+    //     }
+    //   },
+    //   controlAffinity:
+    //       ListTileControlAffinity.trailing, //  <-- leading Checkbox
+    // );
   }
 }
 
@@ -1614,6 +1635,11 @@ class DatePickerWidgetState extends State<DatePickerWidget> {
                 lastDate: SmashUI.DEFAULT_LAST_DATE,
                 context: context,
                 selectedDate: dateTime!,
+                onCancelled: () {
+                  setState(() {
+                    widget._formItem.setValue(null);
+                  });
+                },
                 onChanged: (value) {
                   String day =
                       HU.TimeUtilities.ISO8601_TS_DAY_FORMATTER.format(value);

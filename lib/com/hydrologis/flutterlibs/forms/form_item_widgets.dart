@@ -266,7 +266,15 @@ abstract class AFormWidget {
   }
 
   Future<void> openConfigDialog(
-      BuildContext context, List<Widget> widgets) async {
+      BuildContext context, List<Widget> _widgets) async {
+    List<Widget> widgets = [];
+    for (var w in _widgets) {
+      widgets.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: w,
+      ));
+    }
+
     await showDialog<List<String>>(
         context: context,
         barrierDismissible: true,
@@ -281,9 +289,9 @@ abstract class AFormWidget {
                 width: width,
                 child: ListView(
                   shrinkWrap: true,
-                  children:
-                      ListTile.divideTiles(context: context, tiles: widgets)
-                          .toList(),
+                  children: widgets,
+                  // ListTile.divideTiles(context: context, tiles: widgets)
+                  //     .toList(),
                 ),
               );
             }),
@@ -301,7 +309,8 @@ abstract class AFormWidget {
         });
   }
 
-  void configureFormItem(BuildContext context, SmashFormItem formItem) {}
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {}
 }
 
 class StringWidget extends AFormWidget {
@@ -337,9 +346,14 @@ class StringWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormsCheckboxConfigWidget(
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(FormsBooleanConfigWidget(
         formItem, TAG_IS_RENDER_LABEL, SLL.of(context).set_as_Label));
-    widgets.add(FormsCheckboxConfigWidget(
+    widgets.add(FormsBooleanConfigWidget(
         formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
 
     await openConfigDialog(context, widgets);
@@ -383,6 +397,7 @@ class StringWidget extends AFormWidget {
       field = TextFormField(
         key: getKey(widgetKey),
         validator: (value) {
+          print(value);
           if (value != null && !constraints.isValid(value)) {
             return constraints.getDescription(context);
           }
@@ -445,16 +460,12 @@ class StringAreaWidget extends StringWidget {
   }) : super(context, widgetKey, formItem, presentationMode, formHelper) {
     this.minLines = minLines;
     this.maxLines = maxLines;
+    this.keyboardType = TextInputType.multiline;
   }
 
   @override
   String getName() {
     return TYPE_STRINGAREA;
-  }
-
-  @override
-  Widget getConfigurationWidget() {
-    return Container();
   }
 
   @override
@@ -481,11 +492,6 @@ class DoubleWidget extends StringWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    return Container();
-  }
-
-  @override
   bool isGeometric() {
     return false;
   }
@@ -506,11 +512,6 @@ class IntegerWidget extends StringWidget {
   @override
   String getName() {
     return TYPE_INTEGER;
-  }
-
-  @override
-  Widget getConfigurationWidget() {
-    return Container();
   }
 
   @override
@@ -545,9 +546,23 @@ class LabelWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_VALUE, SLL.of(context).set_label,
+        emptyIsNull: false));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_URL, SLL.of(context).set_cliccable_url,
+        emptyIsNull: false));
+    widgets.add(IntegerFieldConfigWidget(
+      formItem,
+      TAG_SIZE,
+      SLL.of(context).set_font_size,
+    ));
+    widgets.add(LabelUnderlineConfigWidget(formItem));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -623,9 +638,20 @@ class MultipleTextWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_RENDER_LABEL, SLL.of(context).set_as_Label));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -669,9 +695,20 @@ class DateWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_RENDER_LABEL, SLL.of(context).set_as_Label));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -726,9 +763,20 @@ class TimeWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_RENDER_LABEL, SLL.of(context).set_as_Label));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -781,9 +829,16 @@ class BooleanWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override

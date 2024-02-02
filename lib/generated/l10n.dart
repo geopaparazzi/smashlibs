@@ -499,8 +499,26 @@ abstract class SLL {
   /// No description provided for @set_as_Label.
   ///
   /// In en, this message translates to:
-  /// **'set as label'**
+  /// **'use as map label'**
   String get set_as_Label;
+
+  /// No description provided for @set_label.
+  ///
+  /// In en, this message translates to:
+  /// **'set label'**
+  String get set_label;
+
+  /// No description provided for @set_cliccable_url.
+  ///
+  /// In en, this message translates to:
+  /// **'set tappable URL'**
+  String get set_cliccable_url;
+
+  /// No description provided for @set_unique_key_for_formitem.
+  ///
+  /// In en, this message translates to:
+  /// **'set unique key for the form item'**
+  String get set_unique_key_for_formitem;
 
   /// No description provided for @set_as_mandatory.
   ///
@@ -513,6 +531,42 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Configure Widget'**
   String get configure_widget;
+
+  /// No description provided for @key_cannot_be_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'The key cannot be empty'**
+  String get key_cannot_be_empty;
+
+  /// No description provided for @key_cannot_specialchars.
+  ///
+  /// In en, this message translates to:
+  /// **'The key cannot contain spaces or special characters'**
+  String get key_cannot_specialchars;
+
+  /// No description provided for @key_already_exists_in.
+  ///
+  /// In en, this message translates to:
+  /// **'The key already exists in'**
+  String get key_already_exists_in;
+
+  /// No description provided for @underline_label.
+  ///
+  /// In en, this message translates to:
+  /// **'underline label'**
+  String get underline_label;
+
+  /// No description provided for @not_a_valid_number.
+  ///
+  /// In en, this message translates to:
+  /// **'The inserted value is not a valid number'**
+  String get not_a_valid_number;
+
+  /// No description provided for @set_font_size.
+  ///
+  /// In en, this message translates to:
+  /// **'set the font size'**
+  String get set_font_size;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

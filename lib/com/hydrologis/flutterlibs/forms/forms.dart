@@ -985,6 +985,23 @@ class TagsManager {
     }
   }
 
+  /// Checks if a key is unique in teh whole section.
+  ///
+  /// If not unique it returns a summary of the found position, else null.
+  static String? isKeyUnique(String keyToCheck, SmashSection section,
+      SmashFormItem formItemToExclude) {
+    keyToCheck = keyToCheck.trim().toLowerCase();
+    for (var form in section.getForms()) {
+      for (var formItem in form.getFormItems()) {
+        if (!identical(formItem, formItemToExclude) &&
+            formItem.key.trim().toLowerCase() == keyToCheck) {
+          return "Form tab '${form.formName}', widget: '${formItem.label}'";
+        }
+      }
+    }
+    return null;
+  }
+
   ///**
 // * Convert a string to a {@link TagObject}.
 // *
@@ -1266,6 +1283,7 @@ class SmashFormItem {
     FormUtilities.handleConstraints(map, constraints);
   }
 
+  /// Set the "value" of the item.
   void setValue(result) {
     if (map.containsKey(TAG_VALUE.trim())) {
       map[TAG_VALUE.trim()] = result;
@@ -1274,13 +1292,25 @@ class SmashFormItem {
     }
   }
 
+  /// Get the content of any map item identified by the key.
+  dynamic getMapItem(String key) {
+    return map[key];
+  }
+
+  /// Set the content of any map item identified by the key.
+  void setMapItem(String key, dynamic value) {
+    map[key] = value;
+    // re-read data
+    readData();
+  }
+
   double getSize() {
-    String sizeStr = "20";
+    dynamic size = 20;
     if (map.containsKey(TAG_SIZE)) {
-      sizeStr = map[TAG_SIZE];
+      size = map[TAG_SIZE];
     }
-    double size = double.parse(sizeStr);
-    return size;
+    double sizeD = double.parse(size.toString());
+    return sizeD;
   }
 
   String? getUrl() {

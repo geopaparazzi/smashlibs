@@ -329,17 +329,8 @@ class _DetailPartState extends State<DetailPart> {
                   foregroundColor: SmashColors.mainBackground,
                   icon: MdiIcons.pencil,
                   onPressed: (context) async {
-                    formWidget.configureFormItem(context, formItem);
-                    // TODO
-                    // String? newFormName =
-                    //     await nameForm(context, formName, formNames4Section);
-                    // if (newFormName != null) {
-                    //   section.renameForm(position, newFormName);
-                    //   setState(() {
-                    //     // reset position to avoid caos
-                    //     _selectedPosition = 0;
-                    //   });
-                    // }
+                    await formWidget.configureFormItem(context, formItem);
+                    setState(() {});
                   })
             ];
           }

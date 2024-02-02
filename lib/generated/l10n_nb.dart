@@ -200,13 +200,40 @@ class SLLNb extends SLL {
   String get ok => 'OK';
 
   @override
-  String get set_as_Label => 'set as label';
+  String get set_as_Label => 'use as map label';
+
+  @override
+  String get set_label => 'set label';
+
+  @override
+  String get set_cliccable_url => 'set tappable URL';
+
+  @override
+  String get set_unique_key_for_formitem => 'set unique key for the form item';
 
   @override
   String get set_as_mandatory => 'set mandatory';
 
   @override
   String get configure_widget => 'Configure Widget';
+
+  @override
+  String get key_cannot_be_empty => 'The key cannot be empty';
+
+  @override
+  String get key_cannot_specialchars => 'The key cannot contain spaces or special characters';
+
+  @override
+  String get key_already_exists_in => 'The key already exists in';
+
+  @override
+  String get underline_label => 'underline label';
+
+  @override
+  String get not_a_valid_number => 'The inserted value is not a valid number';
+
+  @override
+  String get set_font_size => 'set the font size';
 }
 
 /// The translations for Norwegian Bokmål, as used in Norway (`nb_NO`).
