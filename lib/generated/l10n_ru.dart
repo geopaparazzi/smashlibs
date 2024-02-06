@@ -243,4 +243,37 @@ class SLLRu extends SLL {
 
   @override
   String get set_font_size => 'set the font size';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get select_widgets => 'Select Widgets';
+
+  @override
+  String get add_new_widget => 'Add a new widget';
+
+  @override
+  String get form_widgets => 'Form widgets';
+
+  @override
+  String get new_form_name => 'New form name';
+
+  @override
+  String get enter_unique_form_name => 'Enter a unique name for the form';
+
+  @override
+  String get please_enter_name => 'Please enter a name';
+
+  @override
+  String get name_already_exists => 'The name already exists';
+
+  @override
+  String get form_tabs => 'Form tabs';
+
+  @override
+  String get add_new_form_tab => 'Add a new form tab';
 }

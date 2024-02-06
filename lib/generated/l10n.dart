@@ -585,6 +585,72 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'set the font size'**
   String get set_font_size;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @select_widgets.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Widgets'**
+  String get select_widgets;
+
+  /// No description provided for @add_new_widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a new widget'**
+  String get add_new_widget;
+
+  /// No description provided for @form_widgets.
+  ///
+  /// In en, this message translates to:
+  /// **'Form widgets'**
+  String get form_widgets;
+
+  /// No description provided for @new_form_name.
+  ///
+  /// In en, this message translates to:
+  /// **'New form name'**
+  String get new_form_name;
+
+  /// No description provided for @enter_unique_form_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a unique name for the form'**
+  String get enter_unique_form_name;
+
+  /// No description provided for @please_enter_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a name'**
+  String get please_enter_name;
+
+  /// No description provided for @name_already_exists.
+  ///
+  /// In en, this message translates to:
+  /// **'The name already exists'**
+  String get name_already_exists;
+
+  /// No description provided for @form_tabs.
+  ///
+  /// In en, this message translates to:
+  /// **'Form tabs'**
+  String get form_tabs;
+
+  /// No description provided for @add_new_form_tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a new form tab'**
+  String get add_new_form_tab;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

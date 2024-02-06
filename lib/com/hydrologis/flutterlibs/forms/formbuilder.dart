@@ -92,7 +92,7 @@ class TabPartState extends State<TabPart> {
       if (presentationMode.isFormbuilder) {
         endActions = [
           SlidableAction(
-              label: "Remove",
+              label: SLL.of(context).remove,
               backgroundColor: SmashColors.mainDanger,
               foregroundColor: SmashColors.mainBackground,
               icon: MdiIcons.trashCan,
@@ -106,7 +106,7 @@ class TabPartState extends State<TabPart> {
         ];
         startActions = [
           SlidableAction(
-              label: "Edit",
+              label: SLL.of(context).edit,
               backgroundColor: SmashColors.mainDecorations,
               foregroundColor: SmashColors.mainBackground,
               icon: MdiIcons.pencil,
@@ -184,7 +184,7 @@ class TabPartState extends State<TabPart> {
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Align(
                         alignment: Alignment.center,
-                        child: SmashUI.normalText("Form tabs",
+                        child: SmashUI.normalText(SLL.of(context).form_tabs,
                             bold: true,
                             color: SmashColors.mainBackground,
                             textAlign: TextAlign.center),
@@ -196,7 +196,7 @@ class TabPartState extends State<TabPart> {
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: IconButton(
-                        tooltip: "Add a new form tab",
+                        tooltip: SLL.of(context).add_new_form_tab,
                         icon: Icon(
                           MdiIcons.plus,
                           color: SmashColors.mainBackground,
@@ -246,16 +246,16 @@ class TabPartState extends State<TabPart> {
       List<String> formNames4Section) async {
     String? newFormName = await SmashDialogs.showInputDialog(
       context,
-      "New form name",
-      "Enter a unique name for the form",
+      SLL.of(context).new_form_name,
+      SLL.of(context).enter_unique_form_name,
       defaultText: defaultValue,
       validationFunction: (String? value) {
         if (value == null || value.isEmpty) {
-          return "Please enter a name";
+          return SLL.of(context).please_enter_name;
         }
         // the name can't already exist in the section
         if (formNames4Section.contains(value)) {
-          return "The name already exists";
+          return SLL.of(context).name_already_exists;
         }
         return null;
       },
@@ -313,7 +313,7 @@ class _DetailPartState extends State<DetailPart> {
           if (presentationMode.isFormbuilder) {
             endActions = [
               SlidableAction(
-                  label: "Remove",
+                  label: SLL.of(context).remove,
                   backgroundColor: SmashColors.mainDanger,
                   foregroundColor: SmashColors.mainBackground,
                   icon: MdiIcons.trashCan,
@@ -324,7 +324,7 @@ class _DetailPartState extends State<DetailPart> {
             ];
             startActions = [
               SlidableAction(
-                  label: "Edit",
+                  label: SLL.of(context).edit,
                   backgroundColor: SmashColors.mainDecorations,
                   foregroundColor: SmashColors.mainBackground,
                   icon: MdiIcons.pencil,
@@ -375,7 +375,8 @@ class _DetailPartState extends State<DetailPart> {
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Align(
                           alignment: Alignment.center,
-                          child: SmashUI.normalText("Form widgets",
+                          child: SmashUI.normalText(
+                              SLL.of(context).form_widgets,
                               bold: true,
                               color: SmashColors.mainBackground,
                               textAlign: TextAlign.center),
@@ -387,7 +388,7 @@ class _DetailPartState extends State<DetailPart> {
                       Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: IconButton(
-                          tooltip: "Add a new widget",
+                          tooltip: SLL.of(context).add_new_widget,
                           icon: Icon(
                             MdiIcons.plus,
                             color: SmashColors.mainBackground,
@@ -432,8 +433,8 @@ class _DetailPartState extends State<DetailPart> {
   }
 
   Future<List<String>?> getNewFormWidgetJson(BuildContext context) async {
-    String okText = 'Ok';
-    String cancelText = 'Cancel';
+    String okText = SLL.of(context).ok;
+    String cancelText = SLL.of(context).cancel;
     List<Widget> widgets = [];
     List<String> selected = [];
     for (var entry in DEFAULT_FORM_ITEMS.entries) {
@@ -469,7 +470,7 @@ class _DetailPartState extends State<DetailPart> {
         barrierDismissible: true,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: SmashUI.titleText("Select Widgets",
+            title: SmashUI.titleText(SLL.of(context).select_widgets,
                 bold: true,
                 textAlign: TextAlign.center,
                 color: SmashColors.mainDecorationsDarker),
