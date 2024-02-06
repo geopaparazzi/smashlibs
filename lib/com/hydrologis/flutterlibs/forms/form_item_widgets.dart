@@ -28,7 +28,7 @@ abstract class AFormWidget {
     if (defaultJson == null) {
       throw Exception("No default json for type $typeName");
     }
-    return defaultJson!;
+    return defaultJson;
   }
 
   void initItem(SmashFormItem formItem, PresentationMode presentationMode) {
@@ -1079,7 +1079,8 @@ class ConnectedStringComboWidget extends AFormWidget {
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
         emptyIsNull: true));
-    // widgets.add(StringComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(
+        ConnectedStringComboValuesConfigWidget(formItem, emptyIsNull: true));
     widgets.add(Divider(thickness: 3));
     widgets.add(ComboItemsUrlConfigWidget(
         formItem, SLL.of(context).set_from_url,
@@ -1146,9 +1147,22 @@ class AutoCompleteConnectedStringComboWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(
+        ConnectedStringComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(ComboItemsUrlConfigWidget(
+        formItem, SLL.of(context).set_from_url,
+        emptyIsNull: false));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
