@@ -233,5 +233,14 @@ class SLLFr extends SLL {
   String get not_a_valid_number => 'The inserted value is not a valid number';
 
   @override
+  String get set_from_url => 'set from url';
+
+  @override
+  String get not_a_valid_url => 'this is not a valid url';
+
+  @override
+  String get insert_one_item_per_line => 'Insert one item per line. If divided by colon, the first part is the label and the second the value.';
+
+  @override
   String get set_font_size => 'set the font size';
 }

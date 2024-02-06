@@ -115,6 +115,12 @@
   "@underline_label": {},
   "not_a_valid_number": "The inserted value is not a valid number",
   "@not_a_valid_number": {},
+  "set_from_url": "set from url",
+  "@set_from_url": {},
+  "not_a_valid_url": "this is not a valid url",
+  "@not_a_valid_url": {},
+  "insert_one_item_per_line": "Insert one item per line. If divided by colon, the first part is the label and the second the value.",
+  "@insert_one_item_per_line": {},
   "set_font_size": "set the font size",
   "@set_font_size": {}
 }

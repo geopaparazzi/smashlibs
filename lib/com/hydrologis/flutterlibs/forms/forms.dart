@@ -1619,6 +1619,7 @@ class FormsNetworkSupporter {
   }
 
   Future<String?> getJsonString(String url) async {
+    if (url.isEmpty) return null;
     var uri = Uri.parse(url);
     var response =
         await client.get(uri, headers: FormsNetworkSupporter().getHeaders());

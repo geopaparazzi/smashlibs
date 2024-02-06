@@ -562,6 +562,24 @@ abstract class SLL {
   /// **'The inserted value is not a valid number'**
   String get not_a_valid_number;
 
+  /// No description provided for @set_from_url.
+  ///
+  /// In en, this message translates to:
+  /// **'set from url'**
+  String get set_from_url;
+
+  /// No description provided for @not_a_valid_url.
+  ///
+  /// In en, this message translates to:
+  /// **'this is not a valid url'**
+  String get not_a_valid_url;
+
+  /// No description provided for @insert_one_item_per_line.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert one item per line. If divided by colon, the first part is the label and the second the value.'**
+  String get insert_one_item_per_line;
+
   /// No description provided for @set_font_size.
   ///
   /// In en, this message translates to:

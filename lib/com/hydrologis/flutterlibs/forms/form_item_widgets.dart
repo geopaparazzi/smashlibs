@@ -397,7 +397,6 @@ class StringWidget extends AFormWidget {
       field = TextFormField(
         key: getKey(widgetKey),
         validator: (value) {
-          print(value);
           if (value != null && !constraints.isValid(value)) {
             return constraints.getDescription(context);
           }
@@ -882,9 +881,21 @@ class StringComboWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(StringComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(ComboItemsUrlConfigWidget(
+        formItem, SLL.of(context).set_from_url,
+        emptyIsNull: false));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -929,9 +940,21 @@ class IntComboWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(StringComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(ComboItemsUrlConfigWidget(
+        formItem, SLL.of(context).set_from_url,
+        emptyIsNull: false));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -978,9 +1001,21 @@ class AutoCompleteStringComboWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(StringComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(ComboItemsUrlConfigWidget(
+        formItem, SLL.of(context).set_from_url,
+        emptyIsNull: false));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -1036,9 +1071,21 @@ class ConnectedStringComboWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    // widgets.add(StringComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(ComboItemsUrlConfigWidget(
+        formItem, SLL.of(context).set_from_url,
+        emptyIsNull: false));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -1149,9 +1196,21 @@ class MultiStringComboWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(StringComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(ComboItemsUrlConfigWidget(
+        formItem, SLL.of(context).set_from_url,
+        emptyIsNull: false));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
@@ -1208,9 +1267,21 @@ class MultiIntComboWidget extends AFormWidget {
   }
 
   @override
-  Widget getConfigurationWidget() {
-    // TODO: implement getConfigurationWidget
-    throw UnimplementedError();
+  Future<void> configureFormItem(
+      BuildContext context, SmashFormItem formItem) async {
+    var widgets = <Widget>[];
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
+    widgets.add(IntComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(ComboItemsUrlConfigWidget(
+        formItem, SLL.of(context).set_from_url,
+        emptyIsNull: false));
+
+    await openConfigDialog(context, widgets);
   }
 
   @override
