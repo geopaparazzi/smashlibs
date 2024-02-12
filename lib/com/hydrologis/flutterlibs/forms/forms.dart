@@ -159,10 +159,10 @@ abstract class AFormhelper {
   int getId();
 
   /// The name of the section to be edited.
-  String getSectionName();
+  String? getSectionName();
 
   /// The section form.
-  SmashSection getSection();
+  SmashSection? getSection();
 
   /// A title widget for the form view.
   Widget getFormTitleWidget();
@@ -203,20 +203,23 @@ abstract class AFormhelper {
   /// update the form hashmap with the data from the given [newValues].
   void setData(Map<String, dynamic> newValues) {
     var section = getSection();
-    section.updateFromMap(newValues);
-    dataUsed = newValues;
+    if (section != null) {
+      section.updateFromMap(newValues);
+      dataUsed = newValues;
+    }
   }
 
   /// get the initial data map, changed by the interaction with the form.
   Map<String, dynamic> getFormChangedData() {
     var section = getSection();
-    print("SECTION: $section");
-    section.getForms().forEach((form) {
-      var formItems = form.getFormItems();
-      formItems.forEach((formItem) {
-        formItem.saveToDataMap(dataUsed);
+    if (section != null) {
+      section.getForms().forEach((form) {
+        var formItems = form.getFormItems();
+        formItems.forEach((formItem) {
+          formItem.saveToDataMap(dataUsed);
+        });
       });
-    });
+    }
     return dataUsed;
   }
 
@@ -229,6 +232,11 @@ abstract class AFormhelper {
   }
 
   Widget? getSaveFormBuilderAction(BuildContext context, Function? postAction) {
+    return null;
+  }
+
+  Widget? getRenameFormBuilderAction(
+      BuildContext context, Function? postAction) {
     return null;
   }
 }
@@ -988,15 +996,15 @@ class TagsManager {
   static void addFormToSection(
       Map<String, dynamic> section, String newFormName) {
     List<dynamic>? jsonArray = section[ATTR_FORMS];
-    if(jsonArray == null) {
+    if (jsonArray == null) {
       jsonArray = [];
       section[ATTR_FORMS] = jsonArray;
     }
-      Map<String, dynamic> newForm = {
-        ATTR_FORMNAME: newFormName,
-        ATTR_FORMITEMS: [],
-      };
-      jsonArray.add(newForm);
+    Map<String, dynamic> newForm = {
+      ATTR_FORMNAME: newFormName,
+      ATTR_FORMITEMS: [],
+    };
+    jsonArray.add(newForm);
   }
 
   /// Checks if a key is unique in teh whole section.
@@ -1467,6 +1475,11 @@ class SmashSection {
         forms[formName] = SmashForm(form);
       }
     }
+  }
+
+  void setSectionName(String newName) {
+    sectionName = newName;
+    sectionMap[ATTR_SECTIONNAME] = sectionName;
   }
 
   List<String> getFormNames() {

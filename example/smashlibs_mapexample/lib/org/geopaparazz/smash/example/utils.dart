@@ -78,16 +78,16 @@ class DemoAppFormHelper extends AFormhelper {
 }
 
 class FormBuilderFormHelper extends AFormhelper {
-  late SmashSection section;
+  SmashSection? section;
 
   FormBuilderFormHelper();
 
   @override
   Future<bool> init() async {
-    var tagsJson = await rootBundle.loadString("assets/tags.json");
-    var tm = TagsManager();
-    tm.readTags(tagsString: tagsJson);
-    section = tm.getTags().getSections()[0];
+    // var tagsJson = await rootBundle.loadString("assets/tags.json");
+    // var tm = TagsManager();
+    // tm.readTags(tagsString: tagsJson);
+    // section = tm.getTags().getSections()[0];
     return Future.value(true);
   }
 
@@ -107,13 +107,13 @@ class FormBuilderFormHelper extends AFormhelper {
   }
 
   @override
-  SmashSection getSection() {
+  SmashSection? getSection() {
     return section;
   }
 
   @override
-  String getSectionName() {
-    return section.sectionName ?? "unknown section name";
+  String? getSectionName() {
+    return section?.sectionName;
   }
 
   @override
@@ -215,20 +215,52 @@ class FormBuilderFormHelper extends AFormhelper {
           onPressed: () async {
             // in this demo version we save the form with the name of the section and _tags.json
             // into the forms folder
-            Directory formsFolder = await Workspace.getFormsFolder();
-            var name = section.sectionName ?? "untitled";
-            var saveFilePath = FileUtilities.joinPaths(
-                formsFolder.path, "${name.replaceAll(" ", "_")}_tags.json");
-            var sectionMap = section.sectionMap;
-            var jsonString =
-                const JsonEncoder.withIndent("  ").convert([sectionMap]);
-            FileUtilities.writeStringToFile(saveFilePath, jsonString);
+            if (section != null) {
+              Directory formsFolder = await Workspace.getFormsFolder();
+              var name = section!.sectionName ?? "untitled";
+              var saveFilePath = FileUtilities.joinPaths(
+                  formsFolder.path, "${name.replaceAll(" ", "_")}_tags.json");
+              var sectionMap = section!.sectionMap;
+              var jsonString =
+                  const JsonEncoder.withIndent("  ").convert([sectionMap]);
+              FileUtilities.writeStringToFile(saveFilePath, jsonString);
 
-            if (context.mounted) {
-              SmashDialogs.showToast(context, "Form saved to $saveFilePath");
+              if (context.mounted) {
+                SmashDialogs.showToast(context, "Form saved to $saveFilePath");
+              }
             }
           },
           icon: Icon(MdiIcons.contentSave)),
+    );
+  }
+
+  @override
+  Widget? getRenameFormBuilderAction(
+      BuildContext context, Function? postAction) {
+    return Tooltip(
+      message: "Rename the form",
+      child: IconButton(
+          onPressed: () async {
+            Directory formsFolder = await Workspace.getFormsFolder();
+            if (section != null && context.mounted) {
+              var newName = await SmashDialogs.showInputDialog(
+                  context, "RENAME", "Enter a unique form name",
+                  validationFunction: (txt) {
+                var filePath = FileUtilities.joinPaths(
+                    formsFolder.path, "${txt.replaceAll(" ", "_")}_tags.json");
+                if (File(filePath).existsSync()) {
+                  return "A form with that name already exists";
+                }
+                return null;
+              });
+
+              if (newName != null) {
+                section!.setSectionName(newName);
+                if (postAction != null) postAction();
+              }
+            }
+          },
+          icon: Icon(MdiIcons.rename)),
     );
   }
 }

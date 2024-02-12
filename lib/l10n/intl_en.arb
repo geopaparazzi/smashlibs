@@ -144,5 +144,9 @@
   "form_tabs": "Form tabs",
   "@form_tabs": {},
   "add_new_form_tab": "Add a new form tab",
-  "@add_new_form_tab": {}
+  "@add_new_form_tab": {},
+  "no_section_in_form": "No section available in form.",
+  "@no_section_in_form": {},
+  "nothing_loaded": "Nothing loaded.",
+  "@nothing_loaded": {}
 }

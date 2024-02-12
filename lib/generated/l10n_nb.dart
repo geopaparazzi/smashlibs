@@ -276,6 +276,12 @@ class SLLNb extends SLL {
 
   @override
   String get add_new_form_tab => 'Add a new form tab';
+
+  @override
+  String get no_section_in_form => 'No section available in form.';
+
+  @override
+  String get nothing_loaded => 'Nothing loaded.';
 }
 
 /// The translations for Norwegian Bokmål, as used in Norway (`nb_NO`).

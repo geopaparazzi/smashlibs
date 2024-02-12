@@ -346,7 +346,7 @@ class StringWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -640,7 +640,7 @@ class MultipleTextWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -697,7 +697,7 @@ class DateWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -765,7 +765,7 @@ class TimeWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -831,7 +831,7 @@ class BooleanWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -884,7 +884,7 @@ class StringComboWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -943,7 +943,7 @@ class IntComboWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -1004,7 +1004,7 @@ class AutoCompleteStringComboWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -1074,7 +1074,7 @@ class ConnectedStringComboWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -1150,7 +1150,7 @@ class AutoCompleteConnectedStringComboWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -1213,7 +1213,7 @@ class MultiStringComboWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -1284,7 +1284,7 @@ class MultiIntComboWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -1341,7 +1341,7 @@ class PicturesAndImagesWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     // widgets.add(Divider(thickness: 3));
     // widgets.add(StringFieldConfigWidget(
     //     formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -1401,7 +1401,7 @@ class DrawingWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     // widgets.add(Divider(thickness: 3));
     // widgets.add(StringFieldConfigWidget(
     //     formItem, TAG_LABEL, SLL.of(context).set_label,
@@ -1470,7 +1470,7 @@ abstract class InFormGeometryWidget extends AFormWidget {
   Future<void> configureFormItem(
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
-    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()));
+    widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
 
     await openConfigDialog(context, widgets);
   }

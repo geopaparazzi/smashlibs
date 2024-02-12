@@ -28,18 +28,28 @@ class _MainFormWidgetState extends State<MainFormWidget> {
     isLargeScreen = ScreenUtilities.isLargeScreen(context);
     double ratio = isLandscape || isLargeScreen ? 0.3 : 0;
 
-    var tabPart = TabPart(widget.formHelper, widget.presentationMode);
-
-    var detailPart = DetailPart(widget.formHelper, widget.presentationMode);
-
-    var body = VerticalSplitView(
-      left: tabPart,
-      right: detailPart,
-      ratio: ratio,
-    );
+    Widget body;
+    if (widget.formHelper.getSection() != null) {
+      var tabPart = TabPart(widget.formHelper, widget.presentationMode);
+      var detailPart = DetailPart(widget.formHelper, widget.presentationMode);
+      body = VerticalSplitView(
+        left: tabPart,
+        right: detailPart,
+        ratio: ratio,
+      );
+    } else {
+      body = SmashUI.errorWidget(SLL.of(context).nothing_loaded);
+    }
 
     if (widget.doScaffold) {
       List<Widget> actions = [];
+      var renameFormBuilderAction =
+          widget.formHelper.getRenameFormBuilderAction(context, () {
+        setState(() {});
+      });
+      if (renameFormBuilderAction != null) {
+        actions.add(renameFormBuilderAction);
+      }
       var newFormBuilderAction =
           widget.formHelper.getNewFormBuilderAction(context, () {
         setState(() {});
@@ -54,14 +64,16 @@ class _MainFormWidgetState extends State<MainFormWidget> {
       if (openFormBuilderAction != null) {
         actions.add(openFormBuilderAction);
       }
-      var saveFormBuilderAction =
-          widget.formHelper.getSaveFormBuilderAction(context, () {});
-      if (saveFormBuilderAction != null) {
-        actions.add(saveFormBuilderAction);
+      if (widget.formHelper.getSection() != null) {
+        var saveFormBuilderAction =
+            widget.formHelper.getSaveFormBuilderAction(context, () {});
+        if (saveFormBuilderAction != null) {
+          actions.add(saveFormBuilderAction);
+        }
       }
       return Scaffold(
         appBar: AppBar(
-          title: Text(widget.formHelper.getSectionName()),
+          title: Text(widget.formHelper.getSectionName() ?? ""),
           actions: actions,
         ),
         body: body,
@@ -86,144 +98,139 @@ class TabPartState extends State<TabPart> {
 
   @override
   Widget build(BuildContext context) {
-    var section = widget.formHelper.getSection();
-    var formNames4Section = section.getFormNames();
-    var presentationMode = widget.presentationMode;
+    return Consumer<FormHandlerState>(builder: (context, formHandler, child) {
+      var section = widget.formHelper.getSection()!;
+      var formNames4Section = section.getFormNames();
+      var presentationMode = widget.presentationMode;
 
-    if (formNames4Section.length == 0) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          getAddTabWidget(context, formNames4Section, section),
-        ],
-      );
-    }
-
-    FormHandlerState formHandler =
-        Provider.of<FormHandlerState>(context, listen: false);
-    if (formHandler.selectedTabName != null) {
-      // find the position and set the selected to that
-      var indexOf = formNames4Section.indexOf(formHandler.selectedTabName!);
-      if (indexOf != -1) {
-        _selectedPosition = indexOf;
+      if (formNames4Section.length == 0) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            getAddTabWidget(context, formNames4Section, section),
+          ],
+        );
       }
-    }
 
-    List<Widget> listItems = [];
-    for (var position = 0; position < formNames4Section.length; position++) {
-      String formName = formNames4Section[position];
+      if (formHandler.selectedTabName != null) {
+        // find the position and set the selected to that
+        var indexOf = formNames4Section.indexOf(formHandler.selectedTabName!);
+        if (indexOf != -1) {
+          _selectedPosition = indexOf;
+        }
+      }
 
-      List<Widget> endActions = [];
-      List<Widget> startActions = [];
-      if (presentationMode.isFormbuilder) {
-        endActions = [
-          SlidableAction(
-              label: SLL.of(context).remove,
-              backgroundColor: SmashColors.mainDanger,
-              foregroundColor: SmashColors.mainBackground,
-              icon: MdiIcons.trashCan,
-              onPressed: (context) async {
-                section.removeForm(position);
-                setState(() {
-                  // reset position to avoid caos
+      List<Widget> listItems = [];
+      for (var position = 0; position < formNames4Section.length; position++) {
+        String formName = formNames4Section[position];
+
+        List<Widget> endActions = [];
+        List<Widget> startActions = [];
+        if (presentationMode.isFormbuilder) {
+          endActions = [
+            SlidableAction(
+                label: SLL.of(context).remove,
+                backgroundColor: SmashColors.mainDanger,
+                foregroundColor: SmashColors.mainBackground,
+                icon: MdiIcons.trashCan,
+                onPressed: (context) async {
+                  section.removeForm(position);
                   _selectedPosition = 0;
-                });
-              })
-        ];
-        startActions = [
-          SlidableAction(
-              label: SLL.of(context).edit,
-              backgroundColor: SmashColors.mainDecorations,
-              foregroundColor: SmashColors.mainBackground,
-              icon: MdiIcons.pencil,
-              onPressed: (context) async {
-                String? newFormName =
-                    await nameForm(context, formName, formNames4Section);
-                if (newFormName != null) {
-                  section.renameForm(position, newFormName);
-                  setState(() {
+                  formHandler.onChanged();
+                })
+          ];
+          startActions = [
+            SlidableAction(
+                label: SLL.of(context).edit,
+                backgroundColor: SmashColors.mainDecorations,
+                foregroundColor: SmashColors.mainBackground,
+                icon: MdiIcons.pencil,
+                onPressed: (context) async {
+                  String? newFormName =
+                      await nameForm(context, formName, formNames4Section);
+                  if (newFormName != null) {
+                    section.renameForm(position, newFormName);
                     // reset position to avoid caos
                     _selectedPosition = 0;
-                  });
-                }
-              })
-        ];
-      }
+                    formHandler.onChanged();
+                  }
+                })
+          ];
+        }
 
-      listItems.add(Ink(
-          key: UniqueKey(),
-          color: _selectedPosition ==
-                  position // TODO check: && widget.isLargeScreen
-              ? SmashColors.mainDecorationsMc[50]
-              : null,
-          child: GestureDetector(
-            onTap: () {
-              FormHandlerState formHandler =
-                  Provider.of<FormHandlerState>(context, listen: false);
-              formHandler.setSelectedTabName(formNames4Section[position]);
-              setState(() {
-                _selectedPosition = position;
-              });
-            },
-            child: Slidable(
-              groupTag: "0",
-              key: Key("$position-$formName-slide"),
-              closeOnScroll: true,
-              startActionPane: ActionPane(
-                extentRatio: 0.35,
-                dragDismissible: false,
-                motion: const ScrollMotion(),
-                dismissible: DismissiblePane(onDismissed: () {}),
-                children: startActions,
-              ),
-              endActionPane: ActionPane(
-                extentRatio: 0.35,
-                dragDismissible: false,
-                motion: const ScrollMotion(),
-                dismissible: DismissiblePane(onDismissed: () {}),
-                children: endActions,
-              ),
-              child: ListTile(
-                title: SingleChildScrollView(
-                  child: SmashUI.normalText(formName, bold: true),
-                  scrollDirection: Axis.horizontal,
+        listItems.add(Ink(
+            key: UniqueKey(),
+            color: _selectedPosition ==
+                    position // TODO check: && widget.isLargeScreen
+                ? SmashColors.mainDecorationsMc[50]
+                : null,
+            child: GestureDetector(
+              onTap: () {
+                formHandler.setSelectedTabName(formNames4Section[position]);
+                setState(() {
+                  _selectedPosition = position;
+                });
+              },
+              child: Slidable(
+                groupTag: "0",
+                key: Key("$position-$formName-slide"),
+                closeOnScroll: true,
+                startActionPane: ActionPane(
+                  extentRatio: 0.35,
+                  dragDismissible: false,
+                  motion: const ScrollMotion(),
+                  dismissible: DismissiblePane(onDismissed: () {}),
+                  children: startActions,
+                ),
+                endActionPane: ActionPane(
+                  extentRatio: 0.35,
+                  dragDismissible: false,
+                  motion: const ScrollMotion(),
+                  dismissible: DismissiblePane(onDismissed: () {}),
+                  children: endActions,
+                ),
+                child: ListTile(
+                  title: SingleChildScrollView(
+                    child: SmashUI.normalText(formName, bold: true),
+                    scrollDirection: Axis.horizontal,
+                  ),
                 ),
               ),
-            ),
-          )));
-    }
+            )));
+      }
 
-    return Row(mainAxisSize: MainAxisSize.min, children: [
-      Expanded(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (presentationMode.isFormbuilder)
-              getAddTabWidget(context, formNames4Section, section),
-            Expanded(
-              child: SlidableAutoCloseBehavior(
-                  child: presentationMode.isFormbuilder
-                      ? ReorderableListView(
-                          children: listItems,
-                          onReorder: (oldIndex, newIndex) {
-                            if (oldIndex != newIndex) {
-                              section.reorderForm(oldIndex, newIndex);
-                              setState(() {
-                                // reset position to avoid caos
-                                _selectedPosition = 0;
-                              });
-                            }
-                          },
-                        )
-                      : ListView(
-                          children: listItems,
-                        )),
-            ),
-          ],
+      return Row(mainAxisSize: MainAxisSize.min, children: [
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (presentationMode.isFormbuilder)
+                getAddTabWidget(context, formNames4Section, section),
+              Expanded(
+                child: SlidableAutoCloseBehavior(
+                    child: presentationMode.isFormbuilder
+                        ? ReorderableListView(
+                            children: listItems,
+                            onReorder: (oldIndex, newIndex) {
+                              if (oldIndex != newIndex) {
+                                section.reorderForm(oldIndex, newIndex);
+                                setState(() {
+                                  // reset position to avoid caos
+                                  _selectedPosition = 0;
+                                });
+                              }
+                            },
+                          )
+                        : ListView(
+                            children: listItems,
+                          )),
+              ),
+            ],
+          ),
         ),
-      ),
-    ]);
+      ]);
+    });
   }
 
   Container getAddTabWidget(BuildContext context,
@@ -310,7 +317,7 @@ class _DetailPartState extends State<DetailPart> {
   Widget build(BuildContext context) {
     return Consumer<FormHandlerState>(
         builder: (context, formHandlerState, child) {
-      var section = widget.formHelper.getSection();
+      var section = widget.formHelper.getSection()!;
       String? selectedTabName = formHandlerState.selectedTabName;
       if (selectedTabName == null) {
         var formNames4Section = section.getFormNames();

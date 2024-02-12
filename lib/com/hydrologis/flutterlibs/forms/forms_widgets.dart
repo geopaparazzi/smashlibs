@@ -63,7 +63,11 @@ class FormSectionsWidgetState extends State<FormSectionsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var formNames4Section = widget._formHelper.getSection().getFormNames();
+    var section = widget._formHelper.getSection();
+    if (section == null) {
+      return SmashUI.errorWidget(SLL.of(context).no_section_in_form);
+    }
+    var formNames4Section = section.getFormNames();
 
     return ListView.builder(
       itemCount: formNames4Section.length,
@@ -120,20 +124,27 @@ class FormDetailWidgetState extends State<FormDetailWidget> {
 
   @override
   void initState() {
-    formNames = widget.formHelper.getSection().getFormNames();
+    var section = widget.formHelper.getSection();
+    if (section != null) {
+      formNames = section.getFormNames();
+    }
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    var section = widget.formHelper.getSection();
+    if (section == null) {
+      return SmashUI.errorWidget(SLL.of(context).no_section_in_form);
+    }
     List<Widget> widgetsList = [];
     var formName = widget.formName;
     if (formName == null) {
       // pick the first of the section
       formName = formNames[0];
     }
-    var form4name = widget.formHelper.getSection().getFormByName(formName);
+    var form4name = section.getFormByName(formName);
     List<SmashFormItem> formItems = form4name!.getFormItems();
 
     var noteId = widget.formHelper.getId();
@@ -244,7 +255,11 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    var formNames = _formHelper.getSection().getFormNames();
+    var section = _formHelper.getSection();
+    if (section == null) {
+      return SmashUI.errorWidget(SLL.of(context).no_section_in_form);
+    }
+    var formNames = section.getFormNames();
 
     // in case of single tab, display detail directly
     bool onlyDetail = formNames.length == 1;

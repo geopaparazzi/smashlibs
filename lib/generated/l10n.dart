@@ -651,6 +651,18 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Add a new form tab'**
   String get add_new_form_tab;
+
+  /// No description provided for @no_section_in_form.
+  ///
+  /// In en, this message translates to:
+  /// **'No section available in form.'**
+  String get no_section_in_form;
+
+  /// No description provided for @nothing_loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing loaded.'**
+  String get nothing_loaded;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {
