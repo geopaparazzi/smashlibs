@@ -219,6 +219,18 @@ abstract class AFormhelper {
     });
     return dataUsed;
   }
+
+  Widget? getNewFormBuilderAction(BuildContext context, Function? postAction) {
+    return null;
+  }
+
+  Widget? getOpenFormBuilderAction(BuildContext context, Function? postAction) {
+    return null;
+  }
+
+  Widget? getSaveFormBuilderAction(BuildContext context, Function? postAction) {
+    return null;
+  }
 }
 
 /// An interface for constraints.
@@ -807,7 +819,7 @@ class TagsManager {
   /// Read the tags from the default location or from a given [tagsFilePath] or from
   /// a passed json string [tagsString].
   ///
-  /// The 3 options are mutually exclusive.
+  /// The 2 options are mutually exclusive.
   Future<void> readTags({String? tagsFilePath, String? tagsString}) async {
     _sectionsMap = null;
 
@@ -976,13 +988,15 @@ class TagsManager {
   static void addFormToSection(
       Map<String, dynamic> section, String newFormName) {
     List<dynamic>? jsonArray = section[ATTR_FORMS];
-    if (jsonArray != null && jsonArray.isNotEmpty) {
+    if(jsonArray == null) {
+      jsonArray = [];
+      section[ATTR_FORMS] = jsonArray;
+    }
       Map<String, dynamic> newForm = {
         ATTR_FORMNAME: newFormName,
         ATTR_FORMITEMS: [],
       };
       jsonArray.add(newForm);
-    }
   }
 
   /// Checks if a key is unique in teh whole section.
@@ -1201,6 +1215,25 @@ class TagsManager {
 //}
 //return valuesMap;
 //}
+
+  static String getEmptyTagsString(String sectionName,
+      {String? description, String? icon}) {
+    if (icon == null) {
+      icon = "marker";
+    }
+    if (description == null) {
+      description = sectionName;
+    }
+    return """
+      [
+        {
+          "sectionname": "$sectionName",
+          "sectiondescription": "$description",
+          "sectionicon": "$icon",
+          "forms": [ ]
+        }
+      ]""";
+  }
 }
 
 /// A SMASH FormItem, which represents the single widget.

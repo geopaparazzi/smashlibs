@@ -831,7 +831,7 @@ class SmashDatabaseFormHelper extends AFormhelper {
   }
 
   @override
-  Future<String> takeSketchForForms(
+  Future<String?> takeSketchForForms(
       BuildContext context, List<String> imageSplit) {
     // // TODO: implement takeSketchForForms
     // throw UnimplementedError();

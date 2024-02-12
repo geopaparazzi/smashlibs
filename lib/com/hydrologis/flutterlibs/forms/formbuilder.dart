@@ -39,9 +39,30 @@ class _MainFormWidgetState extends State<MainFormWidget> {
     );
 
     if (widget.doScaffold) {
+      List<Widget> actions = [];
+      var newFormBuilderAction =
+          widget.formHelper.getNewFormBuilderAction(context, () {
+        setState(() {});
+      });
+      if (newFormBuilderAction != null) {
+        actions.add(newFormBuilderAction);
+      }
+      var openFormBuilderAction =
+          widget.formHelper.getOpenFormBuilderAction(context, () {
+        setState(() {});
+      });
+      if (openFormBuilderAction != null) {
+        actions.add(openFormBuilderAction);
+      }
+      var saveFormBuilderAction =
+          widget.formHelper.getSaveFormBuilderAction(context, () {});
+      if (saveFormBuilderAction != null) {
+        actions.add(saveFormBuilderAction);
+      }
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.formHelper.getSectionName()),
+          actions: actions,
         ),
         body: body,
       );
@@ -70,7 +91,12 @@ class TabPartState extends State<TabPart> {
     var presentationMode = widget.presentationMode;
 
     if (formNames4Section.length == 0) {
-      return Container();
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          getAddTabWidget(context, formNames4Section, section),
+        ],
+      );
     }
 
     FormHandlerState formHandler =
@@ -174,49 +200,7 @@ class TabPartState extends State<TabPart> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (presentationMode.isFormbuilder)
-              Container(
-                height: 60,
-                width: double.infinity,
-                color: SmashColors.mainDecorationsDarker,
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: SmashUI.normalText(SLL.of(context).form_tabs,
-                            bold: true,
-                            color: SmashColors.mainBackground,
-                            textAlign: TextAlign.center),
-                      ),
-                    ),
-                    Spacer(
-                      flex: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: IconButton(
-                        tooltip: SLL.of(context).add_new_form_tab,
-                        icon: Icon(
-                          MdiIcons.plus,
-                          color: SmashColors.mainBackground,
-                        ),
-                        onPressed: () async {
-                          String? newFormName =
-                              await nameForm(context, null, formNames4Section);
-                          if (newFormName != null) {
-                            section.addForm(newFormName);
-                            setState(() {
-                              // reset position to avoid caos
-                              _selectedPosition = formNames4Section.length;
-                            });
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              getAddTabWidget(context, formNames4Section, section),
             Expanded(
               child: SlidableAutoCloseBehavior(
                   child: presentationMode.isFormbuilder
@@ -240,6 +224,53 @@ class TabPartState extends State<TabPart> {
         ),
       ),
     ]);
+  }
+
+  Container getAddTabWidget(BuildContext context,
+      List<String> formNames4Section, SmashSection section) {
+    return Container(
+      height: 60,
+      width: double.infinity,
+      color: SmashColors.mainDecorationsDarker,
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Align(
+              alignment: Alignment.center,
+              child: SmashUI.normalText(SLL.of(context).form_tabs,
+                  bold: true,
+                  color: SmashColors.mainBackground,
+                  textAlign: TextAlign.center),
+            ),
+          ),
+          Spacer(
+            flex: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              tooltip: SLL.of(context).add_new_form_tab,
+              icon: Icon(
+                MdiIcons.plus,
+                color: SmashColors.mainBackground,
+              ),
+              onPressed: () async {
+                String? newFormName =
+                    await nameForm(context, null, formNames4Section);
+                if (newFormName != null) {
+                  section.addForm(newFormName);
+                  setState(() {
+                    // reset position to avoid caos
+                    _selectedPosition = formNames4Section.length;
+                  });
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<String?> nameForm(BuildContext context, String? defaultValue,

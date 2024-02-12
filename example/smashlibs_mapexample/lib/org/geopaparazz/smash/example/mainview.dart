@@ -23,7 +23,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
   SmashMapWidget? mapView;
   final LayerSource _backgroundLayerSource = onlinesTilesSources[0];
   LayerSource _currentLayerSource = onlinesTilesSources[1];
-  DemoAppFormHelper? formHelper;
+  FormBuilderFormHelper? formBuilderHelper;
 
   @override
   FutureOr<void> afterFirstLayout(BuildContext context) async {
@@ -93,8 +93,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
     mapView!.addPostLayer(RulerPluginLayer(tapAreaPixelSize: 1));
 
-    formHelper = DemoAppFormHelper();
-    await formHelper!.init();
+    formBuilderHelper = FormBuilderFormHelper();
+    await formBuilderHelper!.init();
 
     setState(() {});
   }
@@ -295,7 +295,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
                       context,
                       MaterialPageRoute(
                           builder: (context) => MainFormWidget(
-                                formHelper!,
+                                formBuilderHelper!,
                                 presentationMode:
                                     PresentationMode(isFormbuilder: true),
                                 doScaffold: true,

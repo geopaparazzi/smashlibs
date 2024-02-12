@@ -473,7 +473,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
   TYPE_POINT: {
     "an existing point with style": """
     {
-      "key": "a point geometry",
+      "key": "a_point_geometry",
       "value": {
         "type": "Point",
         "coordinates": [11.66, 46.5]
@@ -487,7 +487,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
     }""",
     "an empty point with style": """
     {
-      "key": "a point geometry",
+      "key": "a_point_geometry",
       "value": "",
       "style": {
         "icon": "tree",
@@ -500,7 +500,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
   TYPE_LINESTRING: {
     "an existing linestring with style": """
     {
-      "key": "a line geometry",
+      "key": "a_line_geometry",
       "value": {
         "type": "LineString",
         "coordinates": [
@@ -519,7 +519,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
   TYPE_POLYGON: {
     "an existing polygon with style": """
     {
-      "key": "a polygon geometry",
+      "key": "a_polygon_geometry",
       "value": {
         "type": "Polygon",
         "coordinates": [
