@@ -19,6 +19,7 @@ MultiProvider getMainWidget() {
       ChangeNotifierProvider(create: (_) => InfoToolState()),
       ChangeNotifierProvider(create: (_) => RulerState()),
       ChangeNotifierProvider(create: (_) => GeometryEditorState()),
+      ChangeNotifierProvider(create: (_) => FormHandlerState()),
     ],
     child: const MyApp(),
   );
@@ -35,9 +36,54 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: SLL.localizationsDelegates,
       supportedLocales: SLL.supportedLocales,
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: SmashColors.mainDecorations),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: SmashColors.mainDecorations,
+          background: SmashColors.mainBackground,
+          primary: SmashColors.mainDecorations,
+          // secondary: SmashColors.mainSelection,
+          brightness: Brightness.light,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: SmashColors.mainDecorations,
+          foregroundColor: SmashColors.mainBackground,
+          titleTextStyle: TextStyle(
+            color: SmashColors.mainBackground,
+            fontWeight: FontWeight.bold,
+            fontSize: SmashUI.BIG_SIZE,
+          ),
+        ),
+        bottomAppBarTheme: BottomAppBarTheme(
+          color: SmashColors.mainDecorations,
+        ),
+        tabBarTheme: TabBarTheme(
+            labelColor: SmashColors.mainBackground,
+            unselectedLabelColor: Colors.grey.shade400),
+        cardTheme: CardTheme(
+          surfaceTintColor: SmashColors.mainBackground,
+          color: SmashColors.mainBackground,
+        ),
+        drawerTheme: DrawerThemeData(
+          backgroundColor: SmashColors.mainBackground,
+          surfaceTintColor: SmashColors.mainBackground,
+        ),
+        dialogTheme: DialogTheme(
+          backgroundColor: SmashColors.mainBackground,
+          shape: BeveledRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            side: BorderSide(
+              color: SmashColors.mainDecorations,
+              width: 2.0,
+            ),
+          ),
+          surfaceTintColor: SmashColors.mainBackground,
+          titleTextStyle: TextStyle(
+            color: SmashColors.mainDecorations,
+            fontWeight: FontWeight.bold,
+            fontSize: SmashUI.BIG_SIZE,
+          ),
+        ),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: const MainSmashLibsPage(title: 'Smashlibs Demo'),
     );

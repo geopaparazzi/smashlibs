@@ -192,4 +192,88 @@ class SLLEn extends SLL {
 
   @override
   String get form_sketch_pickColor => 'Pick color';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get set_as_Label => 'use as map label';
+
+  @override
+  String get set_label => 'set label';
+
+  @override
+  String get set_cliccable_url => 'set tappable URL';
+
+  @override
+  String get set_unique_key_for_formitem => 'set unique key for the form item';
+
+  @override
+  String get set_as_mandatory => 'set mandatory';
+
+  @override
+  String get configure_widget => 'Configure Widget';
+
+  @override
+  String get key_cannot_be_empty => 'The key cannot be empty';
+
+  @override
+  String get key_cannot_specialchars => 'The key cannot contain spaces or special characters';
+
+  @override
+  String get key_already_exists_in => 'The key already exists in';
+
+  @override
+  String get underline_label => 'underline label';
+
+  @override
+  String get not_a_valid_number => 'The inserted value is not a valid number';
+
+  @override
+  String get set_from_url => 'set from url';
+
+  @override
+  String get not_a_valid_url => 'this is not a valid url';
+
+  @override
+  String get insert_one_item_per_line => 'Insert one item per line. If divided by colon, the first part is the label and the second the value.';
+
+  @override
+  String get set_font_size => 'set the font size';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get select_widgets => 'Select Widgets';
+
+  @override
+  String get add_new_widget => 'Add a new widget';
+
+  @override
+  String get form_widgets => 'Form widgets';
+
+  @override
+  String get new_form_name => 'New form name';
+
+  @override
+  String get enter_unique_form_name => 'Enter a unique name for the form';
+
+  @override
+  String get please_enter_name => 'Please enter a name';
+
+  @override
+  String get name_already_exists => 'The name already exists';
+
+  @override
+  String get form_tabs => 'Form tabs';
+
+  @override
+  String get add_new_form_tab => 'Add a new form tab';
 }

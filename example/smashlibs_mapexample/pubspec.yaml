@@ -41,6 +41,8 @@ dependencies:
 
   path: ^1.8.3
 
+  dart_hydrologis_utils: ^0.8.1
+
 
 
 dev_dependencies:
@@ -73,10 +75,11 @@ flutter:
     # - assets/tags.json
     # - assets/emptytile256.png
     # - assets/maptools_icon.png
-    # - assets/smash_icon.png
+    - assets/smash_icon.png
     # - assets/smash_logo_64.png
     # - assets/smash_text.png
     - assets/tags.json
+    - assets/tags_single.json
     - assets/gjson_points.json
     - assets/gjson_lines.json
     - assets/gjson_polygons.json

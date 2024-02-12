@@ -219,6 +219,18 @@ abstract class AFormhelper {
     });
     return dataUsed;
   }
+
+  Widget? getNewFormBuilderAction(BuildContext context, Function? postAction) {
+    return null;
+  }
+
+  Widget? getOpenFormBuilderAction(BuildContext context, Function? postAction) {
+    return null;
+  }
+
+  Widget? getSaveFormBuilderAction(BuildContext context, Function? postAction) {
+    return null;
+  }
 }
 
 /// An interface for constraints.
@@ -467,8 +479,8 @@ class FormUtilities {
     if (constraints == null) constraints = new Constraints();
 
     if (jsonObject.containsKey(CONSTRAINT_MANDATORY)) {
-      String mandatory = jsonObject[CONSTRAINT_MANDATORY].trim();
-      if (mandatory.trim() == "yes") {
+      dynamic mandatory = jsonObject[CONSTRAINT_MANDATORY];
+      if (isTrue(mandatory)) {
         constraints.addConstraint(MandatoryConstraint());
       }
     }
@@ -487,6 +499,20 @@ class FormUtilities {
       }
     }
     return constraints;
+  }
+
+  static bool isTrue(dynamic value) {
+    if (value == null) {
+      return false;
+    } else if (value is bool) {
+      return value;
+    } else if (value is String) {
+      String v = value.toLowerCase().trim();
+      return (v == "true" || v == "yes" || v == "y" || v == "1");
+    } else if (value is int) {
+      return value == 1;
+    }
+    return false;
   }
 
   /// Updates a form items array with the given kay/value pair.
@@ -793,7 +819,7 @@ class TagsManager {
   /// Read the tags from the default location or from a given [tagsFilePath] or from
   /// a passed json string [tagsString].
   ///
-  /// The 3 options are mutually exclusive.
+  /// The 2 options are mutually exclusive.
   Future<void> readTags({String? tagsFilePath, String? tagsString}) async {
     _sectionsMap = null;
 
@@ -903,6 +929,87 @@ class TagsManager {
           if (tmpFormName == formName) {
             return jsonObject;
           }
+        }
+      }
+    }
+    return null;
+  }
+
+  /// Reorder a form in a section from an index position to another.
+  static void reorderFormInSection(
+      Map<String, dynamic> sectionMap, int oldIndex, int newIndex) {
+    List<dynamic>? jsonArray = sectionMap[ATTR_FORMS];
+    if (jsonArray != null && jsonArray.isNotEmpty) {
+      if (oldIndex < newIndex) {
+        var toMove = jsonArray.elementAt(oldIndex);
+        jsonArray.insert(newIndex, toMove);
+        jsonArray.removeAt(oldIndex);
+      } else {
+        var toMove = jsonArray.removeAt(oldIndex);
+        jsonArray.insert(newIndex, toMove);
+      }
+    }
+  }
+
+  /// Remove a form from a section at an index position.
+  static void removeFormFromSection(
+      Map<String, dynamic> sectionMap, int removeIndex) {
+    List<dynamic>? jsonArray = sectionMap[ATTR_FORMS];
+    if (jsonArray != null && jsonArray.isNotEmpty) {
+      jsonArray.removeAt(removeIndex);
+    }
+  }
+
+  /// Reorder a formitem in a form map from an index position to another.
+  static void reorderFormitemsInForm(
+      Map<String, dynamic> formMap, int oldIndex, int newIndex) {
+    List<dynamic>? formItemsArray = formMap[TAG_FORMITEMS];
+    if (formItemsArray != null && formItemsArray.isNotEmpty) {
+      if (oldIndex < newIndex) {
+        var toMove = formItemsArray.elementAt(oldIndex);
+        formItemsArray.insert(newIndex, toMove);
+        formItemsArray.removeAt(oldIndex);
+      } else {
+        var toMove = formItemsArray.removeAt(oldIndex);
+        formItemsArray.insert(newIndex, toMove);
+      }
+    }
+  }
+
+  /// Remove a formitem from a form map at an index position.
+  static void removeFormitemFromForm(
+      Map<String, dynamic> formMap, int removeIndex) {
+    List<dynamic>? jsonArray = formMap[ATTR_FORMITEMS];
+    if (jsonArray != null && jsonArray.isNotEmpty) {
+      jsonArray.removeAt(removeIndex);
+    }
+  }
+
+  static void addFormToSection(
+      Map<String, dynamic> section, String newFormName) {
+    List<dynamic>? jsonArray = section[ATTR_FORMS];
+    if(jsonArray == null) {
+      jsonArray = [];
+      section[ATTR_FORMS] = jsonArray;
+    }
+      Map<String, dynamic> newForm = {
+        ATTR_FORMNAME: newFormName,
+        ATTR_FORMITEMS: [],
+      };
+      jsonArray.add(newForm);
+  }
+
+  /// Checks if a key is unique in teh whole section.
+  ///
+  /// If not unique it returns a summary of the found position, else null.
+  static String? isKeyUnique(String keyToCheck, SmashSection section,
+      SmashFormItem formItemToExclude) {
+    keyToCheck = keyToCheck.trim().toLowerCase();
+    for (var form in section.getForms()) {
+      for (var formItem in form.getFormItems()) {
+        if (!identical(formItem, formItemToExclude) &&
+            formItem.key.trim().toLowerCase() == keyToCheck) {
+          return "Form tab '${form.formName}', widget: '${formItem.label}'";
         }
       }
     }
@@ -1108,6 +1215,25 @@ class TagsManager {
 //}
 //return valuesMap;
 //}
+
+  static String getEmptyTagsString(String sectionName,
+      {String? description, String? icon}) {
+    if (icon == null) {
+      icon = "marker";
+    }
+    if (description == null) {
+      description = sectionName;
+    }
+    return """
+      [
+        {
+          "sectionname": "$sectionName",
+          "sectiondescription": "$description",
+          "sectionicon": "$icon",
+          "forms": [ ]
+        }
+      ]""";
+  }
 }
 
 /// A SMASH FormItem, which represents the single widget.
@@ -1190,6 +1316,7 @@ class SmashFormItem {
     FormUtilities.handleConstraints(map, constraints);
   }
 
+  /// Set the "value" of the item.
   void setValue(result) {
     if (map.containsKey(TAG_VALUE.trim())) {
       map[TAG_VALUE.trim()] = result;
@@ -1198,13 +1325,25 @@ class SmashFormItem {
     }
   }
 
+  /// Get the content of any map item identified by the key.
+  dynamic getMapItem(String key) {
+    return map[key];
+  }
+
+  /// Set the content of any map item identified by the key.
+  void setMapItem(String key, dynamic value) {
+    map[key] = value;
+    // re-read data
+    readData();
+  }
+
   double getSize() {
-    String sizeStr = "20";
+    dynamic size = 20;
     if (map.containsKey(TAG_SIZE)) {
-      sizeStr = map[TAG_SIZE];
+      size = map[TAG_SIZE];
     }
-    double size = double.parse(sizeStr);
-    return size;
+    double sizeD = double.parse(size.toString());
+    return sizeD;
   }
 
   String? getUrl() {
@@ -1230,23 +1369,29 @@ class SmashFormItem {
 }
 
 /// A SMASH Form object, which represents a logical grouping
-/// of items. For example the each tab in a SMASH note view is a form.
+/// of items. For example each tab in a SMASH note view is a form.
 class SmashForm {
   String? formName;
   List<SmashFormItem> formItems = [];
-  late Map<String, dynamic> map;
+  late Map<String, dynamic> formMap;
 
   SmashForm(Map<String, dynamic> map) {
-    this.map = map;
+    this.formMap = map;
     readData();
   }
 
   void readData() {
-    formName = map[ATTR_FORMNAME];
-    var formItemsList = TagsManager.getFormItems(map);
+    formItems = [];
+    formName = formMap[ATTR_FORMNAME];
+    var formItemsList = TagsManager.getFormItems(formMap);
     for (var formItem in formItemsList) {
       this.formItems.add(SmashFormItem(formItem));
     }
+  }
+
+  void setName(String newFormName) {
+    formMap[ATTR_FORMNAME] = newFormName;
+    formName = newFormName;
   }
 
   List<SmashFormItem> getFormItems() {
@@ -1259,6 +1404,25 @@ class SmashForm {
         formItem.setValue(value);
       }
     });
+  }
+
+  void reorderFormItem(int oldIndex, int newIndex) {
+    TagsManager.reorderFormitemsInForm(formMap, oldIndex, newIndex);
+    readData();
+  }
+
+  void removeFormItem(int index) {
+    TagsManager.removeFormitemFromForm(formMap, index);
+    readData();
+  }
+
+  void addFormItem(String jsonString) {
+    var defaultMap = jsonDecode(jsonString);
+    List<dynamic>? jsonArray = formMap[ATTR_FORMITEMS];
+    if (jsonArray != null) {
+      jsonArray.add(defaultMap);
+    }
+    readData();
   }
 
   String toString() {
@@ -1282,18 +1446,23 @@ class SmashSection {
   String? sectionName;
   String? sectionDescription;
   String? sectionIcon;
+  List<String> formNames = [];
   Map<String, SmashForm> forms = {};
   late Map<String, dynamic> sectionMap;
 
   SmashSection(Map<String, dynamic> map) {
     this.sectionMap = map;
-    sectionName = map[ATTR_SECTIONNAME];
-    sectionDescription = map[ATTR_SECTIONDESCRIPTION];
-    sectionIcon = map[ATTR_SECTIONICON];
+    readData();
+  }
 
-    var formNames = TagsManager.getFormNames4Section(map);
+  void readData() {
+    sectionName = sectionMap[ATTR_SECTIONNAME];
+    sectionDescription = sectionMap[ATTR_SECTIONDESCRIPTION];
+    sectionIcon = sectionMap[ATTR_SECTIONICON];
+
+    formNames = TagsManager.getFormNames4Section(sectionMap);
     for (var formName in formNames) {
-      var form = TagsManager.getForm4Name(formName, map);
+      var form = TagsManager.getForm4Name(formName, sectionMap);
       if (form != null) {
         forms[formName] = SmashForm(form);
       }
@@ -1301,7 +1470,7 @@ class SmashSection {
   }
 
   List<String> getFormNames() {
-    return forms.keys.toList();
+    return formNames;
   }
 
   SmashForm? getFormByName(String name) {
@@ -1309,7 +1478,15 @@ class SmashSection {
   }
 
   List<SmashForm> getForms() {
-    return forms.values.toList();
+    List<SmashForm> formsList = [];
+    formNames.forEach((formName) {
+      var form = forms[formName];
+      if (form != null) {
+        formsList.add(form);
+      }
+    });
+
+    return formsList;
   }
 
   String getIcon() {
@@ -1323,13 +1500,37 @@ class SmashSection {
   void updateFromMap(Map<String, dynamic> newValues) {
     forms.forEach((name, form) {
       var formItems = form.getFormItems();
-      // FormUtilities.updateFromMap(formItems, newValues);
       formItems.forEach((formItem) {
         // print(formItem.toString());
         formItem.setFromDataMap(newValues);
         // print(formItem.toString());
       });
     });
+  }
+
+  void reorderForm(int oldIndex, int newIndex) {
+    TagsManager.reorderFormInSection(sectionMap, oldIndex, newIndex);
+    readData();
+  }
+
+  void removeForm(int index) {
+    TagsManager.removeFormFromSection(sectionMap, index);
+    readData();
+  }
+
+  void renameForm(int position, String newFormName) {
+    var formNames = getFormNames();
+    var oldFormName = formNames[position];
+    var form = getFormByName(oldFormName);
+    if (form != null) {
+      form.setName(newFormName);
+    }
+    readData();
+  }
+
+  void addForm(String newFormName) {
+    TagsManager.addFormToSection(sectionMap, newFormName);
+    readData();
   }
 
   String toString() {
@@ -1451,6 +1652,7 @@ class FormsNetworkSupporter {
   }
 
   Future<String?> getJsonString(String url) async {
+    if (url.isEmpty) return null;
     var uri = Uri.parse(url);
     var response =
         await client.get(uri, headers: FormsNetworkSupporter().getHeaders());

@@ -1,0 +1,26 @@
+[
+  {
+    "sectionname": "examples",
+    "sectiondescription": "examples of supported form widgets",
+    "sectionicon": "bomb",
+    "forms": [
+      {
+        "formname": "text",
+        "formitems": [
+          {
+            "key": "some text",
+            "value": "example entry",
+            "icon": "font",
+            "type": "string"
+          },
+          {
+            "key": "some text area",
+            "value": "line1\nline2",
+            "icon": "scroll",
+            "type": "stringarea"
+          }
+        ]
+      }
+    ]
+  }
+]

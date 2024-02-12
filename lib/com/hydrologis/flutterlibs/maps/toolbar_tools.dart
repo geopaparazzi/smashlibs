@@ -6,7 +6,7 @@
 part of smashlibs;
 
 class SmashToolsBar extends StatefulWidget {
-  final _iconSize;
+  final double _iconSize;
   final doZoom;
   final doRuler;
   final doQuery;
@@ -831,7 +831,7 @@ class SmashDatabaseFormHelper extends AFormhelper {
   }
 
   @override
-  Future<String> takeSketchForForms(
+  Future<String?> takeSketchForForms(
       BuildContext context, List<String> imageSplit) {
     // // TODO: implement takeSketchForForms
     // throw UnimplementedError();

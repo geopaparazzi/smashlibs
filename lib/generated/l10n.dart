@@ -483,6 +483,174 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Pick color'**
   String get form_sketch_pickColor;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @set_as_Label.
+  ///
+  /// In en, this message translates to:
+  /// **'use as map label'**
+  String get set_as_Label;
+
+  /// No description provided for @set_label.
+  ///
+  /// In en, this message translates to:
+  /// **'set label'**
+  String get set_label;
+
+  /// No description provided for @set_cliccable_url.
+  ///
+  /// In en, this message translates to:
+  /// **'set tappable URL'**
+  String get set_cliccable_url;
+
+  /// No description provided for @set_unique_key_for_formitem.
+  ///
+  /// In en, this message translates to:
+  /// **'set unique key for the form item'**
+  String get set_unique_key_for_formitem;
+
+  /// No description provided for @set_as_mandatory.
+  ///
+  /// In en, this message translates to:
+  /// **'set mandatory'**
+  String get set_as_mandatory;
+
+  /// No description provided for @configure_widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Widget'**
+  String get configure_widget;
+
+  /// No description provided for @key_cannot_be_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'The key cannot be empty'**
+  String get key_cannot_be_empty;
+
+  /// No description provided for @key_cannot_specialchars.
+  ///
+  /// In en, this message translates to:
+  /// **'The key cannot contain spaces or special characters'**
+  String get key_cannot_specialchars;
+
+  /// No description provided for @key_already_exists_in.
+  ///
+  /// In en, this message translates to:
+  /// **'The key already exists in'**
+  String get key_already_exists_in;
+
+  /// No description provided for @underline_label.
+  ///
+  /// In en, this message translates to:
+  /// **'underline label'**
+  String get underline_label;
+
+  /// No description provided for @not_a_valid_number.
+  ///
+  /// In en, this message translates to:
+  /// **'The inserted value is not a valid number'**
+  String get not_a_valid_number;
+
+  /// No description provided for @set_from_url.
+  ///
+  /// In en, this message translates to:
+  /// **'set from url'**
+  String get set_from_url;
+
+  /// No description provided for @not_a_valid_url.
+  ///
+  /// In en, this message translates to:
+  /// **'this is not a valid url'**
+  String get not_a_valid_url;
+
+  /// No description provided for @insert_one_item_per_line.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert one item per line. If divided by colon, the first part is the label and the second the value.'**
+  String get insert_one_item_per_line;
+
+  /// No description provided for @set_font_size.
+  ///
+  /// In en, this message translates to:
+  /// **'set the font size'**
+  String get set_font_size;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @select_widgets.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Widgets'**
+  String get select_widgets;
+
+  /// No description provided for @add_new_widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a new widget'**
+  String get add_new_widget;
+
+  /// No description provided for @form_widgets.
+  ///
+  /// In en, this message translates to:
+  /// **'Form widgets'**
+  String get form_widgets;
+
+  /// No description provided for @new_form_name.
+  ///
+  /// In en, this message translates to:
+  /// **'New form name'**
+  String get new_form_name;
+
+  /// No description provided for @enter_unique_form_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a unique name for the form'**
+  String get enter_unique_form_name;
+
+  /// No description provided for @please_enter_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a name'**
+  String get please_enter_name;
+
+  /// No description provided for @name_already_exists.
+  ///
+  /// In en, this message translates to:
+  /// **'The name already exists'**
+  String get name_already_exists;
+
+  /// No description provided for @form_tabs.
+  ///
+  /// In en, this message translates to:
+  /// **'Form tabs'**
+  String get form_tabs;
+
+  /// No description provided for @add_new_form_tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a new form tab'**
+  String get add_new_form_tab;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {
