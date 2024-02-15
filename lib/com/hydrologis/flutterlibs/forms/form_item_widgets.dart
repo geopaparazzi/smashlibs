@@ -948,7 +948,7 @@ class IntComboWidget extends AFormWidget {
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
         emptyIsNull: true));
-    widgets.add(StringComboValuesConfigWidget(formItem, emptyIsNull: true));
+    widgets.add(IntComboValuesConfigWidget(formItem, emptyIsNull: true));
     widgets.add(Divider(thickness: 3));
     widgets.add(ComboItemsUrlConfigWidget(
         formItem, SLL.of(context).set_from_url,

@@ -1052,7 +1052,7 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
         widget._presentationMode.detailMode != DetailMode.DETAILED) {
       return AFormWidget.getSimpleLabelValue(
           widget._label,
-          found != null ? found.label : value.toString(),
+          found != null ? found.label : (value == null ? "" : value.toString()),
           widget._presentationMode);
     }
 
