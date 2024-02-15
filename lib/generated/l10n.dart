@@ -663,6 +663,48 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Nothing loaded.'**
   String get nothing_loaded;
+
+  /// No description provided for @formbuilder_action_open_existing_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Open and existing form.'**
+  String get formbuilder_action_open_existing_tooltip;
+
+  /// No description provided for @formbuilder_action_create_new_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new form.'**
+  String get formbuilder_action_create_new_tooltip;
+
+  /// No description provided for @formbuilder_action_create_new_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW FORM'**
+  String get formbuilder_action_create_new_dialog_title;
+
+  /// No description provided for @formbuilder_action_create_new_dialog_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a unique form name.'**
+  String get formbuilder_action_create_new_dialog_prompt;
+
+  /// No description provided for @formbuilder_action_create_new_error_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'The name cannot be empty.'**
+  String get formbuilder_action_create_new_error_empty;
+
+  /// No description provided for @formbuilder_action_create_new_error_spaces.
+  ///
+  /// In en, this message translates to:
+  /// **'The name cannot contain spaces.'**
+  String get formbuilder_action_create_new_error_spaces;
+
+  /// No description provided for @formbuilder_action_save_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Save the form in the forms folder.'**
+  String get formbuilder_action_save_tooltip;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

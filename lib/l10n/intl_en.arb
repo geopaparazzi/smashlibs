@@ -148,5 +148,19 @@
   "no_section_in_form": "No section available in form.",
   "@no_section_in_form": {},
   "nothing_loaded": "Nothing loaded.",
-  "@nothing_loaded": {}
+  "@nothing_loaded": {},
+  "formbuilder_action_open_existing_tooltip": "Open and existing form.",
+  "@formbuilder_action_open_existing_tooltip": {},
+  "formbuilder_action_create_new_tooltip": "Create a new form.",
+  "@formbuilder_action_create_new_tooltip": {},
+  "formbuilder_action_create_new_dialog_title": "NEW FORM",
+  "@formbuilder_action_create_new_dialog_title": {},
+  "formbuilder_action_create_new_dialog_prompt": "Enter a unique form name.",
+  "@formbuilder_action_create_new_dialog_prompt": {},
+  "formbuilder_action_create_new_error_empty": "The name cannot be empty.",
+  "@formbuilder_action_create_new_error_empty": {},
+  "formbuilder_action_create_new_error_spaces": "The name cannot contain spaces.",
+  "@formbuilder_action_create_new_error_spaces": {},
+  "formbuilder_action_save_tooltip": "Save the form in the forms folder.",
+  "@formbuilder_action_save_tooltip": {}
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:smashlibs/generated/l10n.dart';
 import 'package:smashlibs/smashlibs.dart';
 import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -147,7 +148,7 @@ class FormBuilderFormHelper extends AFormhelper {
   @override
   Widget? getOpenFormBuilderAction(BuildContext context, Function? postAction) {
     return Tooltip(
-      message: "Open and existing form",
+      message: SLL.of(context).formbuilder_action_open_existing_tooltip,
       child: IconButton(
           onPressed: () async {
             var lastUsedFolder = await Workspace.getLastUsedFolder();
@@ -179,18 +180,24 @@ class FormBuilderFormHelper extends AFormhelper {
   @override
   Widget? getNewFormBuilderAction(BuildContext context, Function? postAction) {
     return Tooltip(
-      message: "Create a new form",
+      message: SLL.of(context).formbuilder_action_create_new_tooltip,
       child: IconButton(
           onPressed: () async {
             var answer = await SmashDialogs.showInputDialog(
-                context, "NEW FORM", "Enter a unique form name",
+                context,
+                SLL.of(context).formbuilder_action_create_new_dialog_title,
+                SLL.of(context).formbuilder_action_create_new_dialog_prompt,
                 validationFunction: (String? value) {
               if (value == null || value.isEmpty) {
-                return "The name cannot be empty";
+                return SLL
+                    .of(context)
+                    .formbuilder_action_create_new_error_empty;
               }
               // no spaces
               if (value.contains(" ")) {
-                return "The name cannot contain spaces";
+                return SLL
+                    .of(context)
+                    .formbuilder_action_create_new_error_spaces;
               }
               return null;
             });
@@ -210,7 +217,7 @@ class FormBuilderFormHelper extends AFormhelper {
   @override
   Widget? getSaveFormBuilderAction(BuildContext context, Function? postAction) {
     return Tooltip(
-      message: "Save the form in the forms folder",
+      message: SLL.of(context).formbuilder_action_save_tooltip,
       child: IconButton(
           onPressed: () async {
             // in this demo version we save the form with the name of the section and _tags.json

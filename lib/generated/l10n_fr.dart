@@ -282,4 +282,25 @@ class SLLFr extends SLL {
 
   @override
   String get nothing_loaded => 'Nothing loaded.';
+
+  @override
+  String get formbuilder_action_open_existing_tooltip => 'Open and existing form.';
+
+  @override
+  String get formbuilder_action_create_new_tooltip => 'Create a new form.';
+
+  @override
+  String get formbuilder_action_create_new_dialog_title => 'NEW FORM';
+
+  @override
+  String get formbuilder_action_create_new_dialog_prompt => 'Enter a unique form name.';
+
+  @override
+  String get formbuilder_action_create_new_error_empty => 'The name cannot be empty.';
+
+  @override
+  String get formbuilder_action_create_new_error_spaces => 'The name cannot contain spaces.';
+
+  @override
+  String get formbuilder_action_save_tooltip => 'Save the form in the forms folder.';
 }
