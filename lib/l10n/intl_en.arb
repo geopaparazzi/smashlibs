@@ -162,5 +162,11 @@
   "formbuilder_action_create_new_error_spaces": "The name cannot contain spaces.",
   "@formbuilder_action_create_new_error_spaces": {},
   "formbuilder_action_save_tooltip": "Save the form in the forms folder.",
-  "@formbuilder_action_save_tooltip": {}
+  "@formbuilder_action_save_tooltip": {},
+  "formbuilder_action_rename_tooltip": "Rename the form.",
+  "@formbuilder_action_rename_tooltip": {},
+  "formbuilder_action_rename_dialog_title": "RENAME FORM",
+  "@formbuilder_action_rename_dialog_title": {},
+  "formbuilder_action_rename_error_empty": "A form with that name already exists.",
+  "@formbuilder_action_rename_error_empty": {}
 }

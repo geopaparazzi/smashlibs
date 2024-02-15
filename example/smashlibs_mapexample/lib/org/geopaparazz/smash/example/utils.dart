@@ -245,18 +245,20 @@ class FormBuilderFormHelper extends AFormhelper {
   Widget? getRenameFormBuilderAction(
       BuildContext context, Function? postAction) {
     return Tooltip(
-      message: "Rename the form",
+      message: SLL.of(context).formbuilder_action_rename_tooltip,
       child: IconButton(
           onPressed: () async {
             Directory formsFolder = await Workspace.getFormsFolder();
             if (section != null && context.mounted) {
               var newName = await SmashDialogs.showInputDialog(
-                  context, "RENAME", "Enter a unique form name",
+                  context,
+                  SLL.of(context).formbuilder_action_rename_dialog_title,
+                  SLL.of(context).formbuilder_action_create_new_dialog_prompt,
                   validationFunction: (txt) {
                 var filePath = FileUtilities.joinPaths(
                     formsFolder.path, "${txt.replaceAll(" ", "_")}_tags.json");
                 if (File(filePath).existsSync()) {
-                  return "A form with that name already exists";
+                  return SLL.of(context).formbuilder_action_rename_error_empty;
                 }
                 return null;
               });

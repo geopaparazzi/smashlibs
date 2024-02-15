@@ -705,6 +705,24 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Save the form in the forms folder.'**
   String get formbuilder_action_save_tooltip;
+
+  /// No description provided for @formbuilder_action_rename_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename the form.'**
+  String get formbuilder_action_rename_tooltip;
+
+  /// No description provided for @formbuilder_action_rename_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'RENAME FORM'**
+  String get formbuilder_action_rename_dialog_title;
+
+  /// No description provided for @formbuilder_action_rename_error_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'A form with that name already exists.'**
+  String get formbuilder_action_rename_error_empty;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

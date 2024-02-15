@@ -303,4 +303,13 @@ class SLLDe extends SLL {
 
   @override
   String get formbuilder_action_save_tooltip => 'Save the form in the forms folder.';
+
+  @override
+  String get formbuilder_action_rename_tooltip => 'Rename the form.';
+
+  @override
+  String get formbuilder_action_rename_dialog_title => 'RENAME FORM';
+
+  @override
+  String get formbuilder_action_rename_error_empty => 'A form with that name already exists.';
 }
