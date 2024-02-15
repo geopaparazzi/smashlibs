@@ -373,7 +373,10 @@ Tuple2<ListTile, bool>? getWidget(
 //    String constraintDescription = constraints.getDescription();
 
   var valueString = value.toString();
-  if (valueString.trim().isEmpty && presentationMode.doIgnoreEmpties) {
+  if ((valueString.trim().isEmpty ||
+          valueString == "null" ||
+          valueString == "default value") &&
+      presentationMode.doIgnoreEmpties) {
     return null;
   }
 
