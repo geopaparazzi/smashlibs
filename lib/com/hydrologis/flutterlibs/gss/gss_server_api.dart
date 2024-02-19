@@ -23,6 +23,7 @@ const API_USERS = "api/users/";
 const API_PROJECTNAMES = "api/projectnames/";
 const API_PROJECTDATA = "api/projectdatas/";
 const API_FORMS = "api/forms/";
+const API_FORMNAMES = "api/formnames/";
 const API_RENDERNOTES = "api/rendernotes/";
 const API_LASTUSERPOSITIONS = "api/lastuserpositions/";
 const API_NOTES = "api/notes/";
