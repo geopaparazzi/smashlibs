@@ -723,6 +723,114 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'A form with that name already exists.'**
   String get formbuilder_action_rename_error_empty;
+
+  /// No description provided for @gss_settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Geopaparazzi Survey Server Settings'**
+  String get gss_settings;
+
+  /// No description provided for @gss_settings_connection.
+  ///
+  /// In en, this message translates to:
+  /// **'GSS Connection Settings'**
+  String get gss_settings_connection;
+
+  /// No description provided for @gss_settings_server_url.
+  ///
+  /// In en, this message translates to:
+  /// **'Server URL'**
+  String get gss_settings_server_url;
+
+  /// No description provided for @gss_settings_server_url_start_http.
+  ///
+  /// In en, this message translates to:
+  /// **'Server url needs to start with http or https.'**
+  String get gss_settings_server_url_start_http;
+
+  /// No description provided for @gss_settings_project.
+  ///
+  /// In en, this message translates to:
+  /// **'GSS Project'**
+  String get gss_settings_project;
+
+  /// No description provided for @gss_settings_server_username.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Username'**
+  String get gss_settings_server_username;
+
+  /// No description provided for @gss_settings_server_username_valid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid server username.'**
+  String get gss_settings_server_username_valid;
+
+  /// No description provided for @gss_settings_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Password'**
+  String get gss_settings_password;
+
+  /// No description provided for @gss_settings_password_valid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid server password.'**
+  String get gss_settings_password_valid;
+
+  /// No description provided for @gss_settings_certificates_self.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow self signed certificates'**
+  String get gss_settings_certificates_self;
+
+  /// No description provided for @gss_settings_upload_position.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload device position to server in regular time intervals.'**
+  String get gss_settings_upload_position;
+
+  /// No description provided for @gss_settings_data_missing.
+  ///
+  /// In en, this message translates to:
+  /// **'User, password, url and project are necessary to login'**
+  String get gss_settings_data_missing;
+
+  /// No description provided for @gss_settings_login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get gss_settings_login;
+
+  /// No description provided for @gss_settings_no_token.
+  ///
+  /// In en, this message translates to:
+  /// **'No token available, please login.'**
+  String get gss_settings_no_token;
+
+  /// No description provided for @gss_settings_no_gss_urls_archive.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved GSS URLs available.'**
+  String get gss_settings_no_gss_urls_archive;
+
+  /// No description provided for @gss_settings_select_gss_url.
+  ///
+  /// In en, this message translates to:
+  /// **'Select GSS URL'**
+  String get gss_settings_select_gss_url;
+
+  /// No description provided for @gss_settings_token_in_store.
+  ///
+  /// In en, this message translates to:
+  /// **'Token is in store.'**
+  String get gss_settings_token_in_store;
+
+  /// No description provided for @gss_settings_unable_selfsigned_certificates.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to connect to ssl with self signed certificate. Allow self signed certificates in the settings.'**
+  String get gss_settings_unable_selfsigned_certificates;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {
