@@ -8,7 +8,7 @@ part of smashlibs;
 
 /// Geopackage vector data layer.
 class GeopackageSource extends DbVectorLayerSource
-    implements SldLayerSource, EditableDataSource {
+    implements SldLayerSource, EditableDataSource, FilterableLayerSource {
   static final double POINT_SIZE_FACTOR = 3;
 
   late String _absolutePath;
@@ -31,6 +31,7 @@ class GeopackageSource extends DbVectorLayerSource
   List<String> alphaFields = [];
   String? sldString;
   JTS.EGeometryType? geometryType;
+  String? whereFilter;
 
   GeopackageSource.fromMap(Map<String, dynamic> map) {
     _tableName = map[LAYERSKEY_LABEL];
@@ -108,6 +109,7 @@ class GeopackageSource extends DbVectorLayerSource
         TableName(_tableName, schemaSupported: false),
         limit: maxFeaturesToLoad,
         envelope: limitBounds,
+        where: whereFilter,
       );
 
       var fromPrj = SmashPrj.fromSrid(_srid!);
@@ -128,6 +130,16 @@ class GeopackageSource extends DbVectorLayerSource
   }
 
   dynamic get db => _gpkgDb;
+
+  @override
+  String? getFilter() {
+    return whereFilter;
+  }
+
+  @override
+  void setFilter(String filter) {
+    whereFilter = filter;
+  }
 
   _getDatabase() {
     var ch = GPKG.ConnectionsHandler();

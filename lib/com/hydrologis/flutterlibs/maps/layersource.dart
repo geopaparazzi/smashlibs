@@ -224,6 +224,12 @@ abstract class SldLayerSource {
 /// Interface for vector data based layersources.
 abstract class VectorLayerSource extends LoadableLayerSource {}
 
+abstract class FilterableLayerSource {
+  void setFilter(String filter);
+
+  String? getFilter();
+}
+
 /// Interface for database vector sources.
 abstract class DbVectorLayerSource extends EditableVectorLayerSource {
   String? getWhere();
