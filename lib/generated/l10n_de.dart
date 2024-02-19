@@ -314,6 +314,15 @@ class SLLDe extends SLL {
   String get formbuilder_action_rename_error_empty => 'A form with that name already exists.';
 
   @override
+  String get formbuilder_action_delete_tooltip => 'Delete the form.';
+
+  @override
+  String get formbuilder_action_delete_dialog_title => 'DELETE FORM';
+
+  @override
+  String get formbuilder_action_delete_dialog_prompt => 'Are you sure you want to delete the form?';
+
+  @override
   String get gss_settings => 'Geopaparazzi Survey Server Settings';
 
   @override

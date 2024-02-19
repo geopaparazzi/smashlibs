@@ -724,6 +724,24 @@ abstract class SLL {
   /// **'A form with that name already exists.'**
   String get formbuilder_action_rename_error_empty;
 
+  /// No description provided for @formbuilder_action_delete_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the form.'**
+  String get formbuilder_action_delete_tooltip;
+
+  /// No description provided for @formbuilder_action_delete_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE FORM'**
+  String get formbuilder_action_delete_dialog_title;
+
+  /// No description provided for @formbuilder_action_delete_dialog_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the form?'**
+  String get formbuilder_action_delete_dialog_prompt;
+
   /// No description provided for @gss_settings.
   ///
   /// In en, this message translates to:
