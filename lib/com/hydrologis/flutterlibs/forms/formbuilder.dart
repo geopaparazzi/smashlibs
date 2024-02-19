@@ -44,21 +44,21 @@ class _MainFormWidgetState extends State<MainFormWidget> {
     if (widget.doScaffold) {
       List<Widget> actions = [];
       var renameFormBuilderAction =
-          widget.formHelper.getRenameFormBuilderAction(context, () {
+          widget.formHelper.getRenameFormBuilderAction(context, postAction: () {
         setState(() {});
       });
       if (renameFormBuilderAction != null) {
         actions.add(renameFormBuilderAction);
       }
       var newFormBuilderAction =
-          widget.formHelper.getNewFormBuilderAction(context, () {
+          widget.formHelper.getNewFormBuilderAction(context, postAction: () {
         setState(() {});
       });
       if (newFormBuilderAction != null) {
         actions.add(newFormBuilderAction);
       }
       var openFormBuilderAction =
-          widget.formHelper.getOpenFormBuilderAction(context, () {
+          widget.formHelper.getOpenFormBuilderAction(context, postAction: () {
         setState(() {});
       });
       if (openFormBuilderAction != null) {
@@ -66,10 +66,20 @@ class _MainFormWidgetState extends State<MainFormWidget> {
       }
       if (widget.formHelper.getSection() != null) {
         var saveFormBuilderAction =
-            widget.formHelper.getSaveFormBuilderAction(context, () {});
+            widget.formHelper.getSaveFormBuilderAction(context);
         if (saveFormBuilderAction != null) {
           actions.add(saveFormBuilderAction);
         }
+        var deleteFormBuilderAction =
+            widget.formHelper.getDeleteFormBuilderAction(context);
+        if (deleteFormBuilderAction != null) {
+          actions.add(deleteFormBuilderAction);
+        }
+      }
+      var extrasFormBuilderAction =
+          widget.formHelper.getExtraFormBuilderAction(context);
+      if (extrasFormBuilderAction != null) {
+        actions.add(extrasFormBuilderAction);
       }
       return Scaffold(
         appBar: AppBar(

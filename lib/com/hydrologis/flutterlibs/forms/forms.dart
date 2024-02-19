@@ -223,20 +223,33 @@ abstract class AFormhelper {
     return dataUsed;
   }
 
-  Widget? getNewFormBuilderAction(BuildContext context, Function? postAction) {
+  Widget? getNewFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
     return null;
   }
 
-  Widget? getOpenFormBuilderAction(BuildContext context, Function? postAction) {
+  Widget? getOpenFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
     return null;
   }
 
-  Widget? getSaveFormBuilderAction(BuildContext context, Function? postAction) {
+  Widget? getSaveFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
     return null;
   }
 
-  Widget? getRenameFormBuilderAction(
-      BuildContext context, Function? postAction) {
+  Widget? getRenameFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
+    return null;
+  }
+
+  Widget? getDeleteFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
+    return null;
+  }
+
+  Widget? getExtraFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
     return null;
   }
 }

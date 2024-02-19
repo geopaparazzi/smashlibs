@@ -146,7 +146,8 @@ class FormBuilderFormHelper extends AFormhelper {
   }
 
   @override
-  Widget? getOpenFormBuilderAction(BuildContext context, Function? postAction) {
+  Widget? getOpenFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
     return Tooltip(
       message: SLL.of(context).formbuilder_action_open_existing_tooltip,
       child: IconButton(
@@ -178,7 +179,8 @@ class FormBuilderFormHelper extends AFormhelper {
   }
 
   @override
-  Widget? getNewFormBuilderAction(BuildContext context, Function? postAction) {
+  Widget? getNewFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
     return Tooltip(
       message: SLL.of(context).formbuilder_action_create_new_tooltip,
       child: IconButton(
@@ -215,7 +217,8 @@ class FormBuilderFormHelper extends AFormhelper {
   }
 
   @override
-  Widget? getSaveFormBuilderAction(BuildContext context, Function? postAction) {
+  Widget? getSaveFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
     return Tooltip(
       message: SLL.of(context).formbuilder_action_save_tooltip,
       child: IconButton(
@@ -242,8 +245,8 @@ class FormBuilderFormHelper extends AFormhelper {
   }
 
   @override
-  Widget? getRenameFormBuilderAction(
-      BuildContext context, Function? postAction) {
+  Widget? getRenameFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
     return Tooltip(
       message: SLL.of(context).formbuilder_action_rename_tooltip,
       child: IconButton(
