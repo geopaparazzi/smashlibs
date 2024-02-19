@@ -17,10 +17,17 @@ class _SmashMapLayerState extends State<SmashMapLayer> with AfterLayoutMixin {
   }
 
   Future<void> reloadData(BuildContext context) async {
-    if (!(widget._layerSource as LoadableLayerSource).isLoaded ||
-        _layersList == null) {
-      _layersList = await widget._layerSource.toLayers(context);
-      if (context.mounted) setState(() {});
+    try {
+      if (!(widget._layerSource as LoadableLayerSource).isLoaded ||
+          _layersList == null) {
+        _layersList = await widget._layerSource.toLayers(context);
+        if (context.mounted) setState(() {});
+      }
+    } on Exception catch (e) {
+      if (context.mounted) {
+        String prompt = e.toString();
+        SmashDialogs.showErrorDialog(context, prompt);
+      }
     }
   }
 
