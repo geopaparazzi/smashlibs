@@ -723,7 +723,8 @@ class FormUtilities {
 
           String type = formItem[TAG_TYPE];
           String value = "";
-          if (formItem.containsKey(TAG_VALUE)) value = formItem[TAG_VALUE];
+          if (formItem.containsKey(TAG_VALUE) && formItem[TAG_VALUE] is String)
+            value = formItem[TAG_VALUE];
 
           if (type == TYPE_PICTURES || type == TYPE_IMAGELIB) {
             if (value.trim().isEmpty) {
