@@ -253,7 +253,7 @@ abstract class AFormhelper {
     return null;
   }
 
-  /// Extras are placed as menu items of the appbar.
+  /// Action placed at the end of the appbar if not null.
   Widget? getExtraFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;
