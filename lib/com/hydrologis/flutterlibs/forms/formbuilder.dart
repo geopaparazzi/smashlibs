@@ -43,12 +43,15 @@ class _MainFormWidgetState extends State<MainFormWidget> {
 
     if (widget.doScaffold) {
       List<Widget> actions = [];
-      var renameFormBuilderAction =
-          widget.formHelper.getRenameFormBuilderAction(context, postAction: () {
-        setState(() {});
-      });
-      if (renameFormBuilderAction != null) {
-        actions.add(renameFormBuilderAction);
+
+      if (widget.formHelper.getSection() != null) {
+        var renameFormBuilderAction = widget.formHelper
+            .getRenameFormBuilderAction(context, postAction: () {
+          setState(() {});
+        });
+        if (renameFormBuilderAction != null) {
+          actions.add(renameFormBuilderAction);
+        }
       }
       var newFormBuilderAction =
           widget.formHelper.getNewFormBuilderAction(context, postAction: () {
@@ -70,17 +73,24 @@ class _MainFormWidgetState extends State<MainFormWidget> {
         if (saveFormBuilderAction != null) {
           actions.add(saveFormBuilderAction);
         }
-        var deleteFormBuilderAction =
-            widget.formHelper.getDeleteFormBuilderAction(context);
+        var deleteFormBuilderAction = widget.formHelper
+            .getDeleteFormBuilderAction(context, postAction: () {
+          setState(() {});
+        });
         if (deleteFormBuilderAction != null) {
           actions.add(deleteFormBuilderAction);
         }
       }
-      var extrasFormBuilderAction =
-          widget.formHelper.getExtraFormBuilderAction(context);
-      if (extrasFormBuilderAction != null) {
-        actions.add(extrasFormBuilderAction);
+      if (widget.formHelper.getSection() != null) {
+        var extrasFormBuilderAction = widget.formHelper
+            .getExtraFormBuilderAction(context, postAction: () {
+          setState(() {});
+        });
+        if (extrasFormBuilderAction != null) {
+          actions.add(extrasFormBuilderAction);
+        }
       }
+
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.formHelper.getSectionName() ?? ""),

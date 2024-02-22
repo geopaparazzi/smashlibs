@@ -554,6 +554,26 @@ class SmashDialogs {
     return selection;
   }
 
+  /// Show a list of widgets in a dialog.
+  static Future<String?> showWidgetListDialog(
+      BuildContext context, dynamic title, List<Widget> widgets) async {
+    String? selection = await showDialog<String>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: title is String
+                ? SmashUI.titleText(title,
+                    bold: true,
+                    textAlign: TextAlign.center,
+                    color: SmashColors.mainDecorationsDarker)
+                : title,
+            children: widgets,
+          );
+        });
+    return selection;
+  }
+
   static Future<void> showToast(BuildContext context, String text,
       {int durationSeconds = 5,
       bool isError = false,

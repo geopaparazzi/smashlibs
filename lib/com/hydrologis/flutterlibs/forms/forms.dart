@@ -223,31 +223,37 @@ abstract class AFormhelper {
     return dataUsed;
   }
 
+  /// Action placed in the appbar if not null.
   Widget? getNewFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;
   }
 
+  /// Action placed in the appbar if not null.
   Widget? getOpenFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;
   }
 
+  /// Action placed in the appbar if not null.
   Widget? getSaveFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;
   }
 
+  /// Action placed in the appbar if not null.
   Widget? getRenameFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;
   }
 
+  /// Action placed in the appbar if not null.
   Widget? getDeleteFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;
   }
 
+  /// Extras are placed as menu items of the appbar.
   Widget? getExtraFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;
