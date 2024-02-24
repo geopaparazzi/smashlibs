@@ -556,19 +556,41 @@ class SmashDialogs {
 
   /// Show a list of widgets in a dialog.
   static Future<String?> showWidgetListDialog(
-      BuildContext context, dynamic title, List<Widget> widgets) async {
+      BuildContext context, dynamic title, List<Widget> widgets,
+      {Function? onOk}) async {
     String? selection = await showDialog<String>(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
-          return SimpleDialog(
+          return AlertDialog(
             title: title is String
                 ? SmashUI.titleText(title,
                     bold: true,
                     textAlign: TextAlign.center,
                     color: SmashColors.mainDecorationsDarker)
                 : title,
-            children: widgets,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: widgets,
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(SLL.of(context).cancel),
+                onPressed: () {
+                  Navigator.of(context).pop(null);
+                },
+              ),
+              TextButton(
+                child: Text(SLL.of(context).ok),
+                onPressed: () {
+                  if (onOk != null) {
+                    onOk();
+                  }
+                  Navigator.of(context).pop(null);
+                },
+              ),
+            ],
           );
         });
     return selection;
