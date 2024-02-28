@@ -688,3 +688,48 @@ class _DialogCheckBoxTileState extends State<DialogCheckBoxTile> {
     );
   }
 }
+
+class DialogRadioGroup extends StatefulWidget {
+  final int selected;
+  final List<String> item;
+  final onSelection;
+
+  DialogRadioGroup(this.item, this.onSelection, {this.selected = 0});
+
+  @override
+  _DialogRadioGroupState createState() => _DialogRadioGroupState();
+}
+
+class _DialogRadioGroupState extends State<DialogRadioGroup> {
+  int selectedRadioValue = 0;
+
+  @override
+  void initState() {
+    selectedRadioValue = widget.selected;
+    super.initState();
+  }
+
+  void handleRadioValueChanged(int? value) {
+    selectedRadioValue = value ?? 0;
+    widget.onSelection(value);
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> radioList = [];
+    for (var i = 0; i < widget.item.length; i++) {
+      radioList.add(RadioListTile(
+        title: Text(widget.item[i]),
+        value: i,
+        groupValue: selectedRadioValue,
+        onChanged: handleRadioValueChanged,
+      ));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: radioList,
+    );
+  }
+}

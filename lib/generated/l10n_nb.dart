@@ -384,6 +384,18 @@ class SLLNb extends SLL {
 
   @override
   String get gss_settings_unable_selfsigned_certificates => 'Unable to connect to ssl with self signed certificate. Allow self signed certificates in the settings.';
+
+  @override
+  String get gss_download_all => 'Download all';
+
+  @override
+  String get gss_download_only_user => 'Download only user data';
+
+  @override
+  String get gss_download_nothing => 'Don\'t download data';
+
+  @override
+  String get gss_download_select_layer => 'Select GSS layers to download';
 }
 
 /// The translations for Norwegian Bokmål, as used in Norway (`nb_NO`).

@@ -39,6 +39,7 @@ const API_DYNAMICLAYERS_DATA = "formlayers/data/";
 
 const API_PROJECT_PARAM = "project=";
 const API_ID_PARAM = "id=";
+const API_DOWNLOADMODE_PARAM = "downloadmode=";
 
 const LOG = "log";
 const LOGTS = "ts";
@@ -165,8 +166,24 @@ class ServerApi {
     }
   }
 
+  /// Download a dynamic layer to the device.
+  ///
+  /// The [layerName] is the name of the layer to download.
+  ///
+  /// The [formDefinition] is the form definition to use for the layer. If
+  /// available it will be placed into the layer tags file.
+  ///
+  /// The [geometryType] is the geometry type of the layer. It is necessary in
+  /// case of empty layers, where the geometry type is not known.
+  ///
+  /// The [downloadMode] is the mode of download. It can be:
+  /// * 0: download all data
+  /// * 1: download only the user's data
+  /// * 2: download no data
   static Future<String?> downloadDynamicLayerToDevice(String layerName,
-      {dynamic formDefinition, JTS.EGeometryType? geometryType}) async {
+      {dynamic formDefinition,
+      JTS.EGeometryType? geometryType,
+      int downloadMode = 0}) async {
     Project? project = getCurrentGssProject();
     if (project == null) {
       throw StateError("No project was selected.");
@@ -179,8 +196,13 @@ class ServerApi {
     var layerPropertiesFilePath =
         await GssUtilities.getGssGeojsonLayerPropertiesFilePath(layerName);
 
-    var uri = Uri.parse("${getBaseUrl()}$API_DYNAMICLAYERS_DATA$layerName" +
-        "?$API_PROJECT_PARAM${project.id}");
+    var urlString =
+        "${getBaseUrl()}$API_DYNAMICLAYERS_DATA$layerName?$API_PROJECT_PARAM${project.id}";
+    if (downloadMode != 0) {
+      urlString += "&$API_DOWNLOADMODE_PARAM$downloadMode";
+    }
+
+    var uri = Uri.parse(urlString);
     var requestHeaders = getTokenHeader();
 
     var response = await HTTP.get(uri, headers: requestHeaders);

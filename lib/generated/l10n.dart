@@ -867,6 +867,30 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Unable to connect to ssl with self signed certificate. Allow self signed certificates in the settings.'**
   String get gss_settings_unable_selfsigned_certificates;
+
+  /// No description provided for @gss_download_all.
+  ///
+  /// In en, this message translates to:
+  /// **'Download all'**
+  String get gss_download_all;
+
+  /// No description provided for @gss_download_only_user.
+  ///
+  /// In en, this message translates to:
+  /// **'Download only user data'**
+  String get gss_download_only_user;
+
+  /// No description provided for @gss_download_nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t download data'**
+  String get gss_download_nothing;
+
+  /// No description provided for @gss_download_select_layer.
+  ///
+  /// In en, this message translates to:
+  /// **'Select GSS layers to download'**
+  String get gss_download_select_layer;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

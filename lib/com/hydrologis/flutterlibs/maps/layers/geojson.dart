@@ -107,17 +107,21 @@ class GeojsonSource extends VectorLayerSource
               var fieldType = "TEXT";
               if (type == "double") {
                 fieldType = "DOUBLE";
-              } else if (type == "int") {
+              } else if (type == "int" || type == "intcombo") {
                 fieldType = "INTEGER";
               } else if (type == "boolean") {
                 fieldType = "BOOLEAN";
-              } else if (type == "sketch" || type == "pictures") {
+              } else if (type == "sketch" ||
+                  type == "pictures" ||
+                  type == "imagelib") {
                 // we keep images in base64 as text
                 fieldType = "TEXT";
               } else if (type == "date" || type == "time") {
                 fieldType = "TEXT";
               } else if (type.startsWith("string")) {
                 fieldType = "TEXT";
+              } else if (type.startsWith("label")) {
+                // this can be safely ignored
               } else {
                 SLogger().w("Unknown type: $type");
               }

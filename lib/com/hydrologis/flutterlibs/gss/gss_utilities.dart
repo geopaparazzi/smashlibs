@@ -200,6 +200,135 @@ class GssUtilities {
         HU.FileUtilities.joinPaths(gssFolder.path, layerName + ".deleted");
     return layerFilePath;
   }
+
+  static Future<List<dynamic>?> getGssLayersFromServer() async {
+    var layersList = await ServerApi.getDynamicLayers();
+    return layersList;
+  }
+
+  static Map<String, GssLayerDescription> getGssLayerDescriptionsMap(
+      List<dynamic> layersList) {
+    Map<String, GssLayerDescription> layerName2DescriptionMap = {};
+    for (var layer in layersList) {
+      var layerName = layer["name"] as String;
+      var formDefinition = layer["form"];
+      var geometryType = layer["geometrytype"] as String;
+
+      var gssLayerDescription = GssLayerDescription()
+        ..name = layerName
+        ..formDefinition = formDefinition
+        ..geometryType = JTS.EGeometryType.forWktName(geometryType);
+
+      layerName2DescriptionMap[layerName] = gssLayerDescription;
+    }
+    return layerName2DescriptionMap;
+  }
+
+  static Future<List> selectGssLayerDialog(
+    BuildContext context,
+    dynamic title,
+    List<String> layerNames, {
+    String okText = 'Ok',
+    String cancelText = 'Cancel',
+  }) async {
+    List<Widget> layerWidgets = [];
+    List<String> selected = [];
+    bool downloadAll = true;
+    bool downloadUser = false;
+    bool downloadNone = false;
+
+    for (var i = 0; i < layerNames.length; ++i) {
+      bool itemSelected = false;
+      layerWidgets.add(DialogCheckBoxTile(
+        itemSelected,
+        layerNames[i],
+        (isSelected, item) {
+          if (isSelected) {
+            selected.add(item);
+          } else {
+            selected.remove(item);
+          }
+        },
+      ));
+    }
+
+    DialogRadioGroup downloadOptions = DialogRadioGroup(
+      [
+        SLL.of(context).gss_download_all,
+        SLL.of(context).gss_download_only_user,
+        SLL.of(context).gss_download_nothing,
+      ],
+      (selected) {
+        downloadAll = selected == 0;
+        downloadUser = selected == 1;
+        downloadNone = selected == 2;
+      },
+      selected: 1,
+    );
+
+    if (title == null) {
+      title = SLL.of(context).gss_download_select_layer;
+    }
+
+    List<String>? selection = await showDialog<List<String>>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: title is String
+                ? SmashUI.normalText(title,
+                    textAlign: TextAlign.center,
+                    color: SmashColors.mainDecorationsDarker)
+                : title,
+            content: Builder(builder: (context) {
+              var width = MediaQuery.of(context).size.width;
+              return Container(
+                width: width,
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: ListTile.divideTiles(
+                                context: context, tiles: layerWidgets)
+                            .toList(),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: downloadOptions,
+                    ),
+                  ],
+                ),
+              );
+            }),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            actions: <Widget>[
+              TextButton(
+                child: Text(cancelText),
+                onPressed: () {
+                  Navigator.of(context).pop(null);
+                },
+              ),
+              TextButton(
+                child: Text(okText),
+                onPressed: () {
+                  Navigator.of(context).pop(selected);
+                },
+              ),
+            ],
+          );
+        });
+    return [selection, downloadAll, downloadUser, downloadNone];
+  }
+}
+
+class GssLayerDescription {
+  String? name;
+  dynamic formDefinition;
+  JTS.EGeometryType? geometryType;
 }
 
 /// Widget to trace upload of geopaparazzi items upload.
