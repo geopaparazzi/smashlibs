@@ -7,7 +7,6 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "key": "string_key",
       "label": "string label",
       "value": "default value",
-      "icon": "font",
       "type": "$TYPE_STRING"
     }""",
     "string as map label": """
@@ -16,7 +15,6 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "label": "string label",
       "islabel": "true",
       "value": "default value",
-      "icon": "font",
       "type": "$TYPE_STRING"
     }""",
   },
@@ -26,7 +24,6 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "key": "text_area_key",
       "label": "text area label",
       "value": "default value 1\ndefault value 2",
-      "icon": "scroll",
       "type": "$TYPE_STRINGAREA"
     }"""
   },
@@ -114,7 +111,6 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
     {
       "key": "boolean_key",
       "value": "",
-      "icon": "questionCircle",
       "type": "$TYPE_BOOLEAN"
     }"""
   },
@@ -452,12 +448,14 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
     "a camera picture": """
     {
       "key": "pictures_key",
+      "label": "A picture from the camera",
       "value": "",
       "type": "$TYPE_PICTURES"
     }""",
     "a picture from the gallery": """
     {
       "key": "pictures_from_lib_key",
+      "label": "A picture from the gallery",
       "value": "",
       "type": "$TYPE_IMAGELIB"
     }"""
@@ -466,6 +464,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
     "a sketch": """
     {
       "key": "sketch_key",
+      "label": "A hand drawn sketch",
       "value": "",
       "type": "$TYPE_SKETCH"
     }"""

@@ -53,8 +53,10 @@ class _MainFormWidgetState extends State<MainFormWidget> {
           actions.add(renameFormBuilderAction);
         }
       }
-      var newFormBuilderAction =
-          widget.formHelper.getNewFormBuilderAction(context, postAction: () {
+      var newFormBuilderAction = widget.formHelper
+          .getNewFormBuilderAction(context, postAction: () async {
+        await SmashDialogs.showToast(
+            context, SLL.of(context).formbuilder_action_created_msg);
         setState(() {});
       });
       if (newFormBuilderAction != null) {
@@ -68,8 +70,20 @@ class _MainFormWidgetState extends State<MainFormWidget> {
         actions.add(openFormBuilderAction);
       }
       if (widget.formHelper.getSection() != null) {
+        var duplicateFormBuilderAction = widget.formHelper
+            .getDuplicateFormBuilderAction(context, postAction: () async {
+          await SmashDialogs.showToast(
+              context, SLL.of(context).formbuilder_action_duplicated_msg);
+          setState(() {});
+        });
+        if (duplicateFormBuilderAction != null) {
+          actions.add(duplicateFormBuilderAction);
+        }
         var saveFormBuilderAction =
-            widget.formHelper.getSaveFormBuilderAction(context);
+            widget.formHelper.getSaveFormBuilderAction(context, postAction: () {
+          SmashDialogs.showToast(
+              context, SLL.of(context).formbuilder_action_saved_msg);
+        });
         if (saveFormBuilderAction != null) {
           actions.add(saveFormBuilderAction);
         }

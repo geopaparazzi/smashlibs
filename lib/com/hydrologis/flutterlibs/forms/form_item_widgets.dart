@@ -1081,10 +1081,10 @@ class ConnectedStringComboWidget extends AFormWidget {
         emptyIsNull: true));
     widgets.add(
         ConnectedStringComboValuesConfigWidget(formItem, emptyIsNull: true));
-    widgets.add(Divider(thickness: 3));
-    widgets.add(ComboItemsUrlConfigWidget(
-        formItem, SLL.of(context).set_from_url,
-        emptyIsNull: false));
+    // widgets.add(Divider(thickness: 3));
+    // widgets.add(ComboItemsUrlConfigWidget(
+    //     formItem, SLL.of(context).set_from_url,
+    //     emptyIsNull: false));
 
     await openConfigDialog(context, widgets);
   }
@@ -1157,10 +1157,10 @@ class AutoCompleteConnectedStringComboWidget extends AFormWidget {
         emptyIsNull: true));
     widgets.add(
         ConnectedStringComboValuesConfigWidget(formItem, emptyIsNull: true));
-    widgets.add(Divider(thickness: 3));
-    widgets.add(ComboItemsUrlConfigWidget(
-        formItem, SLL.of(context).set_from_url,
-        emptyIsNull: false));
+    // widgets.add(Divider(thickness: 3));
+    // widgets.add(ComboItemsUrlConfigWidget(
+    //     formItem, SLL.of(context).set_from_url,
+    //     emptyIsNull: false));
 
     await openConfigDialog(context, widgets);
   }
@@ -1342,10 +1342,10 @@ class PicturesAndImagesWidget extends AFormWidget {
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
     widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
-    // widgets.add(Divider(thickness: 3));
-    // widgets.add(StringFieldConfigWidget(
-    //     formItem, TAG_LABEL, SLL.of(context).set_label,
-    //     emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
     // widgets.add(FormsBooleanConfigWidget(
     //     formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
 
@@ -1361,7 +1361,7 @@ class PicturesAndImagesWidget extends AFormWidget {
       leading: icon,
       title: PicturesWidget(
           label, getKey(widgetKey), formHelper, formItem, itemReadonly,
-          fromGallery: true),
+          fromGallery: fromGallery),
     );
 
     return widget!;
@@ -1402,10 +1402,10 @@ class DrawingWidget extends AFormWidget {
       BuildContext context, SmashFormItem formItem) async {
     var widgets = <Widget>[];
     widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
-    // widgets.add(Divider(thickness: 3));
-    // widgets.add(StringFieldConfigWidget(
-    //     formItem, TAG_LABEL, SLL.of(context).set_label,
-    //     emptyIsNull: true));
+    widgets.add(Divider(thickness: 3));
+    widgets.add(StringFieldConfigWidget(
+        formItem, TAG_LABEL, SLL.of(context).set_label,
+        emptyIsNull: true));
     // widgets.add(FormsBooleanConfigWidget(
     //     formItem, CONSTRAINT_MANDATORY, SLL.of(context).set_as_mandatory));
 

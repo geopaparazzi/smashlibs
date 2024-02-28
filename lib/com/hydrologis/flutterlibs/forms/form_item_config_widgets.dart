@@ -432,7 +432,12 @@ class _StringComboValuesConfigWidgetState
           // split into lines
           var lines = finalText.split("\n");
           var itemList = [];
+          bool foundEmptyAlready = false;
           for (var line in lines) {
+            line = line.trim();
+            if (line.isEmpty && foundEmptyAlready) {
+              continue;
+            }
             // if line contains colon then it is a label:value pair
             if (line.contains(":")) {
               var parts = line.split(":");
@@ -442,6 +447,9 @@ class _StringComboValuesConfigWidgetState
                 "item": {"label": label, "value": value}
               });
             } else {
+              if (line.isEmpty) {
+                foundEmptyAlready = true;
+              }
               itemList.add({"item": line});
             }
           }
@@ -536,6 +544,9 @@ class _IntComboValuesConfigWidgetState
           var lines = finalText.split("\n");
           var itemList = [];
           for (var line in lines) {
+            if (line.trim().isEmpty) {
+              continue;
+            }
             // if line contains colon then it is a label:value pair
             if (line.contains(":")) {
               var parts = line.split(":");

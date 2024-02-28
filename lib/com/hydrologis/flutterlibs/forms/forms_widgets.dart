@@ -2032,6 +2032,13 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
 
   @override
   Widget build(BuildContext context) {
+    String widgetLabel = widget._label;
+    if (widgetLabel.isEmpty) {
+      widgetLabel = widget.fromGallery
+          ? SLL.of(context).formsWidgets_loadImage //"Load image"
+          : SLL.of(context).formsWidgets_takePicture; //"Take a picture"
+    }
+
     return _loading
         ? SmashCircularProgress(label: "Loading pictures...")
         : Center(
@@ -2065,14 +2072,7 @@ class PicturesWidgetState extends State<PicturesWidget> with AfterLayoutMixin {
                                     color: SmashColors.mainDecorations,
                                   ),
                                 ),
-                                SmashUI.normalText(
-                                    widget.fromGallery
-                                        ? SLL
-                                            .of(context)
-                                            .formsWidgets_loadImage //"Load image"
-                                        : SLL
-                                            .of(context)
-                                            .formsWidgets_takePicture, //"Take a picture"
+                                SmashUI.normalText(widgetLabel,
                                     color: SmashColors.mainDecorations,
                                     bold: true),
                               ],

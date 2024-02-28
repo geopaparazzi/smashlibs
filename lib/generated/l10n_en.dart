@@ -305,6 +305,15 @@ class SLLEn extends SLL {
   String get formbuilder_action_save_tooltip => 'Save the form in the forms folder.';
 
   @override
+  String get formbuilder_action_saved_msg => 'Form saved.';
+
+  @override
+  String get formbuilder_action_duplicated_msg => 'Form duplicated.';
+
+  @override
+  String get formbuilder_action_created_msg => 'Form created.';
+
+  @override
   String get formbuilder_action_rename_tooltip => 'Rename the form.';
 
   @override

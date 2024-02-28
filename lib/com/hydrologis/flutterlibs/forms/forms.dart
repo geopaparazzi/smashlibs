@@ -242,6 +242,12 @@ abstract class AFormhelper {
   }
 
   /// Action placed in the appbar if not null.
+  Widget? getDuplicateFormBuilderAction(BuildContext context,
+      {Function? postAction}) {
+    return null;
+  }
+
+  /// Action placed in the appbar if not null.
   Widget? getRenameFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;

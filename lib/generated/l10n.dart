@@ -706,6 +706,24 @@ abstract class SLL {
   /// **'Save the form in the forms folder.'**
   String get formbuilder_action_save_tooltip;
 
+  /// No description provided for @formbuilder_action_saved_msg.
+  ///
+  /// In en, this message translates to:
+  /// **'Form saved.'**
+  String get formbuilder_action_saved_msg;
+
+  /// No description provided for @formbuilder_action_duplicated_msg.
+  ///
+  /// In en, this message translates to:
+  /// **'Form duplicated.'**
+  String get formbuilder_action_duplicated_msg;
+
+  /// No description provided for @formbuilder_action_created_msg.
+  ///
+  /// In en, this message translates to:
+  /// **'Form created.'**
+  String get formbuilder_action_created_msg;
+
   /// No description provided for @formbuilder_action_rename_tooltip.
   ///
   /// In en, this message translates to:
