@@ -287,7 +287,7 @@ class GssUtilities {
                 child: Column(
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: 3,
                       child: ListView(
                         shrinkWrap: true,
                         children: ListTile.divideTiles(
@@ -296,7 +296,7 @@ class GssUtilities {
                       ),
                     ),
                     Expanded(
-                      flex: 1,
+                      flex: 2,
                       child: downloadOptions,
                     ),
                   ],

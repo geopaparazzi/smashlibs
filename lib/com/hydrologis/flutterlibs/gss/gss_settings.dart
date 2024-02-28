@@ -240,9 +240,6 @@ class GssSettingsState extends State<GssSettings> with AfterLayoutMixin {
                                 children: [
                                   Expanded(
                                     child: Container(
-                                      height: 50.0,
-                                      width: ScreenUtilities.getWidth(context) *
-                                          0.8,
                                       child: DropdownButton<Project>(
                                         isExpanded: true,
                                         items:

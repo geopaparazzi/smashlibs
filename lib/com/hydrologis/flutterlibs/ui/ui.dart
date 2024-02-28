@@ -346,9 +346,9 @@ class _EditableTextFieldState extends State<EditableTextField> {
   @override
   void initState() {
     _currentValue = widget.value;
-    super.initState();
     _controller = TextEditingController();
     _controller2 = TextEditingController();
+    super.initState();
   }
 
   void dispose() {
@@ -360,7 +360,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
   @override
   Widget build(BuildContext context) {
     if (editMode) {
-      if (_currentValue != widget.hintText) {
+      if (_currentValue != widget.hintText && _currentValue.isNotEmpty) {
         _controller.text = _currentValue;
         _controller.selection = TextSelection.fromPosition(
             TextPosition(offset: _controller.text.length));
@@ -372,6 +372,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
         children: [
           Expanded(
             child: TextFormField(
+              autofocus: true,
               controller: _controller,
               autovalidateMode: AutovalidateMode.always,
               validator: (inputText) {
