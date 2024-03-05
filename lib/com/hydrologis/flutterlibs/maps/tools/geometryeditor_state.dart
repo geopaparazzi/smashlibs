@@ -134,7 +134,7 @@ class GeometryEditManager {
   DragMarker? pointEditor;
 
   late Widget _intermediateHandlerIcon;
-  late double _handleIconSize;
+  double _handleIconSize = 25;
   late double _intermediateHandleIconSize;
   late Widget _dragHandlerIcon;
   late Function _callbackRefresh;

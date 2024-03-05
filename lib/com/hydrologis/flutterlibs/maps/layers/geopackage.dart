@@ -105,6 +105,20 @@ class GeopackageSource extends DbVectorLayerSource
       if (maxFeaturesToLoad == -1) {
         maxFeaturesToLoad = null;
       }
+      if (whereFilter != null) {
+        if (whereFilter!.isNotEmpty) {
+          GpPreferences()
+              .setString("GPKG_FILTER_KEY$_absolutePath", whereFilter!);
+        } else {
+          whereFilter = null;
+        }
+      } else {
+        whereFilter =
+            GpPreferences().getStringSync("GPKG_FILTER_KEY$_absolutePath");
+        if (whereFilter != null) {
+          whereFilter = whereFilter!.replaceFirst("GPKG_FILTER_KEY", "");
+        }
+      }
       _tableData = _gpkgDb!.getTableData(
         TableName(_tableName, schemaSupported: false),
         limit: maxFeaturesToLoad,
