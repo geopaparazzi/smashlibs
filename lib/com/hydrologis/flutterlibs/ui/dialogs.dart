@@ -616,8 +616,7 @@ class SmashDialogs {
       SnackBar(
         shape: RoundedRectangleBorder(
           side: BorderSide(
-            color:
-                isError ? SmashColors.mainDanger : SmashColors.mainDecorations,
+            color: isError ? SmashColors.mainDanger : mainColor,
             width: 3,
           ),
           borderRadius: BorderRadius.circular(0.0),
