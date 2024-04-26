@@ -451,6 +451,12 @@ class SmashDialogs {
       List<IconData>? iconDataList}) async {
     List<Widget> widgets = [];
     List<String> selected = [];
+    if (selectedItems != null) {
+      // add them to the selected
+      for (String sel in selectedItems){
+        selected.add(sel);
+      }
+    }
     for (var i = 0; i < items.length; ++i) {
       bool itemSelected = false;
       if (selectedItems != null && selectedItems.contains(items[i])) {
