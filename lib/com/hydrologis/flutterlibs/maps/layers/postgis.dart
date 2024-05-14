@@ -46,7 +46,7 @@ class PostgisSource extends DbVectorLayerSource
     if (_where != null && _where!.isEmpty) {
       _where = null;
     }
-    useSSL = map[LAYERSKEY_WHERE] ?? false;
+    useSSL = map[LAYERSKEY_USESSL] ?? false;
     var bounds = map[LAYERSKEY_BOUNDS];
     if (bounds != null && bounds.isNotEmpty) {
       var boundsSplit = bounds.split(";"); // wesn
@@ -241,7 +241,7 @@ class PostgisSource extends DbVectorLayerSource
   String toJson() {
     String w = "";
     if (_where != null) {
-      w = """ "$LAYERSKEY_WHERE": "$_where", """;
+      w = """ "$LAYERSKEY_WHERE": "${_where!.replaceAll("\"", "'")}", """;
     }
 
     String b = "";
@@ -249,9 +249,12 @@ class PostgisSource extends DbVectorLayerSource
       // wesn
       b = """ "$LAYERSKEY_BOUNDS": "${_limitBounds!.getMinX()};${_limitBounds!.getMaxX()};${_limitBounds!.getMinY()};${_limitBounds!.getMaxY()}", """;
     }
+
+    var tn = _tableName.replaceAll("\"", "'");
+
     var json = '''
     {
-        "$LAYERSKEY_LABEL": "$_tableName",
+        "$LAYERSKEY_LABEL": "$tn",
         "$LAYERSKEY_URL":"$_dbUrl",
         "$LAYERSKEY_USER":"$_user",
         "$LAYERSKEY_PWD":"$_pwd",
