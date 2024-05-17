@@ -486,8 +486,8 @@ class FormUtilities {
                         (isLabel.toLowerCase() == "true" ||
                             isLabel.toLowerCase() == "yes"))) {
                   var v = formItem[TAG_VALUE];
-                  if (v != null && v.length > 0) {
-                    return v;
+                  if (v != null && v.toString().length > 0) {
+                    return v.toString();
                   } else {
                     return defaultValue;
                   }
