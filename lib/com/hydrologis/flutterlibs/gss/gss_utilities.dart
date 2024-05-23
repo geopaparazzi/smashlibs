@@ -233,8 +233,8 @@ class GssUtilities {
   }) async {
     List<Widget> layerWidgets = [];
     List<String> selected = [];
-    bool downloadAll = true;
-    bool downloadUser = false;
+    bool downloadAll = false;
+    bool downloadUser = true;
     bool downloadNone = false;
 
     for (var i = 0; i < layerNames.length; ++i) {

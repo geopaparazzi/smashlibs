@@ -210,6 +210,7 @@ class ServerApi {
       HU.FileUtilities.writeStringToFile(layerFilePath, response.body);
 
       String info = "layername=$layerName\nlayerfile=$layerFilePath\n";
+      info += "downloadmode=${downloadMode}\n";
       if (geometryType != null) {
         info += "geometrytype=${geometryType.typeName}\n";
       }
@@ -233,7 +234,7 @@ class ServerApi {
     }
   }
 
-  static Future<void> postNewDynamicLayerData(
+  static Future<dynamic> postNewDynamicLayerData(
       String layerName, String dataJson) async {
     var tokenHeader = getTokenHeader();
     Project? project = getCurrentGssProject();
@@ -249,6 +250,8 @@ class ServerApi {
     if (response.statusCode != 201) {
       throw new StateError(response.body);
     }
+    var idsMapping = jsonDecode(response.body);
+    return idsMapping['ids'];
   }
 
   static Future<void> postModifiedDynamicLayerData(

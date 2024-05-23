@@ -119,7 +119,8 @@ class MapsforgeTileProvider extends TileProvider {
     }
     SymbolCache symbolCache;
     if (content == null) {
-      content = await rootBundle.loadString("assets/defaultrender.xml");
+      // content = await rootBundle.loadString("assets/defaultrender.xml");
+      content = await rootBundle.loadString("assets/darkrender.xml");
       symbolCache =
           FileSymbolCache(imageLoader: ImageBundleLoader(bundle: rootBundle));
     } else {

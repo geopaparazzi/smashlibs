@@ -1163,9 +1163,19 @@ class GeojsonSource extends VectorLayerSource
         if (hasNew) {
           var newFC = toFeatureCollection(newFeaturesToUpload);
           var newFCString = newFC.toJSON(indent: 4);
-          await ServerApi.postNewDynamicLayerData(_name!, newFCString);
+          var idMappings =
+              await ServerApi.postNewDynamicLayerData(_name!, newFCString);
           newFeaturesToUpload.forEach((f) {
             f.attributes.remove(EditableDataSource.EDITMODE_FIELD_NAME);
+
+            // update the id of the new feature with the one from the server
+            if (f.fid != null) {
+              // mappings from server are strings
+              var newId = idMappings[f.fid!.toString()];
+              if (newId != null) {
+                f.fid = newId;
+              }
+            }
           });
         }
         if (modifiedFeaturesToUpload.isNotEmpty) {
@@ -1188,11 +1198,11 @@ class GeojsonSource extends VectorLayerSource
 
         // if a new feature was added, we need to update the geojson file
         // to reflect the rigth ids (the server assigns them)
-        if (hasNew) {
-          await ServerApi.downloadDynamicLayerToDevice(_name!);
-        } else {
-          dumpFeatureCollection();
-        }
+        // if (hasNew) {
+        //   await ServerApi.downloadDynamicLayerToDevice(_name!);
+        // } else {
+        dumpFeatureCollection();
+        // }
         isLoaded = false;
 
         SmashDialogs.showInfoDialog(context, "Upload completed.");
