@@ -44,6 +44,7 @@ class SmashColors {
 
   static final ColorExt tableBorder = mainDecorations;
   static final ColorExt disabledText = ColorExt.fromColor(Colors.grey);
+  static final ColorExt disabled = ColorExt.fromColor(Colors.grey);
 
   static final MaterialColor mainBackgroundMc = toMaterialColor(mainBackground);
   static final MaterialColor mainDecorationsMc =

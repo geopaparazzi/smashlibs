@@ -619,8 +619,9 @@ class TileSourcePropertiesWidgetState
 
     bool isMapsforge = FileManager.isMapsforge(absolutePath);
 
-    return WillPopScope(
-        onWillPop: () async {
+    return PopScope(
+        canPop: true,
+        onPopInvoked: (didPop) {
           if (_somethingChanged) {
             _source.opacityPercentage = _opacitySliderValue;
             if (useHideColor) {
@@ -635,7 +636,6 @@ class TileSourcePropertiesWidgetState
             _source.doGpkgAsOverlay = doGpkgAsOverlay;
             _source.isLoaded = false;
           }
-          return true;
         },
         child: Scaffold(
           appBar: AppBar(
@@ -702,11 +702,11 @@ class TileSourcePropertiesWidgetState
                           leading: Icon(MdiIcons.mapMarker),
                           title: Padding(
                             padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(SLL
-                                .of(context)
-                                .mapsforge_theme), //"Mapsforge properties"
+                            child: Text(SLL.of(context).mapsforge_theme),
                           ),
                           subtitle: TextButton(
+                            style: SmashUI.defaultFlatButtonStyle(
+                                color: SmashColors.mainDecorations),
                             onPressed: () async {
                               List<String> themes = [
                                 "defaultrender",
@@ -730,7 +730,8 @@ class TileSourcePropertiesWidgetState
                                 });
                               }
                             },
-                            child: SmashUI.titleText(mapsforgeTheme),
+                            child:
+                                SmashUI.titleText(mapsforgeTheme, bold: true),
                           ),
                         ),
                       ],
