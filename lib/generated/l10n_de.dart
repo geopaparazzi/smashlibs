@@ -396,4 +396,10 @@ class SLLDe extends SLL {
 
   @override
   String get gss_download_select_layer => 'Select GSS layers to download';
+
+  @override
+  String get mapsforge_theme => 'Mapsforge theme';
+
+  @override
+  String get mapsforge_select_tiles_theme => 'Select a tiles theme';
 }

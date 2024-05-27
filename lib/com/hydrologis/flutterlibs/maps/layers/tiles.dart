@@ -575,6 +575,7 @@ class TileSourcePropertiesWidgetState
   bool useHideColor = false;
   bool isGeopackage = false;
   bool? doGpkgAsOverlay;
+  String mapsforgeTheme = "defaultrender";
 
   TileSourcePropertiesWidgetState(this._source);
 
@@ -600,6 +601,11 @@ class TileSourcePropertiesWidgetState
       doGpkgAsOverlay = this._source.doGpkgAsOverlay;
     }
 
+    // get mapsforge theme from preferences
+    mapsforgeTheme =
+        GpPreferences().getStringSync("KEY_MAPSFORGE_THEME", "defaultrender") ??
+            "defaultrender";
+
     super.initState();
   }
 
@@ -610,6 +616,8 @@ class TileSourcePropertiesWidgetState
     if (absolutePath != null) {
       showColorHide = FileManager.isGeopackage(absolutePath);
     }
+
+    bool isMapsforge = FileManager.isMapsforge(absolutePath);
 
     return WillPopScope(
         onWillPop: () async {
@@ -625,6 +633,7 @@ class TileSourcePropertiesWidgetState
               _source.rgbToHide = null;
             }
             _source.doGpkgAsOverlay = doGpkgAsOverlay;
+            _source.isLoaded = false;
           }
           return true;
         },
@@ -635,51 +644,99 @@ class TileSourcePropertiesWidgetState
           ),
           body: ListView(
             children: <Widget>[
-              Padding(
-                padding: SmashUI.defaultPadding(),
-                child: Card(
-                  shape: SmashUI.defaultShapeBorder(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ListTile(
-                        leading: Icon(MdiIcons.opacity),
-                        title: Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child:
-                              Text(SLL.of(context).tiles_opacity), //"Opacity"
-                        ),
-                        subtitle: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            Flexible(
-                                flex: 1,
-                                child: Slider(
-                                  activeColor: SmashColors.mainSelection,
-                                  min: 0.0,
-                                  max: 100,
-                                  divisions: 10,
-                                  onChanged: (newRating) {
-                                    _somethingChanged = true;
-                                    setState(
-                                        () => _opacitySliderValue = newRating);
-                                  },
-                                  value: _opacitySliderValue,
-                                )),
-                            Container(
-                              width: 50.0,
-                              alignment: Alignment.center,
-                              child: SmashUI.normalText(
-                                '${_opacitySliderValue.toInt()}',
+              if (!isMapsforge)
+                Padding(
+                  padding: SmashUI.defaultPadding(),
+                  child: Card(
+                    shape: SmashUI.defaultShapeBorder(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(MdiIcons.opacity),
+                          title: Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child:
+                                Text(SLL.of(context).tiles_opacity), //"Opacity"
+                          ),
+                          subtitle: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Flexible(
+                                  flex: 1,
+                                  child: Slider(
+                                    activeColor: SmashColors.mainSelection,
+                                    min: 0.0,
+                                    max: 100,
+                                    divisions: 10,
+                                    onChanged: (newRating) {
+                                      _somethingChanged = true;
+                                      setState(() =>
+                                          _opacitySliderValue = newRating);
+                                    },
+                                    value: _opacitySliderValue,
+                                  )),
+                              Container(
+                                width: 50.0,
+                                alignment: Alignment.center,
+                                child: SmashUI.normalText(
+                                  '${_opacitySliderValue.toInt()}',
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              if (isMapsforge)
+                Padding(
+                  padding: SmashUI.defaultPadding(),
+                  child: Card(
+                    shape: SmashUI.defaultShapeBorder(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(MdiIcons.mapMarker),
+                          title: Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(SLL
+                                .of(context)
+                                .mapsforge_theme), //"Mapsforge properties"
+                          ),
+                          subtitle: TextButton(
+                            onPressed: () async {
+                              List<String> themes = [
+                                "defaultrender",
+                                "darkrender",
+                                "custom",
+                              ];
+                              var selected =
+                                  await SmashDialogs.showSingleChoiceDialog(
+                                      context,
+                                      SLL
+                                          .of(context)
+                                          .mapsforge_select_tiles_theme,
+                                      themes,
+                                      selected: mapsforgeTheme);
+                              if (selected != null) {
+                                GpPreferences()
+                                    .setString("KEY_MAPSFORGE_THEME", selected);
+                                setState(() {
+                                  mapsforgeTheme = selected;
+                                  _somethingChanged = true;
+                                });
+                              }
+                            },
+                            child: SmashUI.titleText(mapsforgeTheme),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               if (isGeopackage)
                 Padding(
                   padding: SmashUI.defaultPadding(),

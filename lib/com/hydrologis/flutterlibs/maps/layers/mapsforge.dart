@@ -118,9 +118,14 @@ class MapsforgeTileProvider extends TileProvider {
       }
     }
     SymbolCache symbolCache;
+    // String rendererName = "defaultrender";
+    String rendererName =
+        GpPreferences().getStringSync("KEY_MAPSFORGE_THEME", "defaultrender") ??
+            "defaultrender";
+    // String rendererName = "custom";
     if (content == null) {
-      // content = await rootBundle.loadString("assets/defaultrender.xml");
-      content = await rootBundle.loadString("assets/darkrender.xml");
+      content = await rootBundle.loadString("assets/$rendererName.xml");
+      // content = await rootBundle.loadString("assets/mapsforge_osmarender.xml");
       symbolCache =
           FileSymbolCache(imageLoader: ImageBundleLoader(bundle: rootBundle));
     } else {
@@ -140,7 +145,7 @@ class MapsforgeTileProvider extends TileProvider {
 
     if (DOCACHE) {
       // create a mbtiles cache
-      String cachePath = _mapsforgeFile.path + ".mbtiles";
+      String cachePath = _mapsforgeFile.path + "_" + rendererName + ".mbtiles";
       if (!File(cachePath).existsSync()) {
         SMLogger().d("Creating mbtiles cache in $cachePath");
       }

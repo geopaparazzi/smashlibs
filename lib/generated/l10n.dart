@@ -891,6 +891,18 @@ abstract class SLL {
   /// In en, this message translates to:
   /// **'Select GSS layers to download'**
   String get gss_download_select_layer;
+
+  /// No description provided for @mapsforge_theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Mapsforge theme'**
+  String get mapsforge_theme;
+
+  /// No description provided for @mapsforge_select_tiles_theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a tiles theme'**
+  String get mapsforge_select_tiles_theme;
 }
 
 class _SLLDelegate extends LocalizationsDelegate<SLL> {

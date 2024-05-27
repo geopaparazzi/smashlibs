@@ -202,5 +202,7 @@
   "gss_download_all": "Download all",
   "gss_download_only_user": "Download only user data",
   "gss_download_nothing": "Don't download data",
-  "gss_download_select_layer": "Select GSS layers to download"
+  "gss_download_select_layer": "Select GSS layers to download",
+  "mapsforge_theme": "Mapsforge theme",
+  "mapsforge_select_tiles_theme": "Select a tiles theme"
 }
