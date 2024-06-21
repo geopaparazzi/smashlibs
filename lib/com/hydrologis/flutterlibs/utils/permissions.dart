@@ -82,6 +82,16 @@ class PermissionManager {
   }
 
   Future<bool> _checkLocationPermissions(BuildContext context) async {
+    var statusNotif = await Permission.notification.status;
+    if (statusNotif != PermissionStatus.granted) {
+      var permissionStatus = await Permission.notification.request();
+      if (permissionStatus.isGranted) {
+        SMLogger().i("Notification permission granted.");
+      } else {
+        SMLogger().w("Notification permission is not granted.");
+      }
+    }
+
     var status = await Permission.location.status;
     if (status != PermissionStatus.granted) {
       bool granted = false;
