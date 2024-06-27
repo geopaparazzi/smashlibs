@@ -545,10 +545,10 @@ packages:
     dependency: transitive
     description:
       name: geojson_vi
-      sha256: a47e0efd17617aef8b239719ea2a3ef743563e873709531ee5498ccfd04069f2
+      sha256: f269ba5713b823466630f30711355180591c40c4860de49fb4b9c46026528b2d
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.5"
+    version: "2.2.4"
   golden_toolkit:
     dependency: transitive
     description:
