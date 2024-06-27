@@ -90,7 +90,7 @@ dependencies:
   gpx: ^2.1.0
 
   # MIT
-  geojson_vi: ^2.1.0
+  geojson_vi: 2.2.4
 
   # BSD  rainbow_vis: 1.0.3
   rainbow_color: 2.0.1
