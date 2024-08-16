@@ -146,7 +146,7 @@ dependencies:
   # BSD
   shared_preferences: ^2.0.15
   # MIT
-  flutter_screen_wake: ^1.0.2
+  wakelock_plus: ^1.2.8
   # ON ANDROID NEEDS:
   # <uses-permission android:name="android.permission.WAKE_LOCK" />
 
