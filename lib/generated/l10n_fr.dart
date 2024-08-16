@@ -1,5 +1,7 @@
 import 'l10n.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for French (`fr`).
 class SLLFr extends SLL {
   SLLFr([String locale = 'fr']) : super(locale);
