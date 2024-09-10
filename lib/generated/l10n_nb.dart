@@ -1,7 +1,5 @@
 import 'l10n.dart';
 
-// ignore_for_file: type=lint
-
 /// The translations for Norwegian Bokmål (`nb`).
 class SLLNb extends SLL {
   SLLNb([String locale = 'nb']) : super(locale);
