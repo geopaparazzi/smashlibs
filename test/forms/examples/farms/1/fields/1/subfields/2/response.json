@@ -1,0 +1,20 @@
+[
+  {
+    "item": {
+      "value": 4,
+      "label": "C1 1B F1"
+    }
+  },
+  {
+    "item": {
+      "value": 5,
+      "label": "C1 1B F2"
+    }
+  },
+  {
+    "item": {
+      "value": 6,
+      "label": "C1 1B F3"
+    }
+  }
+]
