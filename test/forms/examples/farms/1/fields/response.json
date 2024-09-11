@@ -1,0 +1,14 @@
+[
+    {
+        "item": {
+            "value": 1,
+            "label": "C1"
+        }
+    },
+    {
+        "item": {
+            "value": 2,
+            "label": "C2"
+        }
+    }
+]
