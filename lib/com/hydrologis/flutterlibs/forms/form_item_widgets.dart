@@ -905,8 +905,8 @@ class StringComboWidget extends AFormWidget {
     }
     widget = ListTile(
       leading: icon,
-      title: ComboboxWidget<String>(
-          getKey(widgetKey), formItem, label, presentationMode, constraints),
+      title: ComboboxWidget<String>(getKey(widgetKey), formItem, label,
+          presentationMode, constraints, formItem.isUrlItem, formHelper),
     );
     return widget!;
   }
@@ -945,6 +945,8 @@ class IntComboWidget extends AFormWidget {
     var widgets = <Widget>[];
     widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_URL_ITEM, SLL.of(context).is_url_item));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
         emptyIsNull: true));
@@ -964,8 +966,8 @@ class IntComboWidget extends AFormWidget {
     }
     widget = ListTile(
       leading: icon,
-      title: ComboboxWidget<int>(
-          getKey(widgetKey), formItem, label, presentationMode, constraints),
+      title: ComboboxWidget<int>(getKey(widgetKey), formItem, label,
+          presentationMode, constraints, formItem.isUrlItem, formHelper),
     );
     return widget!;
   }
@@ -1006,6 +1008,8 @@ class AutoCompleteStringComboWidget extends AFormWidget {
     var widgets = <Widget>[];
     widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_URL_ITEM, SLL.of(context).is_url_item));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
         emptyIsNull: true));
@@ -1032,8 +1036,8 @@ class AutoCompleteStringComboWidget extends AFormWidget {
     } else {
       widget = ListTile(
         leading: icon,
-        title: AutocompleteStringComboWidget(
-            getKey(widgetKey), formItem, label, itemReadonly),
+        title: AutocompleteStringComboWidget(getKey(widgetKey), formItem, label,
+            itemReadonly, formItem.isUrlItem),
       );
     }
 
@@ -1076,6 +1080,8 @@ class ConnectedStringComboWidget extends AFormWidget {
     var widgets = <Widget>[];
     widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_URL_ITEM, SLL.of(context).is_url_item));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
         emptyIsNull: true));
@@ -1108,8 +1114,8 @@ class ConnectedStringComboWidget extends AFormWidget {
     } else {
       widget = ListTile(
         leading: icon,
-        title: ConnectedComboboxWidget(
-            getKey(widgetKey), formItem, label, itemReadonly),
+        title: ConnectedComboboxWidget(getKey(widgetKey), formItem, label,
+            itemReadonly, formItem.isUrlItem),
       );
     }
 
@@ -1152,6 +1158,8 @@ class AutoCompleteConnectedStringComboWidget extends AFormWidget {
     var widgets = <Widget>[];
     widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_URL_ITEM, SLL.of(context).is_url_item));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
         emptyIsNull: true));
@@ -1173,7 +1181,7 @@ class AutoCompleteConnectedStringComboWidget extends AFormWidget {
     widget = ListTile(
       leading: icon,
       title: AutocompleteStringConnectedComboboxWidget(
-          getKey(widgetKey), formItem, label, itemReadonly),
+          getKey(widgetKey), formItem, label, itemReadonly, formItem.isUrlItem),
     );
 
     return widget!;
@@ -1215,6 +1223,8 @@ class MultiStringComboWidget extends AFormWidget {
     var widgets = <Widget>[];
     widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_URL_ITEM, SLL.of(context).is_url_item));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
         emptyIsNull: true));
@@ -1242,8 +1252,14 @@ class MultiStringComboWidget extends AFormWidget {
     } else {
       widget = ListTile(
         leading: icon,
-        title: MultiComboWidget<String>(getKey(widgetKey + "_parent"), formItem,
-            label, itemReadonly, presentationMode),
+        title: MultiComboWidget<String>(
+            getKey(widgetKey + "_parent"),
+            formItem,
+            label,
+            itemReadonly,
+            presentationMode,
+            formItem.isUrlItem,
+            formHelper),
       );
     }
 
@@ -1286,6 +1302,8 @@ class MultiIntComboWidget extends AFormWidget {
     var widgets = <Widget>[];
     widgets.add(FormKeyConfigWidget(formItem, formHelper.getSection()!));
     widgets.add(Divider(thickness: 3));
+    widgets.add(FormsBooleanConfigWidget(
+        formItem, TAG_IS_URL_ITEM, SLL.of(context).is_url_item));
     widgets.add(StringFieldConfigWidget(
         formItem, TAG_LABEL, SLL.of(context).set_label,
         emptyIsNull: true));
@@ -1305,8 +1323,8 @@ class MultiIntComboWidget extends AFormWidget {
     }
     widget = ListTile(
       leading: icon,
-      title: MultiComboWidget<int>(
-          getKey(widgetKey), formItem, label, itemReadonly, presentationMode),
+      title: MultiComboWidget<int>(getKey(widgetKey), formItem, label,
+          itemReadonly, presentationMode, formItem.isUrlItem, formHelper),
     );
 
     return widget!;

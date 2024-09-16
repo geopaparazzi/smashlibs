@@ -206,6 +206,9 @@ class SLLIt extends SLL {
   String get set_label => 'set label';
 
   @override
+  String get is_url_item => 'is url item';
+
+  @override
   String get set_cliccable_url => 'set tappable URL';
 
   @override

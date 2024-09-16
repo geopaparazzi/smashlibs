@@ -97,6 +97,8 @@
   "@set_as_Label": {},
   "set_label": "set label",
   "@set_label": {},
+  "is_url_item": "is url item",
+  "@is_url_item": {},
   "set_cliccable_url": "set tappable URL",
   "@set_cliccable_url": {},
   "set_unique_key_for_formitem":  "set unique key for the form item",

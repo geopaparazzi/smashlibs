@@ -502,6 +502,74 @@
             "type": "polygon"
           }
         ]
+      },
+      {
+          "formname": "Url item substitutions",
+          "formitems": [
+              {
+                  "key": "id",
+                  "value": "",
+                  "type": "hidden",
+                  "mandatory": "no",
+                  "label": "Id"
+              },
+              {
+                  "key": "field",
+                  "value": -1,
+                  "type": "multiintcombo",
+                  "values": {
+                      "items": [
+                          {
+                              "item": {
+                                  "label": "No data",
+                                  "value": -1
+                              }
+                          }
+                      ],
+                      "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/response.json"
+                  },
+                  "mandatory": "no",
+                  "label": "Field",
+                  "isurlitem": "true"
+              },
+              {
+                  "key": "subfield",
+                  "value": -1,
+                  "type": "multiintcombo",
+                  "values": {
+                      "items": [
+                          {
+                              "item": {
+                                  "label": "No data",
+                                  "value": -1
+                              }
+                          }
+                      ],
+                      "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/{field}/subfields/response.json"
+                  },
+                  "mandatory": "no",
+                  "label": "Subfield",
+                  "isurlitem": "true"
+              },
+              {
+                  "key": "row",
+                  "value": -1,
+                  "type": "multiintcombo",
+                  "values": {
+                      "items": [
+                          {
+                              "item": {
+                                  "label": "No data",
+                                  "value": -1
+                              }
+                          }
+                      ],
+                      "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/{field}/subfields/{subfield}/rows/response.json"
+                  },
+                  "mandatory": "no",
+                  "label": "Row"
+              }
+          ]
       }
     ]
   }

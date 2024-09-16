@@ -135,6 +135,7 @@ const String TAG_COLOR = "color";
 const String TAG_OPACITY = "opacity";
 const String TAG_STYLE = "style";
 const String TAG_URL = "url";
+const String TAG_IS_URL_ITEM = "isurlitem";
 
 const IMAGE_ID_SEPARATOR = ";";
 
@@ -262,6 +263,25 @@ abstract class AFormhelper {
   /// Action placed at the end of the appbar if not null.
   Widget? getExtraFormBuilderAction(BuildContext context,
       {Function? postAction}) {
+    return null;
+  }
+
+  /// Get an optional dictionaty that contains required url items
+  /// to allow a url form to be triggered. The key is the form item key.
+  ///
+  /// Ex. in the case /test/forms/examples/farms/{farm}/fields/{field}/subfields/{subfield}/response.json
+  /// if you want to have the subfields combo to be populated only if also the field
+  /// is supplied, then this should return something like:
+  /// {
+  ///  "farm": 1,
+  ///  "field": 2
+  /// }
+  /// since
+  /// {
+  ///  "farm": 1,
+  /// }
+  /// would allow for subfields of teh hole farm to be loaded (if teh API permits it passing -1)
+  Map<String, dynamic>? getRequiredFormUrlItems() {
     return null;
   }
 }
@@ -1279,6 +1299,7 @@ class SmashFormItem {
   String? iconStr;
   bool isReadOnly = false;
   bool isGeometric = false;
+  bool isUrlItem = false;
 
   late Map<String, dynamic> map;
 
@@ -1323,6 +1344,16 @@ class SmashFormItem {
         isReadOnly = readonlyObj;
       } else if (readonlyObj is num) {
         isReadOnly = readonlyObj.toDouble() == 1.0;
+      }
+    }
+    if (map.containsKey(TAG_IS_URL_ITEM)) {
+      var isUrlItemObj = map[TAG_IS_URL_ITEM].trim();
+      if (isUrlItemObj is String) {
+        isUrlItem = isUrlItemObj == 'true';
+      } else if (isUrlItemObj is bool) {
+        isUrlItem = isUrlItemObj;
+      } else if (isUrlItemObj is num) {
+        isUrlItem = isUrlItemObj.toDouble() == 1.0;
       }
     }
   }
@@ -1680,21 +1711,13 @@ class FormsNetworkSupporter {
     _urlSubstitutions[key] = value;
   }
 
-  String applyUrlSubstitutions(String url) {
-    for (var entry in _urlSubstitutions.entries) {
-      var key = entry.key;
-      var value = entry.value;
-
-      url = url.replaceFirst("{$key}", value);
-    }
-    return url;
-  }
-
   Future<String?> getJsonString(String url) async {
     if (url.isEmpty) return null;
     var uri = Uri.parse(url);
     var response =
         await client.get(uri, headers: FormsNetworkSupporter().getHeaders());
+
+    // ! TODO implement cache
     if (response.statusCode == 200) {
       return response.body;
     }

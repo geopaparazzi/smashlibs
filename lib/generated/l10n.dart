@@ -508,6 +508,12 @@ abstract class SLL {
   /// **'set label'**
   String get set_label;
 
+  /// No description provided for @is_url_item.
+  ///
+  /// In en, this message translates to:
+  /// **'is url item'**
+  String get is_url_item;
+
   /// No description provided for @set_cliccable_url.
   ///
   /// In en, this message translates to:
