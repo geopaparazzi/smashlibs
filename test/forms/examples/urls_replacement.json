@@ -1,19 +1,12 @@
 [
     {
-      "sectionname": "url examples",
+      "sectionname": "urlitem examples",
       "sectiondescription": "url widgets",
       "sectionicon": "bomb",
       "forms": [
         {
             "formname": "Measure",
             "formitems": [
-                {
-                    "key": "id",
-                    "value": "",
-                    "type": "hidden",
-                    "mandatory": "no",
-                    "label": "Id"
-                },
                 {
                     "key": "field",
                     "value": -1,
@@ -30,7 +23,8 @@
                         "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/response.json"
                     },
                     "mandatory": "no",
-                    "label": "Field"
+                    "label": "Field",
+                    "isurlitem": "true"
                 },
                 {
                     "key": "subfield",
@@ -48,7 +42,8 @@
                         "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/{field}/subfields/response.json"
                     },
                     "mandatory": "no",
-                    "label": "Subfield"
+                    "label": "Subfield",
+                    "isurlitem": "true"
                 },
                 {
                     "key": "row",
