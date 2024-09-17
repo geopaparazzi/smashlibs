@@ -1014,38 +1014,51 @@ class ComboboxWidget<T> extends StatefulWidget {
   ComboboxWidgetState<T> createState() => ComboboxWidgetState<T>();
 }
 
-class ComboboxWidgetState<T> extends State<ComboboxWidget>
-    with AfterLayoutMixin {
-  String? url;
-  List<dynamic>? urlComboItems;
+class ComboboxWidgetState<T> extends State<ComboboxWidget> {
+  // the url in its template form
+  String? rawUrl;
   Map<String, dynamic>? requiredFormUrlItems;
 
-  @override
-  void afterFirstLayout(BuildContext context) async {
-    if (url != null) {
+  Future<List?> loadUrlData(
+      BuildContext context, FormUrlItemsState urlItemState) async {
+    rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+    if (rawUrl != null) {
       requiredFormUrlItems = widget._formHelper.getRequiredFormUrlItems();
 
-      FormUrlItemsState urlItemState =
-          Provider.of<FormUrlItemsState>(context, listen: false);
-      url = urlItemState.applyUrlSubstitutions(url!);
+      var url = urlItemState.applyUrlSubstitutions(rawUrl!);
       var jsonString = await FormsNetworkSupporter().getJsonString(url!);
       if (jsonString != null) {
-        urlComboItems = jsonDecode(jsonString);
+        List<dynamic>? urlComboItems = jsonDecode(jsonString);
+        return urlComboItems;
       }
-      setState(() {});
     }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<FormUrlItemsState>(builder: (context, urlItemState, child) {
-      return myBuild(context, urlItemState);
+      return FutureBuilder(
+        future: loadUrlData(context, urlItemState),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return SmashCircularProgress();
+          } else if (snapshot.hasError) {
+            return SmashUI.errorWidget('Error: ${snapshot.error}');
+          } else {
+            List? urlComboItems = snapshot.data as List?;
+            return myBuild(context, urlItemState, urlComboItems);
+          }
+        },
+      );
     });
   }
 
-  Widget myBuild(BuildContext context, FormUrlItemsState urlItemState) {
-    if (url != null && requiredFormUrlItems != null) {
-      if (!urlItemState.hasAllRequiredUrlItems(url!, requiredFormUrlItems!)) {
+  Widget myBuild(BuildContext context, FormUrlItemsState urlItemState,
+      List? urlComboItems) {
+    if (rawUrl != null && requiredFormUrlItems != null) {
+      if (!urlItemState.hasAllRequiredUrlItems(
+          rawUrl!, requiredFormUrlItems!)) {
         return Container();
       }
     }
@@ -1075,14 +1088,14 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
           }
         }
       }
-    } else {
-      // check if it is url based
-      url = TagsManager.getComboUrl(widget._formItem.map);
-      if (url != null) {
-        // we have a url, so
-        // return container and wait for afterFirstLayout to get url items
-        return Container();
-      }
+      // } else {
+      //   // check if it is url based
+      //   rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+      //   if (rawUrl != null) {
+      //     // we have a url, so
+      //     // return container and wait for afterFirstLayout to get url items
+      //     return Container();
+      //   }
     }
 
     List<ItemObject?> itemsArray =
@@ -1155,6 +1168,10 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
                 items: items,
                 onChanged: (selected) {
                   setState(() {
+                    if (selected == value) {
+                      return;
+                    }
+
                     widget._formItem.setValue(selected);
 
                     if (widget._isUrlItem && selected != null) {
@@ -1889,20 +1906,18 @@ class MultiComboWidget<T> extends StatefulWidget {
 }
 
 class MultiComboWidgetState<T> extends State<MultiComboWidget> {
-  String? url;
+  // the url in its template form
+  String? rawUrl;
   Map<String, dynamic>? requiredFormUrlItems;
 
   Future<List?> loadUrlData(
       BuildContext context, FormUrlItemsState urlItemState) async {
-    if (url != null) {
-      print("${widget._label} ${urlItemState.formUrlItems}");
-      print("${widget._label} $url");
+    rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+    if (rawUrl != null) {
       requiredFormUrlItems = widget._formHelper.getRequiredFormUrlItems();
 
-      url = urlItemState.applyUrlSubstitutions(url!);
-      var jsonString = await FormsNetworkSupporter().getJsonString(url!);
-      print("${widget._label} $url");
-      print("${widget._label} $jsonString");
+      var url = urlItemState.applyUrlSubstitutions(rawUrl!);
+      var jsonString = await FormsNetworkSupporter().getJsonString(url);
       if (jsonString != null) {
         List<dynamic>? urlComboItems = jsonDecode(jsonString);
         return urlComboItems;
@@ -1920,7 +1935,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return SmashCircularProgress();
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return SmashUI.errorWidget('Error: ${snapshot.error}');
           } else {
             List? urlComboItems = snapshot.data as List?;
             return myBuild(context, urlItemState, urlComboItems);
@@ -1932,8 +1947,9 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
 
   Widget myBuild(BuildContext context, FormUrlItemsState urlItemState,
       List? urlComboItems) {
-    if (url != null && requiredFormUrlItems != null) {
-      if (!urlItemState.hasAllRequiredUrlItems(url!, requiredFormUrlItems!)) {
+    if (rawUrl != null && requiredFormUrlItems != null) {
+      if (!urlItemState.hasAllRequiredUrlItems(
+          rawUrl!, requiredFormUrlItems!)) {
         return Container();
       }
     }
@@ -1976,25 +1992,25 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
       // combo items from url have been retrived
       // so just use those
 
-      if (comboItems.length < urlComboItems!.length) {
-        comboItems.addAll(urlComboItems!);
+      if (comboItems.length < urlComboItems.length) {
+        comboItems.addAll(urlComboItems);
       } else {
         // need to check if the item map is already present and add only if not
-        for (var urlComboItem in urlComboItems!) {
+        for (var urlComboItem in urlComboItems) {
           if (!comboItems.any(
               (item) => DeepCollectionEquality().equals(item, urlComboItem))) {
             comboItems.add(urlComboItem);
           }
         }
       }
-    } else {
-      // check if it is url based
-      url = TagsManager.getComboUrl(widget._formItem.map);
-      if (url != null) {
-        // we have a url, so
-        // return container and wait for afterFirstLayout to get url items
-        return Container();
-      }
+      // } else {
+      //   // check if it is url based
+      //   rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+      //   if (rawUrl != null) {
+      //     // we have a url, so
+      //     // return container and wait for afterFirstLayout to get url items
+      //     return Container();
+      //   }
     }
 
     List<ItemObject?> itemsArray =
@@ -2027,6 +2043,8 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
               key: Key(strKey),
               onPressed: () async {
                 if (!widget._isReadOnly) {
+                  var preSelectedItemsString =
+                      selectedItems.map((i) => i.value.toString()).toList();
                   await showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -2036,6 +2054,13 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
                   );
                   var selectedItemsString =
                       selectedItems.map((i) => i.value.toString()).toList();
+
+                  // if nothing changed, return
+                  if (DeepCollectionEquality()
+                      .equals(preSelectedItemsString, selectedItemsString)) {
+                    return;
+                  }
+
                   var result = selectedItemsString.join(";");
                   setState(() {
                     widget._formItem.setValue(result);

@@ -1697,7 +1697,6 @@ class FormsNetworkSupporter {
   var client = http.Client();
 
   Map<String, String> _headers = {};
-  Map<String, String> _urlSubstitutions = {};
 
   void addHeader(String key, String value) {
     _headers[key] = value;
@@ -1705,10 +1704,6 @@ class FormsNetworkSupporter {
 
   Map<String, String> getHeaders() {
     return Map.from(_headers);
-  }
-
-  void addUrlSubstitution(String key, String value) {
-    _urlSubstitutions[key] = value;
   }
 
   Future<String?> getJsonString(String url) async {

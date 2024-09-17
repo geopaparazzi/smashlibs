@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smashlibs/smashlibs.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   testWidgets('Text Widgets Test', (tester) async {
@@ -211,7 +212,6 @@ void main() {
   });
 
   testWidgets('Single Choice Combo UrlBased Widgets Test', (tester) async {
-    FormsNetworkSupporter().addUrlSubstitution('id', '12');
     FormsNetworkSupporter().client = MockClient((request) async {
       expect(request.url.toString(),
           "https://www.mydataproviderurl.com/api/v1/12/data.json");
@@ -240,12 +240,15 @@ void main() {
 
     var helper = TestFormHelper("combos_single_choice_urlbased_widgets.json");
 
+    var urlItems = {
+      "id": "12",
+    };
     var newValues = {
       "a single choice combo urlbased": "2",
     };
 
     expect(helper.getSectionName(), "single choice combo urlbased examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
 
     // check change of setData
     var section = helper.getSection();
@@ -266,7 +269,6 @@ void main() {
   });
 
   testWidgets('Multi Choice Combo UrlBased Widgets Test', (tester) async {
-    FormsNetworkSupporter().addUrlSubstitution('id', '12');
     FormsNetworkSupporter().client = MockClient((request) async {
       expect(request.url.toString(),
           "https://www.mydataproviderurl.com/api/v1/12/data.json");
@@ -295,12 +297,15 @@ void main() {
 
     var helper = TestFormHelper("combos_multi_choice_urlbased_widgets.json");
 
+    var urlItems = {
+      "id": "12",
+    };
     var newValues = {
       "a multi choice combo urlbased": "2",
     };
 
     expect(helper.getSectionName(), "multi choice combo urlbased examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
 
     // check change of setData
     var section = helper.getSection();
@@ -322,7 +327,6 @@ void main() {
 
   testWidgets('Integer Single Choice Combo UrlBased Widgets Test',
       (tester) async {
-    FormsNetworkSupporter().addUrlSubstitution('id', '12');
     FormsNetworkSupporter().client = MockClient((request) async {
       expect(request.url.toString(),
           "https://www.mydataproviderurl.com/api/v1/12/data.json");
@@ -351,14 +355,16 @@ void main() {
 
     var helper =
         TestFormHelper("combos_int_single_choice_urlbased_widgets.json");
-
+    var urlItems = {
+      "id": "12",
+    };
     var newValues = {
       "an int single choice combo urlbased": 2,
     };
 
     expect(
         helper.getSectionName(), "int single choice combo urlbased examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
 
     // check change of setData
     var section = helper.getSection();
@@ -587,6 +593,42 @@ Future<void> pumpForm(TestFormHelper helper, Map<String, dynamic> newValues,
               ))));
 
   await tester.pumpWidget(widget);
+  await tester.pumpAndSettle();
+}
+
+Future<void> pumpFormWithFormUrlState(
+    TestFormHelper helper,
+    Map<String, dynamic> newValues,
+    Map<String, String> formUrlItems,
+    WidgetTester tester) async {
+  if (newValues.isNotEmpty) helper.setData(newValues);
+
+  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  var formUrlItemsState = FormUrlItemsState();
+  for (var entry in formUrlItems.entries) {
+    formUrlItemsState.setFormUrlItemSilently(entry.key, entry.value);
+  }
+
+  PresentationMode pm = PresentationMode();
+  Widget widget = Material(
+      child: new MediaQuery(
+          data: new MediaQueryData(),
+          child: new MaterialApp(
+              navigatorKey: navigatorKey,
+              home: MasterDetailPage(
+                helper,
+                doScaffold: true,
+                presentationMode: pm,
+              ))));
+
+  await tester.pumpWidget(
+    ChangeNotifierProvider<FormUrlItemsState>.value(
+      value: formUrlItemsState,
+      child: widget,
+    ),
+  );
+  await tester.pumpAndSettle();
 }
 
 Future<void> changeTextFormField(tester, previousText, newText) async {
@@ -601,12 +643,20 @@ Future<void> changeTextFormField(tester, previousText, newText) async {
 }
 
 Future<void> changeBoolean(WidgetTester tester, labelText, choice) async {
-  var ancestor = find.ancestor(
-    of: find.text(labelText),
-    matching: find.byType(CheckboxListTile),
+  Finder foundWidget = find.byType(CheckboxWidget);
+  expect(foundWidget, findsOneWidget);
+
+  final switchFinder = find.descendant(
+    of: foundWidget,
+    matching: find.byType(Switch),
   );
-  expect(ancestor, findsOneWidget);
-  await tester.tap(ancestor);
+  Switch switchWidget = tester.widget<Switch>(switchFinder);
+  expect(switchWidget.value, !choice);
+
+  var textFinder = find.text(labelText);
+  expect(textFinder, findsOneWidget);
+
+  await tester.tap(switchFinder);
   await tester.pump();
 }
 
@@ -626,14 +676,24 @@ Future<void> changeCombo(
 
 Future<void> changeMultiCombo(
     WidgetTester tester, comboKeyString, List<dynamic> newChoices) async {
-  final combo = find.byKey(Key(comboKeyString));
-  await tester.tap(combo);
+  final textButton = find.byKey(Key(comboKeyString));
+  await tester.tap(textButton);
   await tester.pumpAndSettle();
+
+  // this opened a dialog of type multiselect
+  expect(find.byType(MultiSelect), findsOneWidget);
   for (var newChoice in newChoices) {
     final itemToSelect = find.text(newChoice.toString()).last;
     await tester.tap(itemToSelect);
+    await tester.pumpAndSettle();
   }
+
+  // Simulate closing the dialog by calling Navigator.pop()
+  Navigator.of(tester.element(find.byType(AlertDialog))).pop();
   await tester.pumpAndSettle();
+
+  // make sure it is closed
+  expect(find.byType(MultiSelect), findsNothing);
 }
 
 Future<void> changeConnectedCombo(WidgetTester tester, comboKeyString,
