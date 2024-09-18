@@ -1167,11 +1167,10 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget> {
                 isExpanded: true,
                 items: items,
                 onChanged: (selected) {
+                  if (selected == value) {
+                    return;
+                  }
                   setState(() {
-                    if (selected == value) {
-                      return;
-                    }
-
                     widget._formItem.setValue(selected);
 
                     if (widget._isUrlItem && selected != null) {

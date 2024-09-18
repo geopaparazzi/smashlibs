@@ -1156,13 +1156,15 @@ class TagsManager {
   /// Utility method to get the combo items of a formitem object.
   ///
   /// @param formItem the json form <b>item</b>.
-  /// @return the array of items.
+  /// @return a copy of the array of items.
   /// @ if something goes wrong.
   static List<dynamic>? getComboItems(Map<String, dynamic> formItem) {
     if (formItem.containsKey(TAG_VALUES)) {
       var valuesObj = formItem[TAG_VALUES];
       if (valuesObj.containsKey(TAG_ITEMS)) {
-        return valuesObj[TAG_ITEMS];
+        // return a copy of the array
+        return List.from(valuesObj[TAG_ITEMS]);
+        //! TODO make sure this change is ok return valuesObj[TAG_ITEMS];
       }
     }
     return null;
@@ -1305,7 +1307,6 @@ class SmashFormItem {
 
   SmashFormItem(Map<String, dynamic> map) {
     this.map = map;
-
     readData();
   }
 
