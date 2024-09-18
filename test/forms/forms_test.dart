@@ -569,7 +569,7 @@ void main() {
     expect(formItems[1].value, 'new2'); // as set by the setData
   });
 
-  testWidgets('Single Choice Combo changing Urlitems Widgets Test',
+  testWidgets('Multi Choice Combo changing Urlitems Widgets Test',
       (tester) async {
     var path = "urls_replacement.json";
 
@@ -613,8 +613,14 @@ void main() {
     var secondComboKey = "subfield";
     var thirdComboKey = "row";
 
+    var field1_value = "C1";
+    var field1_subfields_values = ["C1 1A", "C1 1B", "C1 1C"];
+    var field1_subfield2_rows_values = ["C1 1B F1", "C1 1B F2", "C1 1B F3"];
+    var field1_subfield1_rows_values = ["C1 1A F1", "C1 1A F2", "C1 1A F3"];
+    var nodataLabel = "No data";
+
     // now select the first item of id 1 and label "C1", deselect default no data
-    await changeMultiCombo(tester, firstComboKey, ["C1", "No data"]);
+    await changeMultiCombo(tester, firstComboKey, [field1_value, nodataLabel]);
     // now the subfields should be loaded
 
     // open the dialog
@@ -625,8 +631,7 @@ void main() {
     var mSelect = find.byType(MultiSelect);
     expect(mSelect, findsOneWidget);
 
-    var labelsThatNeedToExist = ["C1 1A", "C1 1B", "C1 1C"];
-    for (var labelThatNeedsToExist in labelsThatNeedToExist) {
+    for (var labelThatNeedsToExist in field1_subfields_values) {
       final textFinder = find.descendant(
           of: mSelect,
           matching: find.text(
@@ -644,7 +649,7 @@ void main() {
 
     // now we tap on option 2 of the secondo combo (select option, deselect no data)
     await changeMultiCombo(
-        tester, secondComboKey, [labelsThatNeedToExist[1], "No data"]);
+        tester, secondComboKey, [field1_subfields_values[1], nodataLabel]);
     // this should populate the third combo
 
     // open the dialog
@@ -655,8 +660,7 @@ void main() {
     mSelect = find.byType(MultiSelect);
     expect(mSelect, findsOneWidget);
 
-    var labelsThatNeedToExist2 = ["C1 1B F1", "C1 1B F2", "C1 1B F3"];
-    for (var labelThatNeedsToExist in labelsThatNeedToExist2) {
+    for (var labelThatNeedsToExist in field1_subfield2_rows_values) {
       final textFinder = find.descendant(
           of: mSelect,
           matching: find.text(
@@ -674,7 +678,7 @@ void main() {
 
     // now we tap on option 1 of the secondo combo and the labels of the change (select option, deselect old option)
     await changeMultiCombo(tester, secondComboKey,
-        [labelsThatNeedToExist[0], labelsThatNeedToExist[1]]);
+        [field1_subfields_values[0], field1_subfields_values[1]]);
     // this should re-populate the third combo
 
     // open the dialog
@@ -685,8 +689,7 @@ void main() {
     mSelect = find.byType(MultiSelect);
     expect(mSelect, findsOneWidget);
 
-    var labelsThatNeedToExist3 = ["C1 1A F1", "C1 1A F2", "C1 1A F3"];
-    for (var labelThatNeedsToExist in labelsThatNeedToExist3) {
+    for (var labelThatNeedsToExist in field1_subfield1_rows_values) {
       final textFinder = find.descendant(
           of: mSelect,
           matching: find.text(
@@ -695,7 +698,7 @@ void main() {
       expect(textFinder, findsOneWidget);
     }
     // the previous lables instead should no longer exist
-    var labelsThatShouldNoLongerExist = labelsThatNeedToExist2;
+    var labelsThatShouldNoLongerExist = field1_subfield2_rows_values;
     for (var labelThatShouldNoLongerExist in labelsThatShouldNoLongerExist) {
       final textFinder = find.descendant(
           of: mSelect,
