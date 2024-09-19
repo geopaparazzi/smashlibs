@@ -1,0 +1,41 @@
+name: Smashlibs Tests
+
+# Trigger the workflow on push to any branch
+on:
+  push:
+    branches: 
+      - '**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        flutter-version: [ 'stable' ]
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          cache: true
+
+      # Verify Flutter installation
+      - name: Flutter Doctor
+        run: flutter doctor -v
+
+      # Get dependencies
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # Run Flutter tests
+      - name: Run Flutter UI Tests
+        run: flutter test test/forms/forms_test.dart
+
+

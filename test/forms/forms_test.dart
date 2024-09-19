@@ -576,7 +576,6 @@ void main() {
     FormsNetworkSupporter().client = MockClient((request) async {
       String? jsonStr = MOCK_DATA[request.url.toString()];
       if (jsonStr == null) {
-        print("Mock data not found for url: ${request.url}");
         return Response("Mock data not found for url: ${request.url}", 404);
       }
       return Response(jsonStr, 200);
@@ -720,7 +719,6 @@ void main() {
     FormsNetworkSupporter().client = MockClient((request) async {
       String? jsonStr = MOCK_DATA[request.url.toString()];
       if (jsonStr == null) {
-        print("Mock data not found for url: ${request.url}");
         return Response("Mock data not found for url: ${request.url}", 404);
       }
       return Response(jsonStr, 200);
