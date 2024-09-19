@@ -571,7 +571,7 @@ void main() {
 
   testWidgets('Multi Choice Combo changing Urlitems Widgets Test',
       (tester) async {
-    var path = "urls_replacement.json";
+    var path = "urls_replacement_multicombos.json";
 
     FormsNetworkSupporter().client = MockClient((request) async {
       String? jsonStr = MOCK_DATA[request.url.toString()];
@@ -712,6 +712,92 @@ void main() {
     Navigator.of(tester.element(find.byType(AlertDialog))).pop();
     await tester.pumpAndSettle();
   });
+
+  testWidgets('Single Choice Combo changing Urlitems Widgets Test',
+      (tester) async {
+    var path = "urls_replacement_combos.json";
+
+    FormsNetworkSupporter().client = MockClient((request) async {
+      String? jsonStr = MOCK_DATA[request.url.toString()];
+      if (jsonStr == null) {
+        print("Mock data not found for url: ${request.url}");
+        return Response("Mock data not found for url: ${request.url}", 404);
+      }
+      return Response(jsonStr, 200);
+    });
+
+    var firstComboKey = "field";
+    var secondComboKey = "subfield";
+    var thirdComboKey = "row";
+
+    var helper = TestFormHelper(path);
+    var urlItems = <String, String>{};
+    var newValues = <String, dynamic>{};
+
+    expect(helper.getSectionName(), "urlitem examples");
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
+
+    // check the current state, 3 textbuttons with no data value
+    var fieldsDropdownButton = find.byKey(Key(firstComboKey));
+    expect(fieldsDropdownButton, findsOneWidget);
+    var subfieldsDropdownButton = find.byKey(Key(secondComboKey));
+    expect(subfieldsDropdownButton, findsOneWidget);
+    var rowsDropdownButton = find.byKey(Key(thirdComboKey));
+    expect(rowsDropdownButton, findsOneWidget);
+    for (var item in [
+      fieldsDropdownButton,
+      subfieldsDropdownButton,
+      rowsDropdownButton
+    ]) {
+      // Find the Text widget within the TextButton using find.descendant
+      final textFinder = find.descendant(
+        of: item, // The finder for your TextButton
+        matching: find.byType(Text), // Find the Text widget inside
+      );
+      // Extract the Text widget
+      final textWidget = tester.widget<Text>(textFinder);
+      // Check the text inside the Text widget
+      expect(textWidget.data, equals("No data"));
+    }
+
+    var field1_value = "C1";
+    var field1_subfield2_value = "C1 1B";
+    var field1_subfield1_value = "C1 1A";
+    var field1_subfield2_row1_value = "C1 1B F1";
+    var field1_subfield1_row2_value = "C1 1A F2";
+
+    // now select the first item of id 1 and label "C1"
+    await changeCombo(tester, firstComboKey, field1_value);
+    // now the subfields should be loaded
+    await changeCombo(tester, secondComboKey, field1_subfield2_value);
+    // now the rows should be loaded
+    await changeCombo(tester, thirdComboKey, field1_subfield2_row1_value);
+
+    // check the current state, 3 textbuttons with selected data
+    chechComboText(fieldsDropdownButton, tester, field1_value);
+    chechComboText(subfieldsDropdownButton, tester, field1_subfield2_value);
+    chechComboText(rowsDropdownButton, tester, field1_subfield2_row1_value);
+
+    // change the subfield
+    await changeCombo(tester, secondComboKey, field1_subfield1_value);
+    // change the row
+    await changeCombo(tester, thirdComboKey, field1_subfield1_row2_value);
+
+    // check the current state, 3 textbuttons with selected data
+    chechComboText(fieldsDropdownButton, tester, field1_value);
+    chechComboText(subfieldsDropdownButton, tester, field1_subfield1_value);
+    chechComboText(rowsDropdownButton, tester, field1_subfield1_row2_value);
+  });
+}
+
+void chechComboText(
+    Finder fieldsDropdownButton, WidgetTester tester, String field1_value) {
+  final textFinder = find.descendant(
+    of: fieldsDropdownButton,
+    matching: find.byType(Text),
+  );
+  final textWidget = tester.widget<Text>(textFinder);
+  expect(textWidget.data, equals(field1_value));
 }
 
 Future<void> tapBackIcon(WidgetTester tester) async {
