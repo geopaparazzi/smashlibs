@@ -105,12 +105,17 @@ class _MainFormWidgetState extends State<MainFormWidget> {
         }
       }
 
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.formHelper.getSectionName() ?? ""),
-          actions: actions,
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => FormUrlItemsState()),
+        ],
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(widget.formHelper.getSectionName() ?? ""),
+            actions: actions,
+          ),
+          body: body,
         ),
-        body: body,
       );
     } else {
       return body;
