@@ -1916,6 +1916,7 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
       requiredFormUrlItems = widget._formHelper.getRequiredFormUrlItems();
 
       var url = urlItemState.applyUrlSubstitutions(rawUrl!);
+      print("url: $url");
       var jsonString = await FormsNetworkSupporter().getJsonString(url);
       if (jsonString != null) {
         List<dynamic>? urlComboItems = jsonDecode(jsonString);

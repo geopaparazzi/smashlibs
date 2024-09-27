@@ -504,7 +504,7 @@
         ]
       },
       {
-          "formname": "Url item substitutions",
+          "formname": "url item substitutions",
           "formitems": [
               {
                   "key": "id",
@@ -531,6 +531,12 @@
                   "mandatory": "no",
                   "label": "Field",
                   "isurlitem": "true"
+              },
+              {
+                "key": "a_separator_text",
+                "value": "I am just here to separate connected combos",
+                "icon": "font",
+                "type": "string"
               },
               {
                   "key": "subfield",
