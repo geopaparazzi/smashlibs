@@ -802,14 +802,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.13"
-  lat_lon_grid_plugin:
-    dependency: "direct main"
-    description:
-      name: lat_lon_grid_plugin
-      sha256: aa1e962f4f8b7f558d3813fbb8eb874720712339a3c51a7181deff0ee1eca892
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.7"
   latlong2:
     dependency: "direct main"
     description:
