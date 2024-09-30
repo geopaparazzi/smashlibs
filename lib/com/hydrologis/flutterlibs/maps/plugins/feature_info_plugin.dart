@@ -52,11 +52,11 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
   Offset? _start;
   Offset? _running;
 
-  late FlutterMapState map;
+  late MapCamera map;
 
   @override
   Widget build(BuildContext context) {
-    map = FlutterMapState.maybeOf(context)!;
+    map = MapCamera.of(context);
     return Consumer<InfoToolState>(builder: (context, infoToolState, child) {
       if (!infoToolState.isEnabled) {
         return Container();
@@ -118,11 +118,11 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
       BuildContext context, InfoToolState infoToolState) async {
     Provider.of<SmashMapBuilder>(context, listen: false).setInProgress(true);
 
-    CustomPoint pixelOrigin = map.pixelOrigin;
+    Point pixelOrigin = map.pixelOrigin;
     var p1 = map.unproject(
-        CustomPoint(pixelOrigin.x + _start!.dx, pixelOrigin.y + _start!.dy));
-    var p2 = map.unproject(CustomPoint(
-        pixelOrigin.x + _running!.dx, pixelOrigin.y + _running!.dy));
+        Point(pixelOrigin.x + _start!.dx, pixelOrigin.y + _start!.dy));
+    var p2 = map.unproject(
+        Point(pixelOrigin.x + _running!.dx, pixelOrigin.y + _running!.dy));
     var envelope = JTS.Envelope.fromCoordinates(
         JTS.Coordinate(p1.longitude, p1.latitude),
         JTS.Coordinate(p2.longitude, p2.latitude));

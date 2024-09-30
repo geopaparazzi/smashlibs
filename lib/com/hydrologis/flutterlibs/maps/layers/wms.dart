@@ -274,8 +274,8 @@ class Epsg4326Flip extends Earth {
 }
 
 class _LonLat extends FM.Projection {
-  static final Bounds<double> _bounds = Bounds<double>(
-      CustomPoint<double>(-180.0, -90.0), CustomPoint<double>(180.0, 90.0));
+  static final Bounds<double> _bounds =
+      Bounds<double>(Point<double>(-180.0, -90.0), Point<double>(180.0, 90.0));
 
   const _LonLat() : super();
 
@@ -283,8 +283,8 @@ class _LonLat extends FM.Projection {
   Bounds<double> get bounds => _bounds;
 
   @override
-  CustomPoint<double> project(LatLng latlng) {
-    return CustomPoint(latlng.longitude, latlng.latitude);
+  Point<double> project(LatLng latlng) {
+    return Point(latlng.longitude, latlng.latitude);
   }
 
   @override

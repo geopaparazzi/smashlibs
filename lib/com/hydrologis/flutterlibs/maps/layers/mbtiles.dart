@@ -65,6 +65,10 @@ class SmashMBTilesImageProvider extends TileProvider {
 
     return SmashMBTileImage(_loadedDb!, TileCoordinates(x, y, z));
   }
+
+  int invertY(int y, int z) {
+    return ((1 << z) - 1) - y;
+  }
 }
 
 class SmashMBTileImage extends ImageProvider<SmashMBTileImage> {

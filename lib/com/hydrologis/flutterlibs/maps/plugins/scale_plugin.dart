@@ -44,7 +44,7 @@ class ScaleLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final map = FlutterMapState.maybeOf(context)!;
+    final map = MapCamera.of(context);
     var zoom = map.zoom;
     var distance = scale[max(0, min(20, zoom.round() + 2))].toDouble();
     var center = map.center;
@@ -54,7 +54,7 @@ class ScaleLayer extends StatelessWidget {
     var displayDistance = distance > 999
         ? '${(distance / 1000).toStringAsFixed(0)} km'
         : '${distance.toStringAsFixed(0)} m';
-    var width = (end.x - (start.x as double));
+    var width = (end.x - start.x);
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints bc) {

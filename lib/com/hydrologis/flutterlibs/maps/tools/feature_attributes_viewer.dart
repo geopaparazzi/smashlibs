@@ -101,11 +101,11 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
 
       var layer = new MarkerLayer(
         markers: [
-          new Marker(
+          Marker(
             width: size,
             height: size,
             point: LatLng(centroid!.y, centroid.x),
-            builder: (ctx) => new Stack(
+            child: Stack(
               children: <Widget>[
                 Center(
                   child: Icon(

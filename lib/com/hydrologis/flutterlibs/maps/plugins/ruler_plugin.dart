@@ -24,11 +24,11 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
   double? lengthMeters;
 
   List<Offset>? pointsList;
-  late FlutterMapState map;
+  late MapCamera map;
 
   @override
   Widget build(BuildContext context) {
-    map = FlutterMapState.maybeOf(context)!;
+    map = MapCamera.of(context);
     return Consumer<RulerState>(builder: (context, rulerState, child) {
       if (!rulerState.isEnabled) {
         return Container();
@@ -83,9 +83,9 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
       // print(p);
       pointsList!.add(p);
       lengthMeters = 0.0;
-      CustomPoint pixelOrigin = map.pixelOrigin;
-      var tmp = map
-          .unproject(CustomPoint(pixelOrigin.x + p.dx, pixelOrigin.y + (p.dy)));
+      Point pixelOrigin = map.pixelOrigin;
+      var tmp =
+          map.unproject(Point(pixelOrigin.x + p.dx, pixelOrigin.y + (p.dy)));
       runningPointLL = JTS.Coordinate(tmp.longitude, tmp.latitude);
       rulerState.lengthMeters = lengthMeters;
       setState(() {});
@@ -96,9 +96,9 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
     if (_x != null && _y != null) {
       if (pointsList != null) {
         pointsList!.add(p);
-        CustomPoint pixelOrigin = map.pixelOrigin;
-        var tmp = map.unproject(
-            CustomPoint(pixelOrigin.x + p.dx, pixelOrigin.y + (p.dy)));
+        Point pixelOrigin = map.pixelOrigin;
+        var tmp =
+            map.unproject(Point(pixelOrigin.x + p.dx, pixelOrigin.y + (p.dy)));
         var tmpPointLL = JTS.Coordinate(tmp.longitude, tmp.latitude);
         lengthMeters = lengthMeters! +
             JTS.Geodesy()

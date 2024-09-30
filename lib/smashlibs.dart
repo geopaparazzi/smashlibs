@@ -33,13 +33,10 @@ import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smashlibs/com/hydrologis/flutterlibs/utils/logging.dart';
 import 'package:smashlibs/generated/l10n.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:wkt_parser/wkt_parser.dart' as wkt_parser;
 import 'package:collection/collection.dart';
 import 'package:flutter_map/flutter_map.dart' hide Projection;
 import 'package:flutter_map/flutter_map.dart' as FM;
-import 'package:flutter_map/src/core/bounds.dart';
-import 'package:flutter_map/src/map/flutter_map_state.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:mapsforge_flutter/core.dart';
@@ -69,7 +66,6 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
 import 'package:painter/painter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';

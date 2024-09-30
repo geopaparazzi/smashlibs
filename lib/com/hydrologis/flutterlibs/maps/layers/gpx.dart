@@ -301,23 +301,23 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
             point: ll,
             // anchorPos: AnchorPos.exactly(
             //     Anchor(pointsSize / 2, textExtraHeight + pointsSize / 2)),
-            builder: (ctx) => MarkerIcon(
-                  MdiIcons.circle,
-                  colorExt,
-                  pointsSize,
-                  name!,
-                  labelcolorExt,
-                  colorExt.withAlpha(100),
-                ));
+            child: MarkerIcon(
+              MdiIcons.circle,
+              colorExt,
+              pointsSize,
+              name!,
+              labelcolorExt,
+              colorExt.withAlpha(100),
+            ));
         waypoints.add(m);
       }
       var waypointsCluster = MarkerClusterLayerWidget(
         options: MarkerClusterLayerOptions(
           maxClusterRadius: 20,
           size: Size(40, 40),
-          fitBoundsOptions: FitBoundsOptions(
-            padding: EdgeInsets.all(50),
-          ),
+          // fitBoundsOptions: FitBoundsOptions(
+          //   padding: EdgeInsets.all(50),
+          // ),
           markers: waypoints,
           polygonOptions: PolygonOptions(
               borderColor: colorExt,
