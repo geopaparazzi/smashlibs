@@ -152,9 +152,6 @@ class GeometryEditManager {
 
   void startEditing(EditableGeometry? editGeometry, Function callbackRefresh,
       {JTS.EGeometryType? geomType}) {
-    if (editGeometry == null) {
-      return;
-    }
     _callbackRefresh = callbackRefresh;
     _handleIconSize = GpPreferences()
         .getIntSync(SLSettings.SETTINGS_KEY_EDIT_HANLDE_ICON_SIZE, 25)!
@@ -182,6 +179,9 @@ class GeometryEditManager {
               BorderRadius.all(Radius.circular(_intermediateHandleIconSize)),
           border: Border.all(color: Colors.black, width: 2)),
     );
+    if (editGeometry == null) {
+      return;
+    }
     if (!_isEditing) {
       if (editGeometry != null) {
         // When starting editing it is always a point.
