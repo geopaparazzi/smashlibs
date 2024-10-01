@@ -24,7 +24,8 @@ class PluginsHandler {
       const PluginsHandler._(KEY_PLUGIN_CROSS, "Center Cross", true);
   static const GPS =
       const PluginsHandler._(KEY_PLUGIN_GPS, "GPS Position", true);
-  static const FENCE = const PluginsHandler._(KEY_PLUGIN_FENCE, "Fences", true);
+  static const FENCE =
+      const PluginsHandler._(KEY_PLUGIN_FENCE, "Fences", false);
   static const LOG_HEATMAP =
       const PluginsHandler._(KEY_PLUGIN_LOGSHEATMAP, "Logs Heatmap", false);
 

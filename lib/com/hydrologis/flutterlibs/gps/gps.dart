@@ -247,3 +247,20 @@ class GpsState extends ChangeNotifierPlus {
     }
   }
 }
+
+/// Utilities to work with coordinates.
+class CoordinateUtilities {
+  static final geodesy = JTS.Geodesy();
+
+  /// Get the distance between two latlong coordinates in meters, if not otherwise specified by [unit].
+  static double getDistance(JTS.Coordinate ll1, JTS.Coordinate ll2) {
+    return geodesy.distanceBetweenTwoGeoPoints(ll1, ll2).toDouble();
+  }
+
+  /// Get the offset coordinate given a starting point, a distance in meters and an azimuth angle.
+  static JTS.Coordinate getAtOffset(
+      JTS.Coordinate coordinate, double distanceInMeter, double azimuth) {
+    return geodesy.destinationPointByDistanceAndBearing(
+        coordinate, distanceInMeter, azimuth);
+  }
+}

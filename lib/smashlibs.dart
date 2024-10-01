@@ -28,6 +28,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path_provider_ex/path_provider_ex.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4dart;
+import 'package:smashlibs/com/hydrologis/flutterlibs/utils/fence.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';

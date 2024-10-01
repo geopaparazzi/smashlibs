@@ -39,7 +39,7 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
               if (widget.doEdit) GeomEditorButton(widget._iconSize),
               if (widget.doQuery) FeatureQueryButton(widget._iconSize),
               if (widget.doRuler) RulerButton(widget._iconSize),
-              // ! TODO FenceButton(widget._iconSize),
+              if (PluginsHandler.FENCE.isOn()) FenceButton(widget._iconSize),
             ],
           ),
         );
@@ -509,63 +509,63 @@ class RulerButton extends StatelessWidget {
   }
 }
 
-// class FenceButton extends StatelessWidget {
-//   final _iconSize;
+class FenceButton extends StatelessWidget {
+  final _iconSize;
 
-//   FenceButton(this._iconSize, {Key? key}) : super(key: key);
+  FenceButton(this._iconSize, {Key? key}) : super(key: key);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     Widget w = InkWell(
-//       child: Icon(
-//         MdiIcons.gate,
-//         color: SmashColors.mainBackground,
-//         size: _iconSize,
-//       ),
-//     );
+  @override
+  Widget build(BuildContext context) {
+    Widget w = InkWell(
+      child: Icon(
+        MdiIcons.gate,
+        color: SmashColors.mainBackground,
+        size: _iconSize,
+      ),
+    );
 
-//     return Tooltip(
-//       message: SL
-//           .of(context)
-//           .toolbarTools_toggleFenceMapCenter, //"Toggle fence in map center."
-//       child: GestureDetector(
-//         child: Padding(
-//           padding: SmashUI.defaultPadding(),
-//           child: w,
-//         ),
-//         onTap: () async {
-//           var mapState = Provider.of<SmashMapState>(context, listen: false);
+    return Tooltip(
+      message: SLL
+          .of(context)
+          .toolbarTools_toggleFenceMapCenter, //"Toggle fence in map center."
+      child: GestureDetector(
+        child: Padding(
+          padding: SmashUI.defaultPadding(),
+          child: w,
+        ),
+        onTap: () async {
+          var mapState = Provider.of<SmashMapState>(context, listen: false);
 
-//           Fence tmpfence = Fence(context)
-//             ..lat = mapState.center.y
-//             ..lon = mapState.center.x;
+          Fence tmpfence = Fence(context)
+            ..lat = mapState.center.y
+            ..lon = mapState.center.x;
 
-//           Fence? newFence = await FenceMaster()
-//               .showFencePropertiesDialog(context, tmpfence, false);
-//           if (newFence != null) {
-//             FenceMaster().addFence(newFence);
-//             var mapBuilder =
-//                 Provider.of<SmashMapBuilder>(context, listen: false);
-//             mapBuilder.reBuild();
-//           }
-//         },
-//         onLongPress: () async {
-//           var mapState = Provider.of<SmashMapState>(context, listen: false);
-//           var editFence = FenceMaster()
-//               .findIn(Coordinate.fromYX(mapState.center.y, mapState.center.x));
-//           if (editFence != null) {
-//             await FenceMaster()
-//                 .showFencePropertiesDialog(context, editFence, true);
-//             var mapBuilder =
-//                 Provider.of<SmashMapBuilder>(context, listen: false);
-//             mapBuilder.reBuild();
-//           }
-//         },
-//       ),
-//     );
-//     ;
-//   }
-// }
+          Fence? newFence = await FenceMaster()
+              .showFencePropertiesDialog(context, tmpfence, false);
+          if (newFence != null) {
+            FenceMaster().addFence(newFence);
+            var mapBuilder =
+                Provider.of<SmashMapBuilder>(context, listen: false);
+            mapBuilder.reBuild();
+          }
+        },
+        onLongPress: () async {
+          var mapState = Provider.of<SmashMapState>(context, listen: false);
+          var editFence = FenceMaster().findIn(
+              JTS.Coordinate.fromYX(mapState.center.y, mapState.center.x));
+          if (editFence != null) {
+            await FenceMaster()
+                .showFencePropertiesDialog(context, editFence, true);
+            var mapBuilder =
+                Provider.of<SmashMapBuilder>(context, listen: false);
+            mapBuilder.reBuild();
+          }
+        },
+      ),
+    );
+    ;
+  }
+}
 
 class GeomEditorButton extends StatefulWidget {
   final _iconSize;
