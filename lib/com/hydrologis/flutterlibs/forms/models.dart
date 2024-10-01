@@ -30,4 +30,33 @@ class FormUrlItemsState extends ChangeNotifierPlus {
     formUrlItems = {};
     notifyListenersMsg("Formhandler: reset form url items");
   }
+
+  String applyUrlSubstitutions(String url) {
+    for (var entry in formUrlItems.entries) {
+      var key = entry.key;
+      var value = entry.value;
+
+      url = url.replaceFirst("{$key}", value);
+    }
+
+    // replace any remaining placeholders with -1
+    url = url.replaceAll(RegExp(r'{.*?}'), "-1");
+    return url;
+  }
+
+  bool hasAllRequiredUrlItems(String url, Map<String, dynamic> formUrlItems) {
+    // extract all {vars} from url
+    var matches = RegExp(r'{(.*?)}').allMatches(url);
+    // remove start and end { }
+    var requiredVars = matches
+        .map((e) => e.group(0)!.substring(1, e.group(0)!.length - 1))
+        .toList();
+    // check if one of the required vars is not in formUrlItems
+    for (var requiredVar in requiredVars) {
+      if (!formUrlItems.containsKey(requiredVar)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

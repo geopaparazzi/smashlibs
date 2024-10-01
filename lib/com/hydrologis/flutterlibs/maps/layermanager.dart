@@ -61,7 +61,7 @@ class LayerManager {
   /// Get the list of layer sources. Note that this doesn't call the load of actual data.
   ///
   /// By default only the active list is supplied.
-  List<LayerSource?> getLayerSources({onlyActive: true}) {
+  List<LayerSource?> getLayerSources({onlyActive = true}) {
     var list = <LayerSource?>[];
     if (!onlyActive) {
       list.addAll(_layerSources.where((ts) => ts != null));
@@ -106,12 +106,22 @@ class LayerManager {
   }
 
   /// Move a layer from its previous order to a new one.
-  void moveLayer(int oldIndex, int newIndex) {
-    var removed = _layerSources.removeAt(oldIndex);
+  void moveLayer(int oldIndex, int newIndex, bool reversed) {
+    print("oldIndex: $oldIndex, newIndex: $newIndex, reversed: $reversed");
+    List<LayerSource?> workList = _layerSources;
+    if (reversed) {
+      workList = _layerSources.reversed.toList();
+    }
+    var removed = workList.removeAt(oldIndex);
     if (newIndex < oldIndex) {
-      _layerSources.insert(newIndex, removed);
+      workList.insert(newIndex, removed);
     } else if (newIndex > oldIndex) {
-      _layerSources.insert(newIndex - 1, removed);
+      workList.insert(newIndex - 1, removed);
+    }
+    if (reversed) {
+      _layerSources = workList.reversed.toList();
+    } else {
+      _layerSources = workList;
     }
   }
 

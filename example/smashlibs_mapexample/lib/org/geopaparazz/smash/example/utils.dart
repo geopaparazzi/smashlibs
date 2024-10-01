@@ -164,7 +164,7 @@ class FormBuilderFormHelper extends AFormhelper {
                           )));
 
               if (selectedPath != null &&
-                  selectedPath.toString().endsWith("_tags.json")) {
+                  selectedPath.toString().endsWith("tags.json")) {
                 var tagsJson = FileUtilities.readFile(selectedPath);
                 var tm = TagsManager();
                 await tm.readTags(tagsString: tagsJson);

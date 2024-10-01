@@ -660,14 +660,14 @@ class GeojsonSource extends VectorLayerSource
               point: LatLng(l.getY(), l.getX()),
               // anchorPos: AnchorPos.exactly(
               //     Anchor(pointsSize / 2, textExtraHeight + pointsSize / 2)),
-              builder: (ctx) => MarkerIcon(
-                    iconData,
-                    pointFillColor,
-                    pointsSize,
-                    labelText,
-                    labelColor,
-                    pointFillColor.withAlpha(100),
-                  ));
+              child: MarkerIcon(
+                iconData,
+                pointFillColor,
+                pointsSize,
+                labelText,
+                labelColor,
+                pointFillColor.withAlpha(100),
+              ));
           points.add(m);
         }
       }

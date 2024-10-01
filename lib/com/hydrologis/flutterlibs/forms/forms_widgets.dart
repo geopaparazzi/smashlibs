@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 part of smashlibs;
 /*
  * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
@@ -307,21 +309,26 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
             : Container(),
       ]);
     });
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: widget.doScaffold
-          ? Scaffold(
-              appBar: AppBar(
-                title: widget.formHelper.getFormTitleWidget(),
-                leading: IconButton(
-                  icon:
-                      Icon(Icons.arrow_back, color: SmashColors.mainBackground),
-                  onPressed: () => _onWillPop(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => FormUrlItemsState()),
+      ],
+      child: WillPopScope(
+        onWillPop: _onWillPop,
+        child: widget.doScaffold
+            ? Scaffold(
+                appBar: AppBar(
+                  title: widget.formHelper.getFormTitleWidget(),
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back,
+                        color: SmashColors.mainBackground),
+                    onPressed: () => _onWillPop(),
+                  ),
                 ),
-              ),
-              body: bodyContainer,
-            )
-          : bodyContainer,
+                body: bodyContainer,
+              )
+            : bodyContainer,
+      ),
     );
   }
 
@@ -347,6 +354,7 @@ Tuple2<ListTile, bool>? getWidget(
   dynamic value = formItem.value;
   String? iconStr = formItem.iconStr;
   bool itemReadonly = formItem.isReadOnly;
+  bool isUrlItem = formItem.isUrlItem;
 
   Icon? icon;
   if (iconStr != null) {
@@ -606,7 +614,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: ComboboxWidget<String>(ValueKey(widgetKey), formItem,
-                  label, presentationMode, constraints),
+                  label, presentationMode, constraints, isUrlItem, formHelper),
             ),
             false);
       }
@@ -616,7 +624,7 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: ComboboxWidget<int>(ValueKey(widgetKey), formItem, label,
-                  presentationMode, constraints),
+                  presentationMode, constraints, isUrlItem, formHelper),
             ),
             false);
       }
@@ -635,8 +643,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: AutocompleteStringComboWidget(
-                  ValueKey(widgetKey), formItem, label, itemReadonly),
+              title: AutocompleteStringComboWidget(ValueKey(widgetKey),
+                  formItem, label, itemReadonly, isUrlItem),
             ),
             false);
       }
@@ -660,8 +668,8 @@ Tuple2<ListTile, bool>? getWidget(
         return Tuple2(
             ListTile(
               leading: icon,
-              title: ConnectedComboboxWidget(
-                  ValueKey(widgetKey), formItem, label, itemReadonly),
+              title: ConnectedComboboxWidget(ValueKey(widgetKey), formItem,
+                  label, itemReadonly, isUrlItem),
             ),
             false);
       }
@@ -671,7 +679,11 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: AutocompleteStringConnectedComboboxWidget(
-                  ValueKey(widgetKey), formItem, label, itemReadonly),
+                  ValueKey(widgetKey),
+                  formItem,
+                  label,
+                  itemReadonly,
+                  isUrlItem),
             ),
             false);
       }
@@ -697,17 +709,28 @@ Tuple2<ListTile, bool>? getWidget(
             ListTile(
               leading: icon,
               title: MultiComboWidget<String>(ValueKey(widgetKey), formItem,
-                  label, itemReadonly, presentationMode),
+                  label, itemReadonly, presentationMode, isUrlItem, formHelper),
             ),
             false);
       }
     case TYPE_INTMULTIPLECHOICE:
       {
+        if (itemReadonly &&
+            presentationMode.detailMode != DetailMode.DETAILED) {
+          // ! TODO
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
               title: MultiComboWidget<int>(ValueKey(widgetKey), formItem, label,
-                  itemReadonly, presentationMode),
+                  itemReadonly, presentationMode, isUrlItem, formHelper),
             ),
             false);
       }
@@ -853,9 +876,10 @@ class AutocompleteStringComboWidget extends StatelessWidget {
   SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
+  final bool _isUrlItem;
 
-  AutocompleteStringComboWidget(
-      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
+  AutocompleteStringComboWidget(Key _widgetKey, this._formItem, this._label,
+      this._isReadOnly, this._isUrlItem)
       : super(
           key: _widgetKey,
         );
@@ -950,6 +974,12 @@ class AutocompleteStringComboWidget extends StatelessWidget {
                 },
                 onSelected: (String selection) {
                   _formItem.setValue(selection);
+
+                  if (_isUrlItem) {
+                    FormUrlItemsState urlItemState =
+                        Provider.of<FormUrlItemsState>(context, listen: false);
+                    urlItemState.setFormUrlItem(key, selection);
+                  }
                 },
               ),
             ),
@@ -965,9 +995,17 @@ class ComboboxWidget<T> extends StatefulWidget {
   final String _label;
   final PresentationMode _presentationMode;
   final Constraints _constraints;
+  final bool _isUrlItem;
+  final AFormhelper _formHelper;
 
-  ComboboxWidget(Key _widgetKey, this._formItem, this._label,
-      this._presentationMode, this._constraints)
+  ComboboxWidget(
+      Key _widgetKey,
+      this._formItem,
+      this._label,
+      this._presentationMode,
+      this._constraints,
+      this._isUrlItem,
+      this._formHelper)
       : super(
           key: _widgetKey,
         );
@@ -976,25 +1014,55 @@ class ComboboxWidget<T> extends StatefulWidget {
   ComboboxWidgetState<T> createState() => ComboboxWidgetState<T>();
 }
 
-class ComboboxWidgetState<T> extends State<ComboboxWidget>
-    with AfterLayoutMixin {
-  String? url;
-  List<dynamic>? urlComboItems;
+class ComboboxWidgetState<T> extends State<ComboboxWidget> {
+  // the url in its template form
+  String? rawUrl;
+  Map<String, dynamic>? requiredFormUrlItems;
 
-  @override
-  void afterFirstLayout(BuildContext context) async {
-    if (url != null) {
-      url = FormsNetworkSupporter().applyUrlSubstitutions(url!);
+  Future<List?> loadUrlData(
+      BuildContext context, FormUrlItemsState urlItemState) async {
+    rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+    if (rawUrl != null) {
+      requiredFormUrlItems = widget._formHelper.getRequiredFormUrlItems();
+
+      var url = urlItemState.applyUrlSubstitutions(rawUrl!);
       var jsonString = await FormsNetworkSupporter().getJsonString(url!);
       if (jsonString != null) {
-        urlComboItems = jsonDecode(jsonString);
+        List<dynamic>? urlComboItems = jsonDecode(jsonString);
+        return urlComboItems;
       }
-      setState(() {});
     }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<FormUrlItemsState>(builder: (context, urlItemState, child) {
+      return FutureBuilder(
+        future: loadUrlData(context, urlItemState),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return SmashCircularProgress();
+          } else if (snapshot.hasError) {
+            return SmashUI.errorWidget('Error: ${snapshot.error}');
+          } else {
+            List? urlComboItems = snapshot.data as List?;
+            return myBuild(context, urlItemState, urlComboItems);
+          }
+        },
+      );
+    });
+  }
+
+  Widget myBuild(BuildContext context, FormUrlItemsState urlItemState,
+      List? urlComboItems) {
+    if (rawUrl != null && requiredFormUrlItems != null) {
+      if (!urlItemState.hasAllRequiredUrlItems(
+          rawUrl!, requiredFormUrlItems!)) {
+        return Container();
+      }
+    }
+
     T? value;
     if (widget._formItem.value != null) {
       value = widget._formItem.value;
@@ -1020,14 +1088,14 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
           }
         }
       }
-    } else {
-      // check if it is url based
-      url = TagsManager.getComboUrl(widget._formItem.map);
-      if (url != null) {
-        // we have a url, so
-        // return container and wait for afterFirstLayout to get url items
-        return Container();
-      }
+      // } else {
+      //   // check if it is url based
+      //   rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+      //   if (rawUrl != null) {
+      //     // we have a url, so
+      //     // return container and wait for afterFirstLayout to get url items
+      //     return Container();
+      //   }
     }
 
     List<ItemObject?> itemsArray =
@@ -1099,8 +1167,18 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget>
                 isExpanded: true,
                 items: items,
                 onChanged: (selected) {
+                  if (selected == value) {
+                    return;
+                  }
                   setState(() {
                     widget._formItem.setValue(selected);
+
+                    if (widget._isUrlItem && selected != null) {
+                      FormUrlItemsState urlItemState =
+                          Provider.of<FormUrlItemsState>(context,
+                              listen: false);
+                      urlItemState.setFormUrlItem(key, selected.toString());
+                    }
                   });
                 },
               ),
@@ -1116,9 +1194,10 @@ class ConnectedComboboxWidget extends StatefulWidget {
   SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
+  final bool _isUrlItem;
 
-  ConnectedComboboxWidget(
-      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
+  ConnectedComboboxWidget(Key _widgetKey, this._formItem, this._label,
+      this._isReadOnly, this._isUrlItem)
       : super(
           key: _widgetKey,
         );
@@ -1284,8 +1363,17 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                                 setState(() {
                                   if (selected != null) {
                                     var str = widget._formItem.value.toString();
-                                    widget._formItem.setValue(
-                                        str.split("#")[0] + SEP + selected);
+                                    var result =
+                                        str.split("#")[0] + SEP + selected;
+                                    widget._formItem.setValue(result);
+
+                                    if (widget._isUrlItem) {
+                                      FormUrlItemsState urlItemState =
+                                          Provider.of<FormUrlItemsState>(
+                                              context,
+                                              listen: false);
+                                      urlItemState.setFormUrlItem(key, result);
+                                    }
                                   }
                                 });
                               },
@@ -1306,9 +1394,10 @@ class AutocompleteStringConnectedComboboxWidget extends StatefulWidget {
   SmashFormItem _formItem;
   final String _label;
   final bool _isReadOnly;
+  final bool _isUrlItem;
 
-  AutocompleteStringConnectedComboboxWidget(
-      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
+  AutocompleteStringConnectedComboboxWidget(Key _widgetKey, this._formItem,
+      this._label, this._isReadOnly, this._isUrlItem)
       : super(
           key: _widgetKey,
         );
@@ -1500,8 +1589,16 @@ class AutocompleteStringConnectedComboboxWidgetState
                               },
                               onSelected: (selection) {
                                 var str = widget._formItem.value.toString();
-                                widget._formItem.setValue(
-                                    str.split("#")[0] + SEP + selection);
+                                var result =
+                                    str.split("#")[0] + SEP + selection;
+                                widget._formItem.setValue(result);
+
+                                if (widget._isUrlItem) {
+                                  FormUrlItemsState urlItemState =
+                                      Provider.of<FormUrlItemsState>(context,
+                                          listen: false);
+                                  urlItemState.setFormUrlItem(key, result);
+                                }
                               },
                             ),
                           ),
@@ -1790,35 +1887,73 @@ class MultiComboWidget<T> extends StatefulWidget {
   final String _label;
   final bool _isReadOnly;
   final PresentationMode _presentationMode;
-  MultiComboWidget(Key _widgetKey, this._formItem, this._label,
-      this._isReadOnly, this._presentationMode)
+  final bool _isUrlItem;
+  final AFormhelper _formHelper;
+
+  MultiComboWidget(
+      Key _widgetKey,
+      this._formItem,
+      this._label,
+      this._isReadOnly,
+      this._presentationMode,
+      this._isUrlItem,
+      this._formHelper)
       : super(key: _widgetKey);
 
   @override
   MultiComboWidgetState createState() => MultiComboWidgetState();
 }
 
-class MultiComboWidgetState<T> extends State<MultiComboWidget>
-    with AfterLayoutMixin {
-  String? url;
-  List<dynamic>? urlComboItems;
+class MultiComboWidgetState<T> extends State<MultiComboWidget> {
+  // the url in its template form
+  String? rawUrl;
+  Map<String, dynamic>? requiredFormUrlItems;
 
-  @override
-  void afterFirstLayout(BuildContext context) async {
-    if (url != null) {
-      url = FormsNetworkSupporter().applyUrlSubstitutions(url!);
-      var jsonString = await FormsNetworkSupporter().getJsonString(url!);
+  Future<List?> loadUrlData(
+      BuildContext context, FormUrlItemsState urlItemState) async {
+    rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+    if (rawUrl != null) {
+      requiredFormUrlItems = widget._formHelper.getRequiredFormUrlItems();
+
+      var url = urlItemState.applyUrlSubstitutions(rawUrl!);
+      print("url: $url");
+      var jsonString = await FormsNetworkSupporter().getJsonString(url);
       if (jsonString != null) {
-        urlComboItems = jsonDecode(jsonString);
-      } else {
-        urlComboItems = [];
+        List<dynamic>? urlComboItems = jsonDecode(jsonString);
+        return urlComboItems;
       }
-      setState(() {});
     }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<FormUrlItemsState>(builder: (context, urlItemState, child) {
+      return FutureBuilder(
+        future: loadUrlData(context, urlItemState),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return SmashCircularProgress();
+          } else if (snapshot.hasError) {
+            return SmashUI.errorWidget('Error: ${snapshot.error}');
+          } else {
+            List? urlComboItems = snapshot.data as List?;
+            return myBuild(context, urlItemState, urlComboItems);
+          }
+        },
+      );
+    });
+  }
+
+  Widget myBuild(BuildContext context, FormUrlItemsState urlItemState,
+      List? urlComboItems) {
+    if (rawUrl != null && requiredFormUrlItems != null) {
+      if (!urlItemState.hasAllRequiredUrlItems(
+          rawUrl!, requiredFormUrlItems!)) {
+        return Container();
+      }
+    }
+
     String strKey = widget._formItem.key;
 
     List<T> values = [];
@@ -1857,25 +1992,25 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
       // combo items from url have been retrived
       // so just use those
 
-      if (comboItems.length < urlComboItems!.length) {
-        comboItems.addAll(urlComboItems!);
+      if (comboItems.length < urlComboItems.length) {
+        comboItems.addAll(urlComboItems);
       } else {
         // need to check if the item map is already present and add only if not
-        for (var urlComboItem in urlComboItems!) {
+        for (var urlComboItem in urlComboItems) {
           if (!comboItems.any(
               (item) => DeepCollectionEquality().equals(item, urlComboItem))) {
             comboItems.add(urlComboItem);
           }
         }
       }
-    } else {
-      // check if it is url based
-      url = TagsManager.getComboUrl(widget._formItem.map);
-      if (url != null) {
-        // we have a url, so
-        // return container and wait for afterFirstLayout to get url items
-        return Container();
-      }
+      // } else {
+      //   // check if it is url based
+      //   rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+      //   if (rawUrl != null) {
+      //     // we have a url, so
+      //     // return container and wait for afterFirstLayout to get url items
+      //     return Container();
+      //   }
     }
 
     List<ItemObject?> itemsArray =
@@ -1908,6 +2043,8 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
               key: Key(strKey),
               onPressed: () async {
                 if (!widget._isReadOnly) {
+                  var preSelectedItemsString =
+                      selectedItems.map((i) => i.value.toString()).toList();
                   await showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -1917,8 +2054,24 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget>
                   );
                   var selectedItemsString =
                       selectedItems.map((i) => i.value.toString()).toList();
-                  widget._formItem.setValue(selectedItemsString.join(";"));
-                  setState(() {});
+
+                  // if nothing changed, return
+                  if (DeepCollectionEquality()
+                      .equals(preSelectedItemsString, selectedItemsString)) {
+                    return;
+                  }
+
+                  var result = selectedItemsString.join(";");
+                  setState(() {
+                    widget._formItem.setValue(result);
+
+                    if (widget._isUrlItem) {
+                      FormUrlItemsState urlItemState =
+                          Provider.of<FormUrlItemsState>(context,
+                              listen: false);
+                      urlItemState.setFormUrlItem(strKey, result);
+                    }
+                  });
                 }
               },
               child: Center(
@@ -2194,15 +2347,12 @@ class GeometryWidget extends StatefulWidget {
   GeometryWidgetState createState() => GeometryWidgetState();
 }
 
-class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
-  Widget? mapView;
-  bool _loading = true;
+class GeometryWidgetState extends State<GeometryWidget> {
   GeojsonSource? geojsonSource;
   late String keyStr;
   double _iconSize = 32;
 
-  @override
-  void afterFirstLayout(BuildContext context) async {
+  Future<Widget> getMapView(BuildContext context) async {
     String value = ""; //$NON-NLS-1$
     JTS.EGeometryType? geomType =
         JTS.EGeometryType.forTypeName(widget._formItem.type);
@@ -2243,7 +2393,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       var center = mapState.center;
       latLngBoundsExt = LatLngBoundsExt.fromCoordinate(center, 0.01);
     } else {
-      latLngBoundsExt = LatLngBoundsExt.fromBounds(bounds!);
+      latLngBoundsExt = LatLngBoundsExt.fromBounds(bounds);
       if (latLngBoundsExt.getWidth() == 0 && latLngBoundsExt.getHeight() == 0) {
         latLngBoundsExt = latLngBoundsExt.expandBy(0.01, 0.01);
       }
@@ -2251,8 +2401,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       latLngBoundsExt = latLngBoundsExt.expandByFactor(1.1);
     }
 
-    mapView = SmashMapWidget(key: ValueKey(keyStr));
-    SmashMapWidget sWidget = mapView! as SmashMapWidget;
+    SmashMapWidget sWidget = SmashMapWidget(key: ValueKey(keyStr));
     sWidget.setInitParameters(
         canRotate: false,
         initBounds: latLngBoundsExt.toEnvelope(),
@@ -2301,33 +2450,39 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         }
       },
     );
+    sWidget.addPostLayer(SmashMapLayer(
+      geojsonSource!,
+      key: UniqueKey(),
+    ));
     // if (!widget._isReadOnly) {
     //   GeometryEditorState geomEditorState =
     //       Provider.of<GeometryEditorState>(context, listen: false);
     //   geomEditorState.setEnabled(true);
     // }
     // }
-    _loading = false;
-    setState(() {});
+    return sWidget;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (mapView != null && mapView is SmashMapWidget) {
-      // (mapView! as SmashMapWidget).addLayerSource(onlinesTilesSources[0]);
-      (mapView! as SmashMapWidget).addPostLayer(SmashMapLayer(
-        geojsonSource!,
-        key: ValueKey(keyStr + "_smashlayer"),
-      ));
-      // if (widget._isReadOnly) {
-      //   (mapView! as SmashMapWidget).addPostLayer(
-      //       SmashMapEditLayer(key: ValueKey(keyStr + "_smasheditlayer")));
-      // }
-    }
-    return _loading || mapView == null ? Container() : getMainWidget()!;
+    return FutureBuilder(
+      builder: (context, projectSnap) {
+        if (projectSnap.hasError) {
+          return SmashUI.errorWidget(projectSnap.error.toString());
+        } else if (projectSnap.connectionState == ConnectionState.none ||
+            projectSnap.data == null) {
+          return Container();
+        }
+
+        Widget widget = projectSnap.data as Widget;
+        return widget;
+      },
+      future: getMainWidget(context),
+    );
   }
 
-  Widget? getMainWidget() {
+  Future<Widget> getMainWidget(context) async {
+    var mapView = await getMapView(context);
     if (widget._isReadOnly) {
       return mapView;
     } else {
@@ -2336,7 +2491,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       geomEditorState.setEnabledSilently(true);
       return Stack(
         children: [
-          mapView!,
+          mapView,
           Align(
             alignment: Alignment.bottomLeft,
             child: Row(

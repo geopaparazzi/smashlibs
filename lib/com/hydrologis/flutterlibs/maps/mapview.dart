@@ -22,7 +22,6 @@ class SmashMapWidget extends StatelessWidget {
   List<Widget> preLayers = [];
   List<Widget> postLayers = [];
   List<LayerSource> layerSources = [];
-  List<Widget> nonRotationLayers = [];
   void Function(LatLng, double) _handleTap = (ll, z) {};
   void Function(LatLng, double) _handleLongTap = (ll, z) {};
   void Function() _onMapReady = () {};
@@ -130,42 +129,36 @@ class SmashMapWidget extends StatelessWidget {
     return -1;
   }
 
-  // Add a layer that is not subject to rotation.
-  void addNonRotationLayer(Widget layer) {
-    int index = _getLayerIndex(nonRotationLayers, layer);
-    if (index != -1) {
-      nonRotationLayers[index] = layer;
-    } else {
-      nonRotationLayers.add(layer);
-    }
-  }
-
   void triggerRebuild(BuildContext context) {
     Provider.of<SmashMapBuilder>(context, listen: false).reBuild();
   }
 
   void zoomToBounds(JTS.Envelope bounds) {
-    _mapController.fitBounds(LatLngBounds(
+    _mapController.fitCamera(CameraFit.bounds(
+      bounds: LatLngBounds(
         LatLng(bounds.getMinY(), bounds.getMinX()),
-        LatLng(bounds.getMaxY(), bounds.getMaxX())));
+        LatLng(bounds.getMaxY(), bounds.getMaxX()),
+      ),
+    ));
   }
 
   void centerOn(JTS.Coordinate ll) {
-    _mapController.move(LatLngExt.fromCoordinate(ll), _mapController.zoom);
+    _mapController.move(
+        LatLngExt.fromCoordinate(ll), _mapController.camera.zoom);
   }
 
   void zoomTo(double newZoom) {
-    _mapController.move(_mapController.center, newZoom);
+    _mapController.move(_mapController.camera.center, newZoom);
   }
 
   void zoomIn() {
-    var z = _mapController.zoom + 1;
+    var z = _mapController.camera.zoom + 1;
     if (z > _maxZoom) z = _maxZoom;
     zoomTo(z);
   }
 
   void zoomOut() {
-    var z = _mapController.zoom - 1;
+    var z = _mapController.camera.zoom - 1;
     if (z < _minZoom) z = _minZoom;
     zoomTo(z);
   }
@@ -179,10 +172,8 @@ class SmashMapWidget extends StatelessWidget {
   }
 
   JTS.Envelope? getBounds() {
-    if (_mapController.bounds != null) {
-      return LatLngBoundsExt.fromBounds(_mapController.bounds!).toEnvelope();
-    }
-    return null;
+    return LatLngBoundsExt.fromBounds(_mapController.camera.visibleBounds)
+        .toEnvelope();
   }
 
   @override
@@ -241,15 +232,18 @@ class SmashMapWidget extends StatelessWidget {
     Widget flutterMap = FlutterMap(
       key: ValueKey(mapKey),
       options: new MapOptions(
-        bounds: _initBounds != null
-            ? LatLngBounds(
-                LatLng(_initBounds!.getMinY(), _initBounds!.getMinX()),
-                LatLng(_initBounds!.getMaxY(), _initBounds!.getMaxX()))
+        initialCameraFit: _initBounds != null
+            ? CameraFit.bounds(
+                bounds: LatLngBounds(
+                  LatLng(_initBounds!.getMinY(), _initBounds!.getMinX()),
+                  LatLng(_initBounds!.getMaxY(), _initBounds!.getMaxX()),
+                ),
+              )
             : null,
-        center: _initCenterCoordonate != null && _initBounds == null
+        initialCenter: _initCenterCoordonate != null && _initBounds == null
             ? new LatLng(_initCenterCoordonate!.y, _initCenterCoordonate!.x)
-            : null,
-        zoom: _initZoom,
+            : const LatLng(46, 11),
+        initialZoom: _initZoom,
         minZoom: _minZoom,
         maxZoom: _maxZoom,
         onPositionChanged: (newPosition, hasGesture) {
@@ -265,17 +259,18 @@ class SmashMapWidget extends StatelessWidget {
           }
         },
         onTap: (TapPosition tPos, LatLng point) =>
-            _handleTap(point, _mapController.zoom),
+            _handleTap(point, _mapController.camera.zoom),
         onLongPress: (TapPosition tPos, LatLng point) =>
-            _handleLongTap(point, _mapController.zoom),
-        interactiveFlags: mapFlags,
+            _handleLongTap(point, _mapController.camera.zoom),
+        interactionOptions: InteractionOptions(
+          flags: mapFlags,
+        ),
         onMapReady: () {
           _isMapReady = true;
           _onMapReady();
         },
       ),
       children: layers,
-      nonRotatedChildren: nonRotationLayers,
       mapController: _mapController,
     );
 

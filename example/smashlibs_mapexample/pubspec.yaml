@@ -73,7 +73,7 @@ flutter:
     # - assets/fonts/OpenSans-Italic.ttf
     # - assets/fonts/OpenSans-BoldItalic.ttf
     # - assets/tags.json
-    # - assets/emptytile256.png
+    - assets/emptytile256.png
     # - assets/maptools_icon.png
     - assets/smash_icon.png
     # - assets/smash_logo_64.png

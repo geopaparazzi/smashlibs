@@ -6,6 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smashlibs/smashlibs.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
+import 'package:provider/provider.dart';
+
+import 'form_url_mock_data.dart';
 
 void main() {
   testWidgets('Text Widgets Test', (tester) async {
@@ -211,7 +214,6 @@ void main() {
   });
 
   testWidgets('Single Choice Combo UrlBased Widgets Test', (tester) async {
-    FormsNetworkSupporter().addUrlSubstitution('id', '12');
     FormsNetworkSupporter().client = MockClient((request) async {
       expect(request.url.toString(),
           "https://www.mydataproviderurl.com/api/v1/12/data.json");
@@ -240,12 +242,15 @@ void main() {
 
     var helper = TestFormHelper("combos_single_choice_urlbased_widgets.json");
 
+    var urlItems = {
+      "id": "12",
+    };
     var newValues = {
       "a single choice combo urlbased": "2",
     };
 
     expect(helper.getSectionName(), "single choice combo urlbased examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
 
     // check change of setData
     var section = helper.getSection();
@@ -266,7 +271,6 @@ void main() {
   });
 
   testWidgets('Multi Choice Combo UrlBased Widgets Test', (tester) async {
-    FormsNetworkSupporter().addUrlSubstitution('id', '12');
     FormsNetworkSupporter().client = MockClient((request) async {
       expect(request.url.toString(),
           "https://www.mydataproviderurl.com/api/v1/12/data.json");
@@ -295,12 +299,15 @@ void main() {
 
     var helper = TestFormHelper("combos_multi_choice_urlbased_widgets.json");
 
+    var urlItems = {
+      "id": "12",
+    };
     var newValues = {
       "a multi choice combo urlbased": "2",
     };
 
     expect(helper.getSectionName(), "multi choice combo urlbased examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
 
     // check change of setData
     var section = helper.getSection();
@@ -322,7 +329,6 @@ void main() {
 
   testWidgets('Integer Single Choice Combo UrlBased Widgets Test',
       (tester) async {
-    FormsNetworkSupporter().addUrlSubstitution('id', '12');
     FormsNetworkSupporter().client = MockClient((request) async {
       expect(request.url.toString(),
           "https://www.mydataproviderurl.com/api/v1/12/data.json");
@@ -351,14 +357,16 @@ void main() {
 
     var helper =
         TestFormHelper("combos_int_single_choice_urlbased_widgets.json");
-
+    var urlItems = {
+      "id": "12",
+    };
     var newValues = {
       "an int single choice combo urlbased": 2,
     };
 
     expect(
         helper.getSectionName(), "int single choice combo urlbased examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
 
     // check change of setData
     var section = helper.getSection();
@@ -560,6 +568,234 @@ void main() {
     expect(formItems[0].value, 'new1changed');
     expect(formItems[1].value, 'new2'); // as set by the setData
   });
+
+  testWidgets('Multi Choice Combo changing Urlitems Widgets Test',
+      (tester) async {
+    var path = "urls_replacement_multicombos.json";
+
+    FormsNetworkSupporter().client = MockClient((request) async {
+      String? jsonStr = MOCK_DATA[request.url.toString()];
+      if (jsonStr == null) {
+        return Response("Mock data not found for url: ${request.url}", 404);
+      }
+      return Response(jsonStr, 200);
+    });
+
+    var helper = TestFormHelper(path);
+    var urlItems = <String, String>{};
+    var newValues = <String, dynamic>{};
+
+    expect(helper.getSectionName(), "urlitem examples");
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
+
+    // check the current state, 3 textbuttons with no data value
+    var textButtons = find.byType(TextButton);
+    expect(textButtons, findsNWidgets(3));
+    for (var i = 0; i < 3; i++) {
+      var textButton = textButtons.at(i);
+      // var textButtonWidget = tester.widget<TextButton>(textButton);
+
+      // Find the Text widget within the TextButton using find.descendant
+      final textFinder = find.descendant(
+        of: textButton, // The finder for your TextButton
+        matching: find.byType(Text), // Find the Text widget inside
+      );
+
+      // Extract the Text widget
+      final textWidget = tester.widget<Text>(textFinder);
+
+      // Check the text inside the Text widget
+      expect(textWidget.data, equals("No data"));
+    }
+
+    var firstComboKey = "field";
+    var secondComboKey = "subfield";
+    var thirdComboKey = "row";
+
+    var field1_value = "C1";
+    var field1_subfields_values = ["C1 1A", "C1 1B", "C1 1C"];
+    var field1_subfield2_rows_values = ["C1 1B F1", "C1 1B F2", "C1 1B F3"];
+    var field1_subfield1_rows_values = ["C1 1A F1", "C1 1A F2", "C1 1A F3"];
+    var nodataLabel = "No data";
+
+    // now select the first item of id 1 and label "C1", deselect default no data
+    await changeMultiCombo(tester, firstComboKey, [field1_value, nodataLabel]);
+    // now the subfields should be loaded
+
+    // open the dialog
+    final textButton = find.byKey(Key(secondComboKey));
+    await tester.tap(textButton);
+    await tester.pumpAndSettle();
+    // this opened a dialog of type multiselect
+    var mSelect = find.byType(MultiSelect);
+    expect(mSelect, findsOneWidget);
+
+    for (var labelThatNeedsToExist in field1_subfields_values) {
+      final textFinder = find.descendant(
+          of: mSelect,
+          matching: find.text(
+            labelThatNeedsToExist,
+          ));
+      expect(textFinder, findsOneWidget);
+    }
+
+    // Simulate closing the dialog by calling Navigator.pop()
+    Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+    await tester.pumpAndSettle();
+    // multiselect dialog should be closed now
+    mSelect = find.byType(MultiSelect);
+    expect(mSelect, findsNothing);
+
+    // now we tap on option 2 of the secondo combo (select option, deselect no data)
+    await changeMultiCombo(
+        tester, secondComboKey, [field1_subfields_values[1], nodataLabel]);
+    // this should populate the third combo
+
+    // open the dialog
+    final textButton2 = find.byKey(Key(thirdComboKey));
+    await tester.tap(textButton2);
+    await tester.pumpAndSettle();
+    // this opened a dialog of type multiselect
+    mSelect = find.byType(MultiSelect);
+    expect(mSelect, findsOneWidget);
+
+    for (var labelThatNeedsToExist in field1_subfield2_rows_values) {
+      final textFinder = find.descendant(
+          of: mSelect,
+          matching: find.text(
+            labelThatNeedsToExist,
+          ));
+      expect(textFinder, findsOneWidget);
+    }
+
+    // Simulate closing the dialog by calling Navigator.pop()
+    Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+    await tester.pumpAndSettle();
+    // multiselect dialog should be closed now
+    mSelect = find.byType(MultiSelect);
+    expect(mSelect, findsNothing);
+
+    // now we tap on option 1 of the secondo combo and the labels of the change (select option, deselect old option)
+    await changeMultiCombo(tester, secondComboKey,
+        [field1_subfields_values[0], field1_subfields_values[1]]);
+    // this should re-populate the third combo
+
+    // open the dialog
+    final textButton3 = find.byKey(Key(thirdComboKey));
+    await tester.tap(textButton3);
+    await tester.pumpAndSettle();
+    // this opened a dialog of type multiselect
+    mSelect = find.byType(MultiSelect);
+    expect(mSelect, findsOneWidget);
+
+    for (var labelThatNeedsToExist in field1_subfield1_rows_values) {
+      final textFinder = find.descendant(
+          of: mSelect,
+          matching: find.text(
+            labelThatNeedsToExist,
+          ));
+      expect(textFinder, findsOneWidget);
+    }
+    // the previous lables instead should no longer exist
+    var labelsThatShouldNoLongerExist = field1_subfield2_rows_values;
+    for (var labelThatShouldNoLongerExist in labelsThatShouldNoLongerExist) {
+      final textFinder = find.descendant(
+          of: mSelect,
+          matching: find.text(
+            labelThatShouldNoLongerExist,
+          ));
+      expect(textFinder, findsNothing);
+    }
+
+    // Simulate closing the dialog by calling Navigator.pop()
+    Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('Single Choice Combo changing Urlitems Widgets Test',
+      (tester) async {
+    var path = "urls_replacement_combos.json";
+
+    FormsNetworkSupporter().client = MockClient((request) async {
+      String? jsonStr = MOCK_DATA[request.url.toString()];
+      if (jsonStr == null) {
+        return Response("Mock data not found for url: ${request.url}", 404);
+      }
+      return Response(jsonStr, 200);
+    });
+
+    var firstComboKey = "field";
+    var secondComboKey = "subfield";
+    var thirdComboKey = "row";
+
+    var helper = TestFormHelper(path);
+    var urlItems = <String, String>{};
+    var newValues = <String, dynamic>{};
+
+    expect(helper.getSectionName(), "urlitem examples");
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
+
+    // check the current state, 3 textbuttons with no data value
+    var fieldsDropdownButton = find.byKey(Key(firstComboKey));
+    expect(fieldsDropdownButton, findsOneWidget);
+    var subfieldsDropdownButton = find.byKey(Key(secondComboKey));
+    expect(subfieldsDropdownButton, findsOneWidget);
+    var rowsDropdownButton = find.byKey(Key(thirdComboKey));
+    expect(rowsDropdownButton, findsOneWidget);
+    for (var item in [
+      fieldsDropdownButton,
+      subfieldsDropdownButton,
+      rowsDropdownButton
+    ]) {
+      // Find the Text widget within the TextButton using find.descendant
+      final textFinder = find.descendant(
+        of: item, // The finder for your TextButton
+        matching: find.byType(Text), // Find the Text widget inside
+      );
+      // Extract the Text widget
+      final textWidget = tester.widget<Text>(textFinder);
+      // Check the text inside the Text widget
+      expect(textWidget.data, equals("No data"));
+    }
+
+    var field1_value = "C1";
+    var field1_subfield2_value = "C1 1B";
+    var field1_subfield1_value = "C1 1A";
+    var field1_subfield2_row1_value = "C1 1B F1";
+    var field1_subfield1_row2_value = "C1 1A F2";
+
+    // now select the first item of id 1 and label "C1"
+    await changeCombo(tester, firstComboKey, field1_value);
+    // now the subfields should be loaded
+    await changeCombo(tester, secondComboKey, field1_subfield2_value);
+    // now the rows should be loaded
+    await changeCombo(tester, thirdComboKey, field1_subfield2_row1_value);
+
+    // check the current state, 3 textbuttons with selected data
+    chechComboText(fieldsDropdownButton, tester, field1_value);
+    chechComboText(subfieldsDropdownButton, tester, field1_subfield2_value);
+    chechComboText(rowsDropdownButton, tester, field1_subfield2_row1_value);
+
+    // change the subfield
+    await changeCombo(tester, secondComboKey, field1_subfield1_value);
+    // change the row
+    await changeCombo(tester, thirdComboKey, field1_subfield1_row2_value);
+
+    // check the current state, 3 textbuttons with selected data
+    chechComboText(fieldsDropdownButton, tester, field1_value);
+    chechComboText(subfieldsDropdownButton, tester, field1_subfield1_value);
+    chechComboText(rowsDropdownButton, tester, field1_subfield1_row2_value);
+  });
+}
+
+void chechComboText(
+    Finder fieldsDropdownButton, WidgetTester tester, String field1_value) {
+  final textFinder = find.descendant(
+    of: fieldsDropdownButton,
+    matching: find.byType(Text),
+  );
+  final textWidget = tester.widget<Text>(textFinder);
+  expect(textWidget.data, equals(field1_value));
 }
 
 Future<void> tapBackIcon(WidgetTester tester) async {
@@ -587,6 +823,42 @@ Future<void> pumpForm(TestFormHelper helper, Map<String, dynamic> newValues,
               ))));
 
   await tester.pumpWidget(widget);
+  await tester.pumpAndSettle();
+}
+
+Future<void> pumpFormWithFormUrlState(
+    TestFormHelper helper,
+    Map<String, dynamic> newValues,
+    Map<String, String> formUrlItems,
+    WidgetTester tester) async {
+  if (newValues.isNotEmpty) helper.setData(newValues);
+
+  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  var formUrlItemsState = FormUrlItemsState();
+  for (var entry in formUrlItems.entries) {
+    formUrlItemsState.setFormUrlItemSilently(entry.key, entry.value);
+  }
+
+  PresentationMode pm = PresentationMode();
+  Widget widget = Material(
+      child: new MediaQuery(
+          data: new MediaQueryData(),
+          child: new MaterialApp(
+              navigatorKey: navigatorKey,
+              home: MasterDetailPage(
+                helper,
+                doScaffold: true,
+                presentationMode: pm,
+              ))));
+
+  await tester.pumpWidget(
+    ChangeNotifierProvider<FormUrlItemsState>.value(
+      value: formUrlItemsState,
+      child: widget,
+    ),
+  );
+  await tester.pumpAndSettle();
 }
 
 Future<void> changeTextFormField(tester, previousText, newText) async {
@@ -601,12 +873,20 @@ Future<void> changeTextFormField(tester, previousText, newText) async {
 }
 
 Future<void> changeBoolean(WidgetTester tester, labelText, choice) async {
-  var ancestor = find.ancestor(
-    of: find.text(labelText),
-    matching: find.byType(CheckboxListTile),
+  Finder foundWidget = find.byType(CheckboxWidget);
+  expect(foundWidget, findsOneWidget);
+
+  final switchFinder = find.descendant(
+    of: foundWidget,
+    matching: find.byType(Switch),
   );
-  expect(ancestor, findsOneWidget);
-  await tester.tap(ancestor);
+  Switch switchWidget = tester.widget<Switch>(switchFinder);
+  expect(switchWidget.value, !choice);
+
+  var textFinder = find.text(labelText);
+  expect(textFinder, findsOneWidget);
+
+  await tester.tap(switchFinder);
   await tester.pump();
 }
 
@@ -626,14 +906,24 @@ Future<void> changeCombo(
 
 Future<void> changeMultiCombo(
     WidgetTester tester, comboKeyString, List<dynamic> newChoices) async {
-  final combo = find.byKey(Key(comboKeyString));
-  await tester.tap(combo);
+  final textButton = find.byKey(Key(comboKeyString));
+  await tester.tap(textButton);
   await tester.pumpAndSettle();
+
+  // this opened a dialog of type multiselect
+  expect(find.byType(MultiSelect), findsOneWidget);
   for (var newChoice in newChoices) {
     final itemToSelect = find.text(newChoice.toString()).last;
     await tester.tap(itemToSelect);
+    await tester.pumpAndSettle();
   }
+
+  // Simulate closing the dialog by calling Navigator.pop()
+  Navigator.of(tester.element(find.byType(AlertDialog))).pop();
   await tester.pumpAndSettle();
+
+  // make sure it is closed
+  expect(find.byType(MultiSelect), findsNothing);
 }
 
 Future<void> changeConnectedCombo(WidgetTester tester, comboKeyString,

@@ -28,6 +28,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
   @override
   FutureOr<void> afterFirstLayout(BuildContext context) async {
     await LayerManager().initialize(context);
+    await SmashCache.init();
     await Workspace.init();
 
     mapView = SmashMapWidget();

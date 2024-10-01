@@ -465,14 +465,14 @@ class PostgisSource extends DbVectorLayerSource
               point: LatLng(l.getY(), l.getX()),
               // anchorPos: AnchorPos.exactly(
               //     Anchor(pointsSize / 2, textExtraHeight + pointsSize / 2)),
-              builder: (ctx) => MarkerIcon(
-                    iconData,
-                    pointFillColor,
-                    pointsSize,
-                    labelTextString!,
-                    labelColor!,
-                    pointFillColor.withAlpha(100),
-                  ));
+              child: MarkerIcon(
+                iconData,
+                pointFillColor,
+                pointsSize,
+                labelTextString!,
+                labelColor!,
+                pointFillColor.withAlpha(100),
+              ));
           points.add(m);
         }
       }
@@ -487,9 +487,9 @@ class PostgisSource extends DbVectorLayerSource
         options: MarkerClusterLayerOptions(
           maxClusterRadius: 20,
           size: Size(40, 40),
-          fitBoundsOptions: FitBoundsOptions(
-            padding: EdgeInsets.all(50),
-          ),
+          // fitBoundsOptions: FitBoundsOptions(
+          //   padding: EdgeInsets.all(50),
+          // ),
           markers: allPoints[0],
           polygonOptions: PolygonOptions(
               borderColor: pointFillColor,

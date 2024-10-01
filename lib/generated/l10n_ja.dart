@@ -1,5 +1,7 @@
 import 'l10n.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for Japanese (`ja`).
 class SLLJa extends SLL {
   SLLJa([String locale = 'ja']) : super(locale);
@@ -206,6 +208,9 @@ class SLLJa extends SLL {
   String get set_label => 'set label';
 
   @override
+  String get is_url_item => 'is url item';
+
+  @override
   String get set_cliccable_url => 'set tappable URL';
 
   @override
@@ -402,4 +407,52 @@ class SLLJa extends SLL {
 
   @override
   String get mapsforge_select_tiles_theme => 'Select a tiles theme';
+
+  @override
+  String get fence_fenceProperties => 'Fence Properties';
+
+  @override
+  String get fence_delete => 'Delete';
+
+  @override
+  String get fence_removeFence => 'Remove fence';
+
+  @override
+  String get fence_areYouSureRemoveFence => 'Remove the fence?';
+
+  @override
+  String get fence_cancel => 'Cancel';
+
+  @override
+  String get fence_ok => 'OK';
+
+  @override
+  String get fence_aNewFence => 'a new fence';
+
+  @override
+  String get fence_label => 'Label';
+
+  @override
+  String get fence_aNameForFence => 'A name for the fence.';
+
+  @override
+  String get fence_theNameNeedsToBeDefined => 'The name must be defined.';
+
+  @override
+  String get fence_radius => 'Radius';
+
+  @override
+  String get fence_theFenceRadiusMeters => 'The fence radius in meters.';
+
+  @override
+  String get fence_radiusNeedsToBePositive => 'The radius must be a positive number in meters.';
+
+  @override
+  String get fence_onEnter => 'On enter';
+
+  @override
+  String get fence_onExit => 'On exit';
+
+  @override
+  String get toolbarTools_toggleFenceMapCenter => 'Toggle fence in map center.';
 }

@@ -184,115 +184,113 @@ class GeocachingSource extends VectorLayerSource {
             width: pointsSize * MARKER_ICON_TEXT_EXTRA_WIDTH_FACTOR,
             height: pointsSize + textExtraHeight,
             point: latLng,
-            builder: (ctx) => GestureDetector(
-                  child: MarkerIcon(
-                    iconData,
-                    color,
-                    pointsSize,
-                    name!,
-                    labelColor,
-                    color.withAlpha(100),
-                  ),
-                  onTap: () {
-                    bool sizeSnackBar = ScreenUtilities.isLargeScreen(ctx) &&
-                        ScreenUtilities.isLandscape(ctx);
-                    var halfWidth = ScreenUtilities.getWidth(ctx);
-                    if (sizeSnackBar) {
-                      halfWidth /= 2;
-                      if (halfWidth < 100) {
-                        halfWidth = 100;
-                      }
-                    }
-                    ScaffoldMessenger.of(ctx).clearSnackBars();
-                    ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      width: halfWidth,
-                      backgroundColor: SmashColors.snackBarColor,
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Table(
-                            border: TableBorder.symmetric(
-                              inside: BorderSide(width: 1),
-                            ),
-                            columnWidths: {
-                              0: FlexColumnWidth(0.4),
-                              1: FlexColumnWidth(0.6),
-                            },
+            child: GestureDetector(
+              child: MarkerIcon(
+                iconData,
+                color,
+                pointsSize,
+                name!,
+                labelColor,
+                color.withAlpha(100),
+              ),
+              onTap: () {
+                bool sizeSnackBar = ScreenUtilities.isLargeScreen(context) &&
+                    ScreenUtilities.isLandscape(context);
+                var halfWidth = ScreenUtilities.getWidth(context);
+                if (sizeSnackBar) {
+                  halfWidth /= 2;
+                  if (halfWidth < 100) {
+                    halfWidth = 100;
+                  }
+                }
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  width: halfWidth,
+                  backgroundColor: SmashColors.snackBarColor,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Table(
+                        border: TableBorder.symmetric(
+                          inside: BorderSide(width: 1),
+                        ),
+                        columnWidths: {
+                          0: FlexColumnWidth(0.4),
+                          1: FlexColumnWidth(0.6),
+                        },
+                        children: [
+                          getTableRow("name", name),
+                          getTableRow("owner", owner),
+                          getTableRow("id", id),
+                          getTableRow("code", code),
+                          getTableRow("type", type[0]),
+                          getTableRow("difficulty", "$difficulty/5"),
+                          getTableRow("size", "$sizeStr"),
+                          getTableRow("placed date", placedDate.split("T")[0]),
+                          getTableRow("last found date",
+                              lastFoundDate.replaceFirst("T", " ")),
+                          getTableRow("premium", premiumOnly),
+                          TableRow(
                             children: [
-                              getTableRow("name", name),
-                              getTableRow("owner", owner),
-                              getTableRow("id", id),
-                              getTableRow("code", code),
-                              getTableRow("type", type[0]),
-                              getTableRow("difficulty", "$difficulty/5"),
-                              getTableRow("size", "$sizeStr"),
-                              getTableRow(
-                                  "placed date", placedDate.split("T")[0]),
-                              getTableRow("last found date",
-                                  lastFoundDate.replaceFirst("T", " ")),
-                              getTableRow("premium", premiumOnly),
-                              TableRow(
-                                children: [
-                                  TableUtilities.cellForString("details at"),
-                                  TableCell(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Text.rich(TextSpan(
-                                          style: TextStyle(
-                                            fontSize: 27,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                                style: TextStyle(
-                                                    color: Colors.blue,
-                                                    decoration: TextDecoration
-                                                        .underline),
-                                                text: detailsUrl,
-                                                recognizer:
-                                                    TapGestureRecognizer()
-                                                      ..onTap = () async {
-                                                        var urllaunchable =
-                                                            await canLaunchUrlString(
-                                                                completeUrl);
-                                                        if (urllaunchable) {
-                                                          await launchUrlString(
-                                                              completeUrl);
-                                                        }
-                                                      }),
-                                          ])),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Spacer(flex: 1),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.close,
-                                    color: SmashColors.mainDecorationsDarker,
-                                  ),
-                                  iconSize: SmashUI.MEDIUM_ICON_SIZE,
-                                  onPressed: () {
-                                    ScaffoldMessenger.of(ctx)
-                                        .hideCurrentSnackBar();
-                                  },
+                              TableUtilities.cellForString("details at"),
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text.rich(TextSpan(
+                                      style: TextStyle(
+                                        fontSize: 27,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                            style: TextStyle(
+                                                color: Colors.blue,
+                                                decoration:
+                                                    TextDecoration.underline),
+                                            text: detailsUrl,
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () async {
+                                                var urllaunchable =
+                                                    await canLaunchUrlString(
+                                                        completeUrl);
+                                                if (urllaunchable) {
+                                                  await launchUrlString(
+                                                      completeUrl);
+                                                }
+                                              }),
+                                      ])),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           )
                         ],
                       ),
-                      duration: Duration(seconds: 10),
-                    ));
-                  },
+                      Padding(
+                        padding: EdgeInsets.only(top: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Spacer(flex: 1),
+                            IconButton(
+                              icon: Icon(
+                                Icons.close,
+                                color: SmashColors.mainDecorationsDarker,
+                              ),
+                              iconSize: SmashUI.MEDIUM_ICON_SIZE,
+                              onPressed: () {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  duration: Duration(seconds: 10),
                 ));
+              },
+            ));
         geoCaches.add(m);
       }
       var color = ColorExt("#007106");
@@ -301,9 +299,6 @@ class GeocachingSource extends VectorLayerSource {
         options: MarkerClusterLayerOptions(
           maxClusterRadius: 60,
           size: Size(40, 40),
-          fitBoundsOptions: FitBoundsOptions(
-            padding: EdgeInsets.all(50),
-          ),
           markers: geoCaches,
           polygonOptions: PolygonOptions(
               borderColor: color,

@@ -57,14 +57,14 @@ class CenterCrossLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final map = FlutterMapState.maybeOf(context)!;
+    final map = MapCamera.of(context);
     var center = map.center;
-    CustomPoint centerPixel = map.project(center);
-    CustomPoint pixelOrigin = map.pixelOrigin;
+    Point centerPixel = map.project(center);
+    Point pixelOrigin = map.pixelOrigin;
 
     double centerX = (centerPixel.x - pixelOrigin.x).toDouble();
     double centerY = (centerPixel.y - pixelOrigin.y).toDouble();
-    CustomPoint centerPix = CustomPoint(centerX, centerY);
+    Point centerPix = Point(centerX, centerY);
 
     return CustomPaint(
       painter: CenterCrossLayerPainter(
@@ -86,7 +86,7 @@ class CenterCrossLayerPainter extends CustomPainter {
   double lineWidth;
   double crossSize;
   Color crossColor;
-  CustomPoint centerPixel;
+  Point centerPixel;
 
   @override
   void paint(ui.Canvas canvas, ui.Size size) {

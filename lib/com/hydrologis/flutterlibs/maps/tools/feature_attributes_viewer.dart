@@ -101,11 +101,11 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
 
       var layer = new MarkerLayer(
         markers: [
-          new Marker(
+          Marker(
             width: size,
             height: size,
             point: LatLng(centroid!.y, centroid.x),
-            builder: (ctx) => new Stack(
+            child: Stack(
               children: <Widget>[
                 Center(
                   child: Icon(
@@ -224,16 +224,17 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: SmashColors.tableBorder,
-                      width: 2,
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: SmashColors.tableBorder,
+                        width: 2,
+                      ),
                     ),
+                    child: mapWidget,
                   ),
-                  width: MediaQuery.of(context).size.height / 2,
-                  height: double.infinity,
-                  child: mapWidget,
                 ),
                 Expanded(
                   flex: 1,
