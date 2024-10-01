@@ -2347,15 +2347,12 @@ class GeometryWidget extends StatefulWidget {
   GeometryWidgetState createState() => GeometryWidgetState();
 }
 
-class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
-  Widget? mapView;
-  bool _loading = true;
+class GeometryWidgetState extends State<GeometryWidget> {
   GeojsonSource? geojsonSource;
   late String keyStr;
   double _iconSize = 32;
 
-  @override
-  void afterFirstLayout(BuildContext context) async {
+  Future<Widget> getMapView(BuildContext context) async {
     String value = ""; //$NON-NLS-1$
     JTS.EGeometryType? geomType =
         JTS.EGeometryType.forTypeName(widget._formItem.type);
@@ -2396,7 +2393,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       var center = mapState.center;
       latLngBoundsExt = LatLngBoundsExt.fromCoordinate(center, 0.01);
     } else {
-      latLngBoundsExt = LatLngBoundsExt.fromBounds(bounds!);
+      latLngBoundsExt = LatLngBoundsExt.fromBounds(bounds);
       if (latLngBoundsExt.getWidth() == 0 && latLngBoundsExt.getHeight() == 0) {
         latLngBoundsExt = latLngBoundsExt.expandBy(0.01, 0.01);
       }
@@ -2404,8 +2401,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       latLngBoundsExt = latLngBoundsExt.expandByFactor(1.1);
     }
 
-    mapView = SmashMapWidget(key: ValueKey(keyStr));
-    SmashMapWidget sWidget = mapView! as SmashMapWidget;
+    SmashMapWidget sWidget = SmashMapWidget(key: ValueKey(keyStr));
     sWidget.setInitParameters(
         canRotate: false,
         initBounds: latLngBoundsExt.toEnvelope(),
@@ -2454,33 +2450,39 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
         }
       },
     );
+    sWidget.addPostLayer(SmashMapLayer(
+      geojsonSource!,
+      key: UniqueKey(),
+    ));
     // if (!widget._isReadOnly) {
     //   GeometryEditorState geomEditorState =
     //       Provider.of<GeometryEditorState>(context, listen: false);
     //   geomEditorState.setEnabled(true);
     // }
     // }
-    _loading = false;
-    setState(() {});
+    return sWidget;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (mapView != null && mapView is SmashMapWidget) {
-      // (mapView! as SmashMapWidget).addLayerSource(onlinesTilesSources[0]);
-      (mapView! as SmashMapWidget).addPostLayer(SmashMapLayer(
-        geojsonSource!,
-        key: ValueKey(keyStr + "_smashlayer"),
-      ));
-      // if (widget._isReadOnly) {
-      //   (mapView! as SmashMapWidget).addPostLayer(
-      //       SmashMapEditLayer(key: ValueKey(keyStr + "_smasheditlayer")));
-      // }
-    }
-    return _loading || mapView == null ? Container() : getMainWidget()!;
+    return FutureBuilder(
+      builder: (context, projectSnap) {
+        if (projectSnap.hasError) {
+          return SmashUI.errorWidget(projectSnap.error.toString());
+        } else if (projectSnap.connectionState == ConnectionState.none ||
+            projectSnap.data == null) {
+          return Container();
+        }
+
+        Widget widget = projectSnap.data as Widget;
+        return widget;
+      },
+      future: getMainWidget(context),
+    );
   }
 
-  Widget? getMainWidget() {
+  Future<Widget> getMainWidget(context) async {
+    var mapView = await getMapView(context);
     if (widget._isReadOnly) {
       return mapView;
     } else {
@@ -2489,7 +2491,7 @@ class GeometryWidgetState extends State<GeometryWidget> with AfterLayoutMixin {
       geomEditorState.setEnabledSilently(true);
       return Stack(
         children: [
-          mapView!,
+          mapView,
           Align(
             alignment: Alignment.bottomLeft,
             child: Row(
