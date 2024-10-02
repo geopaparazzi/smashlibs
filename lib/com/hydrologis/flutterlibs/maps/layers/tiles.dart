@@ -357,9 +357,7 @@ class TileSource extends TiledRasterLayerSource {
             maxZoom: maxZoom.toDouble(),
             maxNativeZoom: maxNativeZoom,
             tms: isTms,
-            backgroundColor: Colors.transparent,
             retinaMode: false, // not supported
-            // TODO check overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
             errorTileCallback: errorTileCallback,
           ),
         )
@@ -377,9 +375,7 @@ class TileSource extends TiledRasterLayerSource {
             maxZoom: maxZoom.toDouble(),
             maxNativeZoom: maxNativeZoom,
             tms: true,
-            backgroundColor: Colors.transparent,
             retinaMode: false, // not supported
-            // TODO check overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
             errorTileCallback: errorTileCallback,
           ),
         )
@@ -427,9 +423,7 @@ class TileSource extends TiledRasterLayerSource {
               maxZoom: maxZoom.toDouble(),
               maxNativeZoom: maxNativeZoom,
               tms: true,
-              backgroundColor: Colors.transparent,
               retinaMode: false, // not supported
-              // TODO overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
               errorTileCallback: errorTileCallback,
             ),
           )
@@ -447,12 +441,10 @@ class TileSource extends TiledRasterLayerSource {
               baseUrl: url!,
               layers: [name!],
             ),
-            backgroundColor: Colors.transparent,
             maxZoom: maxZoom.toDouble(),
             maxNativeZoom: maxNativeZoom,
             retinaMode: retinaModeOn,
             tileProvider: tileProvider,
-            // TODO  overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
             errorTileCallback: errorTileCallback,
           ),
         );
@@ -465,13 +457,11 @@ class TileSource extends TiledRasterLayerSource {
               key: ValueKey(name),
               tms: isTms,
               urlTemplate: url,
-              backgroundColor: Colors.transparent,
               maxZoom: maxZoom.toDouble(),
               maxNativeZoom: maxNativeZoom,
               subdomains: subdomains,
               retinaMode: retinaModeOn,
               tileProvider: tileProvider,
-              // TODO overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
               errorTileCallback: errorTileCallback,
             ),
           )
@@ -621,7 +611,7 @@ class TileSourcePropertiesWidgetState
 
     return PopScope(
         canPop: true,
-        onPopInvoked: (didPop) {
+        onPopInvokedWithResult: (didPop, result) {
           if (_somethingChanged) {
             _source.opacityPercentage = _opacitySliderValue;
             if (useHideColor) {

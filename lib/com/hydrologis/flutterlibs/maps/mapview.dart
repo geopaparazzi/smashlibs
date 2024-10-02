@@ -269,6 +269,7 @@ class SmashMapWidget extends StatelessWidget {
           _isMapReady = true;
           _onMapReady();
         },
+        backgroundColor: Colors.transparent,
       ),
       children: layers,
       mapController: _mapController,
