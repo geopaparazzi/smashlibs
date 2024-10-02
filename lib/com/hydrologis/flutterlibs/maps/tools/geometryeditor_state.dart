@@ -137,7 +137,7 @@ class GeometryEditManager {
   double _handleIconSize = 25;
   late double _intermediateHandleIconSize;
   late Widget _dragHandlerIcon;
-  late Function _callbackRefresh;
+  late Function(LatLng?)? _callbackRefresh;
 
   bool _isEditing = false;
   bool _polygonInWork = false;
@@ -150,7 +150,8 @@ class GeometryEditManager {
 
   bool isEditing() => _isEditing;
 
-  void startEditing(EditableGeometry? editGeometry, Function callbackRefresh,
+  void startEditing(
+      EditableGeometry? editGeometry, Function(LatLng?)? callbackRefresh,
       {JTS.EGeometryType? geomType}) {
     _callbackRefresh = callbackRefresh;
     _handleIconSize = GpPreferences()
@@ -302,7 +303,6 @@ class GeometryEditManager {
             checkedLines.add(tmp);
           });
           editLayers.add(PolylineLayer(
-            polylineCulling: true,
             polylines: checkedLines,
           ));
         } else if (editPolygon != null) {

@@ -31,7 +31,7 @@ class TileSource extends TiledRasterLayerSource {
       SMLogger().e(tile, null, null);
     } else {
       SMLogger()
-          .e("Unable to load tile: ${tile.coordinatesKey}", null, stacktrace);
+          .e("Unable to load tile: ${tile.coordinates}", null, stacktrace);
     }
   };
   bool overrideTilesOnUrlChange = true;

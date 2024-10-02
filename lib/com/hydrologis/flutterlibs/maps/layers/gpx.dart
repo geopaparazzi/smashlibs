@@ -273,7 +273,6 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
       }
 
       var lineLayer = PolylineLayer(
-        polylineCulling: true,
         polylines: lines,
       );
       layers.add(lineLayer);

@@ -141,7 +141,8 @@ class GpPreferences {
 
   void _checkPreferencesOrThrow() {
     if (_preferences == null) {
-      throw Exception("Need to call initialize to use sync methods.");
+      throw Exception(
+          "GpPreferences: Need to call initialize to use sync methods.");
     }
   }
 

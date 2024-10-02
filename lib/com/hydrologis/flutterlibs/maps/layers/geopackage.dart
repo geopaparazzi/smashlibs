@@ -244,7 +244,6 @@ class GeopackageSource extends DbVectorLayerSource
       } else if (allLines.isNotEmpty) {
         var lineLayer = PolylineLayer(
           key: ValueKey("$_absolutePath#$_tableName"),
-          polylineCulling: true,
           polylines: allLines,
         );
         layers.add(lineLayer);

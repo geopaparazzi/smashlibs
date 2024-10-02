@@ -212,7 +212,6 @@ class ShapefileSource extends VectorLayerSource implements SldLayerSource {
         addMarkerLayer(allPoints, layers, pointFillColor!);
       } else if (allLines.isNotEmpty) {
         var lineLayer = PolylineLayer(
-          polylineCulling: true,
           polylines: allLines,
         );
         layers.add(lineLayer);

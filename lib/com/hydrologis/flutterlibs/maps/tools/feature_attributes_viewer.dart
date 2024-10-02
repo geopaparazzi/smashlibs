@@ -138,7 +138,6 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
             Polyline(points: linePoints, strokeWidth: 3, color: borderFill));
       }
       var lineLayer = PolylineLayer(
-        polylineCulling: true,
         polylines: lines,
       );
       mapWidget.addPostLayer(lineLayer);

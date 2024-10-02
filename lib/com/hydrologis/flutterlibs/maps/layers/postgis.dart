@@ -305,7 +305,6 @@ class PostgisSource extends DbVectorLayerSource
         addMarkerLayer(allPoints, layers, pointFillColor!);
       } else if (allLines.isNotEmpty) {
         var lineLayer = PolylineLayer(
-          polylineCulling: true,
           polylines: allLines,
         );
         layers.add(lineLayer);

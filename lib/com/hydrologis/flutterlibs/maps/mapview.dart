@@ -25,7 +25,7 @@ class SmashMapWidget extends StatelessWidget {
   void Function(LatLng, double) _handleTap = (ll, z) {};
   void Function(LatLng, double) _handleLongTap = (ll, z) {};
   void Function() _onMapReady = () {};
-  void Function(MapPosition, bool) _onPositionChanged =
+  void Function(MapCamera, bool) _onPositionChanged =
       (mapPosition, hasGesture) {};
 
   SmashMapWidget({Key? key})
@@ -66,7 +66,7 @@ class SmashMapWidget extends StatelessWidget {
     return _isMapReady;
   }
 
-  void setOnPositionChanged(Function(MapPosition, bool)? onPositionChanged) {
+  void setOnPositionChanged(Function(MapCamera, bool)? onPositionChanged) {
     if (onPositionChanged != null) _onPositionChanged = onPositionChanged;
   }
 
@@ -188,19 +188,20 @@ class SmashMapWidget extends StatelessWidget {
   }
 
   Widget consumeBuild(SmashMapBuilder mapBuilder) {
+    print("SmashMapWidget consumeBuild");
     var layers = <Widget>[];
 
-    layers.addAll(preLayers);
-    if (_useLayerManager) {
-      layers.addAll(LayerManager().getActiveLayers());
-    } else {
-      layers.addAll(layerSources
-          .map((l) => SmashMapLayer(
-                l,
-                key: ValueKey(l.getName()),
-              ))
-          .toList());
-    }
+    // layers.addAll(preLayers);
+    // if (_useLayerManager) {
+    //   layers.addAll(LayerManager().getActiveLayers());
+    // } else {
+    //   layers.addAll(layerSources
+    //       .map((l) => SmashMapLayer(
+    //             l,
+    //             key: ValueKey(l.getName()),
+    //           ))
+    //       .toList());
+    // }
     layers.addAll(postLayers);
 
     BuildContext context = mapBuilder.context!;

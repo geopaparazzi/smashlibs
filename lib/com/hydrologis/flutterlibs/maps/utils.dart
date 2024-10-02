@@ -22,20 +22,40 @@ class LatLngExt extends LatLng {
   }
 }
 
-class LatLngBoundsExt extends LatLngBounds {
-  LatLngBoundsExt(LatLng corner1, LatLng corner2) : super(corner1, corner2);
+class LatLngBoundsExt implements LatLngBounds {
+  late LatLngBounds bounds;
+
+  /// The latitude north edge of the bounds
+  late double north;
+
+  /// The latitude south edge of the bounds
+  late double south;
+
+  /// The longitude east edge of the bounds
+  late double east;
+
+  /// The longitude west edge of the bounds
+  late double west;
+
+  LatLngBoundsExt(LatLng corner1, LatLng corner2) {
+    bounds = LatLngBounds(corner1, corner2);
+    north = bounds.north;
+    south = bounds.south;
+    east = bounds.east;
+    west = bounds.west;
+  }
 
   LatLngBoundsExt.fromBounds(LatLngBounds bounds)
-      : super(bounds.southWest, bounds.northEast);
+      : this(bounds.southWest, bounds.northEast);
 
   LatLngBoundsExt.fromEnvelope(JTS.Envelope envelope)
-      : super(
+      : this(
           LatLng(envelope.getMinY(), envelope.getMinX()),
           LatLng(envelope.getMaxY(), envelope.getMaxX()),
         );
 
   LatLngBoundsExt.fromCoordinate(JTS.Coordinate coordinate, double buffer)
-      : super(
+      : this(
           LatLng(coordinate.y - buffer, coordinate.x - buffer),
           LatLng(coordinate.y + buffer, coordinate.x + buffer),
         );
@@ -73,6 +93,39 @@ class LatLngBoundsExt extends LatLngBounds {
     var deltaY = newH - h;
     return expandBy(deltaX / 2, deltaY / 2);
   }
+
+  @override
+  LatLng get center => bounds.center;
+
+  @override
+  bool contains(LatLng point) => bounds.contains(point);
+
+  @override
+  bool containsBounds(LatLngBounds other) => bounds.containsBounds(other);
+
+  @override
+  void extend(LatLng latLng) => bounds.extend(latLng);
+
+  @override
+  void extendBounds(LatLngBounds llbounds) => bounds.extendBounds(llbounds);
+
+  @override
+  bool isOverlapping(LatLngBounds other) => bounds.isOverlapping(other);
+
+  @override
+  LatLng get northEast => bounds.northEast;
+
+  @override
+  LatLng get northWest => bounds.northWest;
+
+  @override
+  LatLng get simpleCenter => bounds.simpleCenter;
+
+  @override
+  LatLng get southEast => bounds.southEast;
+
+  @override
+  LatLng get southWest => bounds.southWest;
 }
 
 class SLSettings {

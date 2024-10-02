@@ -9,41 +9,38 @@ class SmashMapLayer extends StatefulWidget {
   State<SmashMapLayer> createState() => _SmashMapLayerState();
 }
 
-class _SmashMapLayerState extends State<SmashMapLayer> with AfterLayoutMixin {
-  List<Widget>? _layersList;
-  @override
-  void afterFirstLayout(BuildContext context) async {
-    await reloadData(context);
-  }
-
-  Future<void> reloadData(BuildContext context) async {
-    try {
-      if (!(widget._layerSource as LoadableLayerSource).isLoaded ||
-          _layersList == null) {
-        _layersList = await widget._layerSource.toLayers(context);
-        if (context.mounted) setState(() {});
-      }
-    } on Exception catch (e) {
-      if (context.mounted) {
-        String prompt = e.toString();
-        SmashDialogs.showErrorDialog(context, prompt);
+class _SmashMapLayerState extends State<SmashMapLayer> {
+  Future<Widget> getWidget(BuildContext context) async {
+    var list = await widget._layerSource.toLayers(context);
+    if (list != null) {
+      if (list.length == 1) {
+        return list[0];
+      } else {
+        return Stack(
+          children: list,
+        );
       }
     }
+    return Container();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_layersList != null) {
-      reloadData(context);
-      if (_layersList!.length == 1) {
-        return _layersList![0];
-      } else {
-        return Stack(
-          children: _layersList!,
-        );
-      }
-    }
-    return SizedBox.shrink();
+    print("SmashMapLayer.build");
+    return FutureBuilder(
+      builder: (context, projectSnap) {
+        if (projectSnap.hasError) {
+          return SmashUI.errorWidget(projectSnap.error.toString());
+        } else if (projectSnap.connectionState == ConnectionState.none ||
+            projectSnap.data == null) {
+          return Container();
+        }
+
+        Widget widget = projectSnap.data as Widget;
+        return widget;
+      },
+      future: getWidget(context),
+    );
   }
 }
 
@@ -65,7 +62,8 @@ class _SmashMapEditLayerState extends State<SmashMapEditLayer> {
       GeometryEditorState editorState =
           Provider.of<GeometryEditorState>(context, listen: false);
       if (editorState.isEnabled) {
-        GeometryEditManager().startEditing(editorState.editableGeometry, () {
+        GeometryEditManager().startEditing(editorState.editableGeometry,
+            (LatLng? ll) {
           setState(() {});
         });
         var editLayers = GeometryEditManager().getEditLayers();
@@ -75,7 +73,7 @@ class _SmashMapEditLayerState extends State<SmashMapEditLayer> {
           );
         }
       }
-      return SizedBox.shrink();
+      return Container();
     });
   }
 }

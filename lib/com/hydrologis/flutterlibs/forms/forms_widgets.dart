@@ -2586,6 +2586,7 @@ class GeometryWidgetState extends State<GeometryWidget> {
           geomEditState.setEnabledSilently(false);
           GeometryEditManager().stopEditing();
 
+          geojsonSource!.isLoaded = false;
           // reload layer geoms
           await reloadLayerSource(geojsonSource!);
 

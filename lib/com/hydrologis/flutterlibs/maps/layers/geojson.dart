@@ -472,14 +472,15 @@ class GeojsonSource extends VectorLayerSource
         addMarkerLayer(allPoints, layers, pointFillColor!);
       } else if (allLines.isNotEmpty) {
         var lineLayer = PolylineLayer(
-          polylineCulling: true,
+          // polylineCulling: true,
           polylines: allLines,
         );
         layers.add(lineLayer);
+        print(allLines[0].points.length);
       } else if (allPolygons.isNotEmpty) {
         var polygonLayer = PolygonLayer(
-          polygonCulling: true,
-          // simplify: true,
+          // polygonCulling: true, // default
+          // simplify: true, // default
           polygons: allPolygons,
         );
         layers.add(polygonLayer);

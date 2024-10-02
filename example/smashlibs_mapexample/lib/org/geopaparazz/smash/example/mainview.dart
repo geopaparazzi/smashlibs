@@ -18,18 +18,20 @@ class MainSmashLibsPage extends StatefulWidget {
   State<MainSmashLibsPage> createState() => _MainSmashLibsPageState();
 }
 
-class _MainSmashLibsPageState extends State<MainSmashLibsPage>
-    with AfterLayoutMixin {
+class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
   SmashMapWidget? mapView;
   final LayerSource _backgroundLayerSource = onlinesTilesSources[0];
   LayerSource _currentLayerSource = onlinesTilesSources[1];
   FormBuilderFormHelper? formBuilderHelper;
 
-  @override
-  FutureOr<void> afterFirstLayout(BuildContext context) async {
-    await LayerManager().initialize(context);
-    await SmashCache.init();
+  FutureOr<void> load(BuildContext context) async {
+    if (mapView != null) {
+      return;
+    }
+    await GpPreferences().initialize();
     await Workspace.init();
+    await SmashCache.init();
+    if (context.mounted) await LayerManager().initialize(context);
 
     mapView = SmashMapWidget();
     mapView!.setInitParameters(
@@ -39,7 +41,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
           Provider.of<SmashMapState>(context, listen: false);
       mapState.setLastPositionQuiet(
           LatLngExt.fromLatLng(newPosition.center!).toCoordinate(),
-          newPosition.zoom!);
+          newPosition.zoom);
     });
     mapView!.setTapHandlers(
       handleTap: (ll, zoom) async {
@@ -96,12 +98,28 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage>
 
     formBuilderHelper = FormBuilderFormHelper();
     await formBuilderHelper!.init();
-
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      builder: (context, projectSnap) {
+        if (projectSnap.hasError) {
+          return SmashUI.errorWidget(projectSnap.error.toString());
+        } else if (projectSnap.connectionState == ConnectionState.none ||
+            projectSnap.data == null) {
+          return SmashCircularProgress(label: "Loading...");
+        }
+
+        Widget widget = projectSnap.data as Widget;
+        return widget;
+      },
+      future: getWidget(context),
+    );
+  }
+
+  Future<Scaffold> getWidget(BuildContext context) async {
+    await load(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),

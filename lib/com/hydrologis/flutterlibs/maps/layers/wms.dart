@@ -20,7 +20,7 @@ class WmsSource extends RasterLayerSource {
   ErrorTileCallBack? errorTileCallback = (tile, exception, stacktrace) {
     // ignore tiles that can't load to avoid
     SMLogger()
-        .e("Unable to load WMS tile: ${tile.coordinatesKey}", null, stacktrace);
+        .e("Unable to load WMS tile: ${tile.coordinates}", null, stacktrace);
   };
   bool overrideTilesOnUrlChange = true;
 
@@ -115,7 +115,6 @@ class WmsSource extends RasterLayerSource {
       Opacity(
         opacity: opacityPercentage ?? 100 / 100.0,
         child: TileLayer(
-          backgroundColor: Colors.transparent,
           wmsOptions: WMSTileLayerOptions(
             crs: crs,
             version: version,
@@ -254,42 +253,5 @@ class WmsPropertiesWidgetState extends State<WmsPropertiesWidget> {
             ],
           ),
         ));
-  }
-}
-
-class Epsg4326Flip extends Earth {
-  @override
-  final String code = 'CRS:84';
-
-  @override
-  final FM.Projection projection;
-
-  @override
-  final Transformation transformation;
-
-  const Epsg4326Flip()
-      : projection = const _LonLat(),
-        transformation = const Transformation(1 / 180, 0.5, -1 / 180, 0.5),
-        super();
-}
-
-class _LonLat extends FM.Projection {
-  static final Bounds<double> _bounds =
-      Bounds<double>(Point<double>(-180.0, -90.0), Point<double>(180.0, 90.0));
-
-  const _LonLat() : super();
-
-  @override
-  Bounds<double> get bounds => _bounds;
-
-  @override
-  Point<double> project(LatLng latlng) {
-    return Point(latlng.longitude, latlng.latitude);
-  }
-
-  @override
-  LatLng unproject(CustomPoint point) {
-    return LatLng(
-        inclusiveLat(point.y.toDouble()), inclusiveLng(point.x.toDouble()));
   }
 }

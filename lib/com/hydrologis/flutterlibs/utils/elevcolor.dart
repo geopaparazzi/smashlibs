@@ -156,11 +156,17 @@ class EnhancedColorUtility {
         LatLngExt p1 = linePoints[startI] as LatLngExt;
         LatLngExt p2 = linePoints[endI] as LatLngExt;
         List<Color> grad = [rb[p1.altim], rb[p2.altim]];
+
+        var pattern = StrokePattern.solid();
+        if (p1.altim > p2.altim) {
+          pattern = StrokePattern.dashed(segments: [10, 10]);
+        }
+
         back.add(Polyline(
           points: points,
           strokeWidth: strokeWidth + 2,
           color: Colors.black,
-          isDotted: p1.altim > p2.altim,
+          pattern: pattern,
         ));
         front.add(Polyline(
           points: points,
@@ -190,11 +196,16 @@ class EnhancedColorUtility {
         List<Color> grad = [rb[prevSlope], rb[slope]];
         prevSlope = slope;
 
+        var pattern = StrokePattern.solid();
+        if (p1.altim > p2.altim) {
+          pattern = StrokePattern.dashed(segments: [10, 10]);
+        }
+
         back.add(Polyline(
           points: points,
           strokeWidth: strokeWidth + 2,
           color: Colors.black,
-          isDotted: p1.altim > p2.altim,
+          pattern: pattern,
         ));
         front.add(Polyline(
           points: points,
@@ -222,11 +233,16 @@ class EnhancedColorUtility {
         LatLngExt p2 = linePoints[endI] as LatLngExt;
 
         List<Color> grad = [rb[p1.speed], rb[p2.speed]];
+
+        var pattern = StrokePattern.solid();
+        if (p1.altim > p2.altim) {
+          pattern = StrokePattern.dashed(segments: [10, 10]);
+        }
         back.add(Polyline(
           points: points,
           strokeWidth: strokeWidth + 2,
           color: Colors.black,
-          isDotted: p1.altim > p2.altim,
+          pattern: pattern,
         ));
         front.add(Polyline(
           points: points,
@@ -247,12 +263,16 @@ class EnhancedColorUtility {
         LatLngExt p1 = linePoints[startI] as LatLngExt;
         LatLngExt p2 = linePoints[endI] as LatLngExt;
 
+        var pattern = StrokePattern.solid();
+        if (p1.altim > p2.altim) {
+          pattern = StrokePattern.dashed(segments: [10, 10]);
+        }
         List<Color> grad = [rb[p1.accuracy], rb[p2.accuracy]];
         back.add(Polyline(
           points: points,
           strokeWidth: strokeWidth + 2,
           color: Colors.black,
-          isDotted: p1.altim > p2.altim,
+          pattern: pattern,
         ));
         front.add(Polyline(
           points: points,
