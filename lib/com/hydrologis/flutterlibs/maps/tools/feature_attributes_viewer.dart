@@ -21,12 +21,11 @@ class FeatureAttributesViewer extends StatefulWidget {
 class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
   int _index = 0;
   late int _total;
-  bool _loading = true;
   late JTS.Geometry _geometry;
   late SmashMapWidget mapWidget;
   var _srids = {};
 
-  void loadOnReady(BuildContext context) async {
+  Future<void> loadOnReady(BuildContext context) async {
     _total = widget.features.geoms.length;
 
     try {
@@ -42,12 +41,29 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
       SMLogger().e("Error.", e, s);
     }
 
-    _loading = false;
-    setState(() {});
+    // setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      builder: (context, projectSnap) {
+        if (projectSnap.hasError) {
+          return SmashUI.errorWidget(projectSnap.error.toString());
+        } else if (projectSnap.connectionState == ConnectionState.none ||
+            projectSnap.data == null) {
+          return SmashCircularProgress(label: "processing...");
+        }
+
+        Widget widget = projectSnap.data as Widget;
+        return widget;
+      },
+      future: getWidget(context),
+    );
+  }
+
+  Future<Widget> getWidget(BuildContext context) async {
+    await loadOnReady(context);
     var isLandscape = ScreenUtilities.isLandscape(context);
 
     Color border = Colors.black;
@@ -64,7 +80,7 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     var expX = env.getWidth() * 0.1;
     var expY = env.getHeight() * 0.1;
     env.expandBy(expX, expY);
-    mapWidget = new SmashMapWidget();
+    mapWidget = new SmashMapWidget(key: UniqueKey());
     mapWidget.setInitParameters(
       initBounds: env,
       initZoom: 15,

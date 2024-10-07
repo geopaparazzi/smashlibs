@@ -1,17 +1,12 @@
 part of smashlibs;
 
-class SmashMapLayer extends StatefulWidget {
+class SmashMapLayer extends StatelessWidget {
   final LayerSource _layerSource;
   SmashMapLayer(this._layerSource, {Key? key})
       : super(key: key != null ? key : ValueKey("SMASH_GENERIC_MAP_LAYER"));
 
-  @override
-  State<SmashMapLayer> createState() => _SmashMapLayerState();
-}
-
-class _SmashMapLayerState extends State<SmashMapLayer> {
   Future<Widget> getWidget(BuildContext context) async {
-    var list = await widget._layerSource.toLayers(context);
+    var list = await _layerSource.toLayers(context);
     if (list != null) {
       if (list.length == 1) {
         return list[0];

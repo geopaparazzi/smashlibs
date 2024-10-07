@@ -19,6 +19,7 @@ class SmashMapWidget extends StatelessWidget {
   bool _isMapReady = false;
 
   MapController _mapController = MapController();
+  FlutterMap? flutterMap;
   List<Widget> preLayers = [];
   List<Widget> postLayers = [];
   List<LayerSource> layerSources = [];
@@ -191,17 +192,17 @@ class SmashMapWidget extends StatelessWidget {
     print("SmashMapWidget consumeBuild");
     var layers = <Widget>[];
 
-    // layers.addAll(preLayers);
-    // if (_useLayerManager) {
-    //   layers.addAll(LayerManager().getActiveLayers());
-    // } else {
-    //   layers.addAll(layerSources
-    //       .map((l) => SmashMapLayer(
-    //             l,
-    //             key: ValueKey(l.getName()),
-    //           ))
-    //       .toList());
-    // }
+    layers.addAll(preLayers);
+    if (_useLayerManager) {
+      layers.addAll(LayerManager().getActiveLayers());
+    } else {
+      layers.addAll(layerSources
+          .map((l) => SmashMapLayer(
+                l,
+                key: ValueKey(l.getName()),
+              ))
+          .toList());
+    }
     layers.addAll(postLayers);
 
     BuildContext context = mapBuilder.context!;
@@ -230,7 +231,7 @@ class SmashMapWidget extends StatelessWidget {
     ));
 
     var mapKey = "FlutterMapWidget-${key.toString()}";
-    Widget flutterMap = FlutterMap(
+    flutterMap = FlutterMap(
       key: ValueKey(mapKey),
       options: new MapOptions(
         initialCameraFit: _initBounds != null
@@ -276,8 +277,9 @@ class SmashMapWidget extends StatelessWidget {
       mapController: _mapController,
     );
 
+    Widget finalWidget = flutterMap!;
     if (_addBorder) {
-      flutterMap = Container(
+      finalWidget = Container(
         child: flutterMap,
         decoration: BoxDecoration(
             color: SmashColors.mainBackground,
@@ -287,7 +289,7 @@ class SmashMapWidget extends StatelessWidget {
     }
     return Stack(
       children: <Widget>[
-        flutterMap,
+        finalWidget,
         mapBuilder.inProgress
             ? Center(
                 child: SmashCircularProgress(

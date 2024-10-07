@@ -309,26 +309,23 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
             : Container(),
       ]);
     });
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => FormUrlItemsState()),
-      ],
-      child: WillPopScope(
-        onWillPop: _onWillPop,
-        child: widget.doScaffold
-            ? Scaffold(
-                appBar: AppBar(
-                  title: widget.formHelper.getFormTitleWidget(),
-                  leading: IconButton(
-                    icon: Icon(Icons.arrow_back,
-                        color: SmashColors.mainBackground),
-                    onPressed: () => _onWillPop(),
-                  ),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: widget.doScaffold
+          ? Scaffold(
+              appBar: AppBar(
+                title: widget.formHelper.getFormTitleWidget(),
+                leading: IconButton(
+                  icon:
+                      Icon(Icons.arrow_back, color: SmashColors.mainBackground),
+                  onPressed: () async {
+                    await _onWillPop();
+                  },
                 ),
-                body: bodyContainer,
-              )
-            : bodyContainer,
-      ),
+              ),
+              body: bodyContainer,
+            )
+          : bodyContainer,
     );
   }
 
@@ -2351,6 +2348,7 @@ class GeometryWidgetState extends State<GeometryWidget> {
   GeojsonSource? geojsonSource;
   late String keyStr;
   double _iconSize = 32;
+  SmashMapWidget? sWidget;
 
   Future<Widget> getMapView(BuildContext context) async {
     String value = ""; //$NON-NLS-1$
@@ -2401,58 +2399,60 @@ class GeometryWidgetState extends State<GeometryWidget> {
       latLngBoundsExt = latLngBoundsExt.expandByFactor(1.1);
     }
 
-    SmashMapWidget sWidget = SmashMapWidget(key: ValueKey(keyStr));
-    sWidget.setInitParameters(
-        canRotate: false,
-        initBounds: latLngBoundsExt.toEnvelope(),
-        addBorder: true);
-    sWidget.setTapHandlers(
-      handleTap: (ll, zoom) async {
-        GeometryEditorState geomEditorState =
-            Provider.of<GeometryEditorState>(context, listen: false);
-        if (geomEditorState.isEnabled) {
-          if (geomEditorState.editableGeometry == null &&
-              geojsonSource!.getFeatureCount() != 0) {
-            // if there is already a feature available, try to select it
-            // by redirecting to thelong tap. Once multigeometries
-            // will be supported, this will have to be rethinked
-            if (!widget._isReadOnly) {
-              GeometryEditorState geomEditorState =
-                  Provider.of<GeometryEditorState>(context, listen: false);
-              if (geomEditorState.isEnabled) {
-                await GeometryEditManager().onMapLongTap(
-                    context, ll, zoom.round(),
-                    eds: geojsonSource);
-              }
-            }
-            return;
-          } else {
-            await GeometryEditManager().onMapTap(
-              context,
-              ll,
-              eds: geojsonSource,
-            );
-          }
-        } else {
-          SmashDialogs.showToast(
-              context, "Tapped: ${ll.longitude}, ${ll.latitude}",
-              durationSeconds: 1);
-        }
-      },
-      handleLongTap: (ll, zoom) async {
-        if (!widget._isReadOnly) {
+    if (sWidget == null) {
+      sWidget = SmashMapWidget(key: ValueKey(keyStr));
+      sWidget!.setInitParameters(
+          canRotate: false,
+          initBounds: latLngBoundsExt.toEnvelope(),
+          addBorder: true);
+      sWidget!.setTapHandlers(
+        handleTap: (ll, zoom) async {
           GeometryEditorState geomEditorState =
               Provider.of<GeometryEditorState>(context, listen: false);
           if (geomEditorState.isEnabled) {
-            await GeometryEditManager()
-                .onMapLongTap(context, ll, zoom.round(), eds: geojsonSource);
+            if (geomEditorState.editableGeometry == null &&
+                geojsonSource!.getFeatureCount() != 0) {
+              // if there is already a feature available, try to select it
+              // by redirecting to thelong tap. Once multigeometries
+              // will be supported, this will have to be rethinked
+              if (!widget._isReadOnly) {
+                GeometryEditorState geomEditorState =
+                    Provider.of<GeometryEditorState>(context, listen: false);
+                if (geomEditorState.isEnabled) {
+                  await GeometryEditManager().onMapLongTap(
+                      context, ll, zoom.round(),
+                      eds: geojsonSource);
+                }
+              }
+              return;
+            } else {
+              await GeometryEditManager().onMapTap(
+                context,
+                ll,
+                eds: geojsonSource,
+              );
+            }
+          } else {
+            SmashDialogs.showToast(
+                context, "Tapped: ${ll.longitude}, ${ll.latitude}",
+                durationSeconds: 1);
           }
-        }
-      },
-    );
-    sWidget.addPostLayer(SmashMapLayer(
+        },
+        handleLongTap: (ll, zoom) async {
+          if (!widget._isReadOnly) {
+            GeometryEditorState geomEditorState =
+                Provider.of<GeometryEditorState>(context, listen: false);
+            if (geomEditorState.isEnabled) {
+              await GeometryEditManager()
+                  .onMapLongTap(context, ll, zoom.round(), eds: geojsonSource);
+            }
+          }
+        },
+      );
+    }
+    sWidget!.addPostLayer(SmashMapLayer(
       geojsonSource!,
-      key: UniqueKey(),
+      key: UniqueKey(), // ValueKey("geojson-form-$keyStr"),
     ));
     // if (!widget._isReadOnly) {
     //   GeometryEditorState geomEditorState =
@@ -2460,7 +2460,7 @@ class GeometryWidgetState extends State<GeometryWidget> {
     //   geomEditorState.setEnabled(true);
     // }
     // }
-    return sWidget;
+    return sWidget!;
   }
 
   @override
@@ -2482,6 +2482,7 @@ class GeometryWidgetState extends State<GeometryWidget> {
   }
 
   Future<Widget> getMainWidget(context) async {
+    print("getMainWidget in geometrywidget");
     var mapView = await getMapView(context);
     if (widget._isReadOnly) {
       return mapView;
@@ -2586,7 +2587,6 @@ class GeometryWidgetState extends State<GeometryWidget> {
           geomEditState.setEnabledSilently(false);
           GeometryEditManager().stopEditing();
 
-          geojsonSource!.isLoaded = false;
           // reload layer geoms
           await reloadLayerSource(geojsonSource!);
 
