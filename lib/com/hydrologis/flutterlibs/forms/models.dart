@@ -17,18 +17,31 @@ class FormHandlerState extends ChangeNotifierPlus {
 class FormUrlItemsState extends ChangeNotifierPlus {
   Map<String, String> formUrlItems = {};
 
-  void setFormUrlItem(String variableName, String value) {
+  void setFormUrlItem(String variableName, dynamic value) {
     setFormUrlItemSilently(variableName, value);
     notifyListenersMsg("Formhandler: set form url item");
   }
 
-  void setFormUrlItemSilently(String variableName, String value) {
-    formUrlItems[variableName] = value;
+  void setFormUrlItemSilently(String variableName, dynamic value) {
+    formUrlItems[variableName] = value.toString();
+  }
+
+  void removeFormUrlItem(String variableName) {
+    removeFormUrlItemSilently(variableName);
+    notifyListenersMsg("Formhandler: remove form url item");
+  }
+
+  void removeFormUrlItemSilently(String variableName) {
+    formUrlItems.remove(variableName);
   }
 
   void resetFormUrlItems() {
-    formUrlItems = {};
+    resetFormUrlItemsSilently();
     notifyListenersMsg("Formhandler: reset form url items");
+  }
+
+  void resetFormUrlItemsSilently() {
+    formUrlItems = {};
   }
 
   String applyUrlSubstitutions(String url) {
