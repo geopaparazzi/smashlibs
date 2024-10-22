@@ -284,6 +284,11 @@ abstract class AFormhelper {
   Map<String, dynamic>? getRequiredFormUrlItems() {
     return null;
   }
+
+  /// Get a list of keys that should be hidden in the form.
+  List<String>? getHideFormItems() {
+    return null;
+  }
 }
 
 /// An interface for constraints.

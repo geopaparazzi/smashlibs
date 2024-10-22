@@ -76,6 +76,11 @@ class DemoAppFormHelper extends AFormhelper {
     // TODO: implement takeSketchForForms
     throw UnimplementedError();
   }
+
+  @override
+  List<String>? getHideFormItems() {
+    return ["some_hidden_text"];
+  }
 }
 
 class FormBuilderFormHelper extends AFormhelper {

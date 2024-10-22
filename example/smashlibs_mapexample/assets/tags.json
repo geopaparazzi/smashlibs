@@ -14,6 +14,12 @@
             "type": "string"
           },
           {
+            "key": "some_hidden_text",
+            "value": "example of hidden text entry",
+            "icon": "font",
+            "type": "string"
+          },
+          {
             "key": "some_text_area",
             "value": "line1\nline2",
             "icon": "scroll",

@@ -346,6 +346,10 @@ Tuple2<ListTile, bool>? getWidget(
   AFormhelper formHelper,
 ) {
   String key = formItem.key;
+  var hideFormItems = formHelper.getHideFormItems();
+  if (hideFormItems != null && hideFormItems.contains(key)) {
+    return null;
+  }
   String type = formItem.type;
   String label = formItem.label;
   dynamic value = formItem.value;

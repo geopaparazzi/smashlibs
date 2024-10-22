@@ -443,11 +443,10 @@ packages:
   flutter_map_line_editor:
     dependency: transitive
     description:
-      path: "."
-      ref: v7
-      resolved-ref: d6ed44268368b58ea3ab83dc13bca7b8a9b8d99c
-      url: "https://github.com/ibrierley/flutter_map_line_editor.git"
-    source: git
+      name: flutter_map_line_editor
+      sha256: "2a8c5a8e22bc4879e017e4a47fb502608d671c5039cc4604880088fb0de9d14a"
+      url: "https://pub.dev"
+    source: hosted
     version: "7.0.0"
   flutter_map_marker_cluster:
     dependency: transitive
