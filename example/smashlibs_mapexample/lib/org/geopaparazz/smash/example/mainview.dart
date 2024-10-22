@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import 'package:smashlibs/smashlibs.dart';
 import 'package:provider/provider.dart';
 import './utils.dart';
+import 'package:smashlibs/com/hydrologis/flutterlibs/camera/camera2.dart';
 
 class MainSmashLibsPage extends StatefulWidget {
   const MainSmashLibsPage({super.key, required this.title});
@@ -119,173 +120,198 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
   }
 
   Future<Scaffold> getWidget(BuildContext context) async {
+    var w = ScreenUtilities.getWidth(context);
+    // pick 70% of the screen width
+    var w2 = w * 0.7;
     await load(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          TextButton(
-            onPressed: () async {
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = onlinesTilesSources[1];
-              await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("WTS", color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              mapView!.removeLayerSource(_currentLayerSource);
-              var url = "https://geoservices.buergernetz.bz.it/mapproxy/wms";
-              _currentLayerSource = WmsSource(
-                  url, "p_bz-Orthoimagery:Aerial-2020-RGB",
-                  imageFormat: "image/png");
-              await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("WMS", color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var gpxPath =
-                  await copyToMapFolder("ciclabile_peschiera_mantova.gpx");
+          SizedBox(
+            width: w2,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = onlinesTilesSources[1];
+                      await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("WTS",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      var url =
+                          "https://geoservices.buergernetz.bz.it/mapproxy/wms";
+                      _currentLayerSource = WmsSource(
+                          url, "p_bz-Orthoimagery:Aerial-2020-RGB",
+                          imageFormat: "image/png");
+                      await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("WMS",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var gpxPath = await copyToMapFolder(
+                          "ciclabile_peschiera_mantova.gpx");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = GpxSource(gpxPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("GPX", color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var imgPath = await copyToMapFolder("testtiff.tif");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = GpxSource(gpxPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("GPX",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var imgPath = await copyToMapFolder("testtiff.tif");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = GeoImageSource(imgPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("IMG", color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var dbPath = await copyToMapFolder("assisi.map");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = GeoImageSource(imgPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("IMG",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var dbPath = await copyToMapFolder("assisi.map");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = TileSource.Mapsforge(dbPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("Mapsforge",
-                color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var dbPath = await copyToMapFolder("world.mbtiles");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = TileSource.Mapsforge(dbPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("Mapsforge",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var dbPath = await copyToMapFolder("world.mbtiles");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = TileSource.Mbtiles(dbPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("MBTiles",
-                color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var dbPath = await copyToMapFolder("orthos.gpkg");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = TileSource.Mbtiles(dbPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("MBTiles",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var dbPath = await copyToMapFolder("orthos.gpkg");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = TileSource.Geopackage(dbPath, "mebo2017");
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("GPKG-rast",
-                color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var dbPath = await copyToMapFolder("vectors.gpkg");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource =
+                          TileSource.Geopackage(dbPath, "mebo2017");
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("GPKG-rast",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var dbPath = await copyToMapFolder("vectors.gpkg");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource =
-                  GeopackageSource(dbPath, "watercourses_small");
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("GPKG-vect",
-                color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var shpPath = await copyToMapFolder("watercourses_small.shp");
-              await copyToMapFolder("watercourses_small.shx");
-              await copyToMapFolder("watercourses_small.sld");
-              await copyToMapFolder("watercourses_small.prj");
-              await copyToMapFolder("watercourses_small.dbf");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource =
+                          GeopackageSource(dbPath, "watercourses_small");
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("GPKG-vect",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var shpPath =
+                          await copyToMapFolder("watercourses_small.shp");
+                      await copyToMapFolder("watercourses_small.shx");
+                      await copyToMapFolder("watercourses_small.sld");
+                      await copyToMapFolder("watercourses_small.prj");
+                      await copyToMapFolder("watercourses_small.dbf");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = ShapefileSource(shpPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("SHP", color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var geojsonPath = await copyToMapFolder("gjson_points.json");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = ShapefileSource(shpPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("SHP",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var geojsonPath =
+                          await copyToMapFolder("gjson_points.json");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = GeojsonSource(geojsonPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("JSON pt",
-                color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var geojsonPath = await copyToMapFolder("gjson_lines.json");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = GeojsonSource(geojsonPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("JSON pt",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var geojsonPath =
+                          await copyToMapFolder("gjson_lines.json");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = GeojsonSource(geojsonPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("JSON ln",
-                color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var geojsonPath = await copyToMapFolder("gjson_polygons.json");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = GeojsonSource(geojsonPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("JSON ln",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var geojsonPath =
+                          await copyToMapFolder("gjson_polygons.json");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = GeojsonSource(geojsonPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("JSON pl",
-                color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              var shpPath = await copyToMapFolder("caldaro.geocaching");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = GeojsonSource(geojsonPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("JSON pl",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var shpPath = await copyToMapFolder("caldaro.geocaching");
 
-              mapView!.removeLayerSource(_currentLayerSource);
-              _currentLayerSource = GeocachingSource(shpPath);
-              if (context.mounted) await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("GCaching",
-                color: SmashColors.mainBackground),
-          ),
-          TextButton(
-            onPressed: () async {
-              SmashDialogs.showInfoDialog(context,
-                  "The postgis example connection parameters need to be set in the code. No generic postgis available.");
+                      mapView!.removeLayerSource(_currentLayerSource);
+                      _currentLayerSource = GeocachingSource(shpPath);
+                      if (context.mounted) await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("GCaching",
+                        color: SmashColors.mainBackground),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      SmashDialogs.showInfoDialog(context,
+                          "The postgis example connection parameters need to be set in the code. No generic postgis available.");
 
-              // mapView!.removeLayer(_currentLayerSource);
-              // // TODO change this with your db if you want to test in demo
-              // _currentLayerSource = PostgisSource(
-              //     "postgis:localhost:5432/testdb",
-              //     "testtable",
-              //     "testuser",
-              //     "testpwd",
-              //     null,
-              //     null,
-              //     useSSL: false);
-              // await addLayerAndZoomTo(context);
-            },
-            child: SmashUI.normalText("PostGIS",
-                color: SmashColors.mainBackground),
+                      // mapView!.removeLayer(_currentLayerSource);
+                      // // TODO change this with your db if you want to test in demo
+                      // _currentLayerSource = PostgisSource(
+                      //     "postgis:localhost:5432/testdb",
+                      //     "testtable",
+                      //     "testuser",
+                      //     "testpwd",
+                      //     null,
+                      //     null,
+                      //     useSSL: false);
+                      // await addLayerAndZoomTo(context);
+                    },
+                    child: SmashUI.normalText("PostGIS",
+                        color: SmashColors.mainBackground),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -319,6 +345,23 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                                     PresentationMode(isFormbuilder: true),
                                 doScaffold: true,
                               )));
+                },
+              ),
+              ListTile(
+                title: SmashUI.normalText("Take a picture", bold: true),
+                onTap: () async {
+                  var cameras = await getCameras();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CameraExampleHome(cameras),
+                        // CameraScreen(
+                        //   onCameraFileFunction: (path) async {
+                        //     await SmashDialogs.showInfoDialog(
+                        //         context, "Picture saved to: $path");
+                        //   },
+                        // ),
+                      ));
                 },
               ),
             ],

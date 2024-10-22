@@ -20,6 +20,7 @@ MultiProvider getMainWidget() {
       ChangeNotifierProvider(create: (_) => RulerState()),
       ChangeNotifierProvider(create: (_) => GeometryEditorState()),
       ChangeNotifierProvider(create: (_) => FormHandlerState()),
+      ChangeNotifierProvider(create: (_) => FormUrlItemsState()),
     ],
     child: const MyApp(),
   );
