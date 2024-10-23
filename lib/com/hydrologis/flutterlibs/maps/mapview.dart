@@ -119,6 +119,10 @@ class SmashMapWidget extends StatelessWidget {
     }
   }
 
+  void clearPostLayers() {
+    postLayers.clear();
+  }
+
   int _getLayerIndex(List<Widget> list, Widget layer) {
     int i = 0;
     for (var item in list) {
