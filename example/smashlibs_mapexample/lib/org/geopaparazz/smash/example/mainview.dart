@@ -351,10 +351,20 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                 title: SmashUI.normalText("Take a picture", bold: true),
                 onTap: () async {
                   var cameras = await getCameras();
+
+                  var frameProperties = FrameProperties.defineCenteredBox(
+                      50, 150,
+                      strokeWidth: 2);
+                  // var frameProperties = FrameProperties.defineBorders(
+                  //     100, 100, 100, 200,
+                  //     width: 2);
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CameraExampleHome(cameras),
+                        builder: (context) => CameraExampleHome(
+                          cameras,
+                          frameProperties: frameProperties,
+                        ),
                         // CameraScreen(
                         //   onCameraFileFunction: (path) async {
                         //     await SmashDialogs.showInfoDialog(

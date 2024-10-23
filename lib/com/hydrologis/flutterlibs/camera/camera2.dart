@@ -9,12 +9,18 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
+import 'package:image/image.dart' as img;
 
 Future<List<CameraDescription>> getCameras() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     var cameras = await availableCameras();
+    // get only first two cameras
+    if (cameras.length > 2) {
+      cameras = cameras.sublist(0, 2);
+    }
     return cameras;
   } on CameraException catch (e) {
     _logError(e.code, e.description);
@@ -24,10 +30,15 @@ Future<List<CameraDescription>> getCameras() async {
 
 /// Camera example home widget.
 class CameraExampleHome extends StatefulWidget {
-  List<CameraDescription> cameras = <CameraDescription>[];
+  final List<CameraDescription> cameras;
+
+  final String title;
+
+  FrameProperties? frameProperties;
 
   /// Default Constructor
-  CameraExampleHome(this.cameras, {super.key});
+  CameraExampleHome(this.cameras,
+      {super.key, this.title = "Take picture", this.frameProperties = null});
 
   @override
   State<CameraExampleHome> createState() {
@@ -110,6 +121,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       parent: _focusModeControlRowAnimationController,
       curve: Curves.easeInCubic,
     );
+
+    onNewCameraSelected(widget.cameras.first);
   }
 
   @override
@@ -142,7 +155,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Camera example'),
+        title: Text(widget.title),
       ),
       body: Column(
         children: <Widget>[
@@ -166,17 +179,18 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
               ),
             ),
           ),
+          // ! TODO
           _captureControlRowWidget(),
-          _modeControlRowWidget(),
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Row(
-              children: <Widget>[
-                _cameraTogglesRowWidget(),
-                _thumbnailWidget(),
-              ],
-            ),
-          ),
+          // _modeControlRowWidget(),
+          // Padding(
+          //   padding: const EdgeInsets.all(5.0),
+          //   child: Row(
+          //     children: <Widget>[
+          //       _cameraTogglesRowWidget(),
+          //       _thumbnailWidget(),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
@@ -196,21 +210,28 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         ),
       );
     } else {
+      Widget finalWidget = LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onScaleStart: _handleScaleStart,
+          onScaleUpdate: _handleScaleUpdate,
+          onTapDown: (TapDownDetails details) =>
+              onViewFinderTap(details, constraints),
+        );
+      });
+      if (widget.frameProperties != null) {
+        finalWidget = CustomPaint(
+          painter: FramePainter(widget.frameProperties!),
+        );
+      }
+      // var frameWidget =
       return Listener(
         onPointerDown: (_) => _pointers++,
         onPointerUp: (_) => _pointers--,
-        child: CameraPreview(
+        child: CameraPreview2(
           controller!,
-          child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onScaleStart: _handleScaleStart,
-              onScaleUpdate: _handleScaleUpdate,
-              onTapDown: (TapDownDetails details) =>
-                  onViewFinderTap(details, constraints),
-            );
-          }),
+          child: finalWidget,
         ),
       );
     }
@@ -529,47 +550,48 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
               ? onTakePictureButtonPressed
               : null,
         ),
-        IconButton(
-          icon: const Icon(Icons.videocam),
-          color: Colors.blue,
-          onPressed: cameraController != null &&
-                  cameraController.value.isInitialized &&
-                  !cameraController.value.isRecordingVideo
-              ? onVideoRecordButtonPressed
-              : null,
-        ),
-        IconButton(
-          icon: cameraController != null &&
-                  cameraController.value.isRecordingPaused
-              ? const Icon(Icons.play_arrow)
-              : const Icon(Icons.pause),
-          color: Colors.blue,
-          onPressed: cameraController != null &&
-                  cameraController.value.isInitialized &&
-                  cameraController.value.isRecordingVideo
-              ? (cameraController.value.isRecordingPaused)
-                  ? onResumeButtonPressed
-                  : onPauseButtonPressed
-              : null,
-        ),
-        IconButton(
-          icon: const Icon(Icons.stop),
-          color: Colors.red,
-          onPressed: cameraController != null &&
-                  cameraController.value.isInitialized &&
-                  cameraController.value.isRecordingVideo
-              ? onStopButtonPressed
-              : null,
-        ),
-        IconButton(
-          icon: const Icon(Icons.pause_presentation),
-          color:
-              cameraController != null && cameraController.value.isPreviewPaused
-                  ? Colors.red
-                  : Colors.blue,
-          onPressed:
-              cameraController == null ? null : onPausePreviewButtonPressed,
-        ),
+        // IconButton(
+        //   icon: const Icon(Icons.videocam),
+        //   color: Colors.blue,
+        //   onPressed: cameraController != null &&
+        //           cameraController.value.isInitialized &&
+        //           !cameraController.value.isRecordingVideo
+        //       ? onVideoRecordButtonPressed
+        //       : null,
+        // ),
+        // IconButton(
+        //   icon: cameraController != null &&
+        //           cameraController.value.isRecordingPaused
+        //       ? const Icon(Icons.play_arrow)
+        //       : const Icon(Icons.pause),
+        //   color: Colors.blue,
+        //   onPressed: cameraController != null &&
+        //           cameraController.value.isInitialized &&
+        //           cameraController.value.isRecordingVideo
+        //       ? (cameraController.value.isRecordingPaused)
+        //           ? onResumeButtonPressed
+        //           : onPauseButtonPressed
+        //       : null,
+        // ),
+        // IconButton(
+        //   icon: const Icon(Icons.stop),
+        //   color: Colors.red,
+        //   onPressed: cameraController != null &&
+        //           cameraController.value.isInitialized &&
+        //           cameraController.value.isRecordingVideo
+        //       ? onStopButtonPressed
+        //       : null,
+        // ),
+        // IconButton(
+        //   icon: const Icon(Icons.pause_presentation),
+        //   color:
+        //       cameraController != null && cameraController.value.isPreviewPaused
+        //           ? Colors.red
+        //           : Colors.blue,
+        //   onPressed:
+        //       cameraController == null ? null : onPausePreviewButtonPressed,
+        // ),
+        _thumbnailWidget(),
       ],
     );
   }
@@ -718,6 +740,50 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   void onTakePictureButtonPressed() {
     takePicture().then((XFile? file) {
+      // crop the picture to the defined frame
+      var frameProperties = widget.frameProperties;
+      if (frameProperties != null) {
+        // crop the picture
+        var imageFile = File(file!.path);
+        // var image = Image.file(file2);
+        // Load an image from a file
+        final image = img.decodeImage(imageFile.readAsBytesSync());
+
+        if (image != null) {
+          double left;
+          double top;
+          double right;
+          double bottom;
+          var h = controller!.value.previewSize!.height;
+          var w = controller!.value.previewSize!.width;
+          if (frameProperties.frameGeometry != null) {
+            left = frameProperties.frameGeometry![0];
+            top = frameProperties.frameGeometry![1];
+            right = frameProperties.frameGeometry![2];
+            bottom = frameProperties.frameGeometry![3];
+          } else {
+            // put the defined box in the center of the screen
+            left = (w - frameProperties.boxWidth!) / 2;
+            top = (h - frameProperties.boxHeight!) / 2;
+            right = left;
+            bottom = top;
+          }
+          // Crop the image (parameters: x, y, width, height)
+          final croppedImage = img.copyCrop(image,
+              x: left.toInt(),
+              y: right.toInt(),
+              width: (w - left - right).toInt(),
+              height: (h - top - bottom).toInt());
+
+          // Save the cropped image as a new file
+          File(file.path)..writeAsBytesSync(img.encodeJpg(croppedImage));
+          // showInSnackBar('Picture saved to ${file.path}');
+          print('Cropped image saved successfully.');
+        } else {
+          print('Failed to load image.');
+        }
+      }
+
       if (mounted) {
         setState(() {
           imageFile = file;
@@ -1073,3 +1139,160 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 //   }
 //   runApp(const CameraApp());
 // }
+
+// Copyright 2013 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+/// A widget showing a live camera preview.
+class CameraPreview2 extends StatelessWidget {
+  /// Creates a preview widget for the given camera controller.
+  const CameraPreview2(this.controller, {super.key, this.child});
+
+  /// The controller for the camera that the preview is shown for.
+  final CameraController controller;
+
+  /// A widget to overlay on top of the camera preview
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    return controller.value.isInitialized
+        ? ValueListenableBuilder<CameraValue>(
+            valueListenable: controller,
+            builder: (BuildContext context, Object? value, Widget? child) {
+              return AspectRatio(
+                aspectRatio: _isLandscape()
+                    ? controller.value.aspectRatio
+                    : (1 / controller.value.aspectRatio),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    // controller.buildPreview(),
+                    _wrapInRotatedBox(child: controller.buildPreview()),
+                    child ?? Container(),
+                  ],
+                ),
+              );
+            },
+            child: child,
+          )
+        : Container();
+  }
+
+  Widget _wrapInRotatedBox({required Widget child}) {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      return child;
+    }
+
+    return RotatedBox(
+      quarterTurns: _getQuarterTurns(),
+      child: child,
+    );
+  }
+
+  bool _isLandscape() {
+    return <DeviceOrientation>[
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+    ].contains(_getApplicableOrientation());
+  }
+
+  int _getQuarterTurns() {
+    final Map<DeviceOrientation, int> turns = <DeviceOrientation, int>{
+      DeviceOrientation.portraitUp: 0,
+      DeviceOrientation.landscapeRight: 1,
+      DeviceOrientation.portraitDown: 2,
+      DeviceOrientation.landscapeLeft: 3,
+    };
+    return turns[_getApplicableOrientation()]! + 1;
+  }
+
+  DeviceOrientation _getApplicableOrientation() {
+    return controller.value.isRecordingVideo
+        ? controller.value.recordingOrientation!
+        : (controller.value.previewPauseOrientation ??
+            controller.value.lockedCaptureOrientation ??
+            controller.value.deviceOrientation);
+  }
+}
+
+class FrameProperties {
+  List<double>? frameGeometry;
+  double? boxWidth;
+  double? boxHeight;
+  late Color frameColor;
+  double? strokeWidth;
+
+  FrameProperties.defineCenteredBox(double width, double height,
+      {Color color = Colors.red, double? strokeWidth}) {
+    this.frameColor = color;
+    this.strokeWidth = width;
+    this.boxWidth = width;
+    this.boxHeight = height;
+    this.strokeWidth = strokeWidth;
+  }
+
+  FrameProperties.defineBorders(
+      double left, double top, double right, double bottom,
+      {Color color = Colors.red, double? strokeWidth})
+      : frameGeometry = [left, top, right, bottom],
+        frameColor = color,
+        strokeWidth = strokeWidth;
+}
+
+class FramePainter extends CustomPainter {
+  final FrameProperties frameProperties;
+
+  FramePainter(FrameProperties frameProperties)
+      : frameProperties = frameProperties;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double left;
+    double top;
+    double right;
+    double bottom;
+    if (frameProperties.frameGeometry != null) {
+      left = frameProperties.frameGeometry![0];
+      top = frameProperties.frameGeometry![1];
+      right = frameProperties.frameGeometry![2];
+      bottom = frameProperties.frameGeometry![3];
+    } else {
+      // put the defined box in the center of the screen
+      left = (size.width - frameProperties.boxWidth!) / 2;
+      top = (size.height - frameProperties.boxHeight!) / 2;
+      right = left;
+      bottom = top;
+    }
+    // draw using broders
+    var style = frameProperties.strokeWidth != null
+        ? PaintingStyle.stroke
+        : PaintingStyle.fill;
+    if (frameProperties.strokeWidth != null) {
+      // draw just the frame
+      Paint p = Paint()
+        ..color = frameProperties.frameColor
+        ..style = style
+        ..strokeWidth = frameProperties.strokeWidth!;
+      final rect = Rect.fromLTWH(
+          left, top, size.width - left - right, size.height - top - bottom);
+      canvas.drawRect(rect, p);
+    } else {
+      // draw colored area
+      Paint p = Paint()
+        ..color = frameProperties.frameColor
+        ..style = style;
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), p);
+      p.blendMode = BlendMode.clear;
+      final transparentRect =
+          Rect.fromLTWH(left, top, size.width - right, size.height - bottom);
+      canvas.drawRect(transparentRect, p);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
