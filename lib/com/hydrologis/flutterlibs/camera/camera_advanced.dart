@@ -893,9 +893,9 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
           videoController?.dispose();
           videoController = null;
         });
-        if (file != null) {
-          showInSnackBar('Picture saved to ${file.path}');
-        }
+        // if (file != null) {
+        //   showInSnackBar('Picture saved to ${file.path}');
+        // }
       }
     });
   }
