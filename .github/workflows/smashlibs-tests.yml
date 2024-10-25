@@ -10,10 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        flutter-version: [ 'stable' ]
-
     steps:
       # Checkout the repository
       - name: Checkout repository
@@ -23,7 +19,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ matrix.flutter-version }}
+          flutter-version: 'stable'
           cache: true
 
       # Verify Flutter installation
