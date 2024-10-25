@@ -1,17 +1,7 @@
 // Copyright 2013 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-
-import 'dart:async';
-import 'dart:io';
-
-import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
-import 'package:video_player/video_player.dart';
-import 'package:image/image.dart' as img;
+part of smashlibs;
 
 Future<List<CameraDescription>> getCameras() async {
   try {
@@ -29,37 +19,23 @@ Future<List<CameraDescription>> getCameras() async {
 }
 
 /// Camera example home widget.
-class CameraExampleHome extends StatefulWidget {
+class AdvancedCameraWidget extends StatefulWidget {
   final List<CameraDescription> cameras;
-
   final String title;
-
   FrameProperties? frameProperties;
+  bool doScaffold;
 
   /// Default Constructor
-  CameraExampleHome(this.cameras,
-      {super.key, this.title = "Take picture", this.frameProperties = null});
+  AdvancedCameraWidget(this.cameras,
+      {super.key,
+      this.title = "Take picture",
+      this.frameProperties = null,
+      this.doScaffold = false});
 
   @override
-  State<CameraExampleHome> createState() {
-    return _CameraExampleHomeState();
+  State<AdvancedCameraWidget> createState() {
+    return _AdvancedCameraWidgetState();
   }
-}
-
-/// Returns a suitable camera icon for [direction].
-IconData getCameraLensIcon(CameraLensDirection direction) {
-  switch (direction) {
-    case CameraLensDirection.back:
-      return Icons.camera_rear;
-    case CameraLensDirection.front:
-      return Icons.camera_front;
-    case CameraLensDirection.external:
-      return Icons.camera;
-  }
-  // This enum is from a different package, so a new value could be added at
-  // any time. The example should keep working if that happens.
-  // ignore: dead_code
-  return Icons.camera;
 }
 
 void _logError(String code, String? message) {
@@ -67,7 +43,7 @@ void _logError(String code, String? message) {
   print('Error: $code${message == null ? '' : '\nError Message: $message'}');
 }
 
-class _CameraExampleHomeState extends State<CameraExampleHome>
+class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   CameraController? controller;
   XFile? imageFile;
@@ -88,6 +64,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   double _maxAvailableZoom = 1.0;
   double _currentScale = 1.0;
   double _baseScale = 1.0;
+  String? _imagePath;
 
   // Counting pointers (number of user fingers on screen)
   int _pointers = 0;
@@ -153,45 +130,115 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black,
-                border: Border.all(
-                  color:
-                      controller != null && controller!.value.isRecordingVideo
-                          ? Colors.redAccent
-                          : Colors.grey,
-                  width: 3.0,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(1.0),
-                child: Center(
-                  child: _cameraPreviewWidget(),
-                ),
-              ),
-            ),
-          ),
-          // ! TODO
-          _captureControlRowWidget(),
-          // _modeControlRowWidget(),
-          // Padding(
-          //   padding: const EdgeInsets.all(5.0),
-          //   child: Row(
-          //     children: <Widget>[
-          //       _cameraTogglesRowWidget(),
-          //       _thumbnailWidget(),
-          //     ],
+    if (widget.doScaffold) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: buildMainWidget(),
+      );
+    } else {
+      return buildMainWidget();
+    }
+  }
+
+  Widget buildMainWidget() {
+    return Stack(
+      children: <Widget>[
+        Container(
+          // decoration: BoxDecoration(
+          //   color: Colors.black,
+          //   border: Border.all(
+          //     color: controller != null && controller!.value.isRecordingVideo
+          //         ? Colors.redAccent
+          //         : Colors.grey,
+          //     width: 3.0,
           //   ),
           // ),
-        ],
+          child: Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: Center(
+              child: _cameraPreviewWidget(),
+            ),
+          ),
+        ),
+        // ! TODO
+        Align(
+          alignment: Alignment.bottomRight,
+          child: IntrinsicWidth(child: IntrinsicHeight(child: _controls())),
+        ),
+        // _modeControlRowWidget(),
+        // Padding(
+        //   padding: const EdgeInsets.all(5.0),
+        //   child: Row(
+        //     children: <Widget>[
+        //       _cameraTogglesRowWidget(),
+        //       _thumbnailWidget(),
+        //     ],
+        //   ),
+        // ),
+      ],
+    );
+  }
+
+  Widget _controls() {
+    final CameraController? cameraController = controller;
+    var isLarge = ScreenUtilities.isLargeScreen(context);
+    var iconSize = isLarge ? SmashUI.LARGE_ICON_SIZE : SmashUI.MEDIUM_ICON_SIZE;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+          border: Border.all(color: SmashColors.mainDecorations, width: 3),
+          color: SmashColors.mainBackground.withOpacity(0.7),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Tooltip(
+              message: "Take or re-take picture",
+              child: IconButton(
+                icon: Icon(Icons.camera_alt, size: iconSize),
+                color: SmashColors.mainDecorations,
+                onPressed: cameraController != null &&
+                        cameraController.value.isInitialized &&
+                        !cameraController.value.isRecordingVideo
+                    ? onTakePictureButtonPressed
+                    : null,
+              ),
+            ),
+            if (_imagePath != null)
+              Tooltip(
+                message: "Use image",
+                child: IconButton(
+                  icon: Icon(MdiIcons.check, size: iconSize),
+                  color: SmashColors.mainDecorations,
+                  onPressed: () {
+                    Navigator.of(context).pop(_imagePath);
+                  },
+                ),
+              ),
+            if (_imagePath != null)
+              Tooltip(
+                message: "Cancel",
+                child: IconButton(
+                  icon: Icon(MdiIcons.close, size: iconSize),
+                  color: SmashColors.mainDecorations,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            if (_imagePath != null)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _thumbnailWidget(),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -257,40 +304,37 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   Widget _thumbnailWidget() {
     final VideoPlayerController? localVideoController = videoController;
 
-    return Expanded(
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (localVideoController == null && imageFile == null)
-              Container()
-            else
-              SizedBox(
-                width: 64.0,
-                height: 64.0,
-                child: (localVideoController == null)
-                    ? (
-                        // The captured image on the web contains a network-accessible URL
-                        // pointing to a location within the browser. It may be displayed
-                        // either with Image.network or Image.memory after loading the image
-                        // bytes to memory.
-                        kIsWeb
-                            ? Image.network(imageFile!.path)
-                            : Image.file(File(imageFile!.path)))
-                    : Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.pink)),
-                        child: Center(
-                          child: AspectRatio(
-                              aspectRatio:
-                                  localVideoController.value.aspectRatio,
-                              child: VideoPlayer(localVideoController)),
-                        ),
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (localVideoController == null && imageFile == null)
+            Container()
+          else
+            SizedBox(
+              width: 64.0,
+              height: 64.0,
+              child: (localVideoController == null)
+                  ? (
+                      // The captured image on the web contains a network-accessible URL
+                      // pointing to a location within the browser. It may be displayed
+                      // either with Image.network or Image.memory after loading the image
+                      // bytes to memory.
+                      kIsWeb
+                          ? Image.network(imageFile!.path)
+                          : Image.file(File(imageFile!.path)))
+                  : Container(
+                      decoration:
+                          BoxDecoration(border: Border.all(color: Colors.pink)),
+                      child: Center(
+                        child: AspectRatio(
+                            aspectRatio: localVideoController.value.aspectRatio,
+                            child: VideoPlayer(localVideoController)),
                       ),
-              ),
-          ],
-        ),
+                    ),
+            ),
+        ],
       ),
     );
   }
@@ -538,62 +582,102 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   Widget _captureControlRowWidget() {
     final CameraController? cameraController = controller;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.camera_alt),
-          color: Colors.blue,
-          onPressed: cameraController != null &&
-                  cameraController.value.isInitialized &&
-                  !cameraController.value.isRecordingVideo
-              ? onTakePictureButtonPressed
-              : null,
-        ),
-        // IconButton(
-        //   icon: const Icon(Icons.videocam),
-        //   color: Colors.blue,
-        //   onPressed: cameraController != null &&
-        //           cameraController.value.isInitialized &&
-        //           !cameraController.value.isRecordingVideo
-        //       ? onVideoRecordButtonPressed
-        //       : null,
-        // ),
-        // IconButton(
-        //   icon: cameraController != null &&
-        //           cameraController.value.isRecordingPaused
-        //       ? const Icon(Icons.play_arrow)
-        //       : const Icon(Icons.pause),
-        //   color: Colors.blue,
-        //   onPressed: cameraController != null &&
-        //           cameraController.value.isInitialized &&
-        //           cameraController.value.isRecordingVideo
-        //       ? (cameraController.value.isRecordingPaused)
-        //           ? onResumeButtonPressed
-        //           : onPauseButtonPressed
-        //       : null,
-        // ),
-        // IconButton(
-        //   icon: const Icon(Icons.stop),
-        //   color: Colors.red,
-        //   onPressed: cameraController != null &&
-        //           cameraController.value.isInitialized &&
-        //           cameraController.value.isRecordingVideo
-        //       ? onStopButtonPressed
-        //       : null,
-        // ),
-        // IconButton(
-        //   icon: const Icon(Icons.pause_presentation),
-        //   color:
-        //       cameraController != null && cameraController.value.isPreviewPaused
-        //           ? Colors.red
-        //           : Colors.blue,
-        //   onPressed:
-        //       cameraController == null ? null : onPausePreviewButtonPressed,
-        // ),
-        _thumbnailWidget(),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+        border: Border.all(color: SmashColors.mainDecorations, width: 3),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.camera_alt, size: SmashUI.LARGE_ICON_SIZE),
+            color: SmashColors.mainDecorations,
+            onPressed: cameraController != null &&
+                    cameraController.value.isInitialized &&
+                    !cameraController.value.isRecordingVideo
+                ? onTakePictureButtonPressed
+                : null,
+          ),
+          if (_imagePath != null)
+            IconButton(
+              icon: Icon(MdiIcons.close, size: SmashUI.LARGE_ICON_SIZE),
+              color: SmashColors.mainDecorations,
+              onPressed: cameraController != null &&
+                      cameraController.value.isInitialized &&
+                      !cameraController.value.isRecordingVideo
+                  ? onTakePictureButtonPressed
+                  : null,
+            ),
+          if (_imagePath != null)
+            IconButton(
+              icon: Icon(MdiIcons.close, size: SmashUI.LARGE_ICON_SIZE),
+              color: SmashColors.mainDecorations,
+              onPressed: cameraController != null &&
+                      cameraController.value.isInitialized &&
+                      !cameraController.value.isRecordingVideo
+                  ? onTakePictureButtonPressed
+                  : null,
+            ),
+          // IconButton(
+          //   icon: const Icon(Icons.videocam),
+          //   color: Colors.blue,
+          //   onPressed: cameraController != null &&
+          //           cameraController.value.isInitialized &&
+          //           !cameraController.value.isRecordingVideo
+          //       ? onVideoRecordButtonPressed
+          //       : null,
+          // ),
+          // IconButton(
+          //   icon: cameraController != null &&
+          //           cameraController.value.isRecordingPaused
+          //       ? const Icon(Icons.play_arrow)
+          //       : const Icon(Icons.pause),
+          //   color: Colors.blue,
+          //   onPressed: cameraController != null &&
+          //           cameraController.value.isInitialized &&
+          //           cameraController.value.isRecordingVideo
+          //       ? (cameraController.value.isRecordingPaused)
+          //           ? onResumeButtonPressed
+          //           : onPauseButtonPressed
+          //       : null,
+          // ),
+          // IconButton(
+          //   icon: const Icon(Icons.stop),
+          //   color: Colors.red,
+          //   onPressed: cameraController != null &&
+          //           cameraController.value.isInitialized &&
+          //           cameraController.value.isRecordingVideo
+          //       ? onStopButtonPressed
+          //       : null,
+          // ),
+          // IconButton(
+          //   icon: const Icon(Icons.pause_presentation),
+          //   color:
+          //       cameraController != null && cameraController.value.isPreviewPaused
+          //           ? Colors.red
+          //           : Colors.blue,
+          //   onPressed:
+          //       cameraController == null ? null : onPausePreviewButtonPressed,
+          // ),
+          _thumbnailWidget(),
+        ],
+      ),
     );
+  }
+
+  /// Returns a suitable camera icon for [direction].
+  IconData getCameraLensIcon(CameraLensDirection direction) {
+    switch (direction) {
+      case CameraLensDirection.back:
+        return Icons.camera_rear;
+      case CameraLensDirection.front:
+        return Icons.camera_front;
+      case CameraLensDirection.external:
+      default:
+        return Icons.camera;
+    }
   }
 
   /// Display a row of toggle to select the camera (or a message if no camera is available).
@@ -747,41 +831,36 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         var imageFile = File(file!.path);
         // var image = Image.file(file2);
         // Load an image from a file
-        final image = img.decodeImage(imageFile.readAsBytesSync());
+        final image = IMG.decodeImage(imageFile.readAsBytesSync());
 
         if (image != null) {
-          double left;
-          double top;
-          double right;
-          double bottom;
-          var h = controller!.value.previewSize!.height;
-          var w = controller!.value.previewSize!.width;
-          if (frameProperties.frameGeometry != null) {
-            left = frameProperties.frameGeometry![0];
-            top = frameProperties.frameGeometry![1];
-            right = frameProperties.frameGeometry![2];
-            bottom = frameProperties.frameGeometry![3];
-          } else {
-            // put the defined box in the center of the screen
-            left = (w - frameProperties.boxWidth!) / 2;
-            top = (h - frameProperties.boxHeight!) / 2;
-            right = left;
-            bottom = top;
-          }
-          // Crop the image (parameters: x, y, width, height)
-          final croppedImage = img.copyCrop(image,
-              x: left.toInt(),
-              y: right.toInt(),
-              width: (w - left - right).toInt(),
-              height: (h - top - bottom).toInt());
+          if (frameProperties.ratio != null) {
+            var imageWidht = image.width;
+            var imageHeight = image.height;
+            var ratio = frameProperties.ratio!;
+            var newWidth = imageHeight * ratio;
+            var newHeight = newWidth / ratio;
+            if (newHeight > imageHeight) {
+              newHeight = imageWidht / ratio;
+              newWidth = newHeight * ratio;
+            }
+            var left = (imageWidht - newWidth) / 2;
+            var top = (imageHeight - newHeight) / 2;
 
-          // Save the cropped image as a new file
-          File(file.path)..writeAsBytesSync(img.encodeJpg(croppedImage));
-          // showInSnackBar('Picture saved to ${file.path}');
-          print('Cropped image saved successfully.');
-        } else {
-          print('Failed to load image.');
+            // Crop the image (parameters: x, y, width, height)
+            final croppedImage = IMG.copyCrop(image,
+                x: left.toInt(),
+                y: top.toInt(),
+                width: newWidth.toInt(),
+                height: newHeight.toInt());
+
+            // Save the cropped image as a new file
+            File(file.path)..writeAsBytesSync(IMG.encodeJpg(croppedImage));
+            // showInSnackBar('Picture saved to ${file.path}');
+            print('Cropped image saved successfully.');
+          }
         }
+        _imagePath = file.path;
       }
 
       if (mounted) {
@@ -1223,6 +1302,7 @@ class FrameProperties {
   double? boxHeight;
   late Color frameColor;
   double? strokeWidth;
+  double? ratio;
 
   FrameProperties.defineCenteredBox(double width, double height,
       {Color color = Colors.red, double? strokeWidth}) {
@@ -1239,6 +1319,13 @@ class FrameProperties {
       : frameGeometry = [left, top, right, bottom],
         frameColor = color,
         strokeWidth = strokeWidth;
+
+  FrameProperties.defineRatio(double ratio,
+      {Color color = Colors.red, double? strokeWidth}) {
+    this.frameColor = color;
+    this.strokeWidth = strokeWidth;
+    this.ratio = ratio;
+  }
 }
 
 class FramePainter extends CustomPainter {
@@ -1258,6 +1345,25 @@ class FramePainter extends CustomPainter {
       top = frameProperties.frameGeometry![1];
       right = frameProperties.frameGeometry![2];
       bottom = frameProperties.frameGeometry![3];
+    } else if (frameProperties.ratio != null) {
+      // put the defined box in the center of the screen
+      // at the maximum available size for the given ratio
+      double ratio = frameProperties.ratio!;
+      double w = size.width;
+      double h = w / ratio;
+      if (h > size.height) {
+        h = size.height;
+        w = h * ratio;
+        left = (size.width - w) / 2;
+        right = left;
+        top = 0;
+        bottom = 0;
+      } else {
+        top = (size.height - h) / 2;
+        bottom = top;
+        left = 0;
+        right = 0;
+      }
     } else {
       // put the defined box in the center of the screen
       left = (size.width - frameProperties.boxWidth!) / 2;

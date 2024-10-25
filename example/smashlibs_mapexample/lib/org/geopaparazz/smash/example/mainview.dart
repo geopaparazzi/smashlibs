@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:after_layout/after_layout.dart';
 import 'package:dart_jts/dart_jts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +8,6 @@ import 'package:path/path.dart' as p;
 import 'package:smashlibs/smashlibs.dart';
 import 'package:provider/provider.dart';
 import './utils.dart';
-import 'package:smashlibs/com/hydrologis/flutterlibs/camera/camera2.dart';
 
 class MainSmashLibsPage extends StatefulWidget {
   const MainSmashLibsPage({super.key, required this.title});
@@ -352,26 +350,28 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                 onTap: () async {
                   var cameras = await getCameras();
 
-                  var frameProperties = FrameProperties.defineCenteredBox(
-                      50, 150,
-                      strokeWidth: 2);
+                  var widhtCm = 10.0;
+                  var heightCm = 20.0;
+                  var ratio = widhtCm / heightCm;
+                  var frameProperties =
+                      FrameProperties.defineRatio(ratio, strokeWidth: 2);
                   // var frameProperties = FrameProperties.defineBorders(
                   //     100, 100, 100, 200,
                   //     width: 2);
-                  Navigator.push(
+                  String? img = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CameraExampleHome(
+                        builder: (context) => AdvancedCameraWidget(
                           cameras,
                           frameProperties: frameProperties,
                         ),
-                        // CameraScreen(
-                        //   onCameraFileFunction: (path) async {
-                        //     await SmashDialogs.showInfoDialog(
-                        //         context, "Picture saved to: $path");
-                        //   },
-                        // ),
                       ));
+                  if (img != null) {
+                    SmashDialogs.showInfoDialog(
+                        context, "The image was saved to: $img");
+                  } else {
+                    SmashDialogs.showInfoDialog(context, "No image was taken.");
+                  }
                 },
               ),
             ],

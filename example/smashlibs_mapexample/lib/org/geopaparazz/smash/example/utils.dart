@@ -65,9 +65,32 @@ class DemoAppFormHelper extends AFormhelper {
 
   @override
   Future<String?> takePictureForForms(
-      BuildContext context, bool fromGallery, List<String> imageSplit) {
-    // TODO: implement takePictureForForms
-    throw UnimplementedError();
+      BuildContext context, bool fromGallery, List<String> imageSplit) async {
+    String? imagePath;
+    if (fromGallery) {
+      imagePath = await Camera.loadImageFromGallery();
+    } else {
+      // open the advanced camera
+      var cameras = await getCameras();
+
+      var widhtCm = 15.0;
+      var heightCm = 20.0;
+      var ratio = widhtCm / heightCm;
+      var frameProperties = FrameProperties.defineRatio(ratio, strokeWidth: 2);
+      // var frameProperties = FrameProperties.defineBorders(
+      //     100, 100, 100, 200,
+      //     width: 2);
+      String? img = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AdvancedCameraWidget(
+              cameras,
+              frameProperties: frameProperties,
+            ),
+          ));
+    }
+
+    return imagePath;
   }
 
   @override

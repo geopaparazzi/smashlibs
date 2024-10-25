@@ -21,6 +21,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/gestures.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_material_pickers/flutter_material_pickers.dart';
 import 'package:flutter_tags_x/flutter_tags_x.dart';
 import 'package:camera/camera.dart';
@@ -68,9 +69,12 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
 import 'package:painter/painter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hive/hive.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
+part 'com/hydrologis/flutterlibs/camera/camera_advanced.dart';
 part 'com/hydrologis/flutterlibs/gps/gps.dart';
 part 'com/hydrologis/flutterlibs/filesystem/filemanagement.dart';
 part 'com/hydrologis/flutterlibs/filesystem/workspace.dart';
