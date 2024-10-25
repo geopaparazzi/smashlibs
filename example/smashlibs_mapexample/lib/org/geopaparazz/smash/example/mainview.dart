@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:smashlibs/smashlibs.dart';
 import 'package:provider/provider.dart';
 import './utils.dart';
+import 'package:image/image.dart' as IMG;
 
 class MainSmashLibsPage extends StatefulWidget {
   const MainSmashLibsPage({super.key, required this.title});
@@ -350,27 +351,40 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                 onTap: () async {
                   var cameras = await getCameras();
 
-                  var widhtCm = 10.0;
-                  var heightCm = 20.0;
+                  var widhtCm = 18.0;
+                  var heightCm = 27.0;
                   var ratio = widhtCm / heightCm;
-                  var frameProperties =
-                      FrameProperties.defineRatio(ratio, strokeWidth: 2);
+                  var frameProperties = FrameProperties.defineRatio(ratio,
+                      color: Colors.orange.withAlpha(120)); //, strokeWidth: 2);
                   // var frameProperties = FrameProperties.defineBorders(
                   //     100, 100, 100, 200,
                   //     width: 2);
-                  String? img = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AdvancedCameraWidget(
-                          cameras,
-                          frameProperties: frameProperties,
-                        ),
-                      ));
-                  if (img != null) {
-                    SmashDialogs.showInfoDialog(
-                        context, "The image was saved to: $img");
-                  } else {
-                    SmashDialogs.showInfoDialog(context, "No image was taken.");
+                  if (mounted && context.mounted) {
+                    String? img = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdvancedCameraWidget(
+                            cameras,
+                            frameProperties: frameProperties,
+                            cameraResolution: CameraResolutions.LOW,
+                          ),
+                        ));
+                    if (mounted && context.mounted) {
+                      if (img != null) {
+                        // Put image in a widget
+                        var image =
+                            IMG.decodeImage(File(img).readAsBytesSync());
+                        var imageWidget = Image.memory(IMG.encodePng(image!));
+                        SmashDialogs.showWidgetListDialog(
+                            context, "Image taken", [
+                          SmashUI.normalText("The image was saved to: $img"),
+                          imageWidget,
+                        ]);
+                      } else {
+                        SmashDialogs.showWarningDialog(
+                            context, "No image was taken.");
+                      }
+                    }
                   }
                 },
               ),

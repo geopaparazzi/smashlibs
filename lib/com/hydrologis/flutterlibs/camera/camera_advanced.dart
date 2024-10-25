@@ -24,13 +24,15 @@ class AdvancedCameraWidget extends StatefulWidget {
   final String title;
   FrameProperties? frameProperties;
   bool doScaffold;
+  String cameraResolution;
 
   /// Default Constructor
   AdvancedCameraWidget(this.cameras,
       {super.key,
       this.title = "Take picture",
       this.frameProperties = null,
-      this.doScaffold = false});
+      this.doScaffold = false,
+      this.cameraResolution = CameraResolutions.HIGH});
 
   @override
   State<AdvancedCameraWidget> createState() {
@@ -64,7 +66,6 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
   double _maxAvailableZoom = 1.0;
   double _currentScale = 1.0;
   double _baseScale = 1.0;
-  String? _imagePath;
 
   // Counting pointers (number of user fingers on screen)
   int _pointers = 0;
@@ -210,29 +211,75 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
                     : null,
               ),
             ),
-            if (_imagePath != null)
+            if (imageFile != null)
               Tooltip(
                 message: "Use image",
                 child: IconButton(
                   icon: Icon(MdiIcons.check, size: iconSize),
                   color: SmashColors.mainDecorations,
                   onPressed: () {
-                    Navigator.of(context).pop(_imagePath);
+                    Navigator.of(context).pop(imageFile!.path);
                   },
                 ),
               ),
-            if (_imagePath != null)
+            if (imageFile != null && widget.frameProperties != null)
               Tooltip(
-                message: "Cancel",
+                message: "Use cropped image",
                 child: IconButton(
-                  icon: Icon(MdiIcons.close, size: iconSize),
+                  icon: Icon(MdiIcons.crop, size: iconSize),
                   color: SmashColors.mainDecorations,
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    if (imageFile != null) {
+                      var frameProperties = widget.frameProperties;
+                      if (frameProperties != null &&
+                          frameProperties.ratio != null) {
+                        // crop the picture to the defined frame
+                        // at the momento we only handle ratio cases
+                        var imgFile = File(imageFile!.path);
+                        final image =
+                            IMG.decodeImage(imgFile.readAsBytesSync());
+
+                        if (image != null) {
+                          var imageWidht = image.width;
+                          var imageHeight = image.height;
+                          var ratio = frameProperties.ratio!;
+                          var newWidth = imageHeight * ratio;
+                          var newHeight = newWidth / ratio;
+                          if (newHeight > imageHeight) {
+                            newHeight = imageWidht / ratio;
+                            newWidth = newHeight * ratio;
+                          }
+                          var left = (imageWidht - newWidth) / 2;
+                          var top = (imageHeight - newHeight) / 2;
+
+                          // Crop the image (parameters: x, y, width, height)
+                          final croppedImage = IMG.copyCrop(image,
+                              x: left.toInt(),
+                              y: top.toInt(),
+                              width: newWidth.toInt(),
+                              height: newHeight.toInt());
+
+                          // Save the cropped image as a new file
+                          File(imageFile!.path)
+                            ..writeAsBytesSync(IMG.encodeJpg(croppedImage));
+                        }
+                      }
+                    }
+                    Navigator.of(context).pop(imageFile!.path);
                   },
                 ),
               ),
-            if (_imagePath != null)
+            Tooltip(
+              message: "Cancel",
+              child: IconButton(
+                icon: Icon(MdiIcons.close, size: iconSize),
+                color: SmashColors.mainDecorations,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+            if (imageFile != null)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: _thumbnailWidget(),
@@ -260,18 +307,22 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
       Widget finalWidget = LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
         return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onScaleStart: _handleScaleStart,
-          onScaleUpdate: _handleScaleUpdate,
-          onTapDown: (TapDownDetails details) =>
-              onViewFinderTap(details, constraints),
-        );
+            behavior: HitTestBehavior.opaque,
+            onScaleStart: _handleScaleStart,
+            onScaleUpdate: _handleScaleUpdate,
+            onTapDown: (TapDownDetails details) =>
+                onViewFinderTap(details, constraints),
+            child: widget.frameProperties != null
+                ? CustomPaint(
+                    painter: FramePainter(widget.frameProperties!),
+                  )
+                : null);
       });
-      if (widget.frameProperties != null) {
-        finalWidget = CustomPaint(
-          painter: FramePainter(widget.frameProperties!),
-        );
-      }
+      // if (widget.frameProperties != null) {
+      //   finalWidget = CustomPaint(
+      //     painter: FramePainter(widget.frameProperties!),
+      //   );
+      // }
       // var frameWidget =
       return Listener(
         onPointerDown: (_) => _pointers++,
@@ -600,7 +651,7 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
                 ? onTakePictureButtonPressed
                 : null,
           ),
-          if (_imagePath != null)
+          if (imageFile != null)
             IconButton(
               icon: Icon(MdiIcons.close, size: SmashUI.LARGE_ICON_SIZE),
               color: SmashColors.mainDecorations,
@@ -610,7 +661,7 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
                   ? onTakePictureButtonPressed
                   : null,
             ),
-          if (_imagePath != null)
+          if (imageFile != null)
             IconButton(
               icon: Icon(MdiIcons.close, size: SmashUI.LARGE_ICON_SIZE),
               color: SmashColors.mainDecorations,
@@ -748,9 +799,21 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
 
   Future<void> _initializeCameraController(
       CameraDescription cameraDescription) async {
+    ResolutionPreset res = ResolutionPreset.medium;
+    switch (widget.cameraResolution) {
+      case CameraResolutions.HIGH:
+        res = ResolutionPreset.max;
+        break;
+      case CameraResolutions.LOW:
+        res = ResolutionPreset.low;
+        break;
+      case CameraResolutions.MEDIUM:
+      default:
+    }
+
     final CameraController cameraController = CameraController(
       cameraDescription,
-      kIsWeb ? ResolutionPreset.max : ResolutionPreset.medium,
+      kIsWeb ? ResolutionPreset.max : res,
       enableAudio: enableAudio,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
@@ -824,45 +887,6 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
 
   void onTakePictureButtonPressed() {
     takePicture().then((XFile? file) {
-      // crop the picture to the defined frame
-      var frameProperties = widget.frameProperties;
-      if (frameProperties != null) {
-        // crop the picture
-        var imageFile = File(file!.path);
-        // var image = Image.file(file2);
-        // Load an image from a file
-        final image = IMG.decodeImage(imageFile.readAsBytesSync());
-
-        if (image != null) {
-          if (frameProperties.ratio != null) {
-            var imageWidht = image.width;
-            var imageHeight = image.height;
-            var ratio = frameProperties.ratio!;
-            var newWidth = imageHeight * ratio;
-            var newHeight = newWidth / ratio;
-            if (newHeight > imageHeight) {
-              newHeight = imageWidht / ratio;
-              newWidth = newHeight * ratio;
-            }
-            var left = (imageWidht - newWidth) / 2;
-            var top = (imageHeight - newHeight) / 2;
-
-            // Crop the image (parameters: x, y, width, height)
-            final croppedImage = IMG.copyCrop(image,
-                x: left.toInt(),
-                y: top.toInt(),
-                width: newWidth.toInt(),
-                height: newHeight.toInt());
-
-            // Save the cropped image as a new file
-            File(file.path)..writeAsBytesSync(IMG.encodeJpg(croppedImage));
-            // showInSnackBar('Picture saved to ${file.path}');
-            print('Cropped image saved successfully.');
-          }
-        }
-        _imagePath = file.path;
-      }
-
       if (mounted) {
         setState(() {
           imageFile = file;
@@ -1389,11 +1413,20 @@ class FramePainter extends CustomPainter {
       Paint p = Paint()
         ..color = frameProperties.frameColor
         ..style = style;
-      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), p);
-      p.blendMode = BlendMode.clear;
-      final transparentRect =
-          Rect.fromLTWH(left, top, size.width - right, size.height - bottom);
-      canvas.drawRect(transparentRect, p);
+      canvas.drawRect(Rect.fromLTWH(0, 0, left, size.height), p);
+      canvas.drawRect(
+          Rect.fromLTWH(size.width - right, 0, size.width, size.height), p);
+      canvas.drawRect(
+          Rect.fromLTWH(left, 0, size.width - left - right, top), p);
+      canvas.drawRect(
+          Rect.fromLTWH(
+              left, size.height - bottom, size.width - left - right, bottom),
+          p);
+      // p.blendMode = BlendMode.clear;
+      // final transparentRect =
+      //     Rect.fromLTWH(
+      //     left, top, size.width - left - right, size.height - top - bottom);
+      // canvas.drawRect(transparentRect, p);
     }
   }
 
