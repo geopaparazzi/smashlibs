@@ -257,10 +257,12 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
       if (_colorTable.isValid() &&
           _tracksRoutes.isNotEmpty &&
           _tracksRoutes[0].isNotEmpty &&
-          _tracksRoutes[0][0] is LatLngExt) {
+          _tracksRoutes[0][0] is LatLngExt &&
+          minLineElev.isFinite &&
+          maxLineElev.isFinite) {
         _tracksRoutes.forEach((linePoints) {
-          lines = EnhancedColorUtility.buildPolylines(lines, linePoints,
-              _colorTable, lineStyle!.strokeWidth, minLineElev, maxLineElev);
+          EnhancedColorUtility.buildPolylines(lines, linePoints, _colorTable,
+              lineStyle!.strokeWidth, minLineElev, maxLineElev);
         });
       } else {
         _tracksRoutes.forEach((linePoints) {
