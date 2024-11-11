@@ -144,6 +144,7 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
   }
 
   Widget buildMainWidget() {
+    var isTablet = ScreenUtilities.isTablet(context);
     return Stack(
       children: <Widget>[
         Container(
@@ -1249,14 +1250,16 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
 
 /// A widget showing a live camera preview.
 class CameraPreview2 extends StatelessWidget {
+  /// A widget to overlay on top of the camera preview
+  final Widget? child;
+  final bool isTablet;
+
   /// Creates a preview widget for the given camera controller.
-  const CameraPreview2(this.controller, {super.key, this.child});
+  const CameraPreview2(this.controller,
+      {this.isTablet = false, super.key, this.child});
 
   /// The controller for the camera that the preview is shown for.
   final CameraController controller;
-
-  /// A widget to overlay on top of the camera preview
-  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
@@ -1308,7 +1311,8 @@ class CameraPreview2 extends StatelessWidget {
       DeviceOrientation.portraitDown: 2,
       DeviceOrientation.landscapeLeft: 3,
     };
-    return turns[_getApplicableOrientation()]! + 1;
+    int extraRotation = isTablet ? 1 : 0;
+    return turns[_getApplicableOrientation()]! + extraRotation;
   }
 
   DeviceOrientation _getApplicableOrientation() {

@@ -33,6 +33,21 @@ class ScreenUtilities {
     }
   }
 
+  /// Check if the screen is in tablet mode
+  ///
+  /// Try to detect if the device is a tablet or not, based on the diagonal size.
+  static bool isTablet(BuildContext context) {
+    // Get the diagonal size in inches
+    final mediaQuery = MediaQuery.of(context);
+    final size = mediaQuery.size;
+    final diagonalInches =
+        sqrt(size.width * size.width + size.height * size.height) /
+            mediaQuery.devicePixelRatio;
+
+    // Define a threshold for tablet detection (e.g., 7 inches and above)
+    return diagonalInches >= 7.0;
+  }
+
   /// Check if the screen is in large width mode, i.e. tablet or phone landscape
   static bool isLargeScreen(BuildContext context) {
     return MediaQuery.of(context).size.width > 600;
