@@ -322,6 +322,9 @@ class EditableTextField extends StatefulWidget {
   final Function onSave;
   final Function? validationFunction;
   final TextInputType? keyboardType;
+  final Color? textColor;
+  final Color? buttonColor;
+  final bool withLabel;
 
   EditableTextField(this.label, this.value, this.onSave,
       {this.validationFunction,
@@ -329,6 +332,9 @@ class EditableTextField extends StatefulWidget {
       this.doBold = false,
       this.hintText,
       this.keyboardType = TextInputType.text,
+      this.withLabel = false,
+      this.textColor,
+      this.buttonColor,
       Key? key})
       : super(key: key);
 
@@ -359,6 +365,8 @@ class _EditableTextFieldState extends State<EditableTextField> {
 
   @override
   Widget build(BuildContext context) {
+    Color textColor = widget.textColor ?? SmashColors.mainTextColor;
+    Color buttonColor = widget.buttonColor ?? SmashColors.mainDecorationsDarker;
     if (editMode) {
       if (_currentValue != widget.hintText && _currentValue.isNotEmpty) {
         _controller.text = _currentValue;
@@ -368,8 +376,13 @@ class _EditableTextFieldState extends State<EditableTextField> {
         _controller.text = "";
       }
       return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          if (widget.withLabel)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: SmashUI.normalText(widget.label),
+            ),
           Expanded(
             child: TextFormField(
               autofocus: true,
@@ -396,7 +409,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
             icon: Icon(
               MdiIcons.contentSave,
               size: SmashUI.MEDIUM_ICON_SIZE,
-              color: SmashColors.mainDecorationsDarker,
+              color: buttonColor,
             ),
             onPressed: () {
               if (_canSave) {
@@ -414,6 +427,11 @@ class _EditableTextFieldState extends State<EditableTextField> {
       _controller2.text = _currentValue;
       return Row(
         children: [
+          if (widget.withLabel)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: SmashUI.normalText(widget.label),
+            ),
           Expanded(
             child: TextFormField(
               controller: _controller2,
@@ -421,7 +439,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
               keyboardType: widget.keyboardType,
               readOnly: true,
               style: TextStyle(
-                color: SmashColors.mainTextColor,
+                color: textColor,
                 fontWeight: FontWeight.bold,
                 fontSize: SmashUI.NORMAL_SIZE,
               ),
@@ -435,7 +453,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
           IconButton(
             icon: Icon(
               MdiIcons.pencil,
-              color: SmashColors.mainDecorationsDarker,
+              color: buttonColor,
             ),
             onPressed: () {
               setState(() {
