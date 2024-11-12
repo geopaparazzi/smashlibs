@@ -74,6 +74,7 @@ import 'package:video_player/video_player.dart';
 
 part 'com/hydrologis/dartlibs/dartlibs.dart';
 part 'com/hydrologis/flutterlibs/camera/camera.dart';
+part 'com/hydrologis/flutterlibs/camera/camera_state.dart';
 part 'com/hydrologis/flutterlibs/camera/camera_advanced.dart';
 part 'com/hydrologis/flutterlibs/gps/gps.dart';
 part 'com/hydrologis/flutterlibs/filesystem/filemanagement.dart';

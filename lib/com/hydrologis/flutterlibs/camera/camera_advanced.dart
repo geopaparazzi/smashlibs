@@ -144,7 +144,6 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
   }
 
   Widget buildMainWidget() {
-    var isTablet = ScreenUtilities.isTablet(context);
     return Stack(
       children: <Widget>[
         Container(
@@ -1249,7 +1248,7 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
 // found in the LICENSE file.
 
 /// A widget showing a live camera preview.
-class CameraPreview2 extends StatelessWidget {
+class CameraPreview2 extends StatefulWidget {
   /// A widget to overlay on top of the camera preview
   final Widget? child;
   final bool isTablet;
@@ -1262,26 +1261,63 @@ class CameraPreview2 extends StatelessWidget {
   final CameraController controller;
 
   @override
+  State<CameraPreview2> createState() => _CameraPreview2State();
+}
+
+class _CameraPreview2State extends State<CameraPreview2>
+    with WidgetsBindingObserver {
+  DeviceOrientation? currentOrientation;
+  CameraState? cameraState;
+  @override
+  void initState() {
+    cameraState = Provider.of<CameraState>(context, listen: false);
+
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    currentOrientation =
+        cameraState!.getOrientation(context, setPreferred: true);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    currentOrientation =
+        cameraState!.getOrientation(context, setPreferred: true);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([]);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return controller.value.isInitialized
+    return widget.controller.value.isInitialized
         ? ValueListenableBuilder<CameraValue>(
-            valueListenable: controller,
+            valueListenable: widget.controller,
             builder: (BuildContext context, Object? value, Widget? child) {
               return AspectRatio(
                 aspectRatio: _isLandscape()
-                    ? controller.value.aspectRatio
-                    : (1 / controller.value.aspectRatio),
+                    ? widget.controller.value.aspectRatio
+                    : (1 / widget.controller.value.aspectRatio),
                 child: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
                     // controller.buildPreview(),
-                    _wrapInRotatedBox(child: controller.buildPreview()),
+                    _wrapInRotatedBox(child: widget.controller.buildPreview()),
                     child ?? Container(),
                   ],
                 ),
               );
             },
-            child: child,
+            child: widget.child,
           )
         : Container();
   }
@@ -1311,16 +1347,26 @@ class CameraPreview2 extends StatelessWidget {
       DeviceOrientation.portraitDown: 2,
       DeviceOrientation.landscapeLeft: 3,
     };
-    int extraRotation = isTablet ? 1 : 0;
-    return turns[_getApplicableOrientation()]! + extraRotation;
+    int extraRotation = 0; //widget.isTablet ? 1 : 0;
+    if (cameraState!.startupOrientation == DeviceOrientation.landscapeLeft ||
+        cameraState!.startupOrientation == DeviceOrientation.landscapeRight) {
+      extraRotation += 1;
+    }
+    var currentOrientation = _getApplicableOrientation();
+    print('currentOrientation: $currentOrientation' +
+        ' vs startuporient ${cameraState!.startupOrientation}');
+
+    return turns[currentOrientation]! + extraRotation;
   }
 
   DeviceOrientation _getApplicableOrientation() {
-    return controller.value.isRecordingVideo
-        ? controller.value.recordingOrientation!
-        : (controller.value.previewPauseOrientation ??
-            controller.value.lockedCaptureOrientation ??
-            controller.value.deviceOrientation);
+    return currentOrientation != null
+        ? currentOrientation!
+        : widget.controller.value.isRecordingVideo
+            ? widget.controller.value.recordingOrientation!
+            : (widget.controller.value.previewPauseOrientation ??
+                widget.controller.value.lockedCaptureOrientation ??
+                widget.controller.value.deviceOrientation);
   }
 }
 
