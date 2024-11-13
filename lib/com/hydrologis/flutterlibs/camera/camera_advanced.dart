@@ -229,43 +229,49 @@ class _AdvancedCameraWidgetState extends State<AdvancedCameraWidget>
                   icon: Icon(MdiIcons.crop, size: iconSize),
                   color: SmashColors.mainDecorations,
                   onPressed: () {
-                    if (imageFile != null) {
-                      var frameProperties = widget.frameProperties;
-                      if (frameProperties != null &&
-                          frameProperties.ratio != null) {
-                        // crop the picture to the defined frame
-                        // at the momento we only handle ratio cases
-                        var imgFile = File(imageFile!.path);
-                        final image =
-                            IMG.decodeImage(imgFile.readAsBytesSync());
+                    var finalPath = imageFile!.path;
+                    var frameProperties = widget.frameProperties;
+                    if (frameProperties != null &&
+                        frameProperties.ratio != null) {
+                      // crop the picture to the defined frame
+                      // at the momento we only handle ratio cases
+                      var imgFile = File(imageFile!.path);
+                      final image = IMG.decodeImage(imgFile.readAsBytesSync());
 
-                        if (image != null) {
-                          var imageWidht = image.width;
-                          var imageHeight = image.height;
-                          var ratio = frameProperties.ratio!;
-                          var newWidth = imageHeight * ratio;
-                          var newHeight = newWidth / ratio;
-                          if (newHeight > imageHeight) {
-                            newHeight = imageWidht / ratio;
-                            newWidth = newHeight * ratio;
-                          }
-                          var left = (imageWidht - newWidth) / 2;
-                          var top = (imageHeight - newHeight) / 2;
-
-                          // Crop the image (parameters: x, y, width, height)
-                          final croppedImage = IMG.copyCrop(image,
-                              x: left.toInt(),
-                              y: top.toInt(),
-                              width: newWidth.toInt(),
-                              height: newHeight.toInt());
-
-                          // Save the cropped image as a new file
-                          File(imageFile!.path)
-                            ..writeAsBytesSync(IMG.encodeJpg(croppedImage));
+                      if (image != null) {
+                        var imageWidth = image.width;
+                        var imageHeight = image.height;
+                        var ratio = frameProperties.ratio!;
+                        var newWidth = imageHeight * ratio;
+                        var newHeight = newWidth / ratio;
+                        if (newWidth > imageWidth) {
+                          newHeight = imageWidth / ratio;
+                          newWidth = newHeight * ratio;
                         }
+                        var left = (imageWidth - newWidth) / 2;
+                        var top = (imageHeight - newHeight) / 2;
+
+                        // print("Old image size: $imageWidth x $imageHeight");
+                        // print(
+                        //     "Cropping image to: left: $left, top: $top, width: $newWidth, height: $newHeight");
+
+                        // Crop the image (parameters: x, y, width, height)
+                        final croppedImage = IMG.copyCrop(image,
+                            x: left.toInt(),
+                            y: top.toInt(),
+                            width: newWidth.toInt(),
+                            height: newHeight.toInt());
+
+                        // Save the cropped image as a new file
+                        var finalFile = HU.FileUtilities.getTmpFile("jpg");
+                        // print("Saving to cropped image: $finalFile");
+                        File(finalFile.path)
+                          ..writeAsBytesSync(IMG.encodeJpg(croppedImage),
+                              flush: true);
+                        finalPath = finalFile.path;
                       }
                     }
-                    Navigator.of(context).pop(imageFile!.path);
+                    Navigator.of(context).pop(finalPath);
                   },
                 ),
               ),
