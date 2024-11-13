@@ -1354,7 +1354,7 @@ class _CameraPreview2State extends State<CameraPreview2>
     }
     var currentOrientation = _getApplicableOrientation();
     print('currentOrientation: $currentOrientation' +
-        ' vs startuporient ${cameraState!.startupOrientation}');
+        ' startup: ${cameraState!.startupOrientation} + rotation-applied: ${turns[currentOrientation]!} + $extraRotation');
 
     return turns[currentOrientation]! + extraRotation;
   }
