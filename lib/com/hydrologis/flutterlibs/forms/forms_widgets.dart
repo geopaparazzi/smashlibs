@@ -1064,9 +1064,27 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget> {
       }
     }
 
+    bool isInt = widget._formItem.type == TYPE_INTCOMBO;
+
     T? value;
     if (widget._formItem.value != null) {
-      value = widget._formItem.value;
+      try {
+        if (isInt && widget._formItem.value is String) {
+          if (widget._formItem.value.isEmpty) {
+            value = null;
+          } else {
+            value = int.parse(widget._formItem.value) as T;
+          }
+        } else {
+          value = widget._formItem.value;
+        }
+      } on TypeError catch (er, st) {
+        print(er);
+        SMLogger()
+            .e("Error parsing value: ${widget._formItem.value}", null, st);
+      } on Exception catch (e, st) {
+        SMLogger().e("Error parsing value: ${widget._formItem.value}", e, st);
+      }
     }
     String? key = widget._formItem.key;
 
