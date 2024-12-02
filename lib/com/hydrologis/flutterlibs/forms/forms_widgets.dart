@@ -2428,7 +2428,8 @@ class GeometryWidgetState extends State<GeometryWidget> {
     }
 
     if (sWidget == null) {
-      sWidget = SmashMapWidget(key: ValueKey(keyStr));
+      sWidget = SmashMapWidget(
+          key: UniqueKey()); // TODO check this ValueKey(keyStr));
       sWidget!.setInitParameters(
           canRotate: false,
           initBounds: latLngBoundsExt.toEnvelope(),
@@ -2616,9 +2617,11 @@ class GeometryWidgetState extends State<GeometryWidget> {
           GeometryEditManager().stopEditing();
 
           // reload layer geoms
-          await reloadLayerSource(geojsonSource!);
+          // await reloadLayerSource(geojsonSource!);
 
-          setState(() {});
+          setState(() {
+            sWidget = null;
+          });
         },
       ),
     );
