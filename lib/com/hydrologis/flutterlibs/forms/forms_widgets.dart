@@ -567,7 +567,7 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, valueString, presentationMode),
+                    label, formItem, presentationMode),
               ),
               false);
         }
@@ -587,7 +587,7 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, valueString, presentationMode),
+                    label, formItem, presentationMode),
               ),
               false);
         }
@@ -637,7 +637,7 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, valueString, presentationMode),
+                    label, formItem, presentationMode),
               ),
               false);
         }
@@ -662,7 +662,8 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, finalString, presentationMode),
+                    label, formItem, presentationMode,
+                    forceValue: finalString),
               ),
               false);
         }
@@ -702,7 +703,7 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, valueString, presentationMode),
+                    label, formItem, presentationMode),
               ),
               false);
         }
@@ -723,7 +724,7 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, valueString, presentationMode),
+                    label, formItem, presentationMode),
               ),
               false);
         }
@@ -1141,9 +1142,10 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget> {
     if (widget._presentationMode.isReadOnly &&
         widget._presentationMode.detailMode != DetailMode.DETAILED) {
       return AFormWidget.getSimpleLabelValue(
-          widget._label,
-          found != null ? found.label : (value == null ? "" : value.toString()),
-          widget._presentationMode);
+          widget._label, widget._formItem, widget._presentationMode,
+          forceValue: found != null
+              ? found.label
+              : (value == null ? "" : value.toString()));
     }
 
     return Column(
@@ -2046,9 +2048,11 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
     if (widget._isReadOnly &&
         widget._presentationMode.detailMode != DetailMode.DETAILED) {
       return AFormWidget.getSimpleLabelValue(
-          widget._label,
-          selectedItems.map((e) => e.label).join(";"),
-          widget._presentationMode);
+        widget._label,
+        widget._formItem,
+        widget._presentationMode,
+        forceValue: selectedItems.map((e) => e.label).join(";"),
+      );
     }
 
     return Center(

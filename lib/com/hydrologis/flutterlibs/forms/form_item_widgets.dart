@@ -78,7 +78,39 @@ abstract class AFormWidget {
   }
 
   static Widget getSimpleLabelValue(
-      String label, String value, PresentationMode pm) {
+      String label, SmashFormItem item, PresentationMode pm,
+      {String? forceValue}) {
+    dynamic value = forceValue;
+    if (value == null) {
+      value = item.value;
+      if (value == null) {
+        return Container();
+      } else if (value is List && value.isEmpty) {
+        return Container();
+      }
+      // if value has a label in the map, use it
+      List<String> valueLabels = [];
+      if (item.map["values"] != null &&
+          item.map["values"]?["items"] != null &&
+          item.map["values"]?["items"] is List) {
+        for (var listItem in item.map["values"]?["items"]) {
+          var itemMap = listItem["item"];
+          var itemLabel = itemMap?["label"];
+          var itemValue = itemMap?["value"];
+          if (itemLabel == null || itemValue == null) {
+            continue;
+          }
+          if (itemValue == value ||
+              (value is List && value.contains(itemValue))) {
+            valueLabels.add(itemLabel);
+          }
+        }
+      }
+      if (valueLabels.isNotEmpty) {
+        value = valueLabels.join(", ");
+      }
+    }
+
     Widget field;
     if (pm.detailMode == DetailMode.NORMAL) {
       field = Column(
@@ -89,7 +121,7 @@ abstract class AFormWidget {
               color: pm.labelTextColor, bold: pm.doLabelBold),
           Padding(
             padding: const EdgeInsets.only(left: 12.0, top: 8),
-            child: SmashUI.normalText(value,
+            child: SmashUI.normalText(value.toString(),
                 color: pm.valueTextColor, bold: pm.doValueBold),
           ),
         ],
@@ -103,7 +135,7 @@ abstract class AFormWidget {
               color: pm.labelTextColor, bold: pm.doLabelBold),
           Padding(
             padding: const EdgeInsets.only(left: 12.0),
-            child: SmashUI.normalText(value,
+            child: SmashUI.normalText(value.toString(),
                 color: pm.valueTextColor, bold: pm.doValueBold),
           ),
         ],
@@ -718,8 +750,8 @@ class DateWidget extends AFormWidget {
     if (itemReadonly && presentationMode.detailMode != DetailMode.DETAILED) {
       widget = ListTile(
         leading: icon,
-        title: AFormWidget.getSimpleLabelValue(
-            label, valueString, presentationMode),
+        title:
+            AFormWidget.getSimpleLabelValue(label, formItem, presentationMode),
       );
     } else {
       widget = ListTile(
@@ -786,8 +818,8 @@ class TimeWidget extends AFormWidget {
     if (itemReadonly && presentationMode.detailMode != DetailMode.DETAILED) {
       widget = ListTile(
         leading: icon,
-        title: AFormWidget.getSimpleLabelValue(
-            label, valueString, presentationMode),
+        title:
+            AFormWidget.getSimpleLabelValue(label, formItem, presentationMode),
       );
     } else {
       widget = ListTile(
@@ -1030,8 +1062,8 @@ class AutoCompleteStringComboWidget extends AFormWidget {
     if (itemReadonly && presentationMode.detailMode != DetailMode.DETAILED) {
       widget = ListTile(
         leading: icon,
-        title: AFormWidget.getSimpleLabelValue(
-            label, valueString, presentationMode),
+        title:
+            AFormWidget.getSimpleLabelValue(label, formItem, presentationMode),
       );
     } else {
       widget = ListTile(
@@ -1109,7 +1141,8 @@ class ConnectedStringComboWidget extends AFormWidget {
       widget = ListTile(
         leading: icon,
         title: AFormWidget.getSimpleLabelValue(
-            label, finalString, presentationMode),
+            label, formItem, presentationMode,
+            forceValue: finalString),
       );
     } else {
       widget = ListTile(
@@ -1246,8 +1279,8 @@ class MultiStringComboWidget extends AFormWidget {
       // ! TODO
       widget = ListTile(
         leading: icon,
-        title: AFormWidget.getSimpleLabelValue(
-            label, valueString, presentationMode),
+        title:
+            AFormWidget.getSimpleLabelValue(label, formItem, presentationMode),
       );
     } else {
       widget = ListTile(
