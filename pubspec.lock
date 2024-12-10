@@ -934,8 +934,8 @@ packages:
     dependency: "direct main"
     description:
       path: mapsforge_flutter
-      ref: HEAD
-      resolved-ref: "4a212be2c03d706e9b21b9cf706072d96e8dcd32"
+      ref: "3e5e41e988c2010b5136a7dd5e9dd164eb3e853e"
+      resolved-ref: "3e5e41e988c2010b5136a7dd5e9dd164eb3e853e"
       url: "https://github.com/mikes222/mapsforge_flutter.git"
     source: git
     version: "2.0.3"
@@ -1272,10 +1272,10 @@ packages:
     dependency: transitive
     description:
       name: rxdart
-      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
+      sha256: "0c7c0cedd93788d996e33041ffecda924cc54389199cde4e6a34b440f50044cb"
       url: "https://pub.dev"
     source: hosted
-    version: "0.28.0"
+    version: "0.27.7"
   sasl_scram:
     dependency: transitive
     description:
