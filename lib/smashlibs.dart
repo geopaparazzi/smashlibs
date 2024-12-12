@@ -149,5 +149,6 @@ part 'com/hydrologis/flutterlibs/maps/plugins/center_cross_plugin.dart';
 part 'com/hydrologis/flutterlibs/maps/plugins/ruler_plugin.dart';
 part 'com/hydrologis/flutterlibs/maps/plugins/scale_plugin.dart';
 part 'com/hydrologis/flutterlibs/maps/plugins/feature_info_plugin.dart';
+part 'com/hydrologis/flutterlibs/maps/plugins/gps_position_plugin.dart';
 part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';

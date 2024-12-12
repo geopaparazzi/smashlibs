@@ -148,6 +148,9 @@ dependencies:
     #   url: https://github.com/moovida/flutter_material_pickers.git
     #   ref: 7b5486c
 
+  # pulled by flutter_material_pickers: force version to avoid bug in file_picker
+  file_picker: 8.1.4 
+
   # BSD
   shared_preferences: ^2.0.15
   # MIT
