@@ -121,6 +121,7 @@ part 'com/hydrologis/flutterlibs/projectdb/othertables.dart';
 
 // maps
 part 'com/hydrologis/flutterlibs/maps/mapview.dart';
+part 'com/hydrologis/flutterlibs/maps/mapviewforms.dart';
 part 'com/hydrologis/flutterlibs/maps/toolbar_tools.dart';
 part 'com/hydrologis/flutterlibs/maps/models/map_state.dart';
 part 'com/hydrologis/flutterlibs/maps/models/preferences_state.dart';

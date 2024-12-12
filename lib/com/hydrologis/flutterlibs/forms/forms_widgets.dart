@@ -2376,7 +2376,7 @@ class GeometryWidgetState extends State<GeometryWidget> {
   GeojsonSource? geojsonSource;
   late String keyStr;
   double _iconSize = 32;
-  SmashMapWidget? sWidget;
+  SmashMapFormsWidget? sWidget;
 
   Future<Widget> getMapView(BuildContext context) async {
     String value = ""; //$NON-NLS-1$
@@ -2428,7 +2428,7 @@ class GeometryWidgetState extends State<GeometryWidget> {
     }
 
     if (sWidget == null) {
-      sWidget = SmashMapWidget(
+      sWidget = SmashMapFormsWidget(
           key: UniqueKey()); // TODO check this ValueKey(keyStr));
       sWidget!.setInitParameters(
           canRotate: false,
