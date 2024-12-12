@@ -2489,6 +2489,13 @@ class GeometryWidgetState extends State<GeometryWidget> {
     //   geomEditorState.setEnabled(true);
     // }
     // }
+
+    // add gps position plugin
+    sWidget!.addPostLayer(GpsPositionLayer(
+      markerColor: SmashColors.mainSelection,
+      markerColorStale: SmashColors.mainSelection.withAlpha(100),
+      markerSize: 30,
+    ));
     return sWidget!;
   }
 
@@ -2529,8 +2536,8 @@ class GeometryWidgetState extends State<GeometryWidget> {
                 getCancelEditButton(geomEditorState),
                 getRemoveFeatureButton(geomEditorState),
                 // getInsertPointInCenterButton(geomEditorState),
-                // if (Provider.of<GpsState>(context, listen: false).hasFix())
-                //   getInsertPointInGpsButton(geomEditorState),
+                if (Provider.of<GpsState>(context, listen: false).hasFix())
+                  getInsertPointInGpsButton(geomEditorState),
                 getSaveFeatureButton(geomEditorState),
               ],
             ),
