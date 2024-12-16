@@ -75,6 +75,10 @@ class SmashPosition {
     _accuracy = -1.0;
     _speed = -1.0;
     _speedAccuracy = -1.0;
+
+    filteredLatitude = lat;
+    filteredLongitude = lon;
+    filteredAccuracy = -1.0;
   }
 
   double get latitude => _latitude;
