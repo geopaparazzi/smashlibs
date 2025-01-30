@@ -11,7 +11,7 @@ abstract class ISmashCache {
 /// A simple cache class singleton.
 ///
 /// Needs to be initialized ad application startup.
-class SmashCache extends ChangeNotifierPlus {
+class SmashCache {
   static final SmashCache _instance = SmashCache._internal();
   ISmashCache? _cache;
 
