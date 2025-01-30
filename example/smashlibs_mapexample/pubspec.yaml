@@ -43,6 +43,8 @@ dependencies:
 
   dart_hydrologis_utils: ^0.8.1
 
+  sembast: ^3.8.2
+
 
 
 dev_dependencies:

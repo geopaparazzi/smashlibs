@@ -183,9 +183,9 @@ dependencies:
   # MIT
   flutter_slidable: ^3.0.1
 
-  # Apache 2
-  hive: ^4.0.0-dev.2
-  isar_flutter_libs: ^4.0.0-dev.13
+  # # Apache 2
+  # hive: ^4.0.0-dev.2
+  # isar_flutter_libs: ^4.0.0-dev.13
 
 
   # MIT

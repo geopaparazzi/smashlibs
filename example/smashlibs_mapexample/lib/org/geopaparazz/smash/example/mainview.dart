@@ -9,6 +9,9 @@ import 'package:smashlibs/smashlibs.dart';
 import 'package:provider/provider.dart';
 import './utils.dart';
 import 'package:image/image.dart' as IMG;
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sembast/sembast_io.dart';
 
 class MainSmashLibsPage extends StatefulWidget {
   const MainSmashLibsPage({super.key, required this.title});
@@ -16,6 +19,45 @@ class MainSmashLibsPage extends StatefulWidget {
 
   @override
   State<MainSmashLibsPage> createState() => _MainSmashLibsPageState();
+}
+
+class SmashExampleCache implements ISmashCache {
+  late Database db;
+  var storesMap = <String, StoreRef>{};
+
+  @override
+  Future<void> init() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final dbPath = join(dir.path, 'smash_cache.db');
+    db = await databaseFactoryIo.openDatabase(dbPath);
+  }
+
+  StoreRef _getStore(String name) {
+    if (!storesMap.containsKey(name)) {
+      storesMap[name] = StoreRef<String, dynamic>.main();
+    }
+    return storesMap[name]!;
+  }
+
+  @override
+  Future<void> clear({String? cacheName}) async {
+    var store = _getStore(cacheName ?? "default");
+    await store.drop(db);
+    storesMap.remove(cacheName ?? "default");
+  }
+
+  @override
+  Future<dynamic> get(String key, {String? cacheName}) async {
+    var store = _getStore(cacheName ?? "default");
+    var object = await store.record(key).get(db);
+    return object;
+  }
+
+  @override
+  Future<void> put(String key, dynamic value, {String? cacheName}) async {
+    var store = _getStore(cacheName ?? "default");
+    await store.record(key).put(db, value);
+  }
 }
 
 class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
@@ -30,7 +72,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
     }
     await GpPreferences().initialize();
     await Workspace.init();
-    await SmashCache.init();
+    await SmashCache().init(SmashExampleCache());
     if (context.mounted) await LayerManager().initialize(context);
 
     mapView = SmashMapWidget();

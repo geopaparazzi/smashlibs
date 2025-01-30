@@ -7,10 +7,63 @@ import 'package:smashlibs/smashlibs.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
 import 'package:provider/provider.dart';
-
+import 'package:path/path.dart' hide equals;
+import 'package:path_provider/path_provider.dart';
+import 'package:sembast/sembast_io.dart' hide Finder;
 import 'form_url_mock_data.dart';
 
+class SmashExampleCache implements ISmashCache {
+  late Database db;
+  var storesMap = <String, StoreRef>{};
+
+  @override
+  Future<void> init() async {
+    // final dir = await getApplicationDocumentsDirectory();
+    final dir = Directory('test/mock_app_documents');
+    // recursive remove it it exists
+    if (dir.existsSync()) {
+      dir.deleteSync(recursive: true);
+    }
+    dir.createSync(recursive: true);
+    final dbPath = join(dir.path, 'smash_test_cache.db');
+    // final dbPath = '/tmp/smash_test_cache.db';
+    db = await databaseFactoryIo.openDatabase(dbPath);
+  }
+
+  StoreRef _getStore(String name) {
+    if (!storesMap.containsKey(name)) {
+      storesMap[name] = StoreRef<String, dynamic>.main();
+    }
+    return storesMap[name]!;
+  }
+
+  @override
+  Future<void> clear({String? cacheName}) async {
+    var store = _getStore(cacheName ?? "default");
+    await store.drop(db);
+    storesMap.remove(cacheName ?? "default");
+  }
+
+  @override
+  Future<dynamic> get(String key, {String? cacheName}) async {
+    var store = _getStore(cacheName ?? "default");
+    var object = await store.record(key).get(db);
+    return object;
+  }
+
+  @override
+  Future<void> put(String key, dynamic value, {String? cacheName}) async {
+    var store = _getStore(cacheName ?? "default");
+    await store.record(key).put(db, value);
+  }
+}
+
 void main() {
+  // prepare the mock data
+  setUp(() {
+    SmashCache().init(SmashExampleCache());
+  });
+
   testWidgets('Text Widgets Test', (tester) async {
     var helper = TestFormHelper("text_widgets.json");
     var newValues = {
@@ -144,7 +197,7 @@ void main() {
     };
 
     expect(helper.getSectionName(), "single choice combo examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, {}, tester);
 
     await changeCombo(tester, "a single choice combo", 'choice 3');
 
@@ -164,7 +217,7 @@ void main() {
     };
 
     expect(helper.getSectionName(), "int single choice combo examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, {}, tester);
 
     await changeCombo(tester, "an int single choice combo", 3);
 
@@ -184,7 +237,7 @@ void main() {
     };
 
     expect(helper.getSectionName(), "multi choice combo examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, {}, tester);
 
     await changeMultiCombo(
         tester, "a multiple choice combo", ['choice 3', 'choice 4']);
@@ -203,7 +256,7 @@ void main() {
     };
 
     expect(helper.getSectionName(), "int multi choice combo examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, {}, tester);
 
     await changeMultiCombo(tester, "an int multiple choice combo", [3, 4]);
 
@@ -395,7 +448,7 @@ void main() {
     };
 
     expect(helper.getSectionName(), "single choice label-value combo examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, {}, tester);
 
     await changeCombo(tester, "combos with item labels", 'choice 3');
 
@@ -415,7 +468,7 @@ void main() {
     };
 
     expect(helper.getSectionName(), "multi choice label-value combo examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, {}, tester);
 
     await changeMultiCombo(tester, "a multiple choice combo with item labels",
         ['choice 3', 'choice 4']);
@@ -437,7 +490,7 @@ void main() {
 
     expect(
         helper.getSectionName(), "int multi choice label-value combo examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, {}, tester);
 
     await changeMultiCombo(
         tester,
@@ -461,7 +514,7 @@ void main() {
 
     expect(helper.getSectionName(),
         "int single choice label-value combo examples");
-    await pumpForm(helper, newValues, tester);
+    await pumpFormWithFormUrlState(helper, newValues, {}, tester);
 
     await changeCombo(tester, "combos with item int labels", 'choice 3');
 
@@ -477,7 +530,7 @@ void main() {
     var helper = TestFormHelper("combos_two_connected_widgets.json");
 
     expect(helper.getSectionName(), "two connected combo examples");
-    await pumpForm(helper, {}, tester);
+    await pumpFormWithFormUrlState(helper, {}, {}, tester);
 
     await changeConnectedCombo(
         tester, "two connected combos", 'items 2', 'choice 3 of 2');

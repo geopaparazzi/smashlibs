@@ -1715,7 +1715,7 @@ class FormsNetworkSupporter {
   Future<String?> getJsonString(String url) async {
     if (url.isEmpty) return null;
 
-    String? cachedData = SmashCache.get(url, cacheName: "forms") as String?;
+    String? cachedData = SmashCache().get(url, cacheName: "forms") as String?;
     if (cachedData != null) {
       return cachedData;
     }
@@ -1726,7 +1726,7 @@ class FormsNetworkSupporter {
 
     if (response.statusCode == 200) {
       String body = response.body;
-      SmashCache.put(url, body, cacheName: "forms");
+      SmashCache().put(url, body, cacheName: "forms");
       return body;
     }
     return null;

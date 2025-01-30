@@ -68,7 +68,6 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
     hide ImageSource;
 import 'package:painter/painter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 
@@ -112,7 +111,7 @@ part 'com/hydrologis/flutterlibs/utils/screen.dart';
 part 'com/hydrologis/flutterlibs/utils/notifier.dart';
 part 'com/hydrologis/flutterlibs/utils/share.dart';
 part 'com/hydrologis/flutterlibs/utils/validators.dart';
-part 'com/hydrologis/flutterlibs/utils/cache.dart';
+part 'com/hydrologis/flutterlibs/maps/models/cache.dart';
 part 'com/hydrologis/flutterlibs/projectdb/project_db.dart';
 part 'com/hydrologis/flutterlibs/projectdb/images.dart';
 part 'com/hydrologis/flutterlibs/projectdb/logs.dart';

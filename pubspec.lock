@@ -94,14 +94,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.3"
-  build:
-    dependency: transitive
-    description:
-      name: build
-      sha256: "80184af8b6cb3e5c1c4ec6d8544d27711700bc3e6d2efad04238c7b5290889f0"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.1"
   cached_network_image:
     dependency: transitive
     description:
@@ -302,14 +294,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  dart_style:
-    dependency: transitive
-    description:
-      name: dart_style
-      sha256: "7856d364b589d1f08986e140938578ed36ed948581fbc3bc9aef1805039ac5ab"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.7"
   dbus:
     dependency: transitive
     description:
@@ -674,14 +658,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  hive:
-    dependency: "direct main"
-    description:
-      name: hive
-      sha256: "10819524df282842ebae12870e2e0e9ebc3e5c4637bec741ad39b919c589cb20"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-dev.2"
   html:
     dependency: transitive
     description:
@@ -810,22 +786,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  isar:
-    dependency: transitive
-    description:
-      name: isar
-      sha256: ebf74d87c400bd9f7da14acb31932b50c2407edbbd40930da3a6c2a8143f85a8
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-dev.14"
-  isar_flutter_libs:
-    dependency: "direct main"
-    description:
-      name: isar_flutter_libs
-      sha256: "04a3f4035e213ddb6e78d0132a7c80296a085c2088c2a761b4a42ee5add36983"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-dev.14"
   js:
     dependency: transitive
     description:
@@ -1401,14 +1361,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
-  source_gen:
-    dependency: transitive
-    description:
-      name: source_gen
-      sha256: "14658ba5f669685cd3d63701d01b31ea748310f7ab854e471962670abcf57832"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
   source_map_stack_trace:
     dependency: transitive
     description:
