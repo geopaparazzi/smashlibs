@@ -1027,10 +1027,8 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget> {
     if (rawUrl != null) {
       requiredFormUrlItems = widget._formHelper.getRequiredFormUrlItems();
 
-      print("rawUrl: $rawUrl");
       var url = urlItemState.applyUrlSubstitutions(rawUrl!);
-      print("url: $url");
-      var jsonString = await FormsNetworkSupporter().getJsonString(url!);
+      var jsonString = await FormsNetworkSupporter().getJsonString(url);
       if (jsonString != null) {
         List<dynamic>? urlComboItems = jsonDecode(jsonString);
         return urlComboItems;

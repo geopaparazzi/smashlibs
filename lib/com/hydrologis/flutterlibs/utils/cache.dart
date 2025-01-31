@@ -5,7 +5,7 @@ abstract class ISmashCache {
   Future<void> init();
   Future<void> clear({String? cacheName});
   Future<void> put(String key, dynamic value, {String? cacheName});
-  dynamic get(String key, {String? cacheName});
+  Future<dynamic> get(String key, {String? cacheName});
 }
 
 /// A simple cache class singleton.
@@ -34,7 +34,7 @@ class SmashCache {
     await _cache!.put(key, value, cacheName: cacheName);
   }
 
-  dynamic get(String key, {String? cacheName}) {
-    return _cache!.get(key, cacheName: cacheName);
+  Future<dynamic> get(String key, {String? cacheName}) async {
+    return await _cache!.get(key, cacheName: cacheName);
   }
 }
