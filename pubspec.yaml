@@ -175,13 +175,13 @@ dependencies:
   #   url: https://github.com/yako-dev/flutter_badges.git
 
   # MIT
-  flutter_widget_from_html: ^0.14.9
+  flutter_widget_from_html: ^0.15.2
 
   #BSD
   painter: ^2.0.0
 
   # MIT
-  flutter_slidable: ^3.0.1
+  flutter_slidable: ^3.1.2
 
   # # Apache 2
   # hive: ^4.0.0-dev.2
