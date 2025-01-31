@@ -696,17 +696,17 @@ Tuple2<ListTile, bool>? getWidget(
 //        break;
     case TYPE_STRINGMULTIPLECHOICE:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
-          // ! TODO
-          return Tuple2(
-              ListTile(
-                leading: icon,
-                title: AFormWidget.getSimpleLabelValue(
-                    label, formItem, presentationMode),
-              ),
-              false);
-        }
+        // if (itemReadonly &&
+        //     presentationMode.detailMode != DetailMode.DETAILED) {
+        //   // ! TODO
+        //   return Tuple2(
+        //       ListTile(
+        //         leading: icon,
+        //         title: AFormWidget.getSimpleLabelValue(
+        //             label, formItem, presentationMode),
+        //       ),
+        //       false);
+        // }
         return Tuple2(
             ListTile(
               leading: icon,
@@ -717,17 +717,17 @@ Tuple2<ListTile, bool>? getWidget(
       }
     case TYPE_INTMULTIPLECHOICE:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
-          // ! TODO
-          return Tuple2(
-              ListTile(
-                leading: icon,
-                title: AFormWidget.getSimpleLabelValue(
-                    label, formItem, presentationMode),
-              ),
-              false);
-        }
+        // if (itemReadonly &&
+        //     presentationMode.detailMode != DetailMode.DETAILED) {
+        //   // ! TODO
+        //   return Tuple2(
+        //       ListTile(
+        //         leading: icon,
+        //         title: AFormWidget.getSimpleLabelValue(
+        //             label, formItem, presentationMode),
+        //       ),
+        //       false);
+        // }
         return Tuple2(
             ListTile(
               leading: icon,
@@ -1027,7 +1027,9 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget> {
     if (rawUrl != null) {
       requiredFormUrlItems = widget._formHelper.getRequiredFormUrlItems();
 
+      print("rawUrl: $rawUrl");
       var url = urlItemState.applyUrlSubstitutions(rawUrl!);
+      print("url: $url");
       var jsonString = await FormsNetworkSupporter().getJsonString(url!);
       if (jsonString != null) {
         List<dynamic>? urlComboItems = jsonDecode(jsonString);
