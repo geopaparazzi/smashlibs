@@ -187,7 +187,7 @@ class SmashMapFormsWidget extends StatelessWidget {
   }
 
   Widget consumeBuild(SmashMapBuilder mapBuilder, BuildContext context) {
-    print("SmashMapFormsWidget consumeBuild");
+    // print("SmashMapFormsWidget consumeBuild");
     var layers = <Widget>[];
 
     layers.addAll(preLayers);

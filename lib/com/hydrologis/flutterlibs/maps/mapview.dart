@@ -193,7 +193,7 @@ class SmashMapWidget extends StatelessWidget {
   }
 
   Widget consumeBuild(SmashMapBuilder mapBuilder) {
-    print("SmashMapWidget consumeBuild");
+    // print("SmashMapWidget consumeBuild");
     var layers = <Widget>[];
 
     layers.addAll(preLayers);

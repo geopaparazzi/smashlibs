@@ -21,7 +21,7 @@ class SmashMapLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("SmashMapLayer.build");
+    // print("SmashMapLayer.build");
     return FutureBuilder(
       builder: (context, projectSnap) {
         if (projectSnap.hasError) {
