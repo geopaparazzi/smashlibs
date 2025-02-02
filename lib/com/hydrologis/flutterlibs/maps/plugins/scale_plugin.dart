@@ -55,20 +55,17 @@ class ScaleLayer extends StatelessWidget {
         ? '${(distance / 1000).toStringAsFixed(0)} km'
         : '${distance.toStringAsFixed(0)} m';
     var width = (end.x - start.x);
-
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints bc) {
-        return CustomPaint(
-          painter: ScalePainter(
-            width,
-            displayDistance,
-            lineColor: lineColor,
-            lineWidth: lineWidth,
-            padding: padding,
-            textStyle: textStyle,
-          ),
-        );
-      },
+    return SafeArea(
+      child: CustomPaint(
+        painter: ScalePainter(
+          width,
+          displayDistance,
+          lineColor: lineColor,
+          lineWidth: lineWidth,
+          padding: padding,
+          textStyle: textStyle,
+        ),
+      ),
     );
   }
 }

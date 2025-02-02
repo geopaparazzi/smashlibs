@@ -302,6 +302,21 @@ class SmashUI {
       children: buttons,
     );
   }
+
+  static Widget makeBackgroundCircle(Widget child,
+      {Color? background, double padding = 6}) {
+    if (background == null) {
+      background = SmashColors.mainDecorations;
+    }
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: background,
+      ),
+      padding: EdgeInsets.all(padding),
+      child: child,
+    );
+  }
 }
 
 /// A textfield that switches between editable and non editable state.
