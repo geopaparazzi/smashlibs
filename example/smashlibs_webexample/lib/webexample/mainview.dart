@@ -186,7 +186,40 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
             children: [
               ListTile(
                 title: SmashUI.normalText("Zoom to garda lake", bold: true),
-                onTap: () async {},
+                onTap: () async {
+                  zoomToPolygon(context);
+                },
+              ),
+              ListTile(
+                title: SmashUI.normalText("Zoom to Riva-Torbole", bold: true),
+                onTap: () async {
+                  zoomToLine(context);
+                },
+              ),
+              ListTile(
+                title: SmashUI.normalText("Zoom to Riva, Torbole", bold: true),
+                onTap: () async {
+                  zoomToPoints(context);
+                },
+              ),
+              ListTile(
+                title: SmashUI.normalText("Zoom with timer", bold: true),
+                onTap: () async {
+                  for (var i = 0; i < 5; i++) {
+                    await Future.delayed(const Duration(seconds: 2));
+                    if (context.mounted) {
+                      zoomToPolygon(context);
+                    }
+                    await Future.delayed(const Duration(seconds: 2));
+                    if (context.mounted) {
+                      zoomToLine(context);
+                    }
+                    await Future.delayed(const Duration(seconds: 2));
+                    if (context.mounted) {
+                      zoomToPoints(context);
+                    }
+                  }
+                },
               ),
             ],
           ),
@@ -199,6 +232,50 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
       //   child: const Icon(Icons.add),
       // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  void zoomToPolygon(BuildContext context) {
+    var d = 0.2;
+    var s = 45.6333;
+    var w = 10.6833;
+    var n = 45.7;
+    var e = 10.7167;
+    Envelope bounds = Envelope(w, e, s, n);
+    bounds.expandBy(d, d);
+    mapView!.zoomToBounds(bounds);
+
+    var hlGeom = HighlightedGeometry.fromPolygon(
+        LatLngBoundsExt.fromEnvelope(bounds).toPolygon());
+    mapView!.setHighlightedGeometry(context, hlGeom);
+  }
+
+  void zoomToLine(BuildContext context) {
+    var wkt =
+        "LINESTRING ( 10.84052 45.88622, 10.86637 45.87956, 10.87613 45.86965)";
+    WKTReader wktReader = WKTReader();
+    var line = wktReader.read(wkt);
+    var d = 0.02;
+    Envelope bounds = line!.getEnvelopeInternal();
+    bounds.expandBy(d, d);
+    mapView!.zoomToBounds(bounds);
+
+    var hlGeom = HighlightedGeometry.fromLineString(line,
+        strokeColor: const Color.fromARGB(255, 49, 134, 237), strokeWidth: 5);
+    mapView!.setHighlightedGeometry(context, hlGeom);
+  }
+
+  void zoomToPoints(BuildContext context) {
+    var wkt = "MULTIPOINT ( 10.84052 45.88622, 10.87613 45.86965)";
+    WKTReader wktReader = WKTReader();
+    var multiPoint = wktReader.read(wkt);
+    var d = 0.02;
+    Envelope bounds = multiPoint!.getEnvelopeInternal();
+    bounds.expandBy(d, d);
+    mapView!.zoomToBounds(bounds);
+
+    var hlGeom = HighlightedGeometry.fromPoint(multiPoint,
+        color: const Color.fromARGB(255, 177, 30, 155), size: 25);
+    mapView!.setHighlightedGeometry(context, hlGeom);
   }
 
   Future<void> addLayerAndZoomTo(BuildContext context) async {

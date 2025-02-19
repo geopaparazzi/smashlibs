@@ -17,6 +17,7 @@ class SmashMapWidget extends StatelessWidget {
   bool _addBorder = false;
   bool consumerBuild = false;
   bool _isMapReady = false;
+  HighlightedGeometry? highlightedGeometry;
 
   MapController _mapController = MapController();
   FlutterMap? flutterMap;
@@ -181,6 +182,11 @@ class SmashMapWidget extends StatelessWidget {
         .toEnvelope();
   }
 
+  void setHighlightedGeometry(BuildContext context, HighlightedGeometry geom) {
+    highlightedGeometry = geom;
+    triggerRebuild(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     consumerBuild = false;
@@ -234,6 +240,10 @@ class SmashMapWidget extends StatelessWidget {
       key: ValueKey(layerKey),
     ));
 
+    if (highlightedGeometry != null) {
+      addHighlightLayer(layers);
+    }
+
     var mapKey = "FlutterMapWidget-${key.toString()}";
     flutterMap = FlutterMap(
       key: ValueKey(mapKey),
@@ -264,8 +274,13 @@ class SmashMapWidget extends StatelessWidget {
             mapState.notifyListenersMsg("manual zoom update");
           }
         },
-        onTap: (TapPosition tPos, LatLng point) =>
-            _handleTap(point, _mapController.camera.zoom),
+        onTap: (TapPosition tPos, LatLng point) {
+          _handleTap(point, _mapController.camera.zoom);
+          if (highlightedGeometry != null) {
+            highlightedGeometry = null;
+            triggerRebuild(context);
+          }
+        },
         onLongPress: (TapPosition tPos, LatLng point) =>
             _handleLongTap(point, _mapController.camera.zoom),
         interactionOptions: InteractionOptions(
@@ -334,5 +349,37 @@ class SmashMapWidget extends StatelessWidget {
         // )
       ],
     );
+  }
+
+  void addHighlightLayer(List<Widget> layers) {
+    if (highlightedGeometry == null) return;
+    var lines = <Polyline>[];
+    var polygons = <Polygon>[];
+    var points = <Marker>[];
+    if (highlightedGeometry!.isPoint) {
+      points = highlightedGeometry!.toMarkers();
+    }
+    if (highlightedGeometry!.isLine) {
+      lines = highlightedGeometry!.tolines();
+    }
+    if (highlightedGeometry!.isPolygon) {
+      polygons = highlightedGeometry!.toPolygons();
+    }
+
+    if (lines.isNotEmpty) {
+      layers.add(PolylineLayer(
+        polylines: lines,
+      ));
+    }
+    if (polygons.isNotEmpty) {
+      layers.add(PolygonLayer(
+        polygons: polygons,
+      ));
+    }
+    if (points.isNotEmpty) {
+      layers.add(MarkerLayer(
+        markers: points,
+      ));
+    }
   }
 }

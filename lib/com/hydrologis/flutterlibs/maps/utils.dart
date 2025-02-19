@@ -67,6 +67,18 @@ class LatLngBoundsExt implements LatLngBounds {
     );
   }
 
+  JTS.Polygon toPolygon() {
+    JTS.GeometryFactory gf = JTS.GeometryFactory.defaultPrecision();
+    var lr = gf.createLinearRing([
+      JTS.Coordinate(west, south),
+      JTS.Coordinate(east, south),
+      JTS.Coordinate(east, north),
+      JTS.Coordinate(west, north),
+      JTS.Coordinate(west, south),
+    ]);
+    return gf.createPolygon(lr, null);
+  }
+
   double getWidth() {
     return east - west;
   }
@@ -146,4 +158,119 @@ class SLSettings {
     80,
     100
   ];
+}
+
+class HighlightedGeometry {
+  late JTS.Geometry geometry;
+  late Color strokeColor;
+  late double strokeWidth;
+  late Color fillColor;
+  late double fillAlpha;
+  late double size;
+  bool isPoint = false;
+  bool isLine = false;
+  bool isPolygon = false;
+
+  HighlightedGeometry();
+
+  // a constructor to create it from polygon
+  HighlightedGeometry.fromPolygon(
+    JTS.Geometry polygon, {
+    Color strokeColor = Colors.red,
+    double strokeWidth = 2.0,
+    Color fillColor = Colors.red,
+    double fillAlpha = 0.2,
+  }) {
+    this.geometry = polygon;
+    this.strokeColor = strokeColor;
+    this.strokeWidth = strokeWidth;
+    this.fillColor = fillColor;
+    this.fillAlpha = fillAlpha;
+    isPolygon = true;
+  }
+
+  // a constructor to create it from line
+  HighlightedGeometry.fromLineString(
+    JTS.Geometry lineString, {
+    Color strokeColor = Colors.red,
+    double strokeWidth = 2.0,
+  }) {
+    this.geometry = lineString;
+    this.strokeColor = strokeColor;
+    this.strokeWidth = strokeWidth;
+    isLine = true;
+  }
+
+  // a constructor to create it from point
+  HighlightedGeometry.fromPoint(
+    JTS.Geometry point, {
+    Color color = Colors.red,
+    double size = 2.0,
+  }) {
+    this.geometry = point;
+    this.size = size;
+    this.fillColor = color;
+    isPoint = true;
+  }
+
+  List<Polygon> toPolygons() {
+    List<Polygon> polygons = [];
+    var count = geometry.getNumGeometries();
+    for (var i = 0; i < count; i++) {
+      JTS.Geometry g = geometry.getGeometryN(i);
+      if (g is JTS.Polygon) {
+        var linePoints = g.getExteriorRing().getCoordinates().map((c) {
+          return LatLng(c.y, c.x);
+        }).toList();
+        var holePoints = <List<LatLng>>[];
+        for (var i = 0; i < g.getNumInteriorRing(); i++) {
+          var hole = g.getInteriorRingN(i);
+          holePoints.add(hole.getCoordinates().map((c) {
+            return LatLng(c.y, c.x);
+          }).toList());
+        }
+        polygons.add(Polygon(
+            points: linePoints,
+            holePointsList: holePoints,
+            color: fillColor.withValues(alpha: fillAlpha),
+            borderStrokeWidth: strokeWidth,
+            borderColor: strokeColor));
+      }
+    }
+    return polygons;
+  }
+
+  List<Polyline> tolines() {
+    List<Polyline> polylines = [];
+    var count = geometry.getNumGeometries();
+    for (var i = 0; i < count; i++) {
+      JTS.Geometry g = geometry.getGeometryN(i);
+      if (g is JTS.LineString) {
+        var linePoints = g.getCoordinates().map((c) {
+          return LatLng(c.y, c.x);
+        }).toList();
+        polylines.add(Polyline(
+            points: linePoints, strokeWidth: strokeWidth, color: strokeColor));
+      }
+    }
+    return polylines;
+  }
+
+  List<Marker> toMarkers() {
+    List<Marker> markers = [];
+    var count = geometry.getNumGeometries();
+    for (var i = 0; i < count; i++) {
+      JTS.Geometry g = geometry.getGeometryN(i);
+      if (g is JTS.Point) {
+        var c = g.getCoordinate();
+        markers.add(
+          Marker(
+            point: LatLng(c!.y, c.x),
+            child: Icon(Icons.circle, color: fillColor, size: size),
+          ),
+        );
+      }
+    }
+    return markers;
+  }
 }

@@ -66,7 +66,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # assets:
+  assets:
+    - assets/smash_icon.png
     # - assets/fonts/OpenSans-Regular.ttf
     # - assets/fonts/OpenSans-Bold.ttf
     # - assets/fonts/OpenSans-Italic.ttf
