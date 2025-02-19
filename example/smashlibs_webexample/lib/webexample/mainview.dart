@@ -171,7 +171,11 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
         mapView ?? Container(),
         Align(
           alignment: Alignment.bottomLeft,
-          child: SmashToolsBar(48),
+          child: SmashToolsBar(
+            48,
+            doEdit: false,
+            doQuery: false,
+          ),
         )
       ]),
       drawer: Drawer(

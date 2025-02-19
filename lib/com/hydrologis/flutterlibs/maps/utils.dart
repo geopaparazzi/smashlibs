@@ -229,10 +229,11 @@ class HighlightedGeometry {
             return LatLng(c.y, c.x);
           }).toList());
         }
+        int alpha255 = (fillAlpha * 255).toInt();
         polygons.add(Polygon(
             points: linePoints,
             holePointsList: holePoints,
-            color: fillColor.withValues(alpha: fillAlpha),
+            color: fillColor.withAlpha(alpha255),
             borderStrokeWidth: strokeWidth,
             borderColor: strokeColor));
       }
