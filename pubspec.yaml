@@ -69,6 +69,9 @@ dependencies:
   flutter_map: ^7.0.2
 
   # BSD3
+  flutter_map_cancellable_tile_provider: ^3.0.2
+
+  # BSD3
   flutter_map_marker_cluster: ^1.4.0
 
   # MIT

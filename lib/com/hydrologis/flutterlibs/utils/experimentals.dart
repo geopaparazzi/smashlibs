@@ -9,10 +9,11 @@ const EXPERIMENTAL_HIDE_COLOR_RASTER__ENABLED = true;
 class ExceptionsToTrack {
   /// Cached uses sqfile on Linux which is not supported.
   static TileProvider getDefaultForOnlineServices() {
-    TileProvider tileProvider = NetworkTileProvider();
-    // if (Platform.isLinux) {
-    //   tileProvider = NetworkTileProvider();
-    // }
-    return tileProvider;
+    return CancellableNetworkTileProvider(silenceExceptions: true);
+    // TileProvider tileProvider = NetworkTileProvider();
+    // // if (Platform.isLinux) {
+    // //   tileProvider = NetworkTileProvider();
+    // // }
+    // return tileProvider;
   }
 }
