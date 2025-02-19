@@ -135,6 +135,7 @@ class SmashMapWidget extends StatelessWidget {
     return -1;
   }
 
+  /// Rebuild the map view, loading new layers and refreshing the view.
   void triggerRebuild(BuildContext context) {
     Provider.of<SmashMapBuilder>(context, listen: false).reBuild();
   }
@@ -182,7 +183,8 @@ class SmashMapWidget extends StatelessWidget {
         .toEnvelope();
   }
 
-  void setHighlightedGeometry(BuildContext context, HighlightedGeometry geom) {
+  /// Set a highlight geometry object or allow to set it to null to remove it.
+  void setHighlightedGeometry(BuildContext context, HighlightedGeometry? geom) {
     highlightedGeometry = geom;
     triggerRebuild(context);
   }

@@ -205,7 +205,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
               ListTile(
                 title: SmashUI.normalText("Zoom with timer", bold: true),
                 onTap: () async {
-                  for (var i = 0; i < 5; i++) {
+                  for (var i = 0; i < 2; i++) {
                     await Future.delayed(const Duration(seconds: 2));
                     if (context.mounted) {
                       zoomToPolygon(context);
@@ -218,6 +218,10 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                     if (context.mounted) {
                       zoomToPoints(context);
                     }
+                  }
+                  await Future.delayed(const Duration(seconds: 2));
+                  if (context.mounted) {
+                    mapView!.setHighlightedGeometry(context, null);
                   }
                 },
               ),
