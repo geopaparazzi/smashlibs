@@ -23,7 +23,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
     {
       "key": "text_area_key",
       "label": "text area label",
-      "value": "default value 1\ndefault value 2",
+      "value": "default value 1",
       "type": "$TYPE_STRINGAREA"
     }"""
   },
@@ -200,7 +200,7 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "value": 1,
       "type": "$TYPE_INTCOMBO"
     }""",
-    "int combo with item labels": """          
+    "int combo with item labels": """
     {
       "key": "int_single_choice_combo_with_labels_key",
       "values": {
