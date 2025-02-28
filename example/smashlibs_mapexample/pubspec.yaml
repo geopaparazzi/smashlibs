@@ -45,6 +45,9 @@ dependencies:
 
   sembast: ^3.8.2
 
+  # MIT
+  sqlite3_flutter_libs: ^0.5.9
+
 
 
 dev_dependencies:
@@ -98,6 +101,8 @@ flutter:
     - assets/watercourses_small.sld
     - assets/watercourses_small.dbf
     - assets/watercourses_small.prj
+    - packages/mapsforge_flutter/assets/patterns/dark_farmland.svg
+    - packages/mapsforge_flutter/assets/patterns/dark_military.png
     - packages/mapsforge_flutter/assets/patterns/coniferous.svg
     - packages/mapsforge_flutter/assets/patterns/coniferous_and_deciduous.svg
     - packages/mapsforge_flutter/assets/patterns/deciduous.svg
@@ -255,3 +260,15 @@ flutter:
     - packages/mapsforge_flutter/assets/symbols/water/weir.svg
     - packages/mapsforge_flutter/assets/symbols/windsock.svg
     - packages/mapsforge_flutter/assets/symbols/viewpoint.svg
+
+  fonts:
+  - family: serif
+    fonts:
+      - asset: packages/mapsforge_flutter/assets/fonts/FreeSerif.otf
+      - asset: packages/mapsforge_flutter/assets/fonts/FreeSerifBold.otf
+        weight: 700
+      - asset: packages/mapsforge_flutter/assets/fonts/FreeSerifBoldItalic.otf
+        style: italic
+        weight: 700
+      - asset: packages/mapsforge_flutter/assets/fonts/FreeSerifItalic.otf
+        style: italic

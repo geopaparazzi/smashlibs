@@ -80,14 +80,15 @@ dependencies:
     #   url: https://github.com/moovida/lat_lon_grid_plugin.git
     #   ref: bump_flutter_map_to_1
 
-  mapsforge_flutter: #^2.0.1
-    # path: /home/hydrologis/development/SMASH/mapsforge_flutter_moovida/mapsforge_flutter
-    git:
-      url: https://github.com/mikes222/mapsforge_flutter.git
-      # url: https://github.com/moovida/mapsforge_flutter.git
-      path: mapsforge_flutter
-      ref: 3e5e41e988c2010b5136a7dd5e9dd164eb3e853e
-      # ref: smash_compats
+  mapsforge_flutter: ^3.0.1
+  # mapsforge_flutter: #^2.0.1
+  #   # path: /home/hydrologis/development/SMASH/mapsforge_flutter_moovida/mapsforge_flutter
+  #   git:
+  #     url: https://github.com/mikes222/mapsforge_flutter.git
+  #     # url: https://github.com/moovida/mapsforge_flutter.git
+  #     path: mapsforge_flutter
+  #     ref: 3e5e41e988c2010b5136a7dd5e9dd164eb3e853e
+  #     # ref: smash_compats
 
   # apache
   latlong2: ^0.9.1

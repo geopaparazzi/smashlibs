@@ -87,7 +87,7 @@ class MapsforgeTileProvider extends TileProvider {
   late DisplayModel _displayModel;
   double tileSize;
 
-  MapFile? _mapDataStore;
+  var _mapDataStore;
   MBTilesDb? _mbtilesCache;
   late RenderTheme _renderTheme;
   late SmashMapDataStoreRenderer dataStoreRenderer;
@@ -138,8 +138,9 @@ class MapsforgeTileProvider extends TileProvider {
     renderThemeBuilder.parseXml(_displayModel, content);
     _renderTheme = renderThemeBuilder.build();
 
+    // _mapDataStore = IsolateMapfile(_mapsforgeFile.path);
     _mapDataStore = await MapFile.from(_mapsforgeFile.path, 0, "en");
-    await _mapDataStore!.lateOpen();
+    // await _mapDataStore!.lateOpen();
     dataStoreRenderer = SmashMapDataStoreRenderer(
         _mapDataStore!, _renderTheme, symbolCache, true);
 
@@ -153,18 +154,22 @@ class MapsforgeTileProvider extends TileProvider {
       _mbtilesCache = MBTilesDb(cachePath);
       _mbtilesCache!.open();
 
-      BoundingBox bBox = _mapDataStore!.boundingBox;
-      _mbtilesCache!.fillMetadata(bBox.maxLatitude, bBox.minLatitude,
-          bBox.minLongitude, bBox.maxLongitude, name, "png", 8, 22);
+      BoundingBox? bBox = await _mapDataStore!.getBoundingBox();
+      if (bBox != null) {
+        _mbtilesCache!.fillMetadata(bBox.maxLatitude, bBox.minLatitude,
+            bBox.minLongitude, bBox.maxLongitude, name, "png", 8, 22);
+      }
     }
   }
 
   Future<LatLngBounds> getBounds() async {
     if (_mapDataStore == null) {
       _mapDataStore = await MapFile.from(_mapsforgeFile.path, 0, "en");
-      await _mapDataStore!.lateOpen();
     }
-    BoundingBox bBox = _mapDataStore!.boundingBox;
+    BoundingBox? bBox = await _mapDataStore!.getBoundingBox();
+    if (bBox == null) {
+      throw new Exception("No bounds found in mapsforge file.");
+    }
     LatLngBounds bounds = LatLngBounds(
         LatLng(bBox.minLatitude, bBox.minLongitude),
         LatLng(bBox.maxLatitude, bBox.maxLongitude));
@@ -180,7 +185,10 @@ class MapsforgeTileProvider extends TileProvider {
   /// fill some base cache for the provider.
   Future<void> fillCache() async {
     if (_mbtilesCache != null) {
-      BoundingBox bBox = _mapDataStore!.boundingBox;
+      BoundingBox? bBox = await _mapDataStore!.getBoundingBox();
+      if (bBox == null) {
+        return;
+      }
       List<int> zoomLevels = [3, 4, 5, 6, 7, 8, 9];
       int indoorLevel = 0; // TODO take care of indoor if interest is there
       for (var i = 0; i < zoomLevels.length; i++) {
@@ -197,17 +205,19 @@ class MapsforgeTileProvider extends TileProvider {
         for (var x = minTileX; x <= maxTileX; x++) {
           for (var y = minTileY; y <= maxTileY; y++) {
             Tile tile = new Tile(x, y, z, indoorLevel);
-            Job mapGeneratorJob = new Job(tile, false, tileSize.toInt());
+            Job mapGeneratorJob = new Job(tile, false);
             JobResult jobResult =
                 await dataStoreRenderer.executeJobSync(mapGeneratorJob);
-            if (jobResult.bitmap != null) {
-              ui.Image img =
-                  (jobResult.bitmap as FlutterTileBitmap).getClonedImage();
-              var byteData =
-                  await img.toByteData(format: ui.ImageByteFormat.png);
-              if (byteData != null) {
-                var bytes = byteData.buffer.asUint8List();
-                _mbtilesCache!.addTile(x, y, z, bytes);
+            if (jobResult.result == JOBRESULT.NORMAL &&
+                jobResult.picture != null) {
+              ui.Image? img = jobResult.picture!.getClonedImage();
+              if (img != null) {
+                var byteData =
+                    await img.toByteData(format: ui.ImageByteFormat.png);
+                if (byteData != null) {
+                  var bytes = byteData.buffer.asUint8List();
+                  _mbtilesCache!.addTile(x, y, z, bytes);
+                }
               }
             }
           }
@@ -224,7 +234,7 @@ class MapsforgeTileProvider extends TileProvider {
 
     // TODO take care of indoor if interest is there (the last 0)
     Tile tile = new Tile(xTile, yTile, zoom, 0);
-    Job mapGeneratorJob = new Job(tile, false, tileSize.toInt());
+    Job mapGeneratorJob = new Job(tile, false);
     return MapsforgeImageProvider(
         dataStoreRenderer, mapGeneratorJob, tile, _mbtilesCache!);
   }
@@ -275,7 +285,7 @@ class MapsforgeImageProvider extends ImageProvider<MapsforgeImageProvider> {
     try {
       jobresult =
           await key._dataStoreRenderer.executeJobSync(key._mapGeneratorJob);
-      var resultTile = jobresult.bitmap;
+      var resultTile = jobresult.picture;
 
       // todo make this way better
       Uint8List? bytes;
@@ -296,18 +306,20 @@ class MapsforgeImageProvider extends ImageProvider<MapsforgeImageProvider> {
         }
         // do not cache
       } else {
-        ui.Image img = (resultTile as FlutterTileBitmap).getClonedImage();
-        var byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-        if (byteData != null) {
-          bytes = byteData.buffer.asUint8List();
-          _bitmapCache.addTile(
-              _tile.tileX, _tile.tileY, _tile.zoomLevel, bytes);
+        ui.Image? img = resultTile.getClonedImage();
+        if (img != null) {
+          var byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+          if (byteData != null) {
+            bytes = byteData.buffer.asUint8List();
+            _bitmapCache.addTile(
+                _tile.tileX, _tile.tileY, _tile.zoomLevel, bytes);
+          }
         }
       }
 
       if (bytes != null) {
         ui.ImmutableBuffer buffer =
-            await ui.ImmutableBuffer.fromUint8List(bytes!);
+            await ui.ImmutableBuffer.fromUint8List(bytes);
         var codec = await PaintingBinding.instance
             .instantiateImageCodecWithSize(buffer);
         return codec;
