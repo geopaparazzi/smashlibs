@@ -77,10 +77,8 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
     if (context.mounted) await LayerManager().initialize(context);
 
     mapView = SmashMapWidget();
-    // var initCoord = Coordinate(11, 46);
-    // var initZoom = 6.0;
-    var initCoord = Coordinate(12.614621, 43.071033);
-    var initZoom = 19.0;
+    var initCoord = Coordinate(11, 46);
+    var initZoom = 9.0;
     mapView!.setInitParameters(
         canRotate: false, initZoom: initZoom, centerCoordinate: initCoord);
     mapView!.setOnPositionChanged((newPosition, hasGest) {
