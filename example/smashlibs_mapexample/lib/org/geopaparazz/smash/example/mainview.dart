@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dart_jts/dart_jts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mapsforge_flutter/src/view/mapview_widget.dart';
 import 'package:path/path.dart' as p;
 import 'package:smashlibs/smashlibs.dart';
 import 'package:provider/provider.dart';
@@ -116,10 +117,6 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
     mapView!.addLayerSource(_backgroundLayerSource);
     mapView!.addLayerSource(_currentLayerSource);
-
-    var dbPath = await copyToMapFolder("assisi.map");
-    mapView!.addPostLayer(
-        MapsforgeLayer(dbPath, initCoord.y, initCoord.x, initZoom));
 
     int tapAreaPixels = GpPreferences()
             .getIntSync(SmashPreferencesKeys.KEY_VECTOR_TAPAREA_SIZE, 50) ??

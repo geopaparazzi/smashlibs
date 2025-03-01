@@ -1,13 +1,12 @@
 part of smashlibs;
 
-class MapsforgeLayer extends StatelessWidget {
+class MapsforgeWidget {
   double initLat;
   double initLon;
   double initZoom;
   String mapFilePath;
-  MapsforgeLayer(this.mapFilePath, this.initLat, this.initLon, this.initZoom,
-      {Key? key})
-      : super(key: key != null ? key : ValueKey(mapFilePath));
+  MapsforgeWidget(this.mapFilePath, this.initLat, this.initLon, this.initZoom,
+      {Key? key});
 
   // Create the displayModel which defines and holds the view/display settings
   // like maximum zoomLevel.
@@ -55,9 +54,9 @@ class MapsforgeLayer extends StatelessWidget {
     return viewModel;
   }
 
-  @override
-  Widget build(BuildContext context) {
+  MapviewWidget getMapWiget() {
     return MapviewWidget(
+      key: ValueKey(mapFilePath),
       displayModel: displayModel,
       createMapModel: _createMapModel,
       createViewModel: _createViewModel,
