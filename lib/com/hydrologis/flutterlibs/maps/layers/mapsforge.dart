@@ -91,11 +91,10 @@ class MapsforgeTileProvider extends TileProvider {
   MBTilesDb? _mbtilesCache;
   late RenderTheme _renderTheme;
   late SmashMapDataStoreRenderer dataStoreRenderer;
-
-//  BitmapCache _bitmapCache;
+  late String renderThemeName;
 
   MapsforgeTileProvider(this._mapsforgeFile,
-      {this.tileSize: MAPSFORGE_TILESIZE});
+      {this.tileSize = MAPSFORGE_TILESIZE});
 
   Future<void> open() async {
     _displayModel = DisplayModel(maxZoomLevel: 24, fontScaleFactor: 1.5);
@@ -118,14 +117,11 @@ class MapsforgeTileProvider extends TileProvider {
       }
     }
     SymbolCache symbolCache;
-    // String rendererName = "defaultrender";
-    String rendererName =
+    renderThemeName =
         GpPreferences().getStringSync("KEY_MAPSFORGE_THEME", "defaultrender") ??
             "defaultrender";
-    // String rendererName = "custom";
     if (content == null) {
-      content = await rootBundle.loadString("assets/$rendererName.xml");
-      // content = await rootBundle.loadString("assets/mapsforge_osmarender.xml");
+      content = await rootBundle.loadString("assets/$renderThemeName.xml");
       symbolCache =
           FileSymbolCache(imageLoader: ImageBundleLoader(bundle: rootBundle));
     } else {
@@ -138,15 +134,17 @@ class MapsforgeTileProvider extends TileProvider {
     renderThemeBuilder.parseXml(_displayModel, content);
     _renderTheme = renderThemeBuilder.build();
 
-    // _mapDataStore = IsolateMapfile(_mapsforgeFile.path);
-    _mapDataStore = await MapFile.from(_mapsforgeFile.path, 0, "en");
-    // await _mapDataStore!.lateOpen();
+    _mapDataStore = await MapFile.from(_mapsforgeFile.path, null, null);
     dataStoreRenderer = SmashMapDataStoreRenderer(
         _mapDataStore!, _renderTheme, symbolCache, true);
 
+    print(
+        "MapsforgeTileProvider: opened mapsforge file with $renderThemeName.");
+
     if (DOCACHE) {
       // create a mbtiles cache
-      String cachePath = _mapsforgeFile.path + "_" + rendererName + ".mbtiles";
+      String cachePath =
+          _mapsforgeFile.path + "_" + renderThemeName + ".mbtiles";
       if (!File(cachePath).existsSync()) {
         SMLogger().d("Creating mbtiles cache in $cachePath");
       }
@@ -160,6 +158,10 @@ class MapsforgeTileProvider extends TileProvider {
             bBox.minLongitude, bBox.maxLongitude, name, "png", 8, 22);
       }
     }
+  }
+
+  String getRenderThemeName() {
+    return renderThemeName;
   }
 
   Future<LatLngBounds> getBounds() async {
@@ -236,7 +238,7 @@ class MapsforgeTileProvider extends TileProvider {
     Tile tile = new Tile(xTile, yTile, zoom, 0);
     Job mapGeneratorJob = new Job(tile, false);
     return MapsforgeImageProvider(
-        dataStoreRenderer, mapGeneratorJob, tile, _mbtilesCache!);
+        dataStoreRenderer, mapGeneratorJob, tile, _mbtilesCache);
   }
 }
 
@@ -245,7 +247,7 @@ class MapsforgeImageProvider extends ImageProvider<MapsforgeImageProvider> {
   SmashMapDataStoreRenderer _dataStoreRenderer;
   var _mapGeneratorJob;
   Tile _tile;
-  MBTilesDb _bitmapCache;
+  MBTilesDb? _bitmapCache;
 
   MapsforgeImageProvider(this._dataStoreRenderer, this._mapGeneratorJob,
       this._tile, this._bitmapCache);
@@ -268,13 +270,15 @@ class MapsforgeImageProvider extends ImageProvider<MapsforgeImageProvider> {
     assert(key == this);
 
     try {
-      List<int>? tileData =
-          _bitmapCache.getTile(_tile.tileX, _tile.tileY, _tile.zoomLevel);
-      if (tileData != null) {
-        ui.ImmutableBuffer buffer =
-            await ui.ImmutableBuffer.fromUint8List(tileData as Uint8List);
-        return await PaintingBinding.instance
-            .instantiateImageCodecWithSize(buffer);
+      if (_bitmapCache != null) {
+        List<int>? tileData =
+            _bitmapCache!.getTile(_tile.tileX, _tile.tileY, _tile.zoomLevel);
+        if (tileData != null) {
+          ui.ImmutableBuffer buffer =
+              await ui.ImmutableBuffer.fromUint8List(tileData as Uint8List);
+          return await PaintingBinding.instance
+              .instantiateImageCodecWithSize(buffer);
+        }
       }
     } catch (e) {
       print("ERROR");
@@ -311,8 +315,10 @@ class MapsforgeImageProvider extends ImageProvider<MapsforgeImageProvider> {
           var byteData = await img.toByteData(format: ui.ImageByteFormat.png);
           if (byteData != null) {
             bytes = byteData.buffer.asUint8List();
-            _bitmapCache.addTile(
-                _tile.tileX, _tile.tileY, _tile.zoomLevel, bytes);
+            if (_bitmapCache != null) {
+              _bitmapCache!
+                  .addTile(_tile.tileX, _tile.tileY, _tile.zoomLevel, bytes);
+            }
           }
         }
       }
