@@ -27,12 +27,12 @@ class TileSource extends TiledRasterLayerSource {
 
   ErrorTileCallBack? errorTileCallback = (tile, exception, stacktrace) {
     // ignore tiles that can't load to avoid
-    if (exception is String) {
-      SMLogger().e(tile, null, null);
-    } else {
-      SMLogger()
-          .e("Unable to load tile: ${tile.coordinates}", null, stacktrace);
-    }
+    // if (exception is String) {
+    //   SMLogger().e(exception, null, stacktrace);
+    // } else {
+    //   SMLogger()
+    //       .e("Unable to load tile: ${tile.coordinates}", null, stacktrace);
+    // }
   };
   bool overrideTilesOnUrlChange = true;
 
@@ -346,21 +346,26 @@ class TileSource extends TiledRasterLayerSource {
       var mapsforgeTileProvider =
           MapsforgeTileProvider(File(absolutePath!), tileSize: tileSize);
       await mapsforgeTileProvider.open();
+      var layerKey = "${name}_${mapsforgeTileProvider.getRenderThemeName()}";
+      var urlTemplate = mapsforgeTileProvider.getUrlTemplate();
+      print(urlTemplate);
       return [
         Opacity(
-          opacity: opacityPercentage / 100.0,
-          child: TileLayer(
-            key: ValueKey(name),
-            tileProvider: mapsforgeTileProvider,
-            tileSize: tileSize,
-            keepBuffer: 2,
-            maxZoom: maxZoom.toDouble(),
-            maxNativeZoom: maxNativeZoom,
-            tms: isTms,
-            retinaMode: false, // not supported
-            errorTileCallback: errorTileCallback,
-          ),
-        )
+            opacity: opacityPercentage / 100.0,
+            child: TileLayer(
+              key: ValueKey(layerKey),
+              tileProvider: mapsforgeTileProvider,
+              urlTemplate: urlTemplate,
+              tileSize: tileSize,
+              keepBuffer: 2,
+              panBuffer: 0,
+              maxZoom: maxZoom.toDouble(),
+              maxNativeZoom: maxNativeZoom,
+              tms: isTms,
+              retinaMode: false, // not supported
+              errorTileCallback: errorTileCallback,
+              // fallbackUrl: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            ))
       ];
     } else if (FileManager.isMbtiles(getAbsolutePath())) {
       var tileProvider = SmashMBTilesImageProvider(File(absolutePath!));
@@ -722,6 +727,40 @@ class TileSourcePropertiesWidgetState
                             },
                             child:
                                 SmashUI.titleText(mapsforgeTheme, bold: true),
+                          ),
+                        ),
+                        ListTile(
+                          leading: Icon(MdiIcons.opacity),
+                          title: Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child:
+                                Text(SLL.of(context).tiles_opacity), //"Opacity"
+                          ),
+                          subtitle: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Flexible(
+                                  flex: 1,
+                                  child: Slider(
+                                    activeColor: SmashColors.mainSelection,
+                                    min: 0.0,
+                                    max: 100,
+                                    divisions: 10,
+                                    onChanged: (newRating) {
+                                      _somethingChanged = true;
+                                      setState(() =>
+                                          _opacitySliderValue = newRating);
+                                    },
+                                    value: _opacitySliderValue,
+                                  )),
+                              Container(
+                                width: 50.0,
+                                alignment: Alignment.center,
+                                child: SmashUI.normalText(
+                                  '${_opacitySliderValue.toInt()}',
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],

@@ -138,9 +138,6 @@ class MapsforgeTileProvider extends TileProvider {
     dataStoreRenderer = SmashMapDataStoreRenderer(
         _mapDataStore!, _renderTheme, symbolCache, true);
 
-    print(
-        "MapsforgeTileProvider: opened mapsforge file with $renderThemeName.");
-
     if (DOCACHE) {
       // create a mbtiles cache
       String cachePath =
@@ -162,6 +159,11 @@ class MapsforgeTileProvider extends TileProvider {
 
   String getRenderThemeName() {
     return renderThemeName;
+  }
+
+  String getUrlTemplate() {
+    var timestamp = DateTime.now().millisecondsSinceEpoch;
+    return "file://${_mapsforgeFile.path}#/$timestamp/{z}/{x}/{y}";
   }
 
   Future<LatLngBounds> getBounds() async {
