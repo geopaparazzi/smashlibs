@@ -80,6 +80,34 @@ class AndromapImageLoader implements ImageLoader {
   }
 }
 
+class AndromapResourceImageLoader implements ImageLoader {
+  static final String PREFIX_FILE = "file:";
+
+  const AndromapResourceImageLoader();
+
+  ///
+  /// Returns the content of the symbol given as [src] as [ByteData]. This method reads the file or resource and returns the requested bytes.
+  ///
+  @override
+  Future<ByteData?> fetchResource(String src) async {
+    // compatibility with mapsforge
+    if (src.startsWith(PREFIX_FILE)) {
+      src = src.substring(PREFIX_FILE.length);
+      var bytes = await rootBundle.load("assets/themes/Elevate/$src");
+      return bytes;
+    } else if (src.startsWith("assets/")) {
+      var bytes = await rootBundle.load(src);
+      return bytes;
+    }
+    File file = File(src);
+    if (await file.exists()) {
+      Uint8List bytes = await file.readAsBytes();
+      return ByteData.view(bytes.buffer);
+    }
+    return null;
+  }
+}
+
 /// Mapsforge tiles provider class.
 ///
 class MapsforgeTileProvider extends TileProvider {
@@ -99,7 +127,7 @@ class MapsforgeTileProvider extends TileProvider {
   Future<void> open() async {
     _displayModel = DisplayModel(maxZoomLevel: 24, fontScaleFactor: 1.5);
 
-    String? content;
+    String? themeContent;
     var parentFolder =
         HU.FileUtilities.parentFolderFromFile(_mapsforgeFile.path);
     var andromapStyleFolderPath =
@@ -113,17 +141,25 @@ class MapsforgeTileProvider extends TileProvider {
       xmlFile = File(xmlPath);
       if (xmlFile.existsSync()) {
         andromapResourcesPath = andromapStyleFolderPath;
-        content = HU.FileUtilities.readFile(xmlPath);
+        themeContent = HU.FileUtilities.readFile(xmlPath);
       }
     }
     SymbolCache symbolCache;
     renderThemeName =
         GpPreferences().getStringSync("KEY_MAPSFORGE_THEME", "defaultrender") ??
             "defaultrender";
-    if (content == null) {
-      content = await rootBundle.loadString("assets/$renderThemeName.xml");
-      symbolCache =
-          FileSymbolCache(imageLoader: ImageBundleLoader(bundle: rootBundle));
+    if (themeContent == null) {
+      if (renderThemeName != "elevate") {
+        themeContent =
+            await rootBundle.loadString("assets/themes/$renderThemeName.xml");
+        symbolCache =
+            FileSymbolCache(imageLoader: ImageBundleLoader(bundle: rootBundle));
+      } else {
+        themeContent =
+            await rootBundle.loadString("assets/themes/Elevate/Elevate.xml");
+        symbolCache =
+            FileSymbolCache(imageLoader: AndromapResourceImageLoader());
+      }
     } else {
       symbolCache = FileSymbolCache(
           imageLoader:
@@ -131,7 +167,7 @@ class MapsforgeTileProvider extends TileProvider {
     }
 
     RenderThemeBuilder renderThemeBuilder = RenderThemeBuilder();
-    renderThemeBuilder.parseXml(_displayModel, content);
+    renderThemeBuilder.parseXml(_displayModel, themeContent);
     _renderTheme = renderThemeBuilder.build();
 
     _mapDataStore = await MapFile.from(_mapsforgeFile.path, null, null);

@@ -348,14 +348,13 @@ class TileSource extends TiledRasterLayerSource {
       await mapsforgeTileProvider.open();
       var layerKey = "${name}_${mapsforgeTileProvider.getRenderThemeName()}";
       var urlTemplate = mapsforgeTileProvider.getUrlTemplate();
-      print(urlTemplate);
       return [
         Opacity(
             opacity: opacityPercentage / 100.0,
             child: TileLayer(
               key: ValueKey(layerKey),
               tileProvider: mapsforgeTileProvider,
-              urlTemplate: urlTemplate,
+              // urlTemplate: urlTemplate,
               tileSize: tileSize,
               keepBuffer: 2,
               panBuffer: 0,
@@ -707,6 +706,7 @@ class TileSourcePropertiesWidgetState
                                 "defaultrender",
                                 "darkrender",
                                 "custom",
+                                "elevate",
                               ];
                               var selected =
                                   await SmashDialogs.showSingleChoiceDialog(
