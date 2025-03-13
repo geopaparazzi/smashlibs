@@ -17,6 +17,7 @@ MultiProvider getMainWidget() {
       ChangeNotifierProvider(create: (_) => SmashMapState()),
       ChangeNotifierProvider(create: (_) => InfoToolState()),
       ChangeNotifierProvider(create: (_) => RulerState()),
+      ChangeNotifierProvider(create: (_) => BoxZoomState()),
       ChangeNotifierProvider(create: (_) => GeometryEditorState()),
       ChangeNotifierProvider(create: (_) => FormHandlerState()),
       ChangeNotifierProvider(create: (_) => FormUrlItemsState()),

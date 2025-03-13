@@ -300,6 +300,12 @@ abstract class SLL {
   /// **'Measure distances on the map with your finger.'**
   String get toolbarTools_measureDistanceWithFinger;
 
+  /// No description provided for @toolbarTools_zoomByBox.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom by box.'**
+  String get toolbarTools_zoomByBox;
+
   /// No description provided for @toolbarTools_modifyGeomVectorLayers.
   ///
   /// In en, this message translates to:

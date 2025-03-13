@@ -5,8 +5,9 @@ class BottomToolbarToolsRegistry {
   static const RULER = const BottomToolbarToolsRegistry._(0);
   static const FEATUREINFO = const BottomToolbarToolsRegistry._(1);
   static const GEOMEDITOR = const BottomToolbarToolsRegistry._(2);
+  static const BOXZOOM = const BottomToolbarToolsRegistry._(3);
 
-  static get values => [RULER, FEATUREINFO, GEOMEDITOR];
+  static get values => [RULER, FEATUREINFO, GEOMEDITOR, BOXZOOM];
   final int value;
 
   const BottomToolbarToolsRegistry._(this.value);
@@ -26,6 +27,17 @@ class BottomToolbarToolsRegistry {
         Provider.of<InfoToolState>(context, listen: false);
     GeometryEditorState geomEditorState =
         Provider.of<GeometryEditorState>(context, listen: false);
+    BoxZoomState boxZoomState =
+        Provider.of<BoxZoomState>(context, listen: false);
+    if (type == BottomToolbarToolsRegistry.BOXZOOM) {
+      if (!boxZoomState.isEnabled) {
+        boxZoomState.setEnabled(true);
+      }
+    } else {
+      if (boxZoomState.isEnabled) {
+        boxZoomState.setEnabled(false);
+      }
+    }
 
     if (type == BottomToolbarToolsRegistry.RULER) {
       if (!rulerState.isEnabled) {
@@ -62,6 +74,8 @@ class BottomToolbarToolsRegistry {
         Provider.of<InfoToolState>(context, listen: false);
     GeometryEditorState geomEditorState =
         Provider.of<GeometryEditorState>(context, listen: false);
+    BoxZoomState boxZoomState =
+        Provider.of<BoxZoomState>(context, listen: false);
     if (type == BottomToolbarToolsRegistry.RULER && rulerState.isEnabled) {
       rulerState.setEnabled(false);
     } else if (type == BottomToolbarToolsRegistry.FEATUREINFO &&
@@ -70,6 +84,9 @@ class BottomToolbarToolsRegistry {
     } else if (type == BottomToolbarToolsRegistry.GEOMEDITOR &&
         geomEditorState.isEnabled) {
       geomEditorState.setEnabled(false);
+    } else if (type == BottomToolbarToolsRegistry.BOXZOOM &&
+        boxZoomState.isEnabled) {
+      boxZoomState.setEnabled(false);
     }
   }
 
@@ -79,6 +96,8 @@ class BottomToolbarToolsRegistry {
         Provider.of<InfoToolState>(context, listen: false);
     GeometryEditorState geomEditorState =
         Provider.of<GeometryEditorState>(context, listen: false);
+    BoxZoomState boxZoomState =
+        Provider.of<BoxZoomState>(context, listen: false);
     if (rulerState.isEnabled) {
       rulerState.setEnabled(false);
     }
@@ -87,6 +106,9 @@ class BottomToolbarToolsRegistry {
     }
     if (geomEditorState.isEnabled) {
       geomEditorState.setEnabled(false);
+    }
+    if (boxZoomState.isEnabled) {
+      boxZoomState.setEnabled(false);
     }
   }
 }

@@ -32,6 +32,7 @@
   "toolbarTools_featureDoesNotHavePrimaryKey": "The feature does not have a primary key. Editing is not allowed.",
   "toolbarTools_queryFeaturesVectorLayers": "Query features from loaded vector layers.",
   "toolbarTools_measureDistanceWithFinger": "Measure distances on the map with your finger.",
+  "toolbarTools_zoomByBox": "Zoom by box.",
   "toolbarTools_modifyGeomVectorLayers": "Modify geometries in editable vector layers.",
   "featureAttributesViewer_loadingData": "Loading data...",
   "featureAttributesViewer_setNewValue": "Set new value.",

@@ -11,10 +11,12 @@ class SmashToolsBar extends StatefulWidget {
   final doRuler;
   final doQuery;
   final doEdit;
+  final doZoomByBox;
   SmashToolsBar(
     this._iconSize, {
     Key? key,
     this.doZoom = true,
+    this.doZoomByBox = true,
     this.doRuler = true,
     this.doQuery = true,
     this.doEdit = true,
@@ -39,6 +41,9 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
               if (widget.doEdit) GeomEditorButton(widget._iconSize),
               if (widget.doQuery) FeatureQueryButton(widget._iconSize),
               if (widget.doRuler) RulerButton(widget._iconSize),
+              if (widget.doZoom) getZoomIn(),
+              if (widget.doZoom) getZoomOut(),
+              if (widget.doZoomByBox) BoxZoomButton(widget._iconSize),
               if (PluginsHandler.FENCE.isOn()) FenceButton(widget._iconSize),
             ],
           ),
@@ -82,19 +87,15 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
 
   Consumer<SmashMapState> getZoomIn() {
     return Consumer<SmashMapState>(builder: (context, mapState, child) {
-      return makeToolbarZoomBadge(
-        IconButton(
-          onPressed: () {
-            mapState.zoomIn();
-          },
-          tooltip: SLL.of(context).toolbarTools_zoomIn, //'Zoom in'
-          icon: Icon(
-            SmashIcons.zoomInIcon,
-            color: SmashColors.mainBackground,
-          ),
-          iconSize: widget._iconSize,
+      return IconButton(
+        onPressed: () {
+          mapState.zoomIn();
+        },
+        tooltip: SLL.of(context).toolbarTools_zoomIn, //'Zoom in'
+        icon: Icon(
+          SmashIcons.zoomInIcon,
+          color: SmashColors.mainBackground,
         ),
-        mapState.zoom.toInt(),
         iconSize: widget._iconSize,
       );
     });
@@ -502,6 +503,40 @@ class RulerButton extends StatelessWidget {
           onTap: () {
             BottomToolbarToolsRegistry.setEnabled(context,
                 BottomToolbarToolsRegistry.RULER, !rulerState.isEnabled);
+          },
+        ),
+      );
+    });
+  }
+}
+
+class BoxZoomButton extends StatelessWidget {
+  final _iconSize;
+
+  BoxZoomButton(this._iconSize, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<BoxZoomState>(builder: (context, boxzoomState, child) {
+      Widget w = InkWell(
+        child: Icon(
+          MdiIcons.magnifyScan,
+          color: boxzoomState.isEnabled
+              ? SmashColors.mainSelection
+              : SmashColors.mainBackground,
+          size: _iconSize,
+        ),
+      );
+      return Tooltip(
+        message: SLL.of(context).toolbarTools_zoomByBox,
+        child: GestureDetector(
+          child: Padding(
+            padding: SmashUI.defaultPadding(),
+            child: w,
+          ),
+          onTap: () {
+            BottomToolbarToolsRegistry.setEnabled(context,
+                BottomToolbarToolsRegistry.BOXZOOM, !boxzoomState.isEnabled);
           },
         ),
       );

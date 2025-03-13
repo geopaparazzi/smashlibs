@@ -13,6 +13,7 @@ class SmashMapWidget extends StatelessWidget {
   double _minZoom = SmashMapState.MINZOOM;
   double _maxZoom = SmashMapState.MAXZOOM;
   bool _canRotate = false;
+  bool _canScrollWheelZoom = true;
   bool _useLayerManager = true;
   bool _addBorder = false;
   bool consumerBuild = false;
@@ -40,6 +41,7 @@ class SmashMapWidget extends StatelessWidget {
     double? minZoom,
     double? maxZoom,
     bool canRotate = false,
+    bool canScrollWheelZoom = true,
     bool useLayerManager = true,
     bool addBorder = false,
   }) {
@@ -51,6 +53,7 @@ class SmashMapWidget extends StatelessWidget {
     _canRotate = canRotate;
     _useLayerManager = useLayerManager;
     _addBorder = addBorder;
+    _canScrollWheelZoom = canScrollWheelZoom;
   }
 
   void setTapHandlers(
@@ -225,6 +228,9 @@ class SmashMapWidget extends StatelessWidget {
         ~InteractiveFlag.pinchMove;
     if (!_canRotate) {
       mapFlags = mapFlags & ~InteractiveFlag.rotate;
+    }
+    if (!_canScrollWheelZoom) {
+      mapFlags = mapFlags & ~InteractiveFlag.scrollWheelZoom;
     }
 
     // ! TODO check

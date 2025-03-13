@@ -103,6 +103,9 @@ class SLLDe extends SLL {
   String get toolbarTools_measureDistanceWithFinger => 'Measure distances on the map with your finger.';
 
   @override
+  String get toolbarTools_zoomByBox => 'Zoom by box.';
+
+  @override
   String get toolbarTools_modifyGeomVectorLayers => 'Modify geometries in editable vector layers.';
 
   @override

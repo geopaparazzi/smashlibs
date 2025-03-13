@@ -27,7 +27,10 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
     mapView = SmashMapWidget();
     mapView!.setInitParameters(
-        canRotate: false, initZoom: 9, centerCoordinate: Coordinate(11, 46));
+        canRotate: false,
+        initZoom: 9,
+        centerCoordinate: Coordinate(11, 46),
+        canScrollWheelZoom: false);
     mapView!.setOnPositionChanged((newPosition, hasGest) {
       SmashMapState mapState =
           Provider.of<SmashMapState>(context, listen: false);
@@ -82,6 +85,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
     ));
 
     mapView!.addPostLayer(RulerPluginLayer(tapAreaPixelSize: 1));
+    mapView!.addPostLayer(BoxZoomPluginLayer());
   }
 
   @override
@@ -173,6 +177,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
           alignment: Alignment.bottomLeft,
           child: SmashToolsBar(
             48,
+            doZoom: true,
             doEdit: false,
             doQuery: false,
           ),
