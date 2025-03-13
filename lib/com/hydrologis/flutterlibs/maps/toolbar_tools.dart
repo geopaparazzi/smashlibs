@@ -12,6 +12,9 @@ class SmashToolsBar extends StatefulWidget {
   final doQuery;
   final doEdit;
   final doZoomByBox;
+  Color? _buttonFgColor;
+  Color? _buttonBgColor;
+  Color? _buttonSelectionColor;
   SmashToolsBar(
     this._iconSize, {
     Key? key,
@@ -20,7 +23,13 @@ class SmashToolsBar extends StatefulWidget {
     this.doRuler = true,
     this.doQuery = true,
     this.doEdit = true,
-  }) : super(key: key);
+    Color? buttonFgColor = null,
+    Color? buttonBgColor = null,
+    Color? buttonSelectionColor = null,
+  })  : _buttonFgColor = buttonFgColor,
+        _buttonBgColor = buttonBgColor,
+        _buttonSelectionColor = buttonSelectionColor,
+        super(key: key);
 
   @override
   _SmashToolsBarState createState() => _SmashToolsBarState();
@@ -29,22 +38,41 @@ class SmashToolsBar extends StatefulWidget {
 class _SmashToolsBarState extends State<SmashToolsBar> {
   @override
   Widget build(BuildContext context) {
+    Color buttonFgColor = widget._buttonFgColor != null
+        ? widget._buttonFgColor!
+        : SmashColors.mainBackground;
+    Color buttonBgColor = widget._buttonBgColor != null
+        ? widget._buttonBgColor!
+        : SmashColors.mainDecorations;
+    Color buttonSelectionColor = widget._buttonSelectionColor != null
+        ? widget._buttonSelectionColor!
+        : SmashColors.mainSelection;
+
     return Consumer<GeometryEditorState>(
         builder: (context, geomEditState, child) {
       if (geomEditState.editableGeometry == null) {
         return Card(
-          color: SmashColors.mainDecorations,
+          color: buttonBgColor,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              if (widget.doEdit) GeomEditorButton(widget._iconSize),
-              if (widget.doQuery) FeatureQueryButton(widget._iconSize),
-              if (widget.doRuler) RulerButton(widget._iconSize),
-              if (widget.doZoom) getZoomIn(),
-              if (widget.doZoom) getZoomOut(),
-              if (widget.doZoomByBox) BoxZoomButton(widget._iconSize),
-              if (PluginsHandler.FENCE.isOn()) FenceButton(widget._iconSize),
+              if (widget.doEdit)
+                GeomEditorButton(
+                    widget._iconSize, buttonFgColor, buttonSelectionColor),
+              if (widget.doQuery)
+                FeatureQueryButton(
+                    widget._iconSize, buttonFgColor, buttonSelectionColor),
+              if (widget.doRuler)
+                RulerButton(
+                    widget._iconSize, buttonFgColor, buttonSelectionColor),
+              if (widget.doZoom) getZoomIn(buttonFgColor),
+              if (widget.doZoom) getZoomOut(buttonFgColor),
+              if (widget.doZoomByBox)
+                BoxZoomButton(
+                    widget._iconSize, buttonFgColor, buttonSelectionColor),
+              if (PluginsHandler.FENCE.isOn())
+                FenceButton(widget._iconSize, buttonFgColor),
             ],
           ),
         );
@@ -69,7 +97,7 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
     });
   }
 
-  Consumer<SmashMapState> getZoomOut() {
+  Consumer<SmashMapState> getZoomOut(Color? buttonColor) {
     return Consumer<SmashMapState>(builder: (context, mapState, child) {
       return IconButton(
         onPressed: () {
@@ -78,14 +106,14 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
         tooltip: SLL.of(context).toolbarTools_zoomOut, //'Zoom out'
         icon: Icon(
           SmashIcons.zoomOutIcon,
-          color: SmashColors.mainBackground,
+          color: buttonColor != null ? buttonColor : SmashColors.mainBackground,
         ),
         iconSize: widget._iconSize,
       );
     });
   }
 
-  Consumer<SmashMapState> getZoomIn() {
+  Consumer<SmashMapState> getZoomIn(Color? buttonColor) {
     return Consumer<SmashMapState>(builder: (context, mapState, child) {
       return IconButton(
         onPressed: () {
@@ -94,7 +122,7 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
         tooltip: SLL.of(context).toolbarTools_zoomIn, //'Zoom in'
         icon: Icon(
           SmashIcons.zoomInIcon,
-          color: SmashColors.mainBackground,
+          color: buttonColor != null ? buttonColor : SmashColors.mainBackground,
         ),
         iconSize: widget._iconSize,
       );
@@ -415,8 +443,12 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
 
 class FeatureQueryButton extends StatefulWidget {
   final _iconSize;
+  final fgColor;
+  final selectionColor;
 
-  FeatureQueryButton(this._iconSize, {Key? key}) : super(key: key);
+  FeatureQueryButton(this._iconSize, this.fgColor, this.selectionColor,
+      {Key? key})
+      : super(key: key);
 
   @override
   _FeatureQueryButtonState createState() => _FeatureQueryButtonState();
@@ -437,8 +469,8 @@ class _FeatureQueryButtonState extends State<FeatureQueryButton> {
               child: Icon(
                 MdiIcons.layersSearch,
                 color: infoState.isEnabled
-                    ? SmashColors.mainSelection
-                    : SmashColors.mainBackground,
+                    ? widget.selectionColor
+                    : widget.fgColor,
                 size: widget._iconSize,
               ),
             ),
@@ -457,8 +489,11 @@ class _FeatureQueryButtonState extends State<FeatureQueryButton> {
 
 class RulerButton extends StatelessWidget {
   final _iconSize;
+  final fgColor;
+  final selectionColor;
 
-  RulerButton(this._iconSize, {Key? key}) : super(key: key);
+  RulerButton(this._iconSize, this.fgColor, this.selectionColor, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -466,9 +501,7 @@ class RulerButton extends StatelessWidget {
       Widget w = InkWell(
         child: Icon(
           MdiIcons.ruler,
-          color: rulerState.isEnabled
-              ? SmashColors.mainSelection
-              : SmashColors.mainBackground,
+          color: rulerState.isEnabled ? selectionColor : fgColor,
           size: _iconSize,
         ),
       );
@@ -512,8 +545,11 @@ class RulerButton extends StatelessWidget {
 
 class BoxZoomButton extends StatelessWidget {
   final _iconSize;
+  final fgColor;
+  final selectionColor;
 
-  BoxZoomButton(this._iconSize, {Key? key}) : super(key: key);
+  BoxZoomButton(this._iconSize, this.fgColor, this.selectionColor, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -521,9 +557,7 @@ class BoxZoomButton extends StatelessWidget {
       Widget w = InkWell(
         child: Icon(
           MdiIcons.magnifyScan,
-          color: boxzoomState.isEnabled
-              ? SmashColors.mainSelection
-              : SmashColors.mainBackground,
+          color: boxzoomState.isEnabled ? selectionColor : fgColor,
           size: _iconSize,
         ),
       );
@@ -546,15 +580,16 @@ class BoxZoomButton extends StatelessWidget {
 
 class FenceButton extends StatelessWidget {
   final _iconSize;
+  final fgColor;
 
-  FenceButton(this._iconSize, {Key? key}) : super(key: key);
+  FenceButton(this._iconSize, this.fgColor, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Widget w = InkWell(
       child: Icon(
         MdiIcons.gate,
-        color: SmashColors.mainBackground,
+        color: fgColor,
         size: _iconSize,
       ),
     );
@@ -604,8 +639,12 @@ class FenceButton extends StatelessWidget {
 
 class GeomEditorButton extends StatefulWidget {
   final _iconSize;
+  final fgColor;
+  final selectionColor;
 
-  GeomEditorButton(this._iconSize, {Key? key}) : super(key: key);
+  GeomEditorButton(this._iconSize, this.fgColor, this.selectionColor,
+      {Key? key})
+      : super(key: key);
 
   @override
   _GeomEditorButtonState createState() => _GeomEditorButtonState();
@@ -627,8 +666,8 @@ class _GeomEditorButtonState extends State<GeomEditorButton> {
               child: Icon(
                 MdiIcons.vectorLine,
                 color: editorState.isEnabled
-                    ? SmashColors.mainSelection
-                    : SmashColors.mainBackground,
+                    ? widget.selectionColor
+                    : widget.fgColor,
                 size: widget._iconSize,
               ),
             ),

@@ -180,6 +180,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
             doZoom: true,
             doEdit: false,
             doQuery: false,
+            buttonFgColor: SmashColors.gpsOnWithFix,
+            buttonBgColor: SmashColors.mainDanger,
+            buttonSelectionColor: SmashColors.mainDecorationsDarker,
           ),
         )
       ]),
