@@ -596,9 +596,9 @@ class TileSourcePropertiesWidgetState
     }
 
     // get mapsforge theme from preferences
-    mapsforgeTheme =
-        GpPreferences().getStringSync("KEY_MAPSFORGE_THEME", "defaultrender") ??
-            "defaultrender";
+    mapsforgeTheme = GpPreferences().getStringSync(
+            "KEY_MAPSFORGE_THEME_${_source.absolutePath}", "defaultrender") ??
+        "defaultrender";
 
     super.initState();
   }
@@ -717,8 +717,9 @@ class TileSourcePropertiesWidgetState
                                       themes,
                                       selected: mapsforgeTheme);
                               if (selected != null) {
-                                GpPreferences()
-                                    .setString("KEY_MAPSFORGE_THEME", selected);
+                                GpPreferences().setString(
+                                    "KEY_MAPSFORGE_THEME_$absolutePath",
+                                    selected);
                                 setState(() {
                                   mapsforgeTheme = selected;
                                   _somethingChanged = true;
