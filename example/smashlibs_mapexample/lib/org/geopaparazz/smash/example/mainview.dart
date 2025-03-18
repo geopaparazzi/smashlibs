@@ -364,7 +364,11 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
         mapView ?? Container(),
         Align(
           alignment: Alignment.bottomLeft,
-          child: SmashToolsBar(48),
+          child: SmashToolsBar(
+            48,
+            doZoom: false,
+            doZoomByBox: false,
+          ),
         )
       ]),
       drawer: Drawer(
@@ -433,6 +437,28 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                   }
                 },
               ),
+              ListTile(
+                  title: SmashUI.normalText("Test File Browser", bold: true),
+                  onTap: () async {
+                    var lastUsedFolder = await Workspace.getLastUsedFolder();
+                    if (context.mounted) {
+                      var selectedPath = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FileBrowser(
+                                    false,
+                                    null,
+                                    lastUsedFolder,
+                                  )));
+                      if (context.mounted) {
+                        var prompt = "Selected file: $selectedPath";
+                        if (selectedPath == null) {
+                          prompt = "No file selected.";
+                        }
+                        SmashDialogs.showInfoDialog(context, prompt);
+                      }
+                    }
+                  }),
             ],
           ),
         ],

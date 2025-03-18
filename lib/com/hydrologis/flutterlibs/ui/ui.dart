@@ -56,7 +56,8 @@ class SmashUI {
       color,
       textAlign = TextAlign.justify,
       underline = false,
-      overflow}) {
+      overflow,
+      textDirection}) {
     Color c;
     if (useColor || color != null) {
       if (color == null) {
@@ -73,6 +74,7 @@ class SmashUI {
       text,
       textAlign: textAlign,
       overflow: overflow,
+      textDirection: textDirection,
       style: TextStyle(
         color: c,
         decoration: textDecoration,
