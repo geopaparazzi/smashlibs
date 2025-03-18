@@ -129,6 +129,8 @@ class FileBrowser extends StatefulWidget {
 class FileBrowserState extends State<FileBrowser> {
   String? currentPath;
   bool onlyFiles = false;
+  List<String>? allStoragerFolders;
+  var rootDir = Workspace.rootFolder;
 
   Future<List<List<dynamic>>> getFiles() async {
     List<List<dynamic>> files = HU.FileUtilities.listFiles(currentPath!,
@@ -155,9 +157,7 @@ class FileBrowserState extends State<FileBrowser> {
               icon: Icon(MdiIcons.arrowUpLeft),
               tooltip: "Go back up one folder.",
               onPressed: () async {
-                var rootDir = Workspace.rootFolder;
-                if (currentPath == rootDir && Workspace.isDesktop()) {
-                  // TODO unlock desktop again
+                if (currentPath == rootDir && !Workspace.isDesktop()) {
                   SmashDialogs.showWarningDialog(context,
                       "The top level folder has already been reached.");
                 } else {
@@ -216,6 +216,20 @@ class FileBrowserState extends State<FileBrowser> {
                 onlyFiles = !onlyFiles;
               });
             },
+          ),
+          FutureBuilder(
+            builder: (context, projectSnap) {
+              if (projectSnap.hasError) {
+                return SmashUI.errorWidget(projectSnap.error.toString());
+              } else if (projectSnap.connectionState == ConnectionState.none ||
+                  projectSnap.data == null) {
+                return SmashCircularProgress(label: "processing...");
+              }
+
+              Widget widget = projectSnap.data as Widget;
+              return widget;
+            },
+            future: getStorageFoldersButton(),
           )
         ],
       ),
@@ -361,6 +375,30 @@ class FileBrowserState extends State<FileBrowser> {
           }
         },
       ),
+    );
+  }
+
+  Future<Widget> getStorageFoldersButton() async {
+    if (allStoragerFolders == null) {
+      allStoragerFolders = await Workspace.getStorageFolders();
+    }
+
+    return IconButton(
+      icon: Icon(MdiIcons.folderMultipleOutline),
+      tooltip: "Change base folder",
+      onPressed: () async {
+        var res = await SmashDialogs.showSingleChoiceDialog(
+          context,
+          "Select base folder",
+          allStoragerFolders!,
+        );
+        if (res != null) {
+          setState(() {
+            currentPath = res;
+            rootDir = res;
+          });
+        }
+      },
     );
   }
 }

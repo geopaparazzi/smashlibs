@@ -222,6 +222,33 @@ class Workspace {
     }
   }
 
+  /// Get all the available storage folders.
+  static Future<List<String>> getStorageFolders() async {
+    List<String> storageFolders = [];
+    if (Platform.isAndroid) {
+      var storageInfo = await PathProviderEx.getStorageInfo();
+      // var internalStorage = _getAndroidInternalStorage(storageInfo);
+      if (storageInfo.isNotEmpty) {
+        for (var storage in storageInfo) {
+          String rootDir = storage.rootDir;
+          if (!storageFolders.contains(rootDir)) {
+            storageFolders.add(rootDir);
+          }
+        }
+      }
+      var directory = await getExternalStorageDirectory();
+      if (directory != null) {
+        if (!storageFolders.contains(directory.path)) {
+          storageFolders.add(directory.path);
+        }
+      }
+    } else {
+      var dir = await getApplicationDocumentsDirectory();
+      storageFolders.add(dir.path);
+    }
+    return storageFolders;
+  }
+
   static List<String>? _getAndroidInternalStorage(
       List<StorageInfo> storageInfo) {
     String? rootDir;
