@@ -145,23 +145,6 @@ class FileBrowserState extends State<FileBrowser> {
     bool removePrefix =
         GpPreferences().getBooleanSync("KEY_FILEBROWSER_DOPREFIX", false);
 
-    // var upButton = FloatingActionButton(
-    //   heroTag: "FileBrowserUpButton",
-    //   tooltip: "Go back up one folder.",
-    //   child: Icon(MdiIcons.folderUpload),
-    //   onPressed: () async {
-    //     var rootDir = Workspace.rootFolder;
-    //     if (currentPath == rootDir && !Workspace.isDesktop()) {
-    //       SmashDialogs.showWarningDialog(
-    //           context, "The top level folder has already been reached.");
-    //     } else {
-    //       setState(() {
-    //         currentPath = HU.FileUtilities.parentFolderFromFile(currentPath!);
-    //       });
-    //     }
-    //   },
-    // );
-
     return Scaffold(
       appBar: new AppBar(
         title: Row(
@@ -173,7 +156,8 @@ class FileBrowserState extends State<FileBrowser> {
               tooltip: "Go back up one folder.",
               onPressed: () async {
                 var rootDir = Workspace.rootFolder;
-                if (currentPath == rootDir && !Workspace.isDesktop()) {
+                if (currentPath == rootDir && Workspace.isDesktop()) {
+                  // TODO unlock desktop again
                   SmashDialogs.showWarningDialog(context,
                       "The top level folder has already been reached.");
                 } else {
@@ -349,7 +333,7 @@ class FileBrowserState extends State<FileBrowser> {
                             iconData,
                             color: SmashColors.mainDecorations,
                           ),
-                          title: Text(labelName),
+                          title: SmashUI.normalText(labelName, bold: isDir),
                           subtitle: addInfo.isNotEmpty ? Text(addInfo) : null,
                           trailing: trailingWidget,
                         );
@@ -361,7 +345,7 @@ class FileBrowserState extends State<FileBrowser> {
                               iconData,
                               color: SmashColors.mainDecorations,
                             ),
-                            title: Text(labelName),
+                            title: SmashUI.normalText(labelName, bold: isDir),
                             subtitle: addInfo.isNotEmpty ? Text(addInfo) : null,
                           ),
                         );
@@ -378,7 +362,5 @@ class FileBrowserState extends State<FileBrowser> {
         },
       ),
     );
-    // floatingActionButton: upButton,
-    // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat);
   }
 }
