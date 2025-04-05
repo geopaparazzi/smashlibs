@@ -146,6 +146,8 @@ class FileBrowserState extends State<FileBrowser> {
     }
     bool removePrefix =
         GpPreferences().getBooleanSync("KEY_FILEBROWSER_DOPREFIX", false);
+    String folderName =
+        ".../" + HU.FileUtilities.nameFromFile(currentPath!, false);
 
     return Scaffold(
       appBar: new AppBar(
@@ -170,25 +172,28 @@ class FileBrowserState extends State<FileBrowser> {
             ),
             Expanded(
               flex: 100,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Padding(
-                  padding: SmashUI.defaultPadding(),
-                  child: SmashUI.titleText(
-                    currentPath!,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.start,
-                    color: SmashColors.mainBackground,
-                    bold: true,
+              child: Tooltip(
+                message: currentPath,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    padding: SmashUI.defaultPadding(),
+                    child: SmashUI.titleText(
+                      folderName,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.start,
+                      color: SmashColors.mainBackground,
+                      bold: true,
+                    ),
+                    // (
+                    //     Platform.isIOS
+                    //         ? IOS_DOCUMENTSFOLDER +
+                    //             Workspace.makeRelative(data[0][0])
+                    //         : data[0][0],
+                    //     color: SmashColors.mainDecorations,
+                    //     bold: true,
+                    //     textAlign: TextAlign.left),
                   ),
-                  // (
-                  //     Platform.isIOS
-                  //         ? IOS_DOCUMENTSFOLDER +
-                  //             Workspace.makeRelative(data[0][0])
-                  //         : data[0][0],
-                  //     color: SmashColors.mainDecorations,
-                  //     bold: true,
-                  //     textAlign: TextAlign.left),
                 ),
               ),
             ),

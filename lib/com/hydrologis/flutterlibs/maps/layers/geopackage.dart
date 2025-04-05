@@ -90,6 +90,9 @@ class GeopackageSource extends DbVectorLayerSource
         } else if (_geometryColumn!.geometryType.isPolygon()) {
           sldString = HU.DefaultSlds.simplePolygonSld();
           _gpkgDb!.updateSld(sqlName, sldString!);
+        } else {
+          throw Exception(
+              "Unsupported geometry type: ${_geometryColumn!.geometryType.getTypeName()}");
         }
       }
       if (sldString != null) {
@@ -213,7 +216,13 @@ class GeopackageSource extends DbVectorLayerSource
 
   @override
   Future<List<Widget>> toLayers(BuildContext context) async {
-    await load(context);
+    try {
+      await load(context);
+    } on Exception catch (e) {
+      SmashDialogs.showErrorDialog(
+          context, "Unable to load layer: $_tableName. $e");
+      return [];
+    }
 
     List<Widget> layers = [];
     if (_tableData!.features.isNotEmpty) {
