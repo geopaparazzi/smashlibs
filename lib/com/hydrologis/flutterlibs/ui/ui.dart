@@ -149,6 +149,48 @@ class SmashUI {
     );
   }
 
+  static List<Widget> widgetsFromString(String text,
+      {useColor = false,
+      bold = true,
+      color = Colors.redAccent,
+      textAlign = TextAlign.center,
+      overflow}) {
+    List<Widget> widgets = [];
+
+    // check if <html> or <!DOCTYPE html> is present in the text, if it is, that part
+    // will be converted to html widget, and parts before and after will be converted to text widgets
+    if (text.contains("<html>") || text.contains("<!DOCTYPE html>")) {
+      text = text.replaceAll("<!DOCTYPE html>", "<html>");
+      int start = text.indexOf("<html>");
+      int end = text.indexOf("</html>") + 7;
+      String htmlText = text.substring(start, end);
+      String beforeHtml = text.substring(0, start);
+      String afterHtml = text.substring(end);
+
+      widgets.add(normalText(beforeHtml,
+          useColor: useColor,
+          bold: bold,
+          color: color,
+          textAlign: textAlign,
+          overflow: overflow));
+      widgets.add(HtmlWidget(htmlText));
+      widgets.add(normalText(afterHtml,
+          useColor: useColor,
+          bold: bold,
+          color: color,
+          textAlign: textAlign,
+          overflow: overflow));
+    } else {
+      widgets.add(normalText(text,
+          useColor: useColor,
+          bold: bold,
+          color: color,
+          textAlign: textAlign,
+          overflow: overflow));
+    }
+    return widgets;
+  }
+
   /// Create a  widget with size and color for errors in pages.
   ///
   /// Allows to choose bold or color/neutral, [underline], [textAlign] and [overflow] (example TextOverflow.ellipsis).
@@ -168,6 +210,22 @@ class SmashUI {
     } else {
       c = SmashColors.mainTextColorNeutral;
     }
+
+    var widgets = widgetsFromString(text,
+        useColor: useColor,
+        bold: bold,
+        color: color,
+        textAlign: textAlign,
+        overflow: overflow);
+    Widget finalWidget = widgets[0];
+    if (widgets.length > 1) {
+      finalWidget = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: widgets,
+      );
+    }
+
     return Container(
       width: double.infinity,
       child: Card(
@@ -176,15 +234,7 @@ class SmashUI {
         color: SmashColors.mainBackground,
         child: Padding(
           padding: EdgeInsets.all(DEFAULT_PADDING * 3),
-          child: Text(
-            text,
-            textAlign: textAlign,
-            overflow: overflow,
-            style: TextStyle(
-                color: c,
-                fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-                fontSize: NORMAL_SIZE),
-          ),
+          child: finalWidget,
         ),
       ),
     );
