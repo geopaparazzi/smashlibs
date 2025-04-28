@@ -155,3 +155,17 @@ part 'com/hydrologis/flutterlibs/maps/plugins/feature_info_plugin.dart';
 part 'com/hydrologis/flutterlibs/maps/plugins/gps_position_plugin.dart';
 part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';
+
+// form widgets
+part 'com/hydrologis/flutterlibs/forms/widgets/autocomplete_stringcombo_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/autocomplete_stringconnectedcombo_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/checkbox_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/combobox_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/connected_combo_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/datepicker_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/dynamicstring_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/geometry_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/multicombo_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/pictures_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/sketches_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/timepicker_widget.dart';

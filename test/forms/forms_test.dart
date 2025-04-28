@@ -597,6 +597,54 @@ void main() {
     expect(formItems[0].value, 'choice 2');
   });
 
+  testWidgets('Autocomplete Combo UrlBased Widgets Test', (tester) async {
+    FormsNetworkSupporter().client = MockClient((request) async {
+      expect(request.url.toString(),
+          "https://www.mydataproviderurl.com/api/v1/12/data.json");
+      final jsonStr = """[
+                        {
+                            "item": {
+                                "value": "1",
+                                "label": "Item 1"
+                            }
+                        },
+                        {
+                            "item": {
+                                "value": "2",
+                                "label": "Item 2"
+                            }
+                        },
+                        {
+                            "item": {
+                                "value": "3",
+                                "label": "Item 3"
+                            }
+                        }
+                    ]""";
+      return Response(jsonStr, 200);
+    });
+
+    var helper = TestFormHelper("combos_autocomplete_urlbased_widgets.json");
+
+    var urlItems = {
+      "id": "12",
+    };
+    var newValues = {
+      "an autocomplete string combo urlbased": "2",
+    };
+
+    expect(helper.getSectionName(), "autocomplete combo urlbased examples");
+    await pumpFormWithFormUrlState(helper, newValues, urlItems, tester);
+
+    // check change of setData
+    var section = helper.getSection();
+    var form = section.getFormByName('autocompletecombos');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, '2');
+
+    await tapBackIcon(tester);
+  });
+
   testWidgets('Missing Section Form Widgets Test', (tester) async {
     // Handle forms that come without section part. These could
     // be simple straight formitems to be seen as a UI for some model
