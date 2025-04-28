@@ -132,7 +132,7 @@ class FileBrowserState extends State<FileBrowser> {
   List<String>? allStoragerFolders;
   var rootDir = Workspace.rootFolder;
 
-  Future<List<List<dynamic>>> getFiles() async {
+  List<List<dynamic>> getFiles() {
     List<List<dynamic>> files = HU.FileUtilities.listFiles(currentPath!,
         doOnlyFolder: widget._doFolderMode,
         allowedExtensions: widget._allowedExtensions);
@@ -149,238 +149,227 @@ class FileBrowserState extends State<FileBrowser> {
     String folderName =
         ".../" + HU.FileUtilities.nameFromFile(currentPath!, false);
 
+    List<List<dynamic>> data = getFiles();
+    if (onlyFiles) {
+      data = data.where((pathName) {
+        bool isDir = pathName[2];
+        return !isDir;
+      }).toList();
+    }
+
     return Scaffold(
-      appBar: new AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-              icon: Icon(MdiIcons.arrowUpLeft),
-              tooltip: "Go back up one folder.",
-              onPressed: () async {
-                if (currentPath == rootDir && !Workspace.isDesktop()) {
-                  SmashDialogs.showWarningDialog(context,
-                      "The top level folder has already been reached.");
-                } else {
-                  setState(() {
-                    currentPath =
-                        HU.FileUtilities.parentFolderFromFile(currentPath!);
-                  });
-                }
-              },
-            ),
-            Expanded(
-              flex: 100,
-              child: Tooltip(
-                message: currentPath,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Padding(
-                    padding: SmashUI.defaultPadding(),
-                    child: SmashUI.titleText(
-                      folderName,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.start,
-                      color: SmashColors.mainBackground,
-                      bold: true,
+        appBar: new AppBar(
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              IconButton(
+                icon: Icon(MdiIcons.arrowUpLeft),
+                tooltip: "Go back up one folder.",
+                onPressed: () async {
+                  if (currentPath == rootDir && !Workspace.isDesktop()) {
+                    SmashDialogs.showWarningDialog(context,
+                        "The top level folder has already been reached.");
+                  } else {
+                    setState(() {
+                      currentPath =
+                          HU.FileUtilities.parentFolderFromFile(currentPath!);
+                    });
+                  }
+                },
+              ),
+              Expanded(
+                flex: 100,
+                child: Tooltip(
+                  message: currentPath,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Padding(
+                      padding: SmashUI.defaultPadding(),
+                      child: SmashUI.titleText(
+                        folderName,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.start,
+                        color: SmashColors.mainBackground,
+                        bold: true,
+                      ),
+                      // (
+                      //     Platform.isIOS
+                      //         ? IOS_DOCUMENTSFOLDER +
+                      //             Workspace.makeRelative(data[0][0])
+                      //         : data[0][0],
+                      //     color: SmashColors.mainDecorations,
+                      //     bold: true,
+                      //     textAlign: TextAlign.left),
                     ),
-                    // (
-                    //     Platform.isIOS
-                    //         ? IOS_DOCUMENTSFOLDER +
-                    //             Workspace.makeRelative(data[0][0])
-                    //         : data[0][0],
-                    //     color: SmashColors.mainDecorations,
-                    //     bold: true,
-                    //     textAlign: TextAlign.left),
                   ),
                 ),
               ),
+            ],
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(removePrefix ? MdiIcons.filter : MdiIcons.filterOff),
+              tooltip: removePrefix ? "View full name" : "Remove prefix",
+              onPressed: () async {
+                await GpPreferences()
+                    .setBoolean("KEY_FILEBROWSER_DOPREFIX", !removePrefix);
+                setState(() {
+                  removePrefix = !removePrefix;
+                });
+              },
             ),
+            IconButton(
+              icon: Icon(onlyFiles
+                  ? MdiIcons.folderMultipleOutline
+                  : MdiIcons.fileOutline),
+              tooltip: onlyFiles ? "View everything" : "View only Files",
+              onPressed: () {
+                setState(() {
+                  onlyFiles = !onlyFiles;
+                });
+              },
+            ),
+            FutureBuilder(
+              builder: (context, projectSnap) {
+                if (projectSnap.hasError) {
+                  return SmashUI.errorWidget(projectSnap.error.toString());
+                } else if (projectSnap.connectionState ==
+                        ConnectionState.none ||
+                    projectSnap.data == null) {
+                  return SmashCircularProgress(label: "processing...");
+                }
+
+                Widget widget = projectSnap.data as Widget;
+                return widget;
+              },
+              future: getStorageFoldersButton(),
+            )
           ],
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(removePrefix ? MdiIcons.filter : MdiIcons.filterOff),
-            tooltip: removePrefix ? "View full name" : "Remove prefix",
-            onPressed: () async {
-              await GpPreferences()
-                  .setBoolean("KEY_FILEBROWSER_DOPREFIX", !removePrefix);
-              setState(() {
-                removePrefix = !removePrefix;
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(onlyFiles
-                ? MdiIcons.folderMultipleOutline
-                : MdiIcons.fileOutline),
-            tooltip: onlyFiles ? "View everything" : "View only Files",
-            onPressed: () {
-              setState(() {
-                onlyFiles = !onlyFiles;
-              });
-            },
-          ),
-          FutureBuilder(
-            builder: (context, projectSnap) {
-              if (projectSnap.hasError) {
-                return SmashUI.errorWidget(projectSnap.error.toString());
-              } else if (projectSnap.connectionState == ConnectionState.none ||
-                  projectSnap.data == null) {
-                return SmashCircularProgress(label: "processing...");
-              }
-
-              Widget widget = projectSnap.data as Widget;
-              return widget;
-            },
-            future: getStorageFoldersButton(),
-          )
-        ],
-      ),
-      body: FutureBuilder<List<List<dynamic>>>(
-        future: getFiles(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<List<dynamic>> data = snapshot.data!;
-            if (onlyFiles) {
-              data = data.where((pathName) {
-                bool isDir = pathName[2];
-                return !isDir;
-              }).toList();
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (data.isEmpty)
-                  Padding(
-                    padding: SmashUI.defaultPadding(),
-                    child: SmashUI.normalText("No files found.",
-                        bold: true, color: SmashColors.mainDecorations),
-                  ),
-                Expanded(
-                  child: ListView(
-                    children: data.map((pathName) {
-                      String parentPath = pathName[0];
-                      String name = pathName[1];
-                      String labelName = name;
-                      String addInfo = "";
-                      if (removePrefix) {
-                        if (labelName.startsWith("smash_") ||
-                            labelName.startsWith("geopaparazzi_")) {
-                          labelName = labelName
-                              .replaceFirst("smash_", "")
-                              .replaceFirst("geopaparazzi_", "");
-                          if (labelName.startsWith(RegExp(r'\d{8}_'))) {
-                            addInfo +=
-                                "${labelName.substring(0, 4)}-${labelName.substring(4, 6)}-${labelName.substring(6, 8)}";
-                            // remove date
-                            labelName =
-                                labelName.replaceFirst(RegExp(r'\d{8}_'), "");
-                            if (labelName.startsWith(RegExp(r'\d{6}'))) {
-                              // remove time
-                              addInfo +=
-                                  " ${labelName.substring(0, 2)}:${labelName.substring(2, 4)}:${labelName.substring(4, 6)}";
-                              labelName =
-                                  labelName.replaceFirst(RegExp(r'\d{6}_'), "");
-                            }
-                          }
-                        }
-                        labelName = labelName.replaceAll("_", " ");
-                        if (labelName.endsWith(".gpap")) {
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (data.isEmpty)
+              Padding(
+                padding: SmashUI.defaultPadding(),
+                child: SmashUI.normalText("No files found.",
+                    bold: true, color: SmashColors.mainDecorations),
+              ),
+            Expanded(
+              child: ListView(
+                children: data.map((pathName) {
+                  String parentPath = pathName[0];
+                  String name = pathName[1];
+                  String labelName = name;
+                  String addInfo = "";
+                  if (removePrefix) {
+                    if (labelName.startsWith("smash_") ||
+                        labelName.startsWith("geopaparazzi_")) {
+                      labelName = labelName
+                          .replaceFirst("smash_", "")
+                          .replaceFirst("geopaparazzi_", "");
+                      if (labelName.startsWith(RegExp(r'\d{8}_'))) {
+                        addInfo +=
+                            "${labelName.substring(0, 4)}-${labelName.substring(4, 6)}-${labelName.substring(6, 8)}";
+                        // remove date
+                        labelName =
+                            labelName.replaceFirst(RegExp(r'\d{8}_'), "");
+                        if (labelName.startsWith(RegExp(r'\d{6}'))) {
+                          // remove time
+                          addInfo +=
+                              " ${labelName.substring(0, 2)}:${labelName.substring(2, 4)}:${labelName.substring(4, 6)}";
                           labelName =
-                              labelName.substring(0, labelName.length - 5);
+                              labelName.replaceFirst(RegExp(r'\d{6}_'), "");
                         }
                       }
-                      bool isDir = pathName[2];
-                      var fullPath =
-                          HU.FileUtilities.joinPaths(parentPath, name);
+                    }
+                    labelName = labelName.replaceAll("_", " ");
+                    if (labelName.endsWith(".gpap")) {
+                      labelName = labelName.substring(0, labelName.length - 5);
+                    }
+                  }
+                  bool isDir = pathName[2];
+                  var fullPath = HU.FileUtilities.joinPaths(parentPath, name);
 
-                      IconData iconData = SmashIcons.forPath(fullPath);
-                      Widget? trailingWidget;
-                      var tapFunction;
-                      if (isDir) {
-                        if (widget._doFolderMode) {
-                          // if folder you can enter or select it
-                          trailingWidget = Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              IconButton(
-                                icon: Icon(MdiIcons.checkCircleOutline,
-                                    color: SmashColors.mainDecorations),
-                                tooltip: "Select folder",
-                                onPressed: () async {
-                                  await Workspace.setLastUsedFolder(parentPath);
-                                  var resultPath = HU.FileUtilities.joinPaths(
-                                      parentPath, name);
-                                  Navigator.pop(context, resultPath);
-                                },
-                              ),
-                              IconButton(
-                                icon: Icon(SmashIcons.menuRightArrow),
-                                tooltip: "Enter folder",
-                                onPressed: () {
-                                  setState(() {
-                                    currentPath = HU.FileUtilities.joinPaths(
-                                        parentPath, name);
-                                  });
-                                },
-                              )
-                            ],
-                          );
-                        } else {
-                          tapFunction = () {
-                            setState(() {
-                              currentPath =
+                  IconData iconData = SmashIcons.forPath(fullPath);
+                  Widget? trailingWidget;
+                  var tapFunction;
+                  if (isDir) {
+                    if (widget._doFolderMode) {
+                      // if folder you can enter or select it
+                      trailingWidget = Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(MdiIcons.checkCircleOutline,
+                                color: SmashColors.mainDecorations),
+                            tooltip: "Select folder",
+                            onPressed: () async {
+                              await Workspace.setLastUsedFolder(parentPath);
+                              var resultPath =
                                   HU.FileUtilities.joinPaths(parentPath, name);
-                            });
-                          };
-                        }
-                      } else {
-                        // if it gets here, then it is sure no folder mode
-                        tapFunction = () async {
-                          await Workspace.setLastUsedFolder(parentPath);
-                          var resultPath =
+                              Navigator.pop(context, resultPath);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(SmashIcons.menuRightArrow),
+                            tooltip: "Enter folder",
+                            onPressed: () {
+                              setState(() {
+                                currentPath = HU.FileUtilities.joinPaths(
+                                    parentPath, name);
+                              });
+                            },
+                          )
+                        ],
+                      );
+                    } else {
+                      tapFunction = () {
+                        setState(() {
+                          currentPath =
                               HU.FileUtilities.joinPaths(parentPath, name);
-                          Navigator.pop(context, resultPath);
-                        };
-                      }
+                        });
+                      };
+                    }
+                  } else {
+                    // if it gets here, then it is sure no folder mode
+                    tapFunction = () async {
+                      await Workspace.setLastUsedFolder(parentPath);
+                      var resultPath =
+                          HU.FileUtilities.joinPaths(parentPath, name);
+                      Navigator.pop(context, resultPath);
+                    };
+                  }
 
-                      if (trailingWidget != null) {
-                        return ListTile(
-                          leading: Icon(
-                            iconData,
-                            color: SmashColors.mainDecorations,
-                          ),
-                          title: SmashUI.normalText(labelName, bold: isDir),
-                          subtitle: addInfo.isNotEmpty ? Text(addInfo) : null,
-                          trailing: trailingWidget,
-                        );
-                      } else {
-                        return InkWell(
-                          onTap: tapFunction,
-                          child: ListTile(
-                            leading: Icon(
-                              iconData,
-                              color: SmashColors.mainDecorations,
-                            ),
-                            title: SmashUI.normalText(labelName, bold: isDir),
-                            subtitle: addInfo.isNotEmpty ? Text(addInfo) : null,
-                          ),
-                        );
-                      }
-                    }).toList(),
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Center(
-                child: SmashCircularProgress(label: "Loading files list..."));
-          }
-        },
-      ),
-    );
+                  if (trailingWidget != null) {
+                    return ListTile(
+                      leading: Icon(
+                        iconData,
+                        color: SmashColors.mainDecorations,
+                      ),
+                      title: SmashUI.normalText(labelName, bold: isDir),
+                      subtitle: addInfo.isNotEmpty ? Text(addInfo) : null,
+                      trailing: trailingWidget,
+                    );
+                  } else {
+                    return InkWell(
+                      onTap: tapFunction,
+                      child: ListTile(
+                        leading: Icon(
+                          iconData,
+                          color: SmashColors.mainDecorations,
+                        ),
+                        title: SmashUI.normalText(labelName, bold: isDir),
+                        subtitle: addInfo.isNotEmpty ? Text(addInfo) : null,
+                      ),
+                    );
+                  }
+                }).toList(),
+              ),
+            ),
+          ],
+        ));
   }
 
   Future<Widget> getStorageFoldersButton() async {
