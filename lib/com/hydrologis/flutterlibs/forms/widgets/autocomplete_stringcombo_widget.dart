@@ -146,7 +146,7 @@ class _AutocompleteStringComboWidgetState
                         .toString()
                         .toLowerCase()
                         .contains(textEditingValue.text.toLowerCase())) {
-                      strItems.add(item);
+                      strItems.add(item.toString());
                     }
                   }
                   return strItems;

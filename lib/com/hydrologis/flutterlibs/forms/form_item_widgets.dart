@@ -95,8 +95,15 @@ abstract class AFormWidget {
           item.map["values"]?["items"] is List) {
         for (var listItem in item.map["values"]?["items"]) {
           var itemMap = listItem["item"];
-          var itemLabel = itemMap?["label"];
-          var itemValue = itemMap?["value"];
+          var itemLabel;
+          var itemValue;
+          if (itemMap is Map) {
+            itemLabel = itemMap["label"];
+            itemValue = itemMap["value"];
+          } else {
+            itemLabel = itemMap;
+            itemValue = itemMap;
+          }
           if (itemLabel == null || itemValue == null) {
             continue;
           }

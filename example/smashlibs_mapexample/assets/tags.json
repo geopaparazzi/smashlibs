@@ -352,6 +352,22 @@
             "type": "autocompletestringcombo"
           },
           {
+            "key": "an autocomplete string combo urlbased",
+            "values": {
+              "items": [
+                {
+                    "item": {
+                        "label": "No data",
+                        "value": -1
+                    }
+                }
+              ],
+              "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/refs/heads/master/test/forms/examples/farms/1/fields/1/subfields/2/rows/response.json"
+            },
+            "value": "",
+            "type": "autocompletestringcombo"
+          },
+          {
             "key": "two_connected_autocomplete_combos",
             "values": {
               "items 1": [
