@@ -1,0 +1,20 @@
+[
+  {
+    "item": {
+      "value": "ABC",
+      "label": "First three letters of the alphabet"
+    }
+  },
+  {
+    "item": {
+      "value": "DEF",
+      "label": "Second three letters of the alphabet"
+    }
+  },
+  {
+    "item": {
+      "value": "XYZ",
+      "label": "Last three letters of the alphabet"
+    }
+  }
+]

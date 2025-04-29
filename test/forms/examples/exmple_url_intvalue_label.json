@@ -1,0 +1,20 @@
+[
+  {
+    "item": {
+      "value": 1,
+      "label": "Give me a ONE!"
+    }
+  },
+  {
+    "item": {
+      "value": 2,
+      "label": "Give me a TWO!"
+    }
+  },
+  {
+    "item": {
+      "value": 3,
+      "label": "Give me a THREE!"
+    }
+  }
+]
