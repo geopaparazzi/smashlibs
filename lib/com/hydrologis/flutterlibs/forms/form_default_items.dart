@@ -180,6 +180,72 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "type": "$TYPE_STRINGCOMBO"
     }"""
   },
+  TYPE_STRINGWHEELSLIDER: {
+    "string wheel slider": """
+    {
+      "key": "string_wheelslider_key",
+      "values": {
+        "items": [
+          {
+            "item": "choice 1"
+          },
+          {
+            "item": "default choice 2"
+          },
+          {
+            "item": "choice 3"
+          }
+        ]
+      },
+      "value": "default choice 2",
+      "type": "$TYPE_STRINGWHEELSLIDER"
+    }""",
+    "string wheel slider with item labels": """
+    {
+      "key": "string_wheelslider_with_labels_key",
+      "values": {
+        "items": [
+          {
+            "item": {
+              "label": "",
+              "value": "0"
+            }
+          },
+          {
+            "item": {
+              "label": "choice 1",
+              "value": "1"
+            }
+          },
+          {
+            "item": {
+              "label": "choice 2",
+              "value": "2"
+            }
+          }
+        ]
+      },
+      "value": "1",
+      "type": "$TYPE_STRINGWHEELSLIDER"
+    }""",
+    "string wheel slider with data from url": """
+    {
+      "key": "string_wheelslider_urlbased_key",
+      "values": {
+        "items": [
+          {
+              "item": {
+                  "label": "No data",
+                  "value": "-1"
+              }
+          }
+        ],
+        "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/feature-fb/example/smashlibs_mapexample/assets/combo_string_items_example.json"
+      },
+      "value": "",
+      "type": "$TYPE_STRINGWHEELSLIDER"
+    }"""
+  },
   TYPE_INTCOMBO: {
     "int combo": """
      {
@@ -236,6 +302,64 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       },
       "value": 0,
       "type": "intcombo"
+    }"""
+  },
+  TYPE_INTWHEELSLIDER: {
+    "int wheel slider": """
+     {
+      "key": "int_wheelslider_key",
+      "values": {
+        "items": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          }
+        ]
+      },
+      "value": 1,
+      "type": "$TYPE_INTWHEELSLIDER"
+    }""",
+    "int wheel slider with item labels": """
+    {
+      "key": "int_wheelslider_with_labels_key",
+      "values": {
+        "items": [
+          {
+            "item": {
+              "label": "",
+              "value": 0
+            }
+          },
+          {
+            "item": {
+              "label": "choice 1",
+              "value": 1
+            }
+          },
+          {
+            "item": {
+              "label": "choice 2",
+              "value": 2
+            }
+          }
+        ]
+      },
+      "value": 1,
+      "type": "$TYPE_INTWHEELSLIDER"
+    }""",
+    "int wheel slider with data from url": """
+    {
+      "key": "int_wheelslider_urlbased_key",
+      "values": {
+        "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/feature-fb/example/smashlibs_mapexample/assets/combo_int_items_example.json"
+      },
+      "value": 0,
+      "type": "$TYPE_INTWHEELSLIDER"
     }"""
   },
   TYPE_CONNECTEDSTRINGCOMBO: {
