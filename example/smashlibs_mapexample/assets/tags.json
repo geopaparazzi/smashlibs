@@ -207,6 +207,132 @@
             "type": "stringcombo"
           },
           {
+            "key": "string_wheelslider_with_item_labels",
+            "values": {
+              "items": [
+                {
+                  "item": {
+                    "label": "",
+                    "value": "0"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 1",
+                    "value": "1"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 2",
+                    "value": "2"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 3",
+                    "value": "3"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 4",
+                    "value": "4"
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 5",
+                    "value": "5"
+                  }
+                }
+              ]
+            },
+            "value": "4",
+            "type": "stringwheelslider"
+          },
+          {
+            "key": "int_wheelslider_with_item_labels",
+            "values": {
+              "items": [
+                {
+                  "item": {
+                    "label": "",
+                    "value": 0
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 1",
+                    "value": 1
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 2",
+                    "value": 2
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 3",
+                    "value": 3
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 4",
+                    "value": 4
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 5",
+                    "value": 5
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 6",
+                    "value": 6
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 7",
+                    "value": 7
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 8",
+                    "value": 8
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 9",
+                    "value": 9
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 10",
+                    "value": 10
+                  }
+                },
+                {
+                  "item": {
+                    "label": "choice 11",
+                    "value": 11
+                  }
+                }
+              ]
+            },
+            "value": 4,
+            "type": "intwheelslider"
+          },
+          {
             "values": {"items": [
               {"item": ""},
               {"item": "item1"},

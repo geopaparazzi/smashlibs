@@ -42,6 +42,9 @@ const String TYPE_BOOLEAN = "boolean";
 const String TYPE_STRINGCOMBO = "stringcombo";
 const String TYPE_INTCOMBO = "intcombo";
 
+const String TYPE_INTWHEELSLIDER = "intwheelslider";
+const String TYPE_STRINGWHEELSLIDER = "stringwheelslider";
+
 /// Type for an autocomplete combo.
 const String TYPE_AUTOCOMPLETESTRINGCOMBO = "autocompletestringcombo";
 const String TYPE_AUTOCOMPLETEINTCOMBO = "autocompleteintcombo";

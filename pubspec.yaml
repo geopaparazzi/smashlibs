@@ -107,6 +107,11 @@ dependencies:
   ####################
   # OTHERS
   ####################
+
+  # MIT
+  wheel_slider: ^1.2.2
+
+
   # BSD
   # charset_converter: ^1.0.3
   # MIT

@@ -629,6 +629,26 @@ Tuple2<ListTile, bool>? getWidget(
             ),
             false);
       }
+    case TYPE_STRINGWHEELSLIDER:
+      {
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: WheelSliderWidget<String>(ValueKey(widgetKey), formItem,
+                  label, presentationMode, constraints, isUrlItem, formHelper),
+            ),
+            false);
+      }
+    case TYPE_INTWHEELSLIDER:
+      {
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: WheelSliderWidget<int>(ValueKey(widgetKey), formItem,
+                  label, presentationMode, constraints, isUrlItem, formHelper),
+            ),
+            false);
+      }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
     case TYPE_AUTOCOMPLETEINTCOMBO:
       {

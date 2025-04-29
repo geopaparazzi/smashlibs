@@ -165,6 +165,8 @@ abstract class AFormWidget {
       TYPE_BOOLEAN,
       TYPE_STRINGCOMBO,
       TYPE_INTCOMBO,
+      TYPE_STRINGWHEELSLIDER,
+      TYPE_INTWHEELSLIDER,
       TYPE_AUTOCOMPLETESTRINGCOMBO,
       TYPE_AUTOCOMPLETEINTCOMBO,
       TYPE_CONNECTEDSTRINGCOMBO,
@@ -228,6 +230,12 @@ abstract class AFormWidget {
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_INTCOMBO:
         return IntComboWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_STRINGWHEELSLIDER:
+        return StringWheelSliderWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_INTWHEELSLIDER:
+        return IntWheelSliderWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_AUTOCOMPLETESTRINGCOMBO:
         return AutoCompleteStringComboWidget(
