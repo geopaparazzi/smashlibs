@@ -21,7 +21,9 @@ class AutoCompleteStringComboWidget extends AFormWidget {
 
   @override
   String getName() {
-    return TYPE_AUTOCOMPLETESTRINGCOMBO;
+    return formItem.type == TYPE_AUTOCOMPLETEINTCOMBO
+        ? TYPE_AUTOCOMPLETEINTCOMBO
+        : TYPE_AUTOCOMPLETESTRINGCOMBO;
   }
 
   @override

@@ -166,6 +166,7 @@ abstract class AFormWidget {
       TYPE_STRINGCOMBO,
       TYPE_INTCOMBO,
       TYPE_AUTOCOMPLETESTRINGCOMBO,
+      TYPE_AUTOCOMPLETEINTCOMBO,
       TYPE_CONNECTEDSTRINGCOMBO,
       TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO,
       TYPE_STRINGMULTIPLECHOICE,
@@ -229,6 +230,9 @@ abstract class AFormWidget {
         return IntComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_AUTOCOMPLETESTRINGCOMBO:
+        return AutoCompleteStringComboWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_AUTOCOMPLETEINTCOMBO:
         return AutoCompleteStringComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_CONNECTEDSTRINGCOMBO:

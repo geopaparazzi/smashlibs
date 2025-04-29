@@ -300,6 +300,36 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "type": "$TYPE_AUTOCOMPLETESTRINGCOMBO"
     }"""
   },
+  TYPE_AUTOCOMPLETEINTCOMBO: {
+    TYPE_AUTOCOMPLETEINTCOMBO: """
+    {
+      "key": "autocomplete_int_combo_key",
+      "values": {
+        "items": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      "value": 0,
+      "type": "$TYPE_AUTOCOMPLETEINTCOMBO"
+    }"""
+  },
   TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO: {
     TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO: """
     {
