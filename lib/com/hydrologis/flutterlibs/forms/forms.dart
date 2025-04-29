@@ -44,6 +44,7 @@ const String TYPE_INTCOMBO = "intcombo";
 
 /// Type for an autocomplete combo.
 const String TYPE_AUTOCOMPLETESTRINGCOMBO = "autocompletestringcombo";
+const String TYPE_AUTOCOMPLETEINTCOMBO = "autocompleteintcombo";
 
 /// Type for autocomplete connected combos.
 const String TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO =
@@ -1690,6 +1691,11 @@ class ItemObject {
   String label;
   dynamic value;
   ItemObject(this.label, this.value);
+
+  @override
+  String toString() {
+    return label;
+  }
 }
 
 class FormsNetworkSupporter {

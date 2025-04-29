@@ -63,8 +63,8 @@ class AutoCompleteStringComboWidget extends AFormWidget {
     } else {
       widget = ListTile(
         leading: icon,
-        title: AutocompleteStringComboWidget(getKey(widgetKey), formItem, label,
-            itemReadonly, formItem.isUrlItem, formHelper),
+        title: AutocompleteComboWidget(getKey(widgetKey), formItem, label,
+            presentationMode, constraints, formItem.isUrlItem, formHelper),
       );
     }
 

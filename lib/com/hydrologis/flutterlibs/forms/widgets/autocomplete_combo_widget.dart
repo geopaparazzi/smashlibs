@@ -1,25 +1,32 @@
 part of smashlibs;
 
-class AutocompleteStringComboWidget extends StatefulWidget {
+class AutocompleteComboWidget extends StatefulWidget {
   final SmashFormItem _formItem;
   final String _label;
-  final bool _isReadOnly;
+  final PresentationMode _presentationMode;
+  final Constraints _constraints;
   final bool _isUrlItem;
   final AFormhelper _formHelper;
 
-  AutocompleteStringComboWidget(Key _widgetKey, this._formItem, this._label,
-      this._isReadOnly, this._isUrlItem, this._formHelper)
+  AutocompleteComboWidget(
+      Key _widgetKey,
+      this._formItem,
+      this._label,
+      this._presentationMode,
+      this._constraints,
+      this._isUrlItem,
+      this._formHelper)
       : super(
           key: _widgetKey,
         );
 
   @override
-  State<AutocompleteStringComboWidget> createState() =>
-      _AutocompleteStringComboWidgetState();
+  _AutocompleteComboWidgetState createState() =>
+      _AutocompleteComboWidgetState();
 }
 
-class _AutocompleteStringComboWidgetState
-    extends State<AutocompleteStringComboWidget> {
+class _AutocompleteComboWidgetState<T extends Object>
+    extends State<AutocompleteComboWidget> {
   // the url in its template form
   String? rawUrl;
   Map<String, dynamic>? requiredFormUrlItems;
@@ -68,13 +75,31 @@ class _AutocompleteStringComboWidgetState
       }
     }
 
-    String value = "";
-    if (widget._formItem.value != null) {
-      value = widget._formItem.value.toString();
-    }
-    String key = widget._formItem.key;
+    bool isInt = widget._formItem.type == TYPE_AUTOCOMPLETEINTCOMBO;
 
-    var comboItems = TagsManager.getComboItems(widget._formItem.map);
+    dynamic value;
+    if (widget._formItem.value != null) {
+      try {
+        if (isInt && widget._formItem.value is String) {
+          if (widget._formItem.value.isEmpty) {
+            value = null;
+          } else {
+            value = int.parse(widget._formItem.value) as T;
+          }
+        } else {
+          value = widget._formItem.value;
+        }
+      } on TypeError catch (er, st) {
+        print(er);
+        SMLogger()
+            .e("Error parsing value: ${widget._formItem.value}", null, st);
+      } on Exception catch (e, st) {
+        SMLogger().e("Error parsing value: ${widget._formItem.value}", e, st);
+      }
+    }
+    String? key = widget._formItem.key;
+
+    List<dynamic>? comboItems = TagsManager.getComboItems(widget._formItem.map);
     if (comboItems == null) {
       comboItems = [];
     }
@@ -105,21 +130,43 @@ class _AutocompleteStringComboWidgetState
       }
     }
     if (found == null) {
-      value = "";
+      value = null;
     }
-    List<dynamic> items = itemsArray
-        .map(
-          (itemObj) => itemObj!.value,
-        )
-        .toList();
+    // List<dynamic> items = itemsArray
+    //     .map(
+    //       (itemObj) => itemObj!.value,
+    //     )
+    //     .toList();
+
+    if (widget._presentationMode.isReadOnly &&
+        widget._presentationMode.detailMode != DetailMode.DETAILED) {
+      return AFormWidget.getSimpleLabelValue(
+          widget._label, widget._formItem, widget._presentationMode,
+          forceValue: found != null
+              ? found.label
+              : (value == null ? "" : value.toString()));
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(bottom: SmashUI.DEFAULT_PADDING),
-          child: SmashUI.normalText(widget._label,
-              color: SmashColors.mainDecorationsDarker),
+          child: Row(
+            children: [
+              SmashUI.normalText(widget._label,
+                  color: widget._presentationMode.labelTextColor,
+                  bold: widget._presentationMode.doLabelBold),
+              if (!widget._constraints.isValid(value))
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: SmashUI.normalText(
+                      widget._constraints.getDescription(context),
+                      bold: true,
+                      color: SmashColors.mainDanger),
+                ),
+            ],
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(left: SmashUI.DEFAULT_PADDING * 2),
@@ -129,27 +176,27 @@ class _AutocompleteStringComboWidgetState
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               border: Border.all(
-                color: SmashColors.mainDecorations,
+                color: widget._presentationMode.labelTextColor,
               ),
             ),
             child: IgnorePointer(
-              ignoring: widget._isReadOnly,
-              child: Autocomplete<String>(
+              ignoring: widget._presentationMode.isReadOnly,
+              child: Autocomplete<ItemObject>(
                 key: Key(key),
                 optionsBuilder: (TextEditingValue textEditingValue) {
                   if (textEditingValue.text == '') {
-                    return const Iterable<String>.empty();
+                    return Iterable<ItemObject>.empty();
                   }
-                  List<String> strItems = [];
-                  for (var item in items) {
-                    if (item
-                        .toString()
-                        .toLowerCase()
-                        .contains(textEditingValue.text.toLowerCase())) {
-                      strItems.add(item.toString());
+                  List<ItemObject> objItems = [];
+                  for (var item in itemsArray) {
+                    if (item != null &&
+                        item.label
+                            .toLowerCase()
+                            .contains(textEditingValue.text.toLowerCase())) {
+                      objItems.add(item);
                     }
                   }
-                  return strItems;
+                  return objItems;
                   // items.where((dynamic option) {
                   //   return option
                   //       .toString()
@@ -159,9 +206,9 @@ class _AutocompleteStringComboWidgetState
                 },
                 fieldViewBuilder: (context, textEditingController, focusNode,
                     onFieldSubmitted) {
-                  if (value.isNotEmpty) {
+                  if (found != null) {
                     return TextFormField(
-                      controller: textEditingController..text = value,
+                      controller: textEditingController..text = found.label,
                       focusNode: focusNode,
                     );
                   } else {
@@ -171,13 +218,13 @@ class _AutocompleteStringComboWidgetState
                     );
                   }
                 },
-                onSelected: (String selection) {
-                  widget._formItem.setValue(selection);
+                onSelected: (ItemObject selection) {
+                  widget._formItem.setValue(selection.value);
 
                   if (widget._isUrlItem) {
                     FormUrlItemsState urlItemState =
                         Provider.of<FormUrlItemsState>(context, listen: false);
-                    urlItemState.setFormUrlItem(key, selection);
+                    urlItemState.setFormUrlItem(key, selection.value);
                   }
                 },
               ),

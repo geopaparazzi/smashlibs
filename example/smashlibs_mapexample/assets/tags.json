@@ -352,7 +352,7 @@
             "type": "autocompletestringcombo"
           },
           {
-            "key": "an autocomplete string combo urlbased",
+            "key": "an autocomplete int combo urlbased",
             "values": {
               "items": [
                 {
@@ -364,8 +364,8 @@
               ],
               "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/refs/heads/master/test/forms/examples/farms/1/fields/1/subfields/2/rows/response.json"
             },
-            "value": "",
-            "type": "autocompletestringcombo"
+            "value": 4,
+            "type": "autocompleteintcombo"
           },
           {
             "key": "two_connected_autocomplete_combos",

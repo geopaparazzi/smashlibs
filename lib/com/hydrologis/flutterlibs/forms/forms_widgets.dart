@@ -630,22 +630,13 @@ Tuple2<ListTile, bool>? getWidget(
             false);
       }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
+    case TYPE_AUTOCOMPLETEINTCOMBO:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
-          return Tuple2(
-              ListTile(
-                leading: icon,
-                title: AFormWidget.getSimpleLabelValue(
-                    label, formItem, presentationMode),
-              ),
-              false);
-        }
         return Tuple2(
             ListTile(
               leading: icon,
-              title: AutocompleteStringComboWidget(ValueKey(widgetKey),
-                  formItem, label, itemReadonly, isUrlItem, formHelper),
+              title: AutocompleteComboWidget(ValueKey(widgetKey), formItem,
+                  label, presentationMode, constraints, isUrlItem, formHelper),
             ),
             false);
       }

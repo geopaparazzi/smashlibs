@@ -157,7 +157,7 @@ part 'com/hydrologis/flutterlibs/maps/utils.dart';
 part 'com/hydrologis/flutterlibs/utils/experimentals.dart';
 
 // form widgets
-part 'com/hydrologis/flutterlibs/forms/widgets/autocomplete_stringcombo_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/autocomplete_combo_widget.dart';
 part 'com/hydrologis/flutterlibs/forms/widgets/autocomplete_stringconnectedcombo_widget.dart';
 part 'com/hydrologis/flutterlibs/forms/widgets/checkbox_widget.dart';
 part 'com/hydrologis/flutterlibs/forms/widgets/combobox_widget.dart';
