@@ -362,10 +362,26 @@
                     }
                 }
               ],
-              "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/refs/heads/master/test/forms/examples/farms/1/fields/1/subfields/2/rows/response.json"
+              "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/refs/heads/master/test/forms/examples/exmple_url_intvalue_label.json"
             },
-            "value": 4,
+            "value": 3,
             "type": "autocompleteintcombo"
+          },
+          {
+            "key": "an autocomplete string combo urlbased",
+            "values": {
+              "items": [
+                {
+                    "item": {
+                        "label": "No data",
+                        "value": ""
+                    }
+                }
+              ],
+              "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/refs/heads/master/test/forms/examples/exmple_url_stringvalue_label.json"
+            },
+            "value": "ABC",
+            "type": "autocompletestringcombo"
           },
           {
             "key": "two_connected_autocomplete_combos",
