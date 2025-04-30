@@ -30,10 +30,13 @@ class _AutocompleteComboWidgetState<T extends Object>
   // the url in its template form
   String? rawUrl;
   Map<String, dynamic>? requiredFormUrlItems;
+  bool _loadUrlDone = false;
+  List? urlComboItems;
 
   Future<List?> loadUrlData(
       BuildContext context, FormUrlItemsState urlItemState) async {
     rawUrl = TagsManager.getComboUrl(widget._formItem.map);
+    _loadUrlDone = true;
     if (rawUrl != null) {
       requiredFormUrlItems = widget._formHelper.getRequiredFormUrlItems();
 
@@ -49,21 +52,29 @@ class _AutocompleteComboWidgetState<T extends Object>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FormUrlItemsState>(builder: (context, urlItemState, child) {
-      return FutureBuilder(
-        future: loadUrlData(context, urlItemState),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return SmashCircularProgress();
-          } else if (snapshot.hasError) {
-            return SmashUI.errorWidget('Error: ${snapshot.error}');
-          } else {
-            List? urlComboItems = snapshot.data as List?;
-            return myBuild(context, urlItemState, urlComboItems);
-          }
-        },
-      );
-    });
+    if (_loadUrlDone) {
+      // load the url data only once
+      FormUrlItemsState urlItemState =
+          Provider.of<FormUrlItemsState>(context, listen: false);
+      return myBuild(context, urlItemState, urlComboItems);
+    } else {
+      return Consumer<FormUrlItemsState>(
+          builder: (context, urlItemState, child) {
+        return FutureBuilder(
+          future: loadUrlData(context, urlItemState),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return SmashCircularProgress();
+            } else if (snapshot.hasError) {
+              return SmashUI.errorWidget('Error: ${snapshot.error}');
+            } else {
+              urlComboItems = snapshot.data as List?;
+              return myBuild(context, urlItemState, urlComboItems);
+            }
+          },
+        );
+      });
+    }
   }
 
   Widget myBuild(BuildContext context, FormUrlItemsState urlItemState,
