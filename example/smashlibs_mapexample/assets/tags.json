@@ -80,6 +80,16 @@
         ]
       },
       {
+        "formname": "a numeric text incrementable by tapping",
+        "formitems": [
+          {
+            "key": "a_tappable_integer_number",
+            "value": "1",
+            "type": "tapcounter"
+          }
+        ]
+      },
+      {
         "formname": "date",
         "formitems": [
           {

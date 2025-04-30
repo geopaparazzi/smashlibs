@@ -203,6 +203,9 @@ abstract class AFormWidget {
       case TYPE_INTEGER:
         return IntegerWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_TAPCOUNTER:
+        return TapcounterItem(
+            context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_STRING:
         return StringWidget(
             context, widgetKey, formItem, presentationMode, formHelper);

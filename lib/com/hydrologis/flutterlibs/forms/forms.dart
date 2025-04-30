@@ -28,6 +28,7 @@ const String TYPE_DOUBLE = "double";
 
 /// Type for a {@link EditText} containing integer numbers.
 const String TYPE_INTEGER = "integer";
+const String TYPE_TAPCOUNTER = "tapcounter";
 
 /// Type for a {@link Button} containing date.
 const String TYPE_DATE = "date";
