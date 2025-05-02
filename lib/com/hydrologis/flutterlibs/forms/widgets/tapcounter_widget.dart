@@ -1,46 +1,102 @@
 part of smashlibs;
 
-class TapcounterWidget extends StatefulWidget {
-  final SmashFormItem _formItem;
-  final String _label;
-  final bool _isReadOnly;
+class TapcounterFormWidget extends AFormWidget {
+  final BuildContext context;
+  final SmashFormItem formItem;
+  final PresentationMode presentationMode;
+  final AFormhelper formHelper;
 
-  TapcounterWidget(
-      Key _widgetKey, this._formItem, this._label, this._isReadOnly)
-      : super(
-          key: _widgetKey,
-        );
+  TapcounterFormWidget(this.context, String widgetKey, this.formItem,
+      this.presentationMode, this.formHelper) {
+    initItem(formItem, presentationMode);
+    widget = _TapcounterItemWidget(
+      key: getKey(widgetKey),
+      formItem: formItem,
+      label: label,
+      isReadOnly: itemReadonly,
+    );
+  }
 
   @override
-  _TapcounterWidgetState createState() => _TapcounterWidgetState();
+  String getName() {
+    return "Tap Counter";
+  }
+
+  @override
+  Widget getWidget() {
+    return widget!;
+  }
+
+  @override
+  bool isGeometric() {
+    return false;
+  }
 }
 
-class _TapcounterWidgetState extends State<TapcounterWidget> {
+class _TapcounterItemWidget extends StatefulWidget {
+  final SmashFormItem formItem;
+  final String label;
+  final bool isReadOnly;
+
+  _TapcounterItemWidget({
+    required Key key,
+    required this.formItem,
+    required this.label,
+    required this.isReadOnly,
+  }) : super(key: key);
+
+  @override
+  _TapcounterItemState createState() => _TapcounterItemState();
+}
+
+class _TapcounterItemState extends State<_TapcounterItemWidget> {
   @override
   Widget build(BuildContext context) {
-    int? value;
-    if (widget._formItem.value != null) {
-      value = widget._formItem.value;
+    int value = 0;
+    if (widget.formItem.value != null) {
+      if (widget.formItem.value is int) {
+        value = widget.formItem.value;
+      } else if (widget.formItem.value is String) {
+        value = int.tryParse(widget.formItem.value) ?? 0;
+      } else if (widget.formItem.value is double) {
+        value = widget.formItem.value.toInt();
+      }
     }
 
-    if (widget._isReadOnly) {
-      // return the readonly representation of the widget
-      return SmashUI.normalText(
-        widget._label,
-        color: SmashColors.mainDecorationsDarker,
-      );
-    }
-
-    // TODO return the editable representation of the widget
-    return TextButton(
-      onPressed: () {
-        if (!widget._isReadOnly) {
-          setState(() {
-            widget._formItem.setValue((value ?? 0) + 1);
-          });
-        }
-      },
-      child: Text("Tap to increment: ${value ?? 0}"),
+    return InputDecorator(
+      decoration: InputDecoration(
+        labelText: widget.label,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide: BorderSide(color: SmashColors.mainDecorations),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.remove_circle_outline,
+                color: SmashColors.mainDecorations),
+            onPressed: () {
+              setState(() {
+                int newValue = value - 1;
+                widget.formItem.setValue(newValue);
+              });
+            },
+          ),
+          SmashUI.normalText(value.toString()),
+          IconButton(
+            icon: Icon(Icons.add_circle_outline,
+                color: SmashColors.mainDecorations),
+            onPressed: () {
+              setState(() {
+                widget.formItem.setValue(value + 1);
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 }

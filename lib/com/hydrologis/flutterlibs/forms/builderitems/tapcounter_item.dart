@@ -7,14 +7,18 @@ class TapcounterItem extends StringWidget {
       final SmashFormItem formItem,
       PresentationMode presentationMode,
       AFormhelper formHelper)
-      : super(context, widgetKey, formItem, presentationMode, formHelper) {
-    this.keyboardType =
-        TextInputType.numberWithOptions(signed: true, decimal: false);
-  }
+      : super(context, widgetKey, formItem, presentationMode, formHelper) {}
 
   @override
   String getName() {
     return TYPE_TAPCOUNTER;
+  }
+
+  @override
+  Widget getWidget() {
+    var tapCounterFormWidget = TapcounterFormWidget(
+        context, widgetKey, formItem, presentationMode, formHelper);
+    return tapCounterFormWidget.getWidget();
   }
 
   @override
