@@ -75,25 +75,41 @@ class _TapcounterItemState extends State<_TapcounterItemWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.remove_circle_outline,
-                color: SmashColors.mainDecorations),
-            onPressed: () {
-              setState(() {
-                int newValue = value - 1;
-                widget.formItem.setValue(newValue);
-              });
-            },
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: SmashColors.mainDecorations,
+                foregroundColor: Colors.white,
+              ),
+              child: Icon(
+                Icons.remove_circle_outline,
+              ),
+              onPressed: () {
+                setState(() {
+                  int newValue = value - 1;
+                  widget.formItem.setValue(newValue);
+                });
+              },
+            ),
           ),
-          SmashUI.normalText(value.toString()),
-          IconButton(
-            icon: Icon(Icons.add_circle_outline,
-                color: SmashColors.mainDecorations),
-            onPressed: () {
-              setState(() {
-                widget.formItem.setValue(value + 1);
-              });
-            },
+          Expanded(
+            child: Center(child: SmashUI.normalText(value.toString())),
+          ),
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: SmashColors.mainDecorations,
+                foregroundColor: Colors.white,
+              ),
+              child: Icon(
+                Icons.add_circle_outline,
+              ),
+              onPressed: () {
+                setState(() {
+                  widget.formItem.setValue(value + 1);
+                });
+              },
+            ),
           ),
         ],
       ),
