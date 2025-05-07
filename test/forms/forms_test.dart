@@ -115,6 +115,40 @@ void main() {
     expect(formItems[2].value, 2.3);
   });
 
+  testWidgets('Tapcounter Widgets Test', (tester) async {
+    var helper = TestFormHelper("tapcounter_widgets.json");
+    var newValues = {
+      "a tap counter": 5,
+      "another tap counter": 15,
+    };
+
+    expect(helper.getSectionName(), "tapcounter examples");
+    await pumpForm(helper, newValues, tester);
+
+    var section = helper.getSection();
+    var form = section.getFormByName('tapcounter form');
+    var formItems = form!.getFormItems();
+    expect(formItems[0].value, 5);
+    expect(formItems[1].value, 15);
+
+    await changeTapCounterIncrement(tester, "a tap counter");
+    await changeTapCounterDecrement(tester, "a tap counter");
+    await changeTapCounterDecrement(tester, "a tap counter");
+    await changeTapCounterText(tester, "a tap counter", 8);
+
+    await changeTapCounterDecrement(tester, "another tap counter");
+    await changeTapCounterIncrement(tester, "another tap counter");
+    await changeTapCounterIncrement(tester, "another tap counter");
+    await changeTapCounterText(tester, "another tap counter", 12);
+
+    await tapBackIcon(tester);
+
+    section = helper.getSection();
+    form = section.getFormByName('tapcounter form');
+    expect(formItems[0].value, 8); // 5 + 1 - 1 - 1 = 4, then set to 8
+    expect(formItems[1].value, 12); // 15 - 1 + 1 + 1 = 16, then set to 12
+  });
+
   testWidgets('Date and Time Widgets Test', (tester) async {
     var helper = TestFormHelper("date_and_time_widgets.json");
     var dateValue = "2023-05-20";
@@ -1098,6 +1132,49 @@ Future<void> changeAutocompletes(
   // select it and trigger saving
   await tester.tap(itemToSelect1);
   await tester.pumpAndSettle();
+}
+
+Future<void> changeTapCounterIncrement(
+    WidgetTester tester, String formItemKey) async {
+  final tapCounterWidgetFinder = find.byKey(Key(formItemKey));
+  expect(tapCounterWidgetFinder, findsOneWidget);
+
+  final addButtonFinder = find.descendant(
+    of: tapCounterWidgetFinder,
+    matching: find.byIcon(Icons.add_circle_outline),
+  );
+  expect(addButtonFinder, findsOneWidget);
+  await tester.tap(addButtonFinder);
+  await tester.pump();
+}
+
+Future<void> changeTapCounterDecrement(
+    WidgetTester tester, String formItemKey) async {
+  final tapCounterWidgetFinder = find.byKey(Key(formItemKey));
+  expect(tapCounterWidgetFinder, findsOneWidget);
+
+  final removeButtonFinder = find.descendant(
+    of: tapCounterWidgetFinder,
+    matching: find.byIcon(Icons.remove_circle_outline),
+  );
+  expect(removeButtonFinder, findsOneWidget);
+  await tester.tap(removeButtonFinder);
+  await tester.pump();
+}
+
+Future<void> changeTapCounterText(
+    WidgetTester tester, String formItemKey, int newValue) async {
+  final tapCounterWidgetFinder = find.byKey(Key(formItemKey));
+  expect(tapCounterWidgetFinder, findsOneWidget);
+
+  final textFieldFinder = find.descendant(
+    of: tapCounterWidgetFinder,
+    matching: find.byType(TextFormField),
+  );
+  expect(textFieldFinder, findsOneWidget);
+  await tester.enterText(textFieldFinder, newValue.toString());
+  await tester.testTextInput.receiveAction(TextInputAction.done);
+  await tester.pump();
 }
 
 class TestFormHelper extends AFormhelper {

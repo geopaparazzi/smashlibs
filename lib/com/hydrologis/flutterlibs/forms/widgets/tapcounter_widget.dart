@@ -9,9 +9,17 @@ class TapcounterFormWidget extends AFormWidget {
   TapcounterFormWidget(this.context, String widgetKey, this.formItem,
       this.presentationMode, this.formHelper) {
     initItem(formItem, presentationMode);
+
+    Key? itemActualKey;
+    if (this.formItem.key != null && this.formItem.key!.isNotEmpty) {
+      itemActualKey = getKey(this.formItem.key);
+    } else {
+      itemActualKey = getKey(null);
+    }
+
     widget = _TapcounterItemWidget(
-      key: getKey(widgetKey),
-      formItem: formItem,
+      key: itemActualKey,
+      formItem: this.formItem,
       label: label,
     );
   }
