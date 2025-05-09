@@ -1,0 +1,24 @@
+[
+  {
+    "sectionname": "tapcounter examples",
+    "forms": [
+      {
+        "formname": "tapcounter form",
+        "formitems": [
+          {
+            "key": "a tap counter",
+            "label": "A Tap Counter",
+            "type": "tapcounter",
+            "value": "0"
+          },
+          {
+            "key": "another tap counter",
+            "label": "Another Tap Counter",
+            "type": "tapcounter",
+            "value": "10"
+          }
+        ]
+      }
+    ]
+  }
+]

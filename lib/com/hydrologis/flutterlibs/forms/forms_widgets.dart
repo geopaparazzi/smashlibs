@@ -814,6 +814,16 @@ Tuple2<ListTile, bool>? getWidget(
                     formItem, itemReadonly)),
           ),
           true);
+    case TYPE_TAPCOUNTER:
+      var tapCounterFormWidgetInstance = TapcounterFormWidget(
+          context, widgetKey, formItem, presentationMode, formHelper);
+
+      return Tuple2(
+          ListTile(
+            leading: icon,
+            title: tapCounterFormWidgetInstance.getWidget(),
+          ),
+          false);
     case TYPE_HIDDEN:
       break;
     default:
