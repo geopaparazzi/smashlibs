@@ -290,10 +290,10 @@ packages:
     dependency: "direct main"
     description:
       name: dart_postgis
-      sha256: "07e772c05a86f095776566951af74e043694101332f0a11288b1a4684f91e01d"
+      sha256: "7d1b5b8cd2b9e717278250d2e67b1d16bb23486108c3fd5bfbd4006ae591bd55"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.3+3"
+    version: "0.3.3+4"
   dart_shp:
     dependency: "direct main"
     description:

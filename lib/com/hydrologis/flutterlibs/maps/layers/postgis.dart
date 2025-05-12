@@ -346,6 +346,9 @@ class PostgisSource extends DbVectorLayerSource
     var featureCount = _tableData!.features.length;
     for (var i = 0; i < featureCount; i++) {
       var feature = _tableData!.features[i];
+      if (feature.geometry == null) {
+        continue;
+      }
       if (key == null || feature.attributes[key]?.toString() == value) {
         var count = feature.geometry!.getNumGeometries();
         for (var i = 0; i < count; i++) {
