@@ -161,6 +161,9 @@ class PostgisSource extends DbVectorLayerSource
         }
         _tableBounds = JTS.Envelope.empty();
         _tableData!.features.forEach((f) {
+          if (f.geometry == null) {
+            return;
+          }
           _tableBounds!
               .expandToIncludeEnvelope(f.geometry!.getEnvelopeInternal());
         });
