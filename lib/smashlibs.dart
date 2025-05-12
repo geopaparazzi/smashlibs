@@ -171,6 +171,7 @@ part 'com/hydrologis/flutterlibs/forms/widgets/multicombo_widget.dart';
 part 'com/hydrologis/flutterlibs/forms/widgets/pictures_widget.dart';
 part 'com/hydrologis/flutterlibs/forms/widgets/sketches_widget.dart';
 part 'com/hydrologis/flutterlibs/forms/widgets/timepicker_widget.dart';
+part 'com/hydrologis/flutterlibs/forms/widgets/tapcounter_widget.dart';
 
 part 'com/hydrologis/flutterlibs/forms/builderitems/boolean_item.dart';
 part 'com/hydrologis/flutterlibs/forms/builderitems/date_item.dart';
@@ -192,3 +193,4 @@ part 'com/hydrologis/flutterlibs/forms/builderitems/multistringcombo_item.dart';
 part 'com/hydrologis/flutterlibs/forms/builderitems/multiintcombo_item.dart';
 part 'com/hydrologis/flutterlibs/forms/builderitems/stringwheelslider_item.dart';
 part 'com/hydrologis/flutterlibs/forms/builderitems/integerwheelslider_item.dart';
+part 'com/hydrologis/flutterlibs/forms/builderitems/tapcounter_item.dart';

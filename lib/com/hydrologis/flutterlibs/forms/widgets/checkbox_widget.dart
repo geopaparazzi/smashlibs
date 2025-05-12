@@ -43,20 +43,5 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
         ),
       ],
     );
-    // TODO remove below if decide to stick with switches
-    // return CheckboxListTile(
-    //   title: SmashUI.normalText(widget._label,
-    //       color: SmashColors.mainDecorationsDarker),
-    //   value: selected,
-    //   onChanged: (value) {
-    //     if (!widget._isReadOnly) {
-    //       setState(() {
-    //         widget._formItem.setValue("$value");
-    //       });
-    //     }
-    //   },
-    //   controlAffinity:
-    //       ListTileControlAffinity.trailing, //  <-- leading Checkbox
-    // );
   }
 }

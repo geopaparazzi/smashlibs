@@ -157,6 +157,7 @@ abstract class AFormWidget {
       TYPE_STRINGAREA,
       TYPE_DOUBLE,
       TYPE_INTEGER,
+      TYPE_TAPCOUNTER,
       TYPE_LABEL,
       TYPE_LABELWITHLINE,
       TYPE_DYNAMICSTRING,
@@ -202,6 +203,9 @@ abstract class AFormWidget {
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_INTEGER:
         return IntegerWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_TAPCOUNTER:
+        return TapcounterFormWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_STRING:
         return StringWidget(
