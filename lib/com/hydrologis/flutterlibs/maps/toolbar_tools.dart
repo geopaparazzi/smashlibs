@@ -556,7 +556,7 @@ class BoxZoomButton extends StatelessWidget {
     return Consumer<BoxZoomState>(builder: (context, boxzoomState, child) {
       Widget w = InkWell(
         child: Icon(
-          MdiIcons.magnifyScan,
+          MdiIcons.selectSearch,
           color: boxzoomState.isEnabled ? selectionColor : fgColor,
           size: _iconSize,
         ),
