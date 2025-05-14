@@ -314,10 +314,10 @@ packages:
     dependency: "direct main"
     description:
       name: device_info_plus
-      sha256: "77f757b789ff68e4eaf9c56d1752309bd9f7ad557cb105b938a7f8eb89e59110"
+      sha256: a7fd703482b391a87d60b6061d04dfdeab07826b96f9abd8f5ed98068acc0074
       url: "https://pub.dev"
     source: hosted
-    version: "9.1.2"
+    version: "10.1.2"
   device_info_plus_platform_interface:
     dependency: transitive
     description:
@@ -460,50 +460,50 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_map
-      sha256: "2ecb34619a4be19df6f40c2f8dce1591675b4eff7a6857bd8f533706977385da"
+      sha256: f7d0379477274f323c3f3bc12d369a2b42eb86d1e7bd2970ae1ea3cff782449a
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.2"
+    version: "8.1.1"
   flutter_map_cancellable_tile_provider:
     dependency: "direct main"
     description:
       name: flutter_map_cancellable_tile_provider
-      sha256: "03662220ce0cd784ad2f2a45c36fc379b8b315c74f5c12b5ff4a0515eab1acd1"
+      sha256: "801760c104a3cfd9268cda7c9b1241223247e8182613a7e060ef4ffc0d825ac8"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.2"
+    version: "3.1.0"
   flutter_map_dragmarker:
     dependency: transitive
     description:
       name: flutter_map_dragmarker
-      sha256: e7ab425758243d9eb824c0ecdc094583a93ffac5b6e58bdb051de4f83110fe81
+      sha256: d73ca9e1c30b1a906a010053594f5957a5d1d8551d3d3ff1267a6f3ff88f4d26
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.0"
+    version: "8.0.3"
   flutter_map_line_editor:
     dependency: "direct main"
     description:
       name: flutter_map_line_editor
-      sha256: "2a8c5a8e22bc4879e017e4a47fb502608d671c5039cc4604880088fb0de9d14a"
+      sha256: aceb8a5070c3d2a445adaec34f1accd6ee98943a49193e6694ac84ec3e90ccf1
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.0"
-  flutter_map_marker_cluster:
+    version: "8.0.0"
+  flutter_map_marker_cluster_plus:
     dependency: "direct main"
     description:
-      name: flutter_map_marker_cluster
-      sha256: "2c1fb4d7a2105c4bbeb89be215320507f4b71b2036df4341fab9d2aa677d3ae9"
+      name: flutter_map_marker_cluster_plus
+      sha256: cd5c21738e6d241e6423845d19f4f3b95ea334f4d724af9200e1931cdcf1d7be
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
-  flutter_map_marker_popup:
+    version: "1.4.2"
+  flutter_map_marker_popup_plus:
     dependency: transitive
     description:
-      name: flutter_map_marker_popup
-      sha256: a7540538114b5d1627ab67b498273d66bc36090385412ae49ef215af4a2861c5
+      name: flutter_map_marker_popup_plus
+      sha256: a0c2cde5006f42e29e33fb8bc6d50400a19f574471b372b4e08df46425576d90
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.0"
+    version: "7.1.0"
   flutter_material_pickers:
     dependency: "direct main"
     description:
@@ -822,10 +822,10 @@ packages:
     dependency: transitive
     description:
       name: just_audio_web
-      sha256: "8c7e779892e180cbc9ffb5a3c52f6e90e1cbbf4a63694cc450972a7edbd2bb6d"
+      sha256: "6ba8a2a7e87d57d32f0f7b42856ade3d6a9fbe0f1a11fabae0a4f00bb73f0663"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.15"
+    version: "0.4.16"
   latlong2:
     dependency: "direct main"
     description:
@@ -1788,10 +1788,10 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter_platform_interface
-      sha256: "18b1640839cf6546784a524c72aded5b6e86b23e7167dc2311cc96f7658b64bd"
+      sha256: e54a2a435144af4e008bea140c06913eeb3f25db421c2ceaa932f314a45d79b9
       url: "https://pub.dev"
     source: hosted
-    version: "2.11.0"
+    version: "2.12.0"
   webview_flutter_wkwebview:
     dependency: transitive
     description:

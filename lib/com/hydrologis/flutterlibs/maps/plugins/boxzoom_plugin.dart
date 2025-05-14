@@ -81,11 +81,11 @@ class _BoxZoomPluginLayerState extends State<BoxZoomPluginLayer> {
   Future<void> dragEnd(BuildContext context, BoxZoomState infoToolState) async {
     MapController mapController = MapController.of(context);
 
-    Point pixelOrigin = map.pixelOrigin;
-    var p1 = map.unproject(
-        Point(pixelOrigin.x + _start!.dx, pixelOrigin.y + _start!.dy));
-    var p2 = map.unproject(
-        Point(pixelOrigin.x + _running!.dx, pixelOrigin.y + _running!.dy));
+    var pixelOrigin = map.pixelOrigin;
+    var p1 = map.unprojectAtZoom(
+        Offset(pixelOrigin.dx + _start!.dx, pixelOrigin.dy + _start!.dy));
+    var p2 = map.unprojectAtZoom(
+        Offset(pixelOrigin.dx + _running!.dx, pixelOrigin.dy + _running!.dy));
     var envelope = JTS.Envelope.fromCoordinates(
         JTS.Coordinate(p1.longitude, p1.latitude),
         JTS.Coordinate(p2.longitude, p2.latitude));

@@ -14,8 +14,7 @@ import 'package:after_layout/after_layout.dart';
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart' as HU;
 import 'package:dart_jts/dart_jts.dart' as JTS;
-import 'package:device_info_plus/device_info_plus.dart'
-    if (dart.library.html) 'web_stubs.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -51,7 +50,7 @@ import 'package:mapsforge_flutter/src/layer/job/jobresult.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:gpx/gpx.dart' hide Bounds;
 import 'package:rainbow_color/rainbow_color.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:flutter_map_marker_cluster_plus/flutter_map_marker_cluster_plus.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:geoimage/geoimage.dart';
 import 'package:dart_postgis/dart_postgis.dart';
