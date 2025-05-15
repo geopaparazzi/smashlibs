@@ -113,87 +113,92 @@ class _TapcounterItemState extends State<_TapcounterItemWidget> {
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: SmashColors.mainDecorations,
-                foregroundColor: Colors.white,
-              ),
-              child: Icon(
-                Icons.remove_circle_outline,
-              ),
-              onPressed: () {
-                int valueToDecrement =
-                    int.tryParse(_controller.text) ?? _getFormItemIntValue();
-                setState(() {
-                  int newValue = valueToDecrement - 1;
-                  widget.formItem.setValue(newValue);
-                  _controller.text = newValue.toString();
-                  _controller.selection = TextSelection.fromPosition(
-                      TextPosition(offset: _controller.text.length));
-                });
-              },
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextFormField(
-                controller: _controller,
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 2.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: SmashColors.mainDecorations,
+                  foregroundColor: Colors.white,
                 ),
-                onChanged: (text) {
-                  final int? newIntValue = int.tryParse(text);
-                  if (newIntValue != null) {
-                    if (newIntValue != _getFormItemIntValue()) {
-                      widget.formItem.setValue(newIntValue);
-                    }
-                  }
-                },
-                onEditingComplete: () {
-                  final int? finalValue = int.tryParse(_controller.text);
-                  if (finalValue != null) {
-                    if (finalValue != _getFormItemIntValue()) {
-                      widget.formItem.setValue(finalValue);
-                    }
-                  } else {
-                    _updateControllerTextFromFormItem();
-                  }
-                  FocusScope.of(context).unfocus();
+                child: Icon(
+                  Icons.remove_circle_outline,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  int valueToDecrement =
+                      int.tryParse(_controller.text) ?? _getFormItemIntValue();
+                  setState(() {
+                    int newValue = valueToDecrement - 1;
+                    widget.formItem.setValue(newValue);
+                    _controller.text = newValue.toString();
+                    _controller.selection = TextSelection.fromPosition(
+                        TextPosition(offset: _controller.text.length));
+                  });
                 },
               ),
             ),
-          ),
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: SmashColors.mainDecorations,
-                foregroundColor: Colors.white,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: TextFormField(
+                  controller: _controller,
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onChanged: (text) {
+                    final int? newIntValue = int.tryParse(text);
+                    if (newIntValue != null) {
+                      if (newIntValue != _getFormItemIntValue()) {
+                        widget.formItem.setValue(newIntValue);
+                      }
+                    }
+                  },
+                  onEditingComplete: () {
+                    final int? finalValue = int.tryParse(_controller.text);
+                    if (finalValue != null) {
+                      if (finalValue != _getFormItemIntValue()) {
+                        widget.formItem.setValue(finalValue);
+                      }
+                    } else {
+                      _updateControllerTextFromFormItem();
+                    }
+                    FocusScope.of(context).unfocus();
+                  },
+                ),
               ),
-              child: Icon(
-                Icons.add_circle_outline,
-              ),
-              onPressed: () {
-                int valueToIncrement =
-                    int.tryParse(_controller.text) ?? _getFormItemIntValue();
-                setState(() {
-                  int newValue = valueToIncrement + 1;
-                  widget.formItem.setValue(newValue);
-                  _controller.text = newValue.toString();
-                  _controller.selection = TextSelection.fromPosition(
-                      TextPosition(offset: _controller.text.length));
-                });
-              },
             ),
-          ),
-        ],
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: SmashColors.mainDecorations,
+                  foregroundColor: Colors.white,
+                ),
+                child: Icon(
+                  Icons.add_circle_outline,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  int valueToIncrement =
+                      int.tryParse(_controller.text) ?? _getFormItemIntValue();
+                  setState(() {
+                    int newValue = valueToIncrement + 1;
+                    widget.formItem.setValue(newValue);
+                    _controller.text = newValue.toString();
+                    _controller.selection = TextSelection.fromPosition(
+                        TextPosition(offset: _controller.text.length));
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
