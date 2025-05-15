@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart'
     hide TextStyle;
-import 'package:dart_jts/dart_jts.dart';
+import 'package:dart_jts/dart_jts.dart' hide Key;
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:smashlibs/com/hydrologis/flutterlibs/utils/logging.dart';

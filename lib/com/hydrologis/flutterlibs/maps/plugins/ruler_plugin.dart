@@ -83,9 +83,9 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
       // print(p);
       pointsList!.add(p);
       lengthMeters = 0.0;
-      Point pixelOrigin = map.pixelOrigin;
-      var tmp =
-          map.unproject(Point(pixelOrigin.x + p.dx, pixelOrigin.y + (p.dy)));
+      var pixelOrigin = map.pixelOrigin;
+      var tmp = map.unprojectAtZoom(
+          Offset(pixelOrigin.dx + p.dx, pixelOrigin.dy + (p.dy)));
       runningPointLL = JTS.Coordinate(tmp.longitude, tmp.latitude);
       rulerState.lengthMeters = lengthMeters;
       setState(() {});
@@ -96,9 +96,9 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
     if (_x != null && _y != null) {
       if (pointsList != null) {
         pointsList!.add(p);
-        Point pixelOrigin = map.pixelOrigin;
-        var tmp =
-            map.unproject(Point(pixelOrigin.x + p.dx, pixelOrigin.y + (p.dy)));
+        var pixelOrigin = map.pixelOrigin;
+        var tmp = map.unprojectAtZoom(
+            Offset(pixelOrigin.dx + p.dx, pixelOrigin.dy + (p.dy)));
         var tmpPointLL = JTS.Coordinate(tmp.longitude, tmp.latitude);
         lengthMeters = lengthMeters! +
             JTS.Geodesy()

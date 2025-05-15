@@ -267,74 +267,74 @@
               "items": [
                 {
                   "item": {
-                    "label": "",
-                    "value": 0
+                    "value": 7,
+                    "label": "Beginning of bud break"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 1",
-                    "value": 1
+                    "value": 10,
+                    "label": "Mouse-ear stage"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 2",
-                    "value": 2
+                    "value": 51,
+                    "label": "buds swelling"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 3",
-                    "value": 3
+                    "value": 55,
+                    "label": "Flower buds visible "
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 4",
-                    "value": 4
+                    "value": 56,
+                    "label": "Green bud stage"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 5",
-                    "value": 5
+                    "value": 57,
+                    "label": "Pink bud stage"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 6",
-                    "value": 6
+                    "value": 65,
+                    "label": "Full flowering"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 7",
-                    "value": 7
+                    "value": 67,
+                    "label": "Flowers fading"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 8",
-                    "value": 8
+                    "value": 69,
+                    "label": "End of flowering"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 9",
-                    "value": 9
+                    "value": 71,
+                    "label": "10mm"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 10",
-                    "value": 10
+                    "value": 72,
+                    "label": "20mm"
                   }
                 },
                 {
                   "item": {
-                    "label": "choice 11",
-                    "value": 11
+                    "value": 74,
+                    "label": "T stage"
                   }
                 }
               ]
@@ -343,24 +343,44 @@
             "type": "intwheelslider"
           },
           {
-            "values": {"items": [
-              {"item": ""},
-              {"item": "item1"},
-              {"item": "item2"},
-              {"item": "item3"}
-            ]},
+            "values": {
+              "items": [
+                {
+                  "item": ""
+                },
+                {
+                  "item": "item1"
+                },
+                {
+                  "item": "item2"
+                },
+                {
+                  "item": "item3"
+                }
+              ]
+            },
             "label": "Select multiple strings",
             "type": "multistringcombo",
             "value": "item2;item3",
             "key": "a_multiple_choice_string_combo"
           },
           {
-            "values": {"items": [
-              {"item": -1},
-              {"item": 0},
-              {"item": 1},
-              {"item": 2}
-            ]},
+            "values": {
+              "items": [
+                {
+                  "item": -1
+                },
+                {
+                  "item": 0
+                },
+                {
+                  "item": 1
+                },
+                {
+                  "item": 2
+                }
+              ]
+            },
             "label": "Select multiple ints",
             "type": "multiintcombo",
             "value": "0;2",
@@ -492,10 +512,10 @@
             "values": {
               "items": [
                 {
-                    "item": {
-                        "label": "No data",
-                        "value": -1
-                    }
+                  "item": {
+                    "label": "No data",
+                    "value": -1
+                  }
                 }
               ],
               "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/refs/heads/master/test/forms/examples/exmple_url_intvalue_label.json"
@@ -508,10 +528,10 @@
             "values": {
               "items": [
                 {
-                    "item": {
-                        "label": "No data",
-                        "value": ""
-                    }
+                  "item": {
+                    "label": "No data",
+                    "value": ""
+                  }
                 }
               ],
               "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/refs/heads/master/test/forms/examples/exmple_url_stringvalue_label.json"
@@ -595,7 +615,10 @@
             "key": "a_point_geometry",
             "value": {
               "type": "Point",
-              "coordinates": [11.66, 46.5]
+              "coordinates": [
+                11.66,
+                46.5
+              ]
             },
             "style": {
               "icon": "tree",
@@ -603,8 +626,8 @@
               "size": 15
             },
             "type": "point"
-            
-          },{
+          },
+          {
             "key": "an_empty_point_geometry",
             "value": "",
             "style": {
@@ -613,14 +636,24 @@
               "size": 15
             },
             "type": "point"
-          },{
+          },
+          {
             "key": "a_multipoint_geometry",
             "value": {
               "type": "MultiPoint",
               "coordinates": [
-                [11.66, 46.5],
-                [11.76, 46.6],
-                [11.56, 46.7]
+                [
+                  11.66,
+                  46.5
+                ],
+                [
+                  11.76,
+                  46.6
+                ],
+                [
+                  11.56,
+                  46.7
+                ]
               ]
             },
             "style": {
@@ -639,9 +672,18 @@
             "value": {
               "type": "LineString",
               "coordinates": [
-                [11.66, 46.5],
-                [11.76, 46.6],
-                [11.56, 46.7]
+                [
+                  11.66,
+                  46.5
+                ],
+                [
+                  11.76,
+                  46.6
+                ],
+                [
+                  11.56,
+                  46.7
+                ]
               ]
             },
             "style": {
@@ -661,10 +703,22 @@
               "type": "Polygon",
               "coordinates": [
                 [
-                  [11.66, 46.5],
-                  [11.76, 46.6],
-                  [11.56, 46.7],
-                  [11.66, 46.5]
+                  [
+                    11.66,
+                    46.5
+                  ],
+                  [
+                    11.76,
+                    46.6
+                  ],
+                  [
+                    11.56,
+                    46.7
+                  ],
+                  [
+                    11.66,
+                    46.5
+                  ]
                 ]
               ]
             },
@@ -678,78 +732,78 @@
         ]
       },
       {
-          "formname": "url item substitutions",
-          "formitems": [
-              {
-                  "key": "id",
-                  "value": "",
-                  "type": "hidden",
-                  "mandatory": "no",
-                  "label": "Id"
-              },
-              {
-                  "key": "field",
-                  "value": -1,
-                  "type": "multiintcombo",
-                  "values": {
-                      "items": [
-                          {
-                              "item": {
-                                  "label": "No data",
-                                  "value": -1
-                              }
-                          }
-                      ],
-                      "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/response.json"
-                  },
-                  "mandatory": "no",
-                  "label": "Field",
-                  "isurlitem": "true"
-              },
-              {
-                "key": "a_separator_text",
-                "value": "I am just here to separate connected combos",
-                "icon": "font",
-                "type": "string"
-              },
-              {
-                  "key": "subfield",
-                  "value": -1,
-                  "type": "multiintcombo",
-                  "values": {
-                      "items": [
-                          {
-                              "item": {
-                                  "label": "No data",
-                                  "value": -1
-                              }
-                          }
-                      ],
-                      "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/{field}/subfields/response.json"
-                  },
-                  "mandatory": "no",
-                  "label": "Subfield",
-                  "isurlitem": "true"
-              },
-              {
-                  "key": "row",
-                  "value": -1,
-                  "type": "multiintcombo",
-                  "values": {
-                      "items": [
-                          {
-                              "item": {
-                                  "label": "No data",
-                                  "value": -1
-                              }
-                          }
-                      ],
-                      "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/{field}/subfields/{subfield}/rows/response.json"
-                  },
-                  "mandatory": "no",
-                  "label": "Row"
-              }
-          ]
+        "formname": "url item substitutions",
+        "formitems": [
+          {
+            "key": "id",
+            "value": "",
+            "type": "hidden",
+            "mandatory": "no",
+            "label": "Id"
+          },
+          {
+            "key": "field",
+            "value": -1,
+            "type": "multiintcombo",
+            "values": {
+              "items": [
+                {
+                  "item": {
+                    "label": "No data",
+                    "value": -1
+                  }
+                }
+              ],
+              "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/response.json"
+            },
+            "mandatory": "no",
+            "label": "Field",
+            "isurlitem": "true"
+          },
+          {
+            "key": "a_separator_text",
+            "value": "I am just here to separate connected combos",
+            "icon": "font",
+            "type": "string"
+          },
+          {
+            "key": "subfield",
+            "value": -1,
+            "type": "multiintcombo",
+            "values": {
+              "items": [
+                {
+                  "item": {
+                    "label": "No data",
+                    "value": -1
+                  }
+                }
+              ],
+              "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/{field}/subfields/response.json"
+            },
+            "mandatory": "no",
+            "label": "Subfield",
+            "isurlitem": "true"
+          },
+          {
+            "key": "row",
+            "value": -1,
+            "type": "multiintcombo",
+            "values": {
+              "items": [
+                {
+                  "item": {
+                    "label": "No data",
+                    "value": -1
+                  }
+                }
+              ],
+              "url": "https://raw.githubusercontent.com/geopaparazzi/smashlibs/master/test/forms/examples/farms/1/fields/{field}/subfields/{subfield}/rows/response.json"
+            },
+            "mandatory": "no",
+            "label": "Row"
+          }
+        ]
       }
     ]
   }

@@ -48,13 +48,13 @@ class ScaleLayer extends StatelessWidget {
     var zoom = map.zoom;
     var distance = scale[max(0, min(20, zoom.round() + 2))].toDouble();
     var center = map.center;
-    var start = map.project(center);
+    var start = map.projectAtZoom(center);
     var targetPoint = calculateEndingGlobalCoordinates(center, 90, distance);
-    var end = map.project(targetPoint);
+    var end = map.projectAtZoom(targetPoint);
     var displayDistance = distance > 999
         ? '${(distance / 1000).toStringAsFixed(0)} km'
         : '${distance.toStringAsFixed(0)} m';
-    var width = (end.x - start.x);
+    var width = (end.dx - start.dx);
     return SafeArea(
       child: CustomPaint(
         painter: ScalePainter(

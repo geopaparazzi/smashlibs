@@ -183,6 +183,9 @@ class SmashPrj {
     GeometryReprojectionFilter filter =
         GeometryReprojectionFilter(from, EPSG4326);
     for (HU.Feature feature in featureCollection.features) {
+      if (feature.geometry == null) {
+        continue;
+      }
       feature.geometry!.applyCF(filter);
       feature.geometry!.geometryChanged();
     }

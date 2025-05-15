@@ -59,11 +59,11 @@ class CenterCrossLayer extends StatelessWidget {
   Widget build(BuildContext context) {
     final map = MapCamera.of(context);
     var center = map.center;
-    Point centerPixel = map.project(center);
-    Point pixelOrigin = map.pixelOrigin;
+    var centerPixel = map.projectAtZoom(center);
+    var pixelOrigin = map.pixelOrigin;
 
-    double centerX = (centerPixel.x - pixelOrigin.x).toDouble();
-    double centerY = (centerPixel.y - pixelOrigin.y).toDouble();
+    double centerX = (centerPixel.dx - pixelOrigin.dx).toDouble();
+    double centerY = (centerPixel.dy - pixelOrigin.dy).toDouble();
     Point centerPix = Point(centerX, centerY);
 
     return CustomPaint(
