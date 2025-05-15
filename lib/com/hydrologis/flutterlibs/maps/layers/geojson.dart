@@ -575,7 +575,6 @@ class GeojsonSource extends VectorLayerSource
             holePointsList: intRingCoords,
             borderColor: lineStrokeColor,
             color: fillColor,
-            isFilled: true,
           ));
         }
       }
