@@ -164,9 +164,9 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = "Copyright Esri",
     this.minZoom = DEFAULT_MINZOOM_INT,
     this.maxZoom = DEFAULT_MAXZOOM_INT,
-    this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
+    this.maxNativeZoom = 17,
     this.isVisible = true,
-    this.isTms = true,
+    this.isTms = false,
     this.canDoProperties = true,
   }) {
     isLoaded = true;

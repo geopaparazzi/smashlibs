@@ -9,6 +9,8 @@ abstract class OnMapTapHandler {
 class SmashMapWidget extends StatelessWidget {
   JTS.Coordinate? _initCenterCoordonate;
   JTS.Envelope? _initBounds;
+  JTS.Envelope? _constraintBounds;
+  Crs? _crs;
   double _initZoom = 13.0;
   double _minZoom = SmashMapState.MINZOOM;
   double _maxZoom = SmashMapState.MAXZOOM;
@@ -34,9 +36,24 @@ class SmashMapWidget extends StatelessWidget {
   SmashMapWidget({Key? key})
       : super(key: key != null ? key : ValueKey("SMASH_MAPVIEW"));
 
+  /// Set the initial parameters for the map.
+  ///
+  /// The [centerCoordinate] is the initial center of the map.
+  /// The [initBounds] is the initial bounds of the map.
+  /// The [constraintBounds] is the bounds that the map cannot go outside of.
+  /// The [crs] is the coordinate reference system of the map.
+  /// The [initZoom] is the initial zoom level of the map.
+  /// The [minZoom] is the minimum zoom level of the map.
+  /// The [maxZoom] is the maximum zoom level of the map.
+  /// The [canRotate] is a boolean that indicates if the map can be rotated.
+  /// The [canScrollWheelZoom] is a boolean that indicates if the map can be zoomed by wheel on desktop.
+  /// The [useLayerManager] is a boolean that indicates if the map should use the layer manager or layers are added manually.
+  /// The [addBorder] is a boolean that indicates if the map should have a border.
   void setInitParameters({
     JTS.Coordinate? centerCoordinate,
     JTS.Envelope? initBounds,
+    JTS.Envelope? constraintBounds,
+    Crs? crs,
     double? initZoom,
     double? minZoom,
     double? maxZoom,
@@ -47,6 +64,8 @@ class SmashMapWidget extends StatelessWidget {
   }) {
     if (centerCoordinate != null) _initCenterCoordonate = centerCoordinate;
     if (initBounds != null) _initBounds = initBounds;
+    if (constraintBounds != null) _constraintBounds = constraintBounds;
+    if (crs != null) _crs = crs;
     if (initZoom != null) _initZoom = initZoom;
     if (minZoom != null) _minZoom = minZoom;
     if (maxZoom != null) _maxZoom = maxZoom;
@@ -256,6 +275,7 @@ class SmashMapWidget extends StatelessWidget {
     flutterMap = FlutterMap(
       key: ValueKey(mapKey),
       options: new MapOptions(
+        crs: _crs ?? Epsg3857(),
         initialCameraFit: _initBounds != null
             ? CameraFit.bounds(
                 bounds: LatLngBounds(
@@ -264,6 +284,16 @@ class SmashMapWidget extends StatelessWidget {
                 ),
               )
             : null,
+        cameraConstraint: _constraintBounds != null
+            ? CameraConstraint.contain(
+                bounds: LatLngBounds(
+                  LatLng(_constraintBounds!.getMinY(),
+                      _constraintBounds!.getMinX()),
+                  LatLng(_constraintBounds!.getMaxY(),
+                      _constraintBounds!.getMaxX()),
+                ),
+              )
+            : const CameraConstraint.unconstrained(),
         initialCenter: _initCenterCoordonate != null && _initBounds == null
             ? new LatLng(_initCenterCoordonate!.y, _initCenterCoordonate!.x)
             : const LatLng(46, 11),

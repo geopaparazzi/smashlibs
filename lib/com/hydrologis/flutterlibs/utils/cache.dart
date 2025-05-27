@@ -21,6 +21,8 @@ class SmashCache {
 
   SmashCache._internal();
 
+  bool get isInitialized => _cache != null;
+
   Future<void> init(ISmashCache cache) async {
     _cache = cache;
     await _cache!.init();

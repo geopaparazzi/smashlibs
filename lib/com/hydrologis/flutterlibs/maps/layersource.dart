@@ -31,7 +31,7 @@ const LAYERSKEY_GPKG_DOOVERLAY = "geopackage_dooverlay";
 const double DEFAULT_MINZOOM = 1;
 const double DEFAULT_ZOOM = 16;
 const int DEFAULT_MINZOOM_INT = 1;
-const int DEFAULT_MAXZOOM_INT = 21;
+const int DEFAULT_MAXZOOM_INT = 25;
 const int DEFAULT_MAXNATIVEZOOM_INT = 19;
 const double DEFAULT_MAXZOOM = 21;
 
