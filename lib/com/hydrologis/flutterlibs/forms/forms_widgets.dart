@@ -257,6 +257,25 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      builder: (context, projectSnap) {
+        if (projectSnap.hasError) {
+          return SmashUI.errorWidget(projectSnap.error.toString());
+        } else if (projectSnap.connectionState == ConnectionState.none ||
+            projectSnap.data == null) {
+          return SmashCircularProgress();
+        }
+
+        Widget widget = projectSnap.data as Widget;
+        return widget;
+      },
+      future: getWidget(context),
+    );
+  }
+
+  Future<Widget> getWidget(BuildContext context) async {
+    await _formHelper.applyPreviousMemoryToForm();
+
     var section = _formHelper.getSection();
     if (section == null) {
       return SmashUI.errorWidget(SLL.of(context).no_section_in_form);
@@ -332,6 +351,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
   Future<bool> _onWillPop() async {
     // TODO check if something changed would be really good
     await widget.formHelper.onSaveFunction(context);
+    await widget.formHelper.storeMemoryFromForm();
     Navigator.of(context).pop();
     return true;
   }

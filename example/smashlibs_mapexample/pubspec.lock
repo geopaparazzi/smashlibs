@@ -109,10 +109,10 @@ packages:
     dependency: transitive
     description:
       name: camera_android_camerax
-      sha256: ea7e40bd63afb8f55058e48ec529ce96562be9d08393f79631a06f781161fd0d
+      sha256: "9fb44e73e0fea3647a904dc26d38db24055e5b74fc68fd2b6d3abfa1bd20f536"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.16"
+    version: "0.6.17"
   camera_avfoundation:
     dependency: transitive
     description:
@@ -309,10 +309,10 @@ packages:
     dependency: transitive
     description:
       name: ecache
-      sha256: "4a80cde670d2206eddf1af65f9a6b4264c53fcecca021192464d0523d7ae50d8"
+      sha256: b5dfeea8bbfee3ce4130f6cf8b4ba3929b2e01955b94db28fca55e0173ab64ac
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.5"
+    version: "2.0.6"
   fake_async:
     dependency: transitive
     description:
@@ -1310,18 +1310,18 @@ packages:
     dependency: transitive
     description:
       name: sqlite3
-      sha256: "310af39c40dd0bb2058538333c9d9840a2725ae0b9f77e4fd09ad6696aa8f66e"
+      sha256: c0503c69b44d5714e6abbf4c1f51a3c3cc42b75ce785f44404765e4635481d38
       url: "https://pub.dev"
     source: hosted
-    version: "2.7.5"
+    version: "2.7.6"
   sqlite3_flutter_libs:
     dependency: "direct main"
     description:
       name: sqlite3_flutter_libs
-      sha256: "1a96b59227828d9eb1463191d684b37a27d66ee5ed7597fcf42eee6452c88a14"
+      sha256: "7986c26234c0a5cf4fd83ff4ee39d4195b1f47cdb50a949ec7987ede4dcbdc2a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.32"
+    version: "0.5.33"
   stack_trace:
     dependency: transitive
     description:
@@ -1502,10 +1502,10 @@ packages:
     dependency: transitive
     description:
       name: vector_graphics_compiler
-      sha256: "1b4b9e706a10294258727674a340ae0d6e64a7231980f9f9a3d12e4b42407aad"
+      sha256: "557a315b7d2a6dbb0aaaff84d857967ce6bdc96a63dc6ee2a57ce5a6ee5d3331"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.16"
+    version: "1.1.17"
   vector_math:
     dependency: transitive
     description:
@@ -1526,10 +1526,10 @@ packages:
     dependency: transitive
     description:
       name: video_player_android
-      sha256: "1f4e8e0e02403452d699ef7cf73fe9936fac8f6f0605303d111d71acb375d1bc"
+      sha256: "28dcc4122079f40f93a0965b3679aff1a5f4251cf79611bd8011f937eb6b69de"
       url: "https://pub.dev"
     source: hosted
-    version: "2.8.3"
+    version: "2.8.4"
   video_player_avfoundation:
     dependency: transitive
     description:
@@ -1590,34 +1590,34 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter
-      sha256: caf0f5a1012aa3c2d33c4215adc72dc1194bb59a2d3ed901f457965626805e66
+      sha256: c3e4fe614b1c814950ad07186007eff2f2e5dd2935eba7b9a9a1af8e5885f1ba
       url: "https://pub.dev"
     source: hosted
-    version: "4.11.0"
+    version: "4.13.0"
   webview_flutter_android:
     dependency: transitive
     description:
       name: webview_flutter_android
-      sha256: "6b0eae02b7604954b80ee9a29507ac38f5de74b712faa6fee33abc1cdedc1b21"
+      sha256: f6e6afef6e234801da77170f7a1847ded8450778caf2fe13979d140484be3678
       url: "https://pub.dev"
     source: hosted
-    version: "4.4.2"
+    version: "4.7.0"
   webview_flutter_platform_interface:
     dependency: transitive
     description:
       name: webview_flutter_platform_interface
-      sha256: e54a2a435144af4e008bea140c06913eeb3f25db421c2ceaa932f314a45d79b9
+      sha256: "7cb32b21825bd65569665c32bb00a34ded5779786d6201f5350979d2d529940d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.12.0"
+    version: "2.13.0"
   webview_flutter_wkwebview:
     dependency: transitive
     description:
       name: webview_flutter_wkwebview
-      sha256: c9f9be526fa0d3347374ceaa05c4b3acb85f4f112abd62f7d74b7d301fa515ff
+      sha256: a3d461fe3467014e05f3ac4962e5fdde2a4bf44c561cb53e9ae5c586600fdbc3
       url: "https://pub.dev"
     source: hosted
-    version: "3.20.0"
+    version: "3.22.0"
   wheel_chooser:
     dependency: transitive
     description:

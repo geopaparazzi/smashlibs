@@ -148,6 +148,8 @@ const HM_FORMS_TABLE = "hm_forms";
 const FORMS_TABLENAME_FIELD = "tablename";
 const FORMS_FIELD = "forms";
 
+const FORMMEMORY = "FORMMEMORY";
+
 /// Separator for multiple items in the form results.
 const String SEP = "#";
 
@@ -156,6 +158,10 @@ abstract class AFormhelper {
   // the data used to fill the form and that
   // need to be sent back with the changed data
   late Map<String, dynamic> dataUsed;
+
+  // The form name 2 key names of the forms that
+  // are allowed to be saved and recalled from the cache.
+  Map<String, List<String>>? _cacheDefinitions;
 
   Future<bool> init();
 
@@ -293,6 +299,143 @@ abstract class AFormhelper {
   /// Get a list of keys that should be hidden in the form.
   List<String>? getHideFormItems() {
     return null;
+  }
+
+  /// Set the definition sthat concurr to getting items from the previous forms
+  /// to be presented in the actual form.
+  ///
+  /// The key has to be the section name and the value is a list of form item keys.
+  ///
+  /// For example:
+  ///
+  /// ```dart
+  /// var demoCacheDefinitions = {
+  ///   "examples": [
+  ///     "some_text",
+  ///     "a_number",
+  ///     "a_tappable_integer_number",
+  ///     "a_time",
+  ///     "combos_with_item_labels"
+  ///   ]
+  /// };
+  /// helper!.setCacheDefinitions(demoCacheDefinitions);
+  /// ```
+  ///
+  /// For a form that looks like (first part that includes the section name
+  /// and the first of the shown keys):
+  ///
+  ///```json
+  /// [
+  ///  {
+  ///   "sectionname": "examples",
+  ///   "sectiondescription": "examples of supported form widgets",
+  ///   "sectionicon": "bomb",
+  ///   "forms": [
+  ///     {
+  ///       "formname": "text",
+  ///       "formitems": [
+  ///         {
+  ///           "key": "some_text",
+  ///           "value": "example entry",
+  ///           "icon": "font",
+  ///           "type": "string"
+  ///         },
+  ///         {
+  ///          ...
+  ///          ...
+  /// ```
+  void setCacheDefinitions(Map<String, List<String>> cacheDefinitions) {
+    _cacheDefinitions = cacheDefinitions;
+  }
+
+  Future<void> applyPreviousMemoryToForm() async {
+    if (_cacheDefinitions == null || _cacheDefinitions!.isEmpty) {
+      return;
+    }
+    if (!SmashCache().isInitialized) {
+      SMLogger().w("Cache is not initialized, cannot apply definitions.");
+      return;
+    }
+    var section = getSection();
+    if (section != null) {
+      var sectionName = section.sectionName;
+      if (sectionName == null || sectionName.isEmpty) {
+        return;
+      }
+      if (_cacheDefinitions != null &&
+          _cacheDefinitions!.containsKey(sectionName)) {
+        var cacheItemKeys = _cacheDefinitions![sectionName];
+        if (cacheItemKeys != null) {
+          var forms = section.getForms();
+          for (var form in forms) {
+            // check if the form is in the cache definitions
+            String? formName = form.formName;
+            if (formName != null && !formName.isEmpty) {
+              // each cacheDefinition has a list of form item keys to check
+              var formItems = form.getFormItems();
+              for (var formItem in formItems) {
+                String formItemKey = formItem.key;
+                if (cacheItemKeys is List &&
+                    cacheItemKeys.contains(formItemKey)) {
+                  // this item needs to be restored from cache, if it is available
+                  var cachedValue = await SmashCache().get(
+                      sectionName + UNDERSCORE + formItemKey,
+                      cacheName: FORMMEMORY);
+                  if (cachedValue != null) {
+                    // set the cached value
+                    formItem.setValue(cachedValue);
+                    // also update the dataUsed map
+                    // dataUsed[formItemKey] = cachedValue;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  Future<void> storeMemoryFromForm() async {
+    if (_cacheDefinitions == null || _cacheDefinitions!.isEmpty) {
+      return;
+    }
+    if (!SmashCache().isInitialized) {
+      SMLogger().w("Cache is not initialized, cannot store definitions.");
+      return;
+    }
+    var section = getSection();
+    if (section != null) {
+      var sectionName = section.sectionName;
+      if (sectionName == null || sectionName.isEmpty) {
+        return;
+      }
+      if (_cacheDefinitions != null &&
+          _cacheDefinitions!.containsKey(sectionName)) {
+        var cacheItemKeys = _cacheDefinitions![sectionName];
+        if (cacheItemKeys != null) {
+          var forms = section.getForms();
+          for (var form in forms) {
+            String? formName = form.formName;
+            if (formName != null && !formName.isEmpty) {
+              // check if the form is in the cache definitions
+              // each cacheDefinition has a list of form item keys to check
+              var formItems = form.getFormItems();
+              for (var formItem in formItems) {
+                String formItemKey = formItem.key;
+                if (cacheItemKeys is List &&
+                    cacheItemKeys.contains(formItemKey)) {
+                  // this item needs to be stored in cache
+                  await SmashCache().put(
+                      sectionName + UNDERSCORE + formItemKey, formItem.value,
+                      cacheName: FORMMEMORY);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 

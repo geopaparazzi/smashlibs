@@ -335,6 +335,17 @@ class _FormsExamplePageState extends State<FormsExamplePage>
   FutureOr<void> afterFirstLayout(BuildContext context) async {
     helper = DemoAppFormHelper();
     await helper!.init();
+
+    var demoCacheDefinitions = {
+      "examples": [
+        "some_text",
+        "a_number",
+        "a_tappable_integer_number",
+        "a_time",
+        "combos_with_item_labels"
+      ]
+    };
+    helper!.setCacheDefinitions(demoCacheDefinitions);
     setState(() {});
   }
 
