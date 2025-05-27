@@ -89,6 +89,7 @@ part 'com/hydrologis/flutterlibs/forms/form_default_items.dart';
 part 'com/hydrologis/flutterlibs/forms/form_item_config_widgets.dart';
 part 'com/hydrologis/flutterlibs/forms/widgets/form_sketch.dart';
 part 'com/hydrologis/flutterlibs/forms/models.dart';
+part 'com/hydrologis/flutterlibs/forms/formsettings.dart';
 part 'com/hydrologis/flutterlibs/forms/formbuilder.dart';
 part 'com/hydrologis/flutterlibs/network/download_file_listtile.dart';
 part 'com/hydrologis/flutterlibs/network/download_file_progress.dart';
