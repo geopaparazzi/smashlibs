@@ -141,7 +141,7 @@ dependencies:
     #   path: permission_handler
 
   # BSD
-  device_info_plus: ^10.1.2
+  device_info_plus: ^11.4.0
   # MIT
   after_layout: ^1.2.0
 
@@ -199,6 +199,9 @@ dependencies:
 
   # MIT
   flutter_ringtone_player: ^4.0.0+3
+
+dependency_overrides:
+  intl: ^0.20.2
 
 dev_dependencies:
   lints: ^1.0.1
