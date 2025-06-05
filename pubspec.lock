@@ -274,10 +274,10 @@ packages:
     dependency: "direct main"
     description:
       name: dart_hydrologis_utils
-      sha256: ce7d483bc1dc79abfceb4896c9fcf5ff4ae7f28be206d6bafeeb31d128d78c5f
+      sha256: "6b6f5ba9d4c3a7db83438e2db40fced1c87690b5eb272ff96d58f17b49c10c43"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.1+2"
+    version: "0.8.2"
   dart_jts:
     dependency: "direct main"
     description:
