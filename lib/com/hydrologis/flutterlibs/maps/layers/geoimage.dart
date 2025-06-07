@@ -12,6 +12,7 @@ class GeoImageSource extends RasterLayerSource {
   double opacityPercentage = 100;
   bool isVisible = true;
   LatLngBounds? _imageBounds;
+  String _attribution = "";
 
   MyMemoryImage? _memoryImage;
   late int _srid;
@@ -181,7 +182,11 @@ class GeoImageSource extends RasterLayerSource {
   }
 
   String getAttribution() {
-    return "";
+    return _attribution;
+  }
+
+  void setAttribution(String attribution) {
+    this._attribution = attribution;
   }
 
   bool isActive() {

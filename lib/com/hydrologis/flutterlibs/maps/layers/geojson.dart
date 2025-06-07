@@ -391,6 +391,10 @@ class GeojsonSource extends VectorLayerSource
     return _attribution;
   }
 
+  void setAttribution(String attribution) {
+    this._attribution = attribution;
+  }
+
   bool isActive() {
     return isVisible;
   }

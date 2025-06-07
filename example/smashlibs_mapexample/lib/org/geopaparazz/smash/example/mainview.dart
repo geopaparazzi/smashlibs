@@ -114,6 +114,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
     );
 
     mapView!.addLayerSource(_backgroundLayerSource);
+
     mapView!.addLayerSource(_currentLayerSource);
 
     int tapAreaPixels = GpPreferences()
@@ -183,6 +184,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                     onPressed: () async {
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = onlinesTilesSources[1];
+                      refreshAttributions();
                       await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("WTS",
@@ -196,6 +198,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                       _currentLayerSource = WmsSource(
                           url, "p_bz-Orthoimagery:Aerial-2020-RGB",
                           imageFormat: "image/png");
+                      _currentLayerSource.setAttribution(
+                          "WMS from Buergernetz, © Provincia Autonoma di Bolzano");
+                      refreshAttributions();
                       await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("WMS",
@@ -208,6 +213,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = GpxSource(gpxPath);
+                      _currentLayerSource.setAttribution(
+                          "GPX from OSM, © OpenStreetMap contributors");
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("GPX",
@@ -219,6 +227,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = GeoImageSource(imgPath);
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("IMG",
@@ -230,6 +239,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = TileSource.Mapsforge(dbPath);
+                      _currentLayerSource.setAttribution(
+                          "Mapsforge map, © OpenStreetMap contributors");
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("Mapsforge",
@@ -241,6 +253,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = TileSource.Mbtiles(dbPath);
+                      _currentLayerSource.setAttribution(
+                          "Natural Earth tiles, © Natural Earth contributors");
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("MBTiles",
@@ -253,6 +268,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource =
                           TileSource.Geopackage(dbPath, "mebo2017");
+                      _currentLayerSource.setAttribution(
+                          "WMS Ortophoto, © Provincia Autonoma di Bolzano");
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("GPKG-rast",
@@ -265,6 +283,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource =
                           GeopackageSource(dbPath, "watercourses_small");
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("GPKG-vect",
@@ -281,6 +300,9 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = ShapefileSource(shpPath);
+                      _currentLayerSource.setAttribution(
+                          "Natrural Earth vector, © Natural Earth contributors");
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("SHP",
@@ -293,6 +315,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = GeojsonSource(geojsonPath);
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("JSON pt",
@@ -305,6 +328,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = GeojsonSource(geojsonPath);
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("JSON ln",
@@ -317,6 +341,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = GeojsonSource(geojsonPath);
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("JSON pl",
@@ -328,6 +353,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = GeocachingSource(shpPath);
+                      refreshAttributions();
                       if (context.mounted) await addLayerAndZoomTo(context);
                     },
                     child: SmashUI.normalText("GCaching",
@@ -495,5 +521,12 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
     }
 
     return newMapPath;
+  }
+
+  void refreshAttributions() {
+    List<List<String?>> attributions = [];
+    attributions.add([_backgroundLayerSource.getAttribution(), null]);
+    attributions.add([_currentLayerSource.getAttribution(), null]);
+    mapView!.setAttributionsAndUrls(attributions);
   }
 }

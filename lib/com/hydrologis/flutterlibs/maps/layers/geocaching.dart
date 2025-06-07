@@ -104,6 +104,10 @@ class GeocachingSource extends VectorLayerSource {
     return _attribution;
   }
 
+  void setAttribution(String attribution) {
+    _attribution = attribution;
+  }
+
   bool isActive() {
     return isVisible;
   }

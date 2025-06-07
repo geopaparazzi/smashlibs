@@ -288,6 +288,10 @@ class TileSource extends TiledRasterLayerSource {
     return attribution;
   }
 
+  void setAttribution(String attribution) {
+    this.attribution = attribution;
+  }
+
   bool isActive() {
     return isVisible;
   }

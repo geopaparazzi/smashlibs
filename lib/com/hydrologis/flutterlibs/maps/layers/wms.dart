@@ -70,6 +70,10 @@ class WmsSource extends RasterLayerSource {
     return attribution;
   }
 
+  void setAttribution(String attribution) {
+    this.attribution = attribution;
+  }
+
   bool isActive() {
     return isVisible ?? true;
   }

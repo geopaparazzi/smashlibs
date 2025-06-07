@@ -27,6 +27,7 @@ class SmashMapWidget extends StatelessWidget {
   List<Widget> preLayers = [];
   List<Widget> postLayers = [];
   List<LayerSource> layerSources = [];
+  List<List<String?>> _attributionsAndUrls = [];
   void Function(LatLng, double) _handleTap = (ll, z) {};
   void Function(LatLng, double) _handleLongTap = (ll, z) {};
   void Function() _onMapReady = () {};
@@ -92,6 +93,10 @@ class SmashMapWidget extends StatelessWidget {
 
   void setOnPositionChanged(Function(MapCamera, bool)? onPositionChanged) {
     if (onPositionChanged != null) _onPositionChanged = onPositionChanged;
+  }
+
+  void setAttributionsAndUrls(List<List<String?>> attributionsAndUrls) {
+    _attributionsAndUrls = attributionsAndUrls;
   }
 
   /// Clear all layers list (pre, post and manual [LayerSource]s).
@@ -271,6 +276,37 @@ class SmashMapWidget extends StatelessWidget {
       addHighlightLayer(layers);
     }
 
+    // add attributions
+    if (_attributionsAndUrls.isNotEmpty) {
+      List<SourceAttribution> attributions = [];
+      for (var attribution in _attributionsAndUrls) {
+        if (attribution.length == 2 &&
+            attribution[1] != null &&
+            attribution[1]!.isNotEmpty) {
+          attributions.add(TextSourceAttribution(
+            attribution[0] ?? "",
+            onTap: () {
+              if (attribution[1] != null && attribution[1]!.isNotEmpty) {
+                launchUrlString(attribution[1]!,
+                    mode: LaunchMode.externalApplication);
+              }
+            },
+            prependCopyright: false,
+          ));
+        } else if (attribution.length >= 1) {
+          attributions.add(TextSourceAttribution(
+            attribution[0] ?? "",
+            prependCopyright: false,
+          ));
+        }
+      }
+      RichAttributionWidget richAttributionWidget = RichAttributionWidget(
+        key: ValueKey("SmashMapAttribution-${key.toString()}"),
+        attributions: attributions,
+        showFlutterMapAttribution: false,
+      );
+      layers.add(richAttributionWidget);
+    }
     var mapKey = "FlutterMapWidget-${key.toString()}";
     flutterMap = FlutterMap(
       key: ValueKey(mapKey),

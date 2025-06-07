@@ -229,6 +229,10 @@ class PostgisSource extends DbVectorLayerSource
     return _attribution;
   }
 
+  void setAttribution(String attribution) {
+    this._attribution = attribution;
+  }
+
   String? getWhere() {
     return _where;
   }

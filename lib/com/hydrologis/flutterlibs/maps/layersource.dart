@@ -60,6 +60,9 @@ abstract class LayerSource {
   /// Get the optional attribution of the dataset.
   String? getAttribution();
 
+  /// Set the attribution of the dataset.
+  void setAttribution(String attribution);
+
   /// Returns the active flag of the layer (usually visible/non visible).
   bool isActive();
 
