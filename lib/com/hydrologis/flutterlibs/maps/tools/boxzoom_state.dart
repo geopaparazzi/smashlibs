@@ -10,6 +10,7 @@ class BoxZoomState extends ChangeNotifier {
   // static final type = BottomToolbarToolsRegistry.BOXZOOM;
 
   bool isEnabled = false;
+  bool isOneShot = false;
 
   double? xTapPosition;
   double? yTapPosition;

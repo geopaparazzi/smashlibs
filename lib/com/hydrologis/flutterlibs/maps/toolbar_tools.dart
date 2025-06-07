@@ -70,7 +70,11 @@ class _SmashToolsBarState extends State<SmashToolsBar> {
               if (widget.doZoom) getZoomOut(buttonFgColor),
               if (widget.doZoomByBox)
                 BoxZoomButton(
-                    widget._iconSize, buttonFgColor, buttonSelectionColor),
+                  widget._iconSize,
+                  buttonFgColor,
+                  buttonSelectionColor,
+                  oneShot: true,
+                ),
               if (PluginsHandler.FENCE.isOn())
                 FenceButton(widget._iconSize, buttonFgColor),
             ],
@@ -547,13 +551,16 @@ class BoxZoomButton extends StatelessWidget {
   final _iconSize;
   final fgColor;
   final selectionColor;
+  final bool oneShot;
 
-  BoxZoomButton(this._iconSize, this.fgColor, this.selectionColor, {Key? key})
+  BoxZoomButton(this._iconSize, this.fgColor, this.selectionColor,
+      {this.oneShot = false, Key? key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer<BoxZoomState>(builder: (context, boxzoomState, child) {
+      boxzoomState.isOneShot = oneShot;
       Widget w = InkWell(
         child: Icon(
           MdiIcons.selectSearch,

@@ -78,7 +78,7 @@ class _BoxZoomPluginLayerState extends State<BoxZoomPluginLayer> {
     setState(() {});
   }
 
-  Future<void> dragEnd(BuildContext context, BoxZoomState infoToolState) async {
+  Future<void> dragEnd(BuildContext context, BoxZoomState boxZoomState) async {
     MapController mapController = MapController.of(context);
 
     var pixelOrigin = map.pixelOrigin;
@@ -92,6 +92,11 @@ class _BoxZoomPluginLayerState extends State<BoxZoomPluginLayer> {
 
     mapController.fitCamera(
         CameraFit.bounds(bounds: LatLngBoundsExt.fromEnvelope(envelope)));
+
+    if (boxZoomState.isOneShot) {
+      boxZoomState.isOneShot = false;
+      boxZoomState.setEnabled(false);
+    }
 
     _start = null;
     _running = null;
