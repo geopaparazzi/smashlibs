@@ -28,6 +28,7 @@ class SmashMapWidget extends StatelessWidget {
   List<Widget> postLayers = [];
   List<LayerSource> layerSources = [];
   List<List<String?>> _attributionsAndUrls = [];
+  AttributionAlignment _attributionAlignment = AttributionAlignment.bottomRight;
   void Function(LatLng, double) _handleTap = (ll, z) {};
   void Function(LatLng, double) _handleLongTap = (ll, z) {};
   void Function() _onMapReady = () {};
@@ -95,8 +96,10 @@ class SmashMapWidget extends StatelessWidget {
     if (onPositionChanged != null) _onPositionChanged = onPositionChanged;
   }
 
-  void setAttributionsAndUrls(List<List<String?>> attributionsAndUrls) {
+  void setAttributionsAndUrls(List<List<String?>> attributionsAndUrls,
+      {AttributionAlignment alignment = AttributionAlignment.bottomRight}) {
     _attributionsAndUrls = attributionsAndUrls;
+    _attributionAlignment = alignment;
   }
 
   /// Clear all layers list (pre, post and manual [LayerSource]s).
@@ -304,6 +307,7 @@ class SmashMapWidget extends StatelessWidget {
         key: ValueKey("SmashMapAttribution-${key.toString()}"),
         attributions: attributions,
         showFlutterMapAttribution: false,
+        alignment: _attributionAlignment,
       );
       layers.add(richAttributionWidget);
     }
