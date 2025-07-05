@@ -39,8 +39,8 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.smashlibs_mapexample"
         minSdkVersion 23
-        targetSdkVersion 34
-        compileSdk 34
+        targetSdkVersion 35
+        compileSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
