@@ -48,3 +48,4 @@ test/mock_app_documents
 .vscode/
 example/build/
 example/smashlibs_mapexample/.metadata
+ios/Flutter/ephemeral/
