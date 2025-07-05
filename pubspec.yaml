@@ -120,8 +120,9 @@ dependencies:
   # BSD 2
   tuple: ^2.0.2
 
-  # MIT
-  share_extend: ^2.0.0
+  # BSD-3
+  share_plus: ^11.0.0
+
   # BSD
   path_provider: ^2.0.15
   

@@ -7,16 +7,22 @@ part of smashlibs;
 
 class ShareHandler {
   static Future<void> shareText(String text, {String title: ''}) async {
-    await ShareExtend.share(text, "text");
+    await SharePlus.instance.share(
+      ShareParams(text: text),
+    );
   }
 
   static Future<void> shareImage(String text, var imageData) async {
     Directory cacheFolder = await Workspace.getCacheFolder();
-    var outPath = HU.FileUtilities.joinPaths(cacheFolder.path,
-        "smash_tmp_share_${HU.TimeUtilities.DATE_TS_FORMATTER}.jpg");
+    var imageName = "smash_tmp_share_${HU.TimeUtilities.DATE_TS_FORMATTER}.jpg";
+    var outPath = HU.FileUtilities.joinPaths(cacheFolder.path, imageName);
 
     HU.FileUtilities.writeBytesToFile(outPath, imageData);
 
-    await ShareExtend.share(outPath, "image");
+    final params = ShareParams(
+      text: imageName,
+      files: [XFile(outPath)],
+    );
+    await SharePlus.instance.share(params);
   }
 }
