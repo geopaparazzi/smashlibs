@@ -34,6 +34,7 @@ const int DEFAULT_MINZOOM_INT = 1;
 const int DEFAULT_MAXZOOM_INT = 25;
 const int DEFAULT_MAXNATIVEZOOM_INT = 19;
 const double DEFAULT_MAXZOOM = 21;
+const USER_AGENT = "SMASH Flutter Client";
 
 const LAYERSTYPE_WMS = 'wms';
 const LAYERSTYPE_TMS = 'tms';

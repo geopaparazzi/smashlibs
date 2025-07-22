@@ -22,6 +22,7 @@ class TileSource extends TiledRasterLayerSource {
   double opacityPercentage = 100;
   List<int>? rgbToHide;
   int _srid = SmashPrj.EPSG3857_INT;
+  String userAgentPackageName = USER_AGENT;
 
   bool canDoProperties = true;
 
@@ -50,6 +51,7 @@ class TileSource extends TiledRasterLayerSource {
     this.opacityPercentage = 100,
     this.rgbToHide,
     this.doGpkgAsOverlay,
+    this.userAgentPackageName = USER_AGENT,
   }) {
     isLoaded = true;
   }
@@ -99,6 +101,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
+    this.userAgentPackageName = USER_AGENT,
   }) {
     isLoaded = true;
   }
@@ -298,6 +301,10 @@ class TileSource extends TiledRasterLayerSource {
 
   void setActive(bool active) {
     isVisible = active;
+  }
+
+  void setUserAgentPackageName(String userAgentPackageName) {
+    this.userAgentPackageName = userAgentPackageName;
   }
 
   IconData getIcon() => SmashIcons.iconTypeRaster;
