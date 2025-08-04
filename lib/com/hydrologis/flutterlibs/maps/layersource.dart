@@ -28,12 +28,15 @@ const LAYERSKEY_MINZOOM = 'minzoom';
 const LAYERSKEY_MAXZOOM = 'maxzoom';
 const LAYERSKEY_MAXNATIVEZOOM = 'maxnativezoom';
 const LAYERSKEY_GPKG_DOOVERLAY = "geopackage_dooverlay";
+const LAYERSKEY_USERAGENT = "useragent_package_name";
 const double DEFAULT_MINZOOM = 1;
 const double DEFAULT_ZOOM = 16;
 const int DEFAULT_MINZOOM_INT = 1;
 const int DEFAULT_MAXZOOM_INT = 25;
 const int DEFAULT_MAXNATIVEZOOM_INT = 19;
 const double DEFAULT_MAXZOOM = 21;
+
+const USER_AGENT = "org.geopaparazzi";
 
 const LAYERSTYPE_WMS = 'wms';
 const LAYERSTYPE_TMS = 'tms';

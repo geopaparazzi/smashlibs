@@ -5,7 +5,7 @@
  */
 part of smashlibs;
 
-const MAPSFORGE_TILESIZE = 256.0;
+const MAPSFORGE_TILESIZE = 256;
 
 const DOCACHE = true;
 
@@ -113,7 +113,7 @@ class AndromapResourceImageLoader implements ImageLoader {
 class MapsforgeTileProvider extends TileProvider {
   late File _mapsforgeFile;
   late DisplayModel _displayModel;
-  double tileSize;
+  int tileSize;
 
   var _mapDataStore;
   MBTilesDb? _mbtilesCache;

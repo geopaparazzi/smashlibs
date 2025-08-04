@@ -22,6 +22,7 @@ class TileSource extends TiledRasterLayerSource {
   double opacityPercentage = 100;
   List<int>? rgbToHide;
   int _srid = SmashPrj.EPSG3857_INT;
+  String userAgentPackageName = USER_AGENT;
 
   bool canDoProperties = true;
 
@@ -50,6 +51,7 @@ class TileSource extends TiledRasterLayerSource {
     this.opacityPercentage = 100,
     this.rgbToHide,
     this.doGpkgAsOverlay,
+    this.userAgentPackageName = USER_AGENT,
   }) {
     isLoaded = true;
   }
@@ -69,6 +71,8 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = map[LAYERSKEY_ISVISIBLE];
     this.opacityPercentage = (map[LAYERSKEY_OPACITY] ?? 100).toDouble();
     this.doGpkgAsOverlay = map[LAYERSKEY_GPKG_DOOVERLAY];
+    this.userAgentPackageName = map[LAYERSKEY_USERAGENT] ??
+        USER_AGENT; // default user agent is the smash app name
 
     var c2hide = map[LAYERSKEY_COLORTOHIDE];
     if (c2hide != null) {
@@ -99,6 +103,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
+    this.userAgentPackageName = USER_AGENT,
   }) {
     isLoaded = true;
   }
@@ -112,6 +117,7 @@ class TileSource extends TiledRasterLayerSource {
     this.maxNativeZoom = DEFAULT_MAXNATIVEZOOM_INT,
     this.isVisible = true,
     this.canDoProperties = true,
+    this.userAgentPackageName = USER_AGENT,
   }) {
     isLoaded = true;
   }
@@ -127,6 +133,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
+    this.userAgentPackageName = USER_AGENT,
   }) {
     isLoaded = true;
   }
@@ -153,6 +160,7 @@ class TileSource extends TiledRasterLayerSource {
     this.isVisible = true,
     this.isTms = false,
     this.canDoProperties = true,
+    this.userAgentPackageName = USER_AGENT,
   }) {
     isLoaded = true;
   }
@@ -292,6 +300,10 @@ class TileSource extends TiledRasterLayerSource {
     this.attribution = attribution;
   }
 
+  void setUserAgentPackageName(String packageName) {
+    this.userAgentPackageName = packageName;
+  }
+
   bool isActive() {
     return isVisible;
   }
@@ -346,7 +358,7 @@ class TileSource extends TiledRasterLayerSource {
         .getBooleanSync(SmashPreferencesKeys.KEY_RETINA_MODE_ON, false);
     if (FileManager.isMapsforge(getAbsolutePath())) {
       // mapsforge
-      double tileSize = 256;
+      int tileSize = 256;
       var mapsforgeTileProvider =
           MapsforgeTileProvider(File(absolutePath!), tileSize: tileSize);
       await mapsforgeTileProvider.open();
@@ -359,7 +371,7 @@ class TileSource extends TiledRasterLayerSource {
               key: ValueKey(layerKey),
               tileProvider: mapsforgeTileProvider,
               // urlTemplate: urlTemplate,
-              tileSize: tileSize,
+              tileDimension: tileSize,
               keepBuffer: 2,
               panBuffer: 0,
               maxZoom: maxZoom.toDouble(),
@@ -367,6 +379,9 @@ class TileSource extends TiledRasterLayerSource {
               tms: isTms,
               retinaMode: false, // not supported
               errorTileCallback: errorTileCallback,
+              additionalOptions: {
+                'attribution': '© OpenStreetMap contributors'
+              },
               // fallbackUrl: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
             ))
       ];
@@ -471,6 +486,7 @@ class TileSource extends TiledRasterLayerSource {
               retinaMode: retinaModeOn,
               tileProvider: tileProvider,
               errorTileCallback: errorTileCallback,
+              userAgentPackageName: userAgentPackageName,
             ),
           )
         ];
@@ -513,6 +529,7 @@ class TileSource extends TiledRasterLayerSource {
         "$LAYERSKEY_ATTRIBUTION": "$attribution",
         "$LAYERSKEY_SRID": $_srid,
         "$LAYERSKEY_TYPE": "$LAYERSTYPE_TMS",
+        "$LAYERSKEY_USERAGENT": "$userAgentPackageName",
         $colorToHideLine
         $doGeopkgMode
         "$LAYERSKEY_ISVISIBLE": $isVisible ${subdomains.isNotEmpty ? "," : ""}
