@@ -22,42 +22,47 @@ class LatLngExt extends LatLng {
   }
 }
 
-class LatLngBoundsExt implements LatLngBounds {
+class LatLngBoundsExt extends LatLngBounds {
   late LatLngBounds bounds;
 
-  /// The latitude north edge of the bounds
-  late double north;
-
-  /// The latitude south edge of the bounds
-  late double south;
-
-  /// The longitude east edge of the bounds
-  late double east;
-
-  /// The longitude west edge of the bounds
-  late double west;
-
-  LatLngBoundsExt(LatLng corner1, LatLng corner2) {
-    bounds = LatLngBounds(corner1, corner2);
-    north = bounds.north;
-    south = bounds.south;
-    east = bounds.east;
-    west = bounds.west;
-  }
+  LatLngBoundsExt(LatLng corner1, LatLng corner2)
+      : super.unsafe(
+          north: corner1.latitude >= corner2.latitude
+              ? corner1.latitude
+              : corner2.latitude,
+          south: corner1.latitude < corner2.latitude
+              ? corner1.latitude
+              : corner2.latitude,
+          east: corner1.longitude >= corner2.longitude
+              ? corner1.longitude
+              : corner2.longitude,
+          west: corner1.longitude < corner2.longitude
+              ? corner1.longitude
+              : corner2.longitude,
+        );
 
   LatLngBoundsExt.fromBounds(LatLngBounds bounds)
-      : this(bounds.southWest, bounds.northEast);
+      : super.unsafe(
+          north: bounds.north,
+          south: bounds.south,
+          east: bounds.east,
+          west: bounds.west,
+        );
 
   LatLngBoundsExt.fromEnvelope(JTS.Envelope envelope)
-      : this(
-          LatLng(envelope.getMinY(), envelope.getMinX()),
-          LatLng(envelope.getMaxY(), envelope.getMaxX()),
+      : super.unsafe(
+          north: envelope.getMaxY(),
+          south: envelope.getMinY(),
+          east: envelope.getMaxX(),
+          west: envelope.getMinX(),
         );
 
   LatLngBoundsExt.fromCoordinate(JTS.Coordinate coordinate, double buffer)
-      : this(
-          LatLng(coordinate.y - buffer, coordinate.x - buffer),
-          LatLng(coordinate.y + buffer, coordinate.x + buffer),
+      : super.unsafe(
+          north: coordinate.y + buffer,
+          south: coordinate.y - buffer,
+          east: coordinate.x + buffer,
+          west: coordinate.x - buffer,
         );
 
   JTS.Envelope toEnvelope() {
@@ -79,13 +84,9 @@ class LatLngBoundsExt implements LatLngBounds {
     return gf.createPolygon(lr, null);
   }
 
-  double getWidth() {
-    return east - west;
-  }
+  double getWidth() => east - west;
 
-  double getHeight() {
-    return north - south;
-  }
+  double getHeight() => north - south;
 
   /// Expand this enveloe and create a new one.
   LatLngBoundsExt expandBy(double deltaX, double deltaY) {
@@ -138,12 +139,6 @@ class LatLngBoundsExt implements LatLngBounds {
 
   @override
   LatLng get southWest => bounds.southWest;
-
-  // @override
-  // double get longitudeCenter => bounds.longitudeCenter;
-
-  // @override
-  // double get longitudeWidth => bounds.longitudeWidth;
 }
 
 class SLSettings {
