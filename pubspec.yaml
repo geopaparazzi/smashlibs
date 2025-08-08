@@ -68,8 +68,8 @@ dependencies:
   # BSD
   flutter_map: ^8.1.1
 
-  # BSD3
-  flutter_map_cancellable_tile_provider: ^3.1.0
+  # BSD3 -> replaced by flutter map
+  # flutter_map_cancellable_tile_provider: ^3.1.0
 
   # BSD3
   flutter_map_marker_cluster_plus: ^1.4.2

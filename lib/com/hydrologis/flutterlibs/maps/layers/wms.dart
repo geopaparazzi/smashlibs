@@ -129,7 +129,6 @@ class WmsSource extends RasterLayerSource {
           ),
           // TODO overrideTilesWhenUrlChanges: overrideTilesOnUrlChange,
           errorTileCallback: errorTileCallback,
-          tileProvider: ExceptionsToTrack.getDefaultForOnlineServices(),
         ),
       )
     ];

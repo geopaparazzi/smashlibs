@@ -453,8 +453,6 @@ class TileSource extends TiledRasterLayerSource {
         ];
       }
     } else if (isOnlineService()) {
-      TileProvider tileProvider =
-          ExceptionsToTrack.getDefaultForOnlineServices();
       if (isWms) {
         var tileLayerOptions = Opacity(
           opacity: opacityPercentage / 100.0,
@@ -467,7 +465,6 @@ class TileSource extends TiledRasterLayerSource {
             maxZoom: maxZoom.toDouble(),
             maxNativeZoom: maxNativeZoom,
             retinaMode: retinaModeOn,
-            tileProvider: tileProvider,
             errorTileCallback: errorTileCallback,
           ),
         );
@@ -484,7 +481,6 @@ class TileSource extends TiledRasterLayerSource {
               maxNativeZoom: maxNativeZoom,
               subdomains: subdomains,
               retinaMode: retinaModeOn,
-              tileProvider: tileProvider,
               errorTileCallback: errorTileCallback,
               userAgentPackageName: userAgentPackageName,
             ),

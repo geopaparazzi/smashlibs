@@ -138,6 +138,12 @@ class LatLngBoundsExt implements LatLngBounds {
 
   @override
   LatLng get southWest => bounds.southWest;
+
+  // @override
+  // double get longitudeCenter => bounds.longitudeCenter;
+
+  // @override
+  // double get longitudeWidth => bounds.longitudeWidth;
 }
 
 class SLSettings {
