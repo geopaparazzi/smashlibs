@@ -23,8 +23,6 @@ class LatLngExt extends LatLng {
 }
 
 class LatLngBoundsExt extends LatLngBounds {
-  late LatLngBounds bounds;
-
   LatLngBoundsExt(LatLng corner1, LatLng corner2)
       : super.unsafe(
           north: corner1.latitude >= corner2.latitude
@@ -106,39 +104,6 @@ class LatLngBoundsExt extends LatLngBounds {
     var deltaY = newH - h;
     return expandBy(deltaX / 2, deltaY / 2);
   }
-
-  @override
-  LatLng get center => bounds.center;
-
-  @override
-  bool contains(LatLng point) => bounds.contains(point);
-
-  @override
-  bool containsBounds(LatLngBounds other) => bounds.containsBounds(other);
-
-  @override
-  void extend(LatLng latLng) => bounds.extend(latLng);
-
-  @override
-  void extendBounds(LatLngBounds llbounds) => bounds.extendBounds(llbounds);
-
-  @override
-  bool isOverlapping(LatLngBounds other) => bounds.isOverlapping(other);
-
-  @override
-  LatLng get northEast => bounds.northEast;
-
-  @override
-  LatLng get northWest => bounds.northWest;
-
-  @override
-  LatLng get simpleCenter => bounds.simpleCenter;
-
-  @override
-  LatLng get southEast => bounds.southEast;
-
-  @override
-  LatLng get southWest => bounds.southWest;
 }
 
 class SLSettings {
