@@ -66,7 +66,7 @@ dependencies:
     #   ref: v7
 
   # BSD
-  flutter_map: ^8.1.1
+  flutter_map: ^8.2.1
 
   # BSD3 -> replaced by flutter map
   # flutter_map_cancellable_tile_provider: ^3.1.0
@@ -80,7 +80,7 @@ dependencies:
     #   url: https://github.com/moovida/lat_lon_grid_plugin.git
     #   ref: bump_flutter_map_to_1
 
-  mapsforge_flutter: ^3.0.1
+  mapsforge_flutter: ^3.0.2
   # mapsforge_flutter: #^2.0.1
   #   # path: /home/hydrologis/development/SMASH/mapsforge_flutter_moovida/mapsforge_flutter
   #   git:
@@ -93,13 +93,13 @@ dependencies:
   # apache
   latlong2: ^0.9.1
 
-  xml: ^6.1.0 #'>=4.5.1 <=5.3.1'
+  xml: ^6.5.0 #'>=4.5.1 <=5.3.1'
 
   # Apache 2.0
   gpx: ^2.1.0
 
   # MIT
-  geojson_vi: 2.2.4
+  geojson_vi: ^2.2.5
 
   # BSD  rainbow_vis: 1.0.3
   rainbow_color: 2.0.1
@@ -136,7 +136,7 @@ dependencies:
   # MIT
   dio: ^5.1.1
   # MIT
-  permission_handler: ^11.3.1
+  permission_handler: ^12.0.1
     # git: 
     #   url: https://github.com/Baseflow/flutter-permission-handler.git
     #   path: permission_handler
@@ -159,7 +159,7 @@ dependencies:
     #   ref: 7b5486c
 
   # pulled by flutter_material_pickers: force version to avoid bug in file_picker
-  file_picker: 8.1.4 
+  file_picker: ^8.1.4 
 
   # BSD
   shared_preferences: ^2.0.15

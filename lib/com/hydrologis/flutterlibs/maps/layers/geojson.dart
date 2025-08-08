@@ -165,8 +165,8 @@ class GeojsonSource extends VectorLayerSource
           }
           int id = 0;
           for (var jsonFeature in fColl.features) {
-            if (jsonFeature != null) {
-              GEOJSON.GeoJSONGeometry jsonGeometry = jsonFeature.geometry;
+            if (jsonFeature != null && jsonFeature.geometry != null) {
+              GEOJSON.GeoJSONGeometry jsonGeometry = jsonFeature.geometry!;
               JTS.Geometry? geometry = getJtsGeometry(jsonGeometry, gf);
               if (geometry != null) {
                 int idToUse = id;
@@ -1033,7 +1033,7 @@ class GeojsonSource extends VectorLayerSource
       // we need to extract the single geometry
       if (featureCollection.features.length > 0) {
         _geojsonGeometryString =
-            featureCollection.features[0]!.geometry.toJSON();
+            featureCollection.features[0]!.geometry!.toJSON();
       } else {
         _geojsonGeometryString = "";
       }
