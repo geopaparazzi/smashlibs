@@ -1,11 +1,14 @@
 part of smashlibs;
 
 // Cache interface
+//
+// This is the class that needs to be implementd by the cache provider
+// and initialized at application startup.
 abstract class ISmashCache {
   Future<void> init();
-  Future<void> clear({String? cacheName});
-  Future<void> put(String key, dynamic value, {String? cacheName});
-  Future<dynamic> get(String key, {String? cacheName});
+  Future<void> clear({String? storeName});
+  Future<void> put(String key, dynamic value, {String? storeName});
+  Future<dynamic> get(String key, {String? storeName});
 }
 
 /// A simple cache class singleton.
@@ -29,14 +32,14 @@ class SmashCache {
   }
 
   Future<void> clear({String? cacheName}) async {
-    await _cache!.clear(cacheName: cacheName);
+    await _cache!.clear(storeName: cacheName);
   }
 
   Future<void> put(String key, dynamic value, {String? cacheName}) async {
-    await _cache!.put(key, value, cacheName: cacheName);
+    await _cache!.put(key, value, storeName: cacheName);
   }
 
   Future<dynamic> get(String key, {String? cacheName}) async {
-    return await _cache!.get(key, cacheName: cacheName);
+    return await _cache!.get(key, storeName: cacheName);
   }
 }
