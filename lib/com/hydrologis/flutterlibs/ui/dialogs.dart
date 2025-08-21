@@ -444,16 +444,22 @@ class SmashDialogs {
   ///
   /// Returns the selected items.
   static Future<List<String>?> showMultiSelectionComboDialog(
-      BuildContext context, dynamic title, List<String> items,
-      {List<String>? selectedItems,
-      String okText = 'Ok',
-      String cancelText = 'Cancel',
-      List<IconData>? iconDataList}) async {
+    BuildContext context,
+    dynamic title,
+    List<String> items, {
+    List<String>? selectedItems,
+    String okText = 'Ok',
+    String cancelText = 'Cancel',
+    List<IconData>? iconDataList,
+    double? dialogWidth,
+  }) async {
+    // all = 1, none = 0, don't act = -1
+    ValueNotifier<int> allOrNoneSelectionNotifier = ValueNotifier<int>(-1);
     List<Widget> widgets = [];
     List<String> selected = [];
     if (selectedItems != null) {
       // add them to the selected
-      for (String sel in selectedItems){
+      for (String sel in selectedItems) {
         selected.add(sel);
       }
     }
@@ -462,34 +468,78 @@ class SmashDialogs {
       if (selectedItems != null && selectedItems.contains(items[i])) {
         itemSelected = true;
       }
-      widgets.add(DialogCheckBoxTile(
-        itemSelected,
-        items[i],
-        (isSelected, item) {
-          if (isSelected) {
-            selected.add(item);
-          } else {
-            selected.remove(item);
-          }
-        },
-        iconData: iconDataList != null ? iconDataList[i] : null,
-      ));
+      widgets.add(DialogCheckBoxTile(itemSelected, items[i],
+          (isSelected, item) {
+        if (isSelected) {
+          selected.add(item);
+        } else {
+          selected.remove(item);
+        }
+        allOrNoneSelectionNotifier.value = -1;
+      },
+          iconData: iconDataList != null ? iconDataList[i] : null,
+          allOrNoneSelectionNotifier: allOrNoneSelectionNotifier));
     }
+
+    var titleRow = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: title is String
+              ? SmashUI.normalText(title,
+                  textAlign: TextAlign.center,
+                  color: SmashColors.mainDecorationsDarker)
+              : title,
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.check_box,
+                color: SmashColors.mainDecorations,
+              ),
+              onPressed: () {
+                // select all
+                allOrNoneSelectionNotifier.value = 0;
+                selected.clear();
+                selected.addAll(items);
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.check_box_outline_blank,
+                color: SmashColors.mainDecorations,
+              ),
+              onPressed: () {
+                // deselect all
+                allOrNoneSelectionNotifier.value = 1;
+                selected.clear();
+              },
+            ),
+          ],
+        )
+      ],
+    );
 
     List<String>? selection = await showDialog<List<String>>(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: title is String
-                ? SmashUI.normalText(title,
-                    textAlign: TextAlign.center,
-                    color: SmashColors.mainDecorationsDarker)
-                : title,
+            title: titleRow,
             content: Builder(builder: (context) {
-              var width = MediaQuery.of(context).size.width;
+              if (dialogWidth == null) {
+                if (ScreenUtilities.isPortrait(context)) {
+                  dialogWidth = MediaQuery.of(context).size.width * 0.9;
+                } else {
+                  dialogWidth = MediaQuery.of(context).size.width / 2;
+                }
+              }
               return Container(
-                width: width,
+                width: dialogWidth!,
                 child: ListView(
                   shrinkWrap: true,
                   children:
@@ -642,9 +692,10 @@ class DialogCheckBoxTile extends StatefulWidget {
   final String item;
   final onSelection;
   final IconData? iconData;
+  final ValueNotifier<int>? allOrNoneSelectionNotifier;
 
   DialogCheckBoxTile(this.selected, this.item, this.onSelection,
-      {this.iconData});
+      {this.iconData, this.allOrNoneSelectionNotifier});
 
   @override
   _DialogCheckBoxTileState createState() => _DialogCheckBoxTileState();
@@ -661,6 +712,27 @@ class _DialogCheckBoxTileState extends State<DialogCheckBoxTile> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.allOrNoneSelectionNotifier != null) {
+      return ValueListenableBuilder<int>(
+        valueListenable: widget.allOrNoneSelectionNotifier!,
+        builder: (context, value, child) {
+          return buildClean(widget.allOrNoneSelectionNotifier!.value);
+        },
+      );
+    }
+    return buildClean(null);
+  }
+
+  CheckboxListTile buildClean(int? allOrNoneSelection) {
+    if (allOrNoneSelection != null && allOrNoneSelection != -1) {
+      if (allOrNoneSelection == 0) {
+        // All selected
+        selected = true;
+      } else {
+        // None selected
+        selected = false;
+      }
+    }
     var icd = widget.iconData;
     var normalText = SingleChildScrollView(
         scrollDirection: Axis.horizontal,
