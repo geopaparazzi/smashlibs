@@ -89,13 +89,13 @@ flutter:
     - assets/gjson_points.json
     - assets/gjson_lines.json
     - assets/gjson_polygons.json
-    - assets/assisi.map
+    - assets/monaco.map
     - assets/ciclabile_peschiera_mantova.gpx
     - assets/testtiff.tif
     - assets/world.mbtiles
     - assets/orthos.gpkg
     - assets/vectors.gpkg
-    - assets/defaultrender.xml
+    - assets/themes/defaultrender.xml
     - assets/caldaro.geocaching
     - assets/watercourses_small.shp
     - assets/watercourses_small.shx

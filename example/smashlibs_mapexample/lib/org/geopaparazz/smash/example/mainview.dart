@@ -5,7 +5,9 @@ import 'package:dart_jts/dart_jts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapsforge_flutter/src/view/mapview_widget.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:path/path.dart' as p;
+import 'package:smashlibs/com/hydrologis/flutterlibs/maps/layers/debugtile_layer.dart';
 import 'package:smashlibs/smashlibs.dart';
 import 'package:provider/provider.dart';
 import './utils.dart';
@@ -66,6 +68,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
   final LayerSource _backgroundLayerSource = onlinesTilesSources[0];
   LayerSource _currentLayerSource = onlinesTilesSources[1];
   FormBuilderFormHelper? formBuilderHelper;
+  bool showDebug = true;
 
   FutureOr<void> load(BuildContext context) async {
     if (mapView != null) {
@@ -116,6 +119,18 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
     mapView!.addLayerSource(_backgroundLayerSource);
 
     mapView!.addLayerSource(_currentLayerSource);
+
+    if (showDebug) {
+      mapView!.addPostLayer(
+        TileLayer(
+          key: const ValueKey("debugtiles"),
+          maxZoom: 25.0,
+          maxNativeZoom: 25,
+          urlTemplate: 'debug://{z}/{x}/{y}',
+          tileProvider: DebugTileProvider(tileSize: 256),
+        ),
+      );
+    }
 
     int tapAreaPixels = GpPreferences()
             .getIntSync(SmashPreferencesKeys.KEY_VECTOR_TAPAREA_SIZE, 50) ??
@@ -235,7 +250,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var dbPath = await copyToMapFolder("assisi.map");
+                      var dbPath = await copyToMapFolder("monaco.map");
 
                       mapView!.removeLayerSource(_currentLayerSource);
                       _currentLayerSource = TileSource.Mapsforge(dbPath);
@@ -392,7 +407,7 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
           alignment: Alignment.bottomLeft,
           child: SmashToolsBar(
             48,
-            doZoom: false,
+            doZoom: true,
             doZoomByBox: false,
           ),
         )

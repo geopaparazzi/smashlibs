@@ -125,7 +125,8 @@ class MapsforgeTileProvider extends TileProvider {
       {this.tileSize = MAPSFORGE_TILESIZE});
 
   Future<void> open() async {
-    _displayModel = DisplayModel(maxZoomLevel: 24, fontScaleFactor: 1.5);
+    _displayModel = DisplayModel(
+        deviceScaleFactor: 1, maxZoomLevel: 25, fontScaleFactor: 1.0);
 
     String? themeContent;
     var parentFolder =
