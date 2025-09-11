@@ -165,15 +165,31 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
                 if (!widget._isReadOnly) {
                   var preSelectedItemsString =
                       selectedItems.map((i) => i.value.toString()).toList();
-                  await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return MultiSelect(
-                          itemsArray, selectedItems, widget._label, strKey);
-                    },
-                  );
-                  var selectedItemsString =
+
+                  var itemsNamesArray = itemsArray
+                      .where((i) => i != null)
+                      .map((i) => i!.value.toString())
+                      .toList();
+                  var selectedItemsNames =
                       selectedItems.map((i) => i.value.toString()).toList();
+                  var selectedItemsString =
+                      await SmashDialogs.showMultiSelectionComboDialog(
+                          context, widget._label, itemsNamesArray,
+                          selectedItems: selectedItemsNames);
+
+                  if (selectedItemsString == null) {
+                    return;
+                  }
+
+                  // await showDialog(
+                  //   context: context,
+                  //   builder: (BuildContext context) {
+                  //     return MultiSelect(
+                  //         itemsArray, selectedItems, widget._label, strKey);
+                  //   },
+                  // );
+                  // var selectedItemsString =
+                  //     selectedItems.map((i) => i.value.toString()).toList();
 
                   // if nothing changed, return
                   if (DeepCollectionEquality()

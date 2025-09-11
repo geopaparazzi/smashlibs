@@ -438,12 +438,131 @@ class SmashDialogs {
         "A working network connection is necessary to perform the action.");
   }
 
+  static Future<List<String>?> showMultiSelectionComboDialog(
+    BuildContext context,
+    dynamic title,
+    List<String> items, {
+    List<String>? selectedItems,
+    String okText = 'Ok',
+    String cancelText = 'Cancel',
+    List<IconData>? iconDataList,
+    double? dialogWidth,
+  }) async {
+    final selected = <String>{...?(selectedItems ?? const [])};
+
+    return showDialog<List<String>>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        // use a tiny state holder for the dialog itself
+        return StatefulBuilder(builder: (context, setState) {
+          void selectAll() => setState(() {
+                selected
+                  ..clear()
+                  ..addAll(items);
+              });
+
+          void deselectAll() => setState(() => selected.clear());
+
+          final titleRow = Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: title is String
+                    ? SmashUI.titleText(
+                        title,
+                        bold: true,
+                        textAlign: TextAlign.center,
+                        color: SmashColors.mainDecorations,
+                      )
+                    : title,
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.check_box,
+                        color: SmashColors.mainDecorations),
+                    onPressed: selectAll,
+                    tooltip: 'Select all',
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.check_box_outline_blank,
+                        color: SmashColors.mainDecorations),
+                    onPressed: deselectAll,
+                    tooltip: 'Deselect all',
+                  ),
+                ],
+              ),
+            ],
+          );
+
+          final width = dialogWidth ??
+              (ScreenUtilities.isPortrait(context)
+                  ? MediaQuery.of(context).size.width * 0.9
+                  : MediaQuery.of(context).size.width / 2);
+
+          return AlertDialog(
+            title: titleRow,
+            content: SizedBox(
+              width: width,
+              child: ListView.separated(
+                itemCount: items.length,
+                shrinkWrap: true,
+                itemBuilder: (ctx, i) {
+                  final item = items[i];
+                  final isChecked = selected.contains(item);
+                  return CheckboxListTile(
+                    key: ValueKey(item),
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.trailing,
+                    value: isChecked,
+                    onChanged: (v) => setState(() {
+                      if (v == true) {
+                        selected.add(item);
+                      } else {
+                        selected.remove(item);
+                      }
+                    }),
+                    title: SmashUI.normalText(item,
+                        color: SmashColors.mainDecorations, bold: true),
+                    secondary: iconDataList != null && i < iconDataList.length
+                        ? Icon(iconDataList[i])
+                        : null,
+                  );
+                },
+                separatorBuilder: (ctx, i) => const Divider(
+                  height: 1,
+                  thickness: 1,
+                ),
+              ),
+            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            actions: [
+              TextButton(
+                child: Text(cancelText),
+                onPressed: () => Navigator.of(context).pop(null),
+              ),
+              TextButton(
+                child: Text(okText),
+                onPressed: () => Navigator.of(context).pop(selected.toList()),
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
   /// Show a multiselection dialog, adding a [title] and a list of [items] to propose.
   ///
   /// [title] can be either a String or a Widget.
   ///
   /// Returns the selected items.
-  static Future<List<String>?> showMultiSelectionComboDialog(
+  ///
+  /// Deprecated, use [showMultiSelectionComboDialog] instead.
+  static Future<List<String>?> showMultiSelectionComboDialogOld(
     BuildContext context,
     dynamic title,
     List<String> items, {

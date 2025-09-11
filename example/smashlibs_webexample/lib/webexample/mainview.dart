@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:smashlibs/smashlibs.dart';
 import 'package:dart_jts/dart_jts.dart';
 import 'package:provider/provider.dart';
+import './utils.dart';
 
 class MainSmashLibsPage extends StatefulWidget {
   const MainSmashLibsPage({super.key, required this.title});
@@ -54,6 +55,11 @@ class _MainSmashLibsPageState extends State<MainSmashLibsPage> {
             Provider.of<GeometryEditorState>(context, listen: false);
         if (geomEditorState.isEnabled) {
           GeometryEditManager().onMapLongTap(context, ll, zoom.round());
+        } else {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const FormsExamplePage()));
         }
       },
     );

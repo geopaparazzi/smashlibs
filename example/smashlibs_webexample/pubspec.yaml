@@ -73,5 +73,5 @@ flutter:
     # - assets/fonts/OpenSans-Bold.ttf
     # - assets/fonts/OpenSans-Italic.ttf
     # - assets/fonts/OpenSans-BoldItalic.ttf
-    # - assets/tags.json
+    - assets/tags.json
     
