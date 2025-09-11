@@ -448,7 +448,7 @@ class SmashDialogs {
     List<IconData>? iconDataList,
     double? dialogWidth,
   }) async {
-    final selected = <String>{...?(selectedItems ?? const [])};
+    final selected = <String>{...(selectedItems ?? const [])};
 
     return showDialog<List<String>>(
       context: context,
