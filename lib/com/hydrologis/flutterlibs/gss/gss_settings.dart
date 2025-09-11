@@ -131,13 +131,13 @@ class GssSettingsState extends State<GssSettings> with AfterLayoutMixin {
                                         await GpPreferences().setString(
                                             SmashPreferencesKeys
                                                 .KEY_GSS_DJANGO_SERVER_URL,
-                                            res);
+                                            res!);
                                         setState(() {
                                           _gssUrl = res;
                                         });
                                       },
                                       validationFunction: (text) {
-                                        if (text.startsWith("http://") ||
+                                        if (text!.startsWith("http://") ||
                                             text.startsWith("https://")) {
                                           return null;
                                         } else {
@@ -332,7 +332,7 @@ class GssSettingsState extends State<GssSettings> with AfterLayoutMixin {
                                   await GpPreferences().setString(
                                       SmashPreferencesKeys
                                           .KEY_GSS_DJANGO_SERVER_USER,
-                                      res);
+                                      res!);
                                   setState(() {
                                     _gssUser = res;
                                   });
@@ -378,7 +378,7 @@ class GssSettingsState extends State<GssSettings> with AfterLayoutMixin {
                                 await GpPreferences().setString(
                                     SmashPreferencesKeys
                                         .KEY_GSS_DJANGO_SERVER_PWD,
-                                    res);
+                                    res!);
                                 setState(() {
                                   _gssPwd = res;
                                 });

@@ -859,10 +859,10 @@ class _RulePropertiesEditorState extends State<RulePropertiesEditor> {
                               filter.uniqueValueValue = newValueString;
                             } else if (filter.uniqueValueValue is double) {
                               filter.uniqueValueValue =
-                                  double.parse(newValueString);
+                                  double.parse(newValueString!);
                             } else if (filter.uniqueValueValue is int) {
                               filter.uniqueValueValue =
-                                  double.parse(newValueString).toInt();
+                                  double.parse(newValueString!).toInt();
                             } else {
                               SMLogger().e(
                                   "Unable to find type for key: ${filter.uniqueValueKey} and value: ${filter.uniqueValueValue}",

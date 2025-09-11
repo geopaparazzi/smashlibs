@@ -386,151 +386,132 @@ class EditableTextField extends StatefulWidget {
   final String? hintText;
   final bool isPassword;
   final bool doBold;
-  final Function onSave;
-  final Function? validationFunction;
+  final ValueChanged<String?> onSave;
+  final String? Function(String?)? validationFunction;
   final TextInputType? keyboardType;
   final Color? textColor;
   final Color? buttonColor;
   final bool withLabel;
 
-  EditableTextField(this.label, this.value, this.onSave,
-      {this.validationFunction,
-      this.isPassword = false,
-      this.doBold = false,
-      this.hintText,
-      this.keyboardType = TextInputType.text,
-      this.withLabel = false,
-      this.textColor,
-      this.buttonColor,
-      Key? key})
-      : super(key: key);
+  const EditableTextField(
+    this.label,
+    this.value,
+    this.onSave, {
+    this.validationFunction,
+    this.isPassword = false,
+    this.doBold = false,
+    this.hintText,
+    this.keyboardType = TextInputType.text,
+    this.withLabel = false,
+    this.textColor,
+    this.buttonColor,
+    super.key,
+  });
 
   @override
-  _EditableTextFieldState createState() => _EditableTextFieldState();
+  State<EditableTextField> createState() => _EditableTextFieldState();
 }
 
 class _EditableTextFieldState extends State<EditableTextField> {
-  bool editMode = false;
-  String _currentValue = "";
-  late TextEditingController _controller;
-  late TextEditingController _controller2;
-  bool _canSave = true;
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _c;
+  late final FocusNode _focus;
+  bool _editMode = false;
 
   @override
   void initState() {
-    _currentValue = widget.value;
-    _controller = TextEditingController();
-    _controller2 = TextEditingController();
     super.initState();
+    _c = TextEditingController(text: widget.value);
+    _focus = FocusNode();
   }
 
+  @override
+  void didUpdateWidget(covariant EditableTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If parent-provided value changes, sync controller (but don’t clobber equal text)
+    if (oldWidget.value != widget.value && _c.text != widget.value) {
+      _c.text = widget.value;
+    }
+  }
+
+  @override
   void dispose() {
-    _controller.dispose();
-    _controller2.dispose();
+    _c.dispose();
+    _focus.dispose();
     super.dispose();
+  }
+
+  void _enterEdit() {
+    setState(() => _editMode = true);
+    // place cursor at end after the frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _c.selection = TextSelection.collapsed(offset: _c.text.length);
+      _focus.requestFocus();
+    });
+  }
+
+  void _saveIfValid() {
+    if (_formKey.currentState?.validate() ?? true) {
+      widget.onSave(_c.text);
+      setState(() => _editMode = false);
+      _focus.unfocus();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Color textColor = widget.textColor ?? SmashColors.mainTextColor;
-    Color buttonColor = widget.buttonColor ?? SmashColors.mainDecorationsDarker;
-    if (editMode) {
-      if (_currentValue != widget.hintText && _currentValue.isNotEmpty) {
-        _controller.text = _currentValue;
-        _controller.selection = TextSelection.fromPosition(
-            TextPosition(offset: _controller.text.length));
-      } else {
-        _controller.text = "";
-      }
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (widget.withLabel)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: SmashUI.normalText(widget.label),
-            ),
-          Expanded(
-            child: TextFormField(
-              autofocus: true,
-              controller: _controller,
-              autovalidateMode: AutovalidateMode.always,
-              validator: (inputText) {
-                String? errorText;
-                if (widget.validationFunction != null) {
-                  errorText = widget.validationFunction!(inputText);
-                }
-                _canSave = errorText == null;
-                return errorText;
-              },
-              obscureText: widget.isPassword,
-              keyboardType: widget.keyboardType,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: widget.label,
-                hintText: widget.hintText,
-              ),
-            ),
+    final textColor = widget.textColor ?? SmashColors.mainTextColor;
+    final buttonColor = widget.buttonColor ?? SmashColors.mainDecorationsDarker;
+
+    final field = Form(
+      key: _formKey,
+      child: TextFormField(
+        controller: _c,
+        focusNode: _focus,
+        readOnly: !_editMode,
+        obscureText: widget.isPassword,
+        keyboardType: widget.keyboardType,
+        autovalidateMode: AutovalidateMode.always,
+        validator: widget.validationFunction,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: widget.doBold ? FontWeight.bold : FontWeight.normal,
+          fontSize: SmashUI.NORMAL_SIZE,
+        ),
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          labelText: widget.label,
+          hintText: widget.hintText,
+          suffixIcon: _editMode
+              ? IconButton(
+                  icon: Icon(MdiIcons.contentSave),
+                  color: buttonColor,
+                  onPressed: _saveIfValid,
+                )
+              : IconButton(
+                  icon: Icon(MdiIcons.pencil),
+                  color: buttonColor,
+                  onPressed: _enterEdit,
+                ),
+        ),
+        onTap: () {
+          if (!_editMode) _enterEdit();
+        },
+        onFieldSubmitted: (_) => _saveIfValid(),
+      ),
+    );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (widget.withLabel)
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: SmashUI.normalText(widget.label),
           ),
-          IconButton(
-            icon: Icon(
-              MdiIcons.contentSave,
-              size: SmashUI.MEDIUM_ICON_SIZE,
-              color: buttonColor,
-            ),
-            onPressed: () {
-              if (_canSave) {
-                _currentValue = _controller.text;
-                widget.onSave(_controller.text);
-                setState(() {
-                  editMode = false;
-                });
-              }
-            },
-          )
-        ],
-      );
-    } else {
-      _controller2.text = _currentValue;
-      return Row(
-        children: [
-          if (widget.withLabel)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: SmashUI.normalText(widget.label),
-            ),
-          Expanded(
-            child: TextFormField(
-              controller: _controller2,
-              obscureText: widget.isPassword,
-              keyboardType: widget.keyboardType,
-              readOnly: true,
-              style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-                fontSize: SmashUI.NORMAL_SIZE,
-              ),
-              onTap: () {
-                setState(() {
-                  editMode = true;
-                });
-              },
-            ),
-          ),
-          IconButton(
-            icon: Icon(
-              MdiIcons.pencil,
-              color: buttonColor,
-            ),
-            onPressed: () {
-              setState(() {
-                editMode = true;
-              });
-            },
-          )
-        ],
-      );
-    }
+        Expanded(child: field),
+      ],
+    );
   }
 }
 
