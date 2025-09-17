@@ -44,7 +44,7 @@ class Workspace {
 
   /// Make a [relativePath] absolute using to the current rootfolder.
   static String makeAbsolute(String relativePath) {
-    if (_isDesktop) {
+    if (_isDesktop || File(relativePath).existsSync()) {
       return relativePath;
     }
     if (relativePath.startsWith(_rootFolder)) return relativePath;
