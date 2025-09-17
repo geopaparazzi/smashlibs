@@ -9,8 +9,8 @@ part of smashlibs;
 ///
 /// Returns null if the string is valid. This can be used
 /// as [TextFormField] validator.
-String? noEmptyValidator(String value) {
-  if (value.trim().length == 0) {
+String? noEmptyValidator(String? value) {
+  if (value == null || value.trim().length == 0) {
     return "Please enter some text to continue.";
   } else {
     return null;
