@@ -35,7 +35,7 @@ class LayerManager {
                   absolutePath != null && File(absolutePath).existsSync();
               bool isurl = url != null && url.trim().isNotEmpty;
               if (isFile || isurl) {
-                if (source is LoadableLayerSource && source.isActive()) {
+                if (source is LoadableLayerSource) {
                   await source.load(context);
                 }
                 if (source.getSrid() == null) {
@@ -146,14 +146,14 @@ class LayerManager {
   // }
 
   List<SmashMapLayer> getActiveLayers() {
-    return LayerManager().getLayerSources().where((l) => l != null).map((l) {
-      // if (l is LoadableLayerSource && !l.isLoaded) {
-      //   l = LayerSource.fromJson(l.toJson())[0];
-      // }
+    final sources =
+        LayerManager().getLayerSources().where((l) => l != null).toList();
+    return List.generate(sources.length, (i) {
+      final l = sources[i]!;
       return SmashMapLayer(
-        l!,
-        key: ValueKey(l.getName()),
+        l,
+        key: ValueKey('${l.getName()}_$i'),
       );
-    }).toList();
+    });
   }
 }

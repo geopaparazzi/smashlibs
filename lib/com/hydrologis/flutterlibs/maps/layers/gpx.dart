@@ -20,7 +20,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   LatLngBounds? _gpxBounds;
 
   late String sldString;
-  late HU.SldObjectParser _style;
+  HU.SldObjectParser? _style;
   double minLineElev = double.infinity;
   double maxLineElev = double.negativeInfinity;
   ColorTables _colorTable = ColorTables.none;
@@ -37,30 +37,37 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
 
   GpxSource(this._absolutePath);
 
+  HU.SldObjectParser getStyle() {
+    if (_style != null) {
+      return _style!;
+    }
+    var parentFolder = HU.FileUtilities.parentFolderFromFile(_absolutePath!);
+    var fileName = HU.FileUtilities.nameFromFile(_absolutePath!, false);
+    _name ??= fileName;
+
+    sldPath = HU.FileUtilities.joinPaths(parentFolder, fileName + ".sld");
+    var sldFile = File(sldPath);
+
+    if (sldFile.existsSync()) {
+      sldString = HU.FileUtilities.readFile(sldPath);
+      _style = HU.SldObjectParser.fromString(sldString);
+      _style!.parse();
+    } else {
+      // create style for points, lines and text
+      sldString = HU.DefaultSlds.simplePointSld();
+      _style = HU.SldObjectParser.fromString(sldString);
+      _style!.parse();
+      _style!.featureTypeStyles.first.rules.first.addLineStyle(HU.LineStyle());
+      _style!.featureTypeStyles.first.rules.first.addTextStyle(HU.TextStyle());
+      sldString = _style!.toSldString();
+      HU.FileUtilities.writeStringToFile(sldPath, sldString);
+    }
+    return _style!;
+  }
+
   Future<void> load(BuildContext? context) async {
     if (!isLoaded) {
-      var parentFolder = HU.FileUtilities.parentFolderFromFile(_absolutePath!);
-
-      var fileName = HU.FileUtilities.nameFromFile(_absolutePath!, false);
-      _name ??= fileName;
-
-      sldPath = HU.FileUtilities.joinPaths(parentFolder, fileName + ".sld");
-      var sldFile = File(sldPath);
-
-      if (sldFile.existsSync()) {
-        sldString = HU.FileUtilities.readFile(sldPath);
-        _style = HU.SldObjectParser.fromString(sldString);
-        _style.parse();
-      } else {
-        // create style for points, lines and text
-        sldString = HU.DefaultSlds.simplePointSld();
-        _style = HU.SldObjectParser.fromString(sldString);
-        _style.parse();
-        _style.featureTypeStyles.first.rules.first.addLineStyle(HU.LineStyle());
-        _style.featureTypeStyles.first.rules.first.addTextStyle(HU.TextStyle());
-        sldString = _style.toSldString();
-        HU.FileUtilities.writeStringToFile(sldPath, sldString);
-      }
+      getStyle();
 
       var xml = HU.FileUtilities.readFile(_absolutePath!);
       // try {
@@ -229,12 +236,13 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   @override
   Future<List<Widget>> toLayers(BuildContext context) async {
     load(context);
+    getStyle();
 
     HU.LineStyle? lineStyle;
     HU.PointStyle? pointStyle;
     HU.TextStyle? textStyle;
-    if (_style.featureTypeStyles.isNotEmpty) {
-      var fts = _style.featureTypeStyles.first;
+    if (_style!.featureTypeStyles.isNotEmpty) {
+      var fts = _style!.featureTypeStyles.first;
       if (fts.rules.isNotEmpty) {
         var rule = fts.rules.first;
 
@@ -391,7 +399,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   void updateStyle(String newSldString) {
     sldString = newSldString;
     _style = HU.SldObjectParser.fromString(sldString);
-    _style.parse();
+    _style!.parse();
     HU.FileUtilities.writeStringToFile(sldPath, sldString);
   }
 }
@@ -422,8 +430,9 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (textStyle == null && _source._style.featureTypeStyles.isNotEmpty) {
-      var fts = _source._style.featureTypeStyles.first;
+    var style = _source.getStyle();
+    if (textStyle == null && style.featureTypeStyles.isNotEmpty) {
+      var fts = style.featureTypeStyles.first;
       if (fts.rules.isNotEmpty) {
         var rule = fts.rules.first;
 
@@ -462,8 +471,9 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
 
     return WillPopScope(
         onWillPop: () async {
+          var style = _source.getStyle(); // to be sure it is loaded
           var sldString = HU.SldObjectBuilder.buildFromFeatureTypeStyles(
-              _source._style.featureTypeStyles);
+              style.featureTypeStyles);
 
           _source.updateStyle(sldString);
           return true;
