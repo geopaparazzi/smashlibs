@@ -163,41 +163,41 @@ class MultiComboWidgetState<T> extends State<MultiComboWidget> {
               key: Key(strKey),
               onPressed: () async {
                 if (!widget._isReadOnly) {
-                  var preSelectedItemsString =
-                      selectedItems.map((i) => i.value.toString()).toList();
+                  var preSelectedItemsLabels =
+                      selectedItems.map((i) => i.label.toString()).toList();
 
-                  var itemsNamesArray = itemsArray
+                  var itemsLabels = itemsArray
                       .where((i) => i != null)
-                      .map((i) => i!.value.toString())
+                      .map((i) => i!.label.toString())
                       .toList();
-                  var selectedItemsNames =
-                      selectedItems.map((i) => i.value.toString()).toList();
-                  var selectedItemsString =
+                  var itemsValues = itemsArray
+                      .where((i) => i != null)
+                      .map((i) => i!.value)
+                      .toList();
+                  var selectedItemsLabels =
                       await SmashDialogs.showMultiSelectionComboDialog(
-                          context, widget._label, itemsNamesArray,
-                          selectedItems: selectedItemsNames);
+                          context, widget._label, itemsLabels,
+                          selectedItems: preSelectedItemsLabels);
 
-                  if (selectedItemsString == null) {
+                  if (selectedItemsLabels == null) {
                     return;
                   }
-
-                  // await showDialog(
-                  //   context: context,
-                  //   builder: (BuildContext context) {
-                  //     return MultiSelect(
-                  //         itemsArray, selectedItems, widget._label, strKey);
-                  //   },
-                  // );
-                  // var selectedItemsString =
-                  //     selectedItems.map((i) => i.value.toString()).toList();
 
                   // if nothing changed, return
                   if (DeepCollectionEquality()
-                      .equals(preSelectedItemsString, selectedItemsString)) {
+                      .equals(preSelectedItemsLabels, selectedItemsLabels)) {
                     return;
                   }
+                  // now get the values from the labels
+                  List selectedItemsValues = [];
+                  for (var selLabel in selectedItemsLabels) {
+                    int index = itemsLabels.indexOf(selLabel);
+                    if (index != -1) {
+                      selectedItemsValues.add(itemsValues[index]);
+                    }
+                  }
 
-                  var result = selectedItemsString.join(";");
+                  var result = selectedItemsValues.join(";");
                   setState(() {
                     widget._formItem.setValue(result);
 
