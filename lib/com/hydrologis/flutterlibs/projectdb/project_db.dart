@@ -112,6 +112,8 @@ abstract class ProjectDb {
   /// Invert the visiblity of all logs.
   int? invertGpsLogsVisibility();
 
+  int? updateGpsLogTags(int logId, String tags);
+
   /// Update the length of a log
   ///
   /// Calculates the length of a log of id [logId].

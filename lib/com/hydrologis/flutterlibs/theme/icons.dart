@@ -334,45 +334,45 @@ class MarkerIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return labelText == null
-        ? Container(
-            child: Icon(
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.topCenter,
+      child: IntrinsicWidth(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
               iconData,
               size: iconSize,
               color: iconColor,
             ),
-          )
-        : Container(
-            height: iconSize,
-            width: iconSize,
-            child: Column(
-              children: [
-                Container(
-                  child: Icon(
-                    iconData,
-                    size: iconSize,
-                    color: iconColor,
+            if (labelText != null) ...[
+              const SizedBox(height: 2),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: labelBackColor ?? Colors.black87,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  labelText!,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                  style: TextStyle(
+                    color: labelColor ?? Colors.white,
+                    fontSize: iconSize * 0.22,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                if (labelText != null)
-                  FittedBox(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: labelBackColor,
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: Text(
-                          labelText!,
-                          style: TextStyle(
-                              color: labelColor, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  )
-              ],
-            ),
-          );
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }
