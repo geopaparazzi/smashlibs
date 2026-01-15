@@ -334,45 +334,48 @@ class MarkerIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.topCenter,
-      child: IntrinsicWidth(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              iconData,
-              size: iconSize,
-              color: iconColor,
-            ),
-            if (labelText != null) ...[
-              const SizedBox(height: 2),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: labelBackColor ?? Colors.black87,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  labelText!,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.fade,
-                  style: TextStyle(
-                    color: labelColor ?? Colors.white,
-                    fontSize: iconSize * 0.22,
-                    fontWeight: FontWeight.w600,
-                  ),
+    final label = labelText == null
+        ? null
+        : UnconstrainedBox(
+            alignment: Alignment.topCenter,
+            child: Container(
+              margin: const EdgeInsets.only(top: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: labelBackColor ?? Colors.black87,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                labelText!,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.fade,
+                style: TextStyle(
+                  color: labelColor ?? Colors.white,
+                  fontSize: iconSize * 0.22,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ],
-          ],
+            ),
+          );
+
+    return Stack(
+      clipBehavior: Clip.none, // important: allow label to extend outside
+      alignment: Alignment.topCenter,
+      children: [
+        SizedBox(
+          height: iconSize,
+          width: iconSize,
+          child: Center(
+            child: Icon(iconData, size: iconSize, color: iconColor),
+          ),
         ),
-      ),
+        if (label != null)
+          Positioned(
+            top: iconSize, // label starts below the icon box
+            child: label,
+          ),
+      ],
     );
   }
 }
