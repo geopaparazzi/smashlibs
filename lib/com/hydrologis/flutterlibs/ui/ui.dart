@@ -417,12 +417,24 @@ class _EditableTextFieldState extends State<EditableTextField> {
   late final TextEditingController _c;
   late final FocusNode _focus;
   bool _editMode = false;
+  String? _lastSavedText;
 
   @override
   void initState() {
     super.initState();
     _c = TextEditingController(text: widget.value);
+
+    _lastSavedText = widget.value;
+
     _focus = FocusNode();
+    _focus.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    // When user clicks elsewhere / back button closes keyboard, etc.
+    if (!_focus.hasFocus && _editMode) {
+      _saveIfValid();
+    }
   }
 
   @override
@@ -431,11 +443,13 @@ class _EditableTextFieldState extends State<EditableTextField> {
     // If parent-provided value changes, sync controller (but don’t clobber equal text)
     if (oldWidget.value != widget.value && _c.text != widget.value) {
       _c.text = widget.value;
+      _lastSavedText = widget.value;
     }
   }
 
   @override
   void dispose() {
+    _focus.removeListener(_onFocusChange);
     _c.dispose();
     _focus.dispose();
     super.dispose();
@@ -451,10 +465,17 @@ class _EditableTextFieldState extends State<EditableTextField> {
   }
 
   void _saveIfValid() {
+    // Avoid saving repeatedly or saving unchanged text
+    final text = _c.text;
+    if (text == _lastSavedText) {
+      setState(() => _editMode = false);
+      return;
+    }
+
     if (_formKey.currentState?.validate() ?? true) {
       widget.onSave(_c.text);
       setState(() => _editMode = false);
-      _focus.unfocus();
+      // _focus.unfocus();
     }
   }
 
