@@ -196,7 +196,13 @@ class _AutocompleteComboWidgetState<T extends Object>
                 key: Key(key),
                 optionsBuilder: (TextEditingValue textEditingValue) {
                   if (textEditingValue.text == '') {
-                    return Iterable<ItemObject>.empty();
+                    var items = <ItemObject>[];
+                    for (var item in itemsArray) {
+                      if (item != null) {
+                        items.add(item);
+                      }
+                    }
+                    return items;
                   }
                   List<ItemObject> objItems = [];
                   for (var item in itemsArray) {

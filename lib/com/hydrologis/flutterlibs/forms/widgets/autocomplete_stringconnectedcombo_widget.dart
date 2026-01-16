@@ -119,7 +119,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                         key: Key("${key}_main"),
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text == '') {
-                            return const Iterable<String>.empty();
+                            return mainComboItems;
                           }
                           return mainComboItems.where((String option) {
                             return option
@@ -174,7 +174,11 @@ class AutocompleteStringConnectedComboboxWidgetState
                               optionsBuilder:
                                   (TextEditingValue textEditingValue) {
                                 if (textEditingValue.text == '') {
-                                  return const Iterable<String>.empty();
+                                  if (secondaryCombos[currentMain] == null) {
+                                    return const Iterable<String>.empty();
+                                  } else {
+                                    return secondaryCombos[currentMain]!;
+                                  }
                                 }
                                 return secondaryCombos[currentMain]!
                                     .where((String option) {
