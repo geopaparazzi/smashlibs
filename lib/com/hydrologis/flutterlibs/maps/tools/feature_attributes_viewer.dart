@@ -31,10 +31,19 @@ class _FeatureAttributesViewerState extends State<FeatureAttributesViewer> {
     try {
       EditableQueryResult f = widget.features;
       for (var i = 0; i < f.ids!.length; i++) {
-        var eds = f.edsList![i];
-        var gcAndSrid = await eds.getGeometryColumnNameAndSrid();
-        if (gcAndSrid != null) {
-          _srids[eds.getName()] = gcAndSrid.item2;
+        if (f.editable![i]) {
+          var eds = f.edsList![i];
+          var gcAndSrid = await eds.getGeometryColumnNameAndSrid();
+          if (gcAndSrid != null) {
+            _srids[eds.getName()] = gcAndSrid.item2;
+          }
+        } else {
+          // get srid from geometry itself
+          var geom = f.geoms[i];
+          _srids[f.ids![i]] = geom.getSRID();
+          if (_srids[f.ids![i]] == 0) {
+            _srids[f.ids![i]] = SmashPrj.EPSG4326_INT;
+          }
         }
       }
     } on Exception catch (e, s) {

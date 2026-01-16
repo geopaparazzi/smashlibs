@@ -248,6 +248,15 @@ class _FeatureInfoLayerState extends State<FeatureInfoLayer> {
           totalQueryResult.geoms.add(f.geometry!);
           totalQueryResult.data.add(f.attributes);
         });
+      } else if (vLayer is GpxSource) {
+        var features = vLayer.getInRoi(roiGeom: boundsGeom);
+        features.forEach((f) {
+          totalQueryResult.ids!.add(vLayer.getName()!);
+          totalQueryResult.primaryKeys?.add(null);
+          totalQueryResult.editable!.add(false);
+          totalQueryResult.geoms.add(f.geometry!);
+          totalQueryResult.data.add(f.attributes);
+        });
       }
     }
 

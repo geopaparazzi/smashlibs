@@ -14,10 +14,13 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   int _srid = SmashPrj.EPSG4326_INT;
   late String sldPath;
 
-  List<LatLng> _wayPoints = [];
+  // List<LatLng> _wayPoints = [];
   List<String> _wayPointNames = [];
-  List<List<LatLng>> _tracksRoutes = [];
-  LatLngBounds? _gpxBounds;
+  // List<List<LatLng>> _tracksRoutes = [];
+  List<HU.Feature> _wayPointFeatures = [];
+  List<HU.Feature> _tracksRoutesFeatures = [];
+  JTS.STRtree? _featureTree;
+  JTS.Envelope? _gpxBounds;
 
   late String sldString;
   HU.SldObjectParser? _style;
@@ -82,15 +85,46 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
         _name = tmp;
       }
 
+      _gpxBounds = JTS.Envelope.empty();
+      _featureTree = JTS.STRtree();
+
       int count = 1;
+      JTS.GeometryFactory gf = JTS.GeometryFactory.defaultPrecision();
       _gpx!.wpts.forEach((wpt) {
-        var latLng = LatLng(wpt.lat!, wpt.lon!);
-        if (_gpxBounds == null) {
-          _gpxBounds = LatLngBounds.fromPoints([latLng]);
-        } else {
-          _gpxBounds!.extend(latLng);
+        JTS.Coordinate? coord = JTS.Coordinate(wpt.lon!, wpt.lat!);
+        var wayPointGeom = gf.createPoint(coord);
+        var envLL = wayPointGeom.getEnvelopeInternal();
+        _gpxBounds!.expandToIncludeEnvelope(envLL);
+        var feature = HU.Feature();
+        feature.geometry = wayPointGeom;
+        // get description from gps and try to split it into attributes
+        if (wpt.name != null) {
+          feature.fid = count;
         }
-        _wayPoints.add(latLng);
+        if (wpt.desc != null) {
+          var descr = wpt.desc!;
+          // split by line breaks and the =
+          var lines = descr.split(RegExp(r'[\n\r]+'));
+          if (lines.length == 1) {
+            // try splitting by ;
+            feature.attributes["description"] = descr;
+          } else {
+            var valueCount = 1;
+            for (var line in lines) {
+              var keyValue = line.split("=");
+              if (keyValue.length == 2) {
+                feature.attributes[keyValue[0].trim()] = keyValue[1].trim();
+              } else {
+                feature.attributes["value_$valueCount"] = line.trim();
+                valueCount++;
+              }
+            }
+          }
+        }
+
+        _wayPointFeatures.add(feature);
+        _featureTree!.insert(envLL, feature);
+
         var name = wpt.name;
         if (name == null) {
           name = "Point $count";
@@ -103,11 +137,12 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
         _attribution = _attribution + "Wpts(${_gpx!.wpts.length}) ";
       }
 
+      count = 1;
       double lengthMeters = 0;
       JTS.Coordinate? prevLatLng;
       _gpx!.trks.forEach((trk) {
         trk.trksegs.forEach((trkSeg) {
-          List<LatLng> points = trkSeg.trkpts.map((wpt) {
+          List<JTS.Coordinate> points = trkSeg.trkpts.map((wpt) {
             JTS.Coordinate coord;
             if (wpt.ele == null) {
               coord = JTS.Coordinate.fromYX(wpt.lat!, wpt.lon!);
@@ -122,17 +157,18 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
               lengthMeters += distance;
             }
             prevLatLng = coord;
-            var latLng = coord.z == JTS.Coordinate.NULL_ORDINATE
-                ? LatLng(coord.y, coord.x)
-                : LatLngExt.fromCoordinate(coord);
-            if (_gpxBounds == null) {
-              _gpxBounds = LatLngBounds.fromPoints([latLng]);
-            } else {
-              _gpxBounds!.extend(latLng);
-            }
-            return latLng;
+            return coord;
           }).toList();
-          _tracksRoutes.add(points);
+
+          var lineGeom = gf.createLineString(points);
+          var envLL = lineGeom.getEnvelopeInternal();
+          _gpxBounds!.expandToIncludeEnvelope(envLL);
+          var feature = HU.Feature();
+          feature.fid = count;
+          count++;
+          feature.geometry = lineGeom;
+          _tracksRoutesFeatures.add(feature);
+          _featureTree!.insert(envLL, feature);
         });
       });
       if (_gpx!.trks.isNotEmpty) {
@@ -147,7 +183,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
       lengthMeters = 0;
       prevLatLng = null;
       _gpx!.rtes.forEach((rt) {
-        List<LatLng> points = rt.rtepts.map((wpt) {
+        List<JTS.Coordinate> points = rt.rtepts.map((wpt) {
           JTS.Coordinate? coord;
           if (wpt.ele == null) {
             coord = JTS.Coordinate.fromYX(wpt.lat!, wpt.lon!);
@@ -162,18 +198,17 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
             lengthMeters += distance;
           }
           prevLatLng = coord;
-          var latLng = coord.z == JTS.Coordinate.NULL_ORDINATE
-              ? LatLng(coord.y, coord.x)
-              : LatLngExt.fromCoordinate(coord);
-
-          if (_gpxBounds == null) {
-            _gpxBounds = LatLngBounds.fromPoints([latLng]);
-          } else {
-            _gpxBounds!.extend(latLng);
-          }
-          return latLng;
+          return coord;
         }).toList();
-        _tracksRoutes.add(points);
+        var lineGeom = gf.createLineString(points);
+        var envLL = lineGeom.getEnvelopeInternal();
+        _gpxBounds!.expandToIncludeEnvelope(envLL);
+        var feature = HU.Feature();
+        feature.fid = count;
+        count++;
+        feature.geometry = lineGeom;
+        _tracksRoutesFeatures.add(feature);
+        _featureTree!.insert(envLL, feature);
       });
       if (_gpx!.rtes.isNotEmpty) {
         String info = "${_gpx!.rtes.length}";
@@ -188,7 +223,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   }
 
   bool hasData() {
-    return _wayPoints.isNotEmpty || _tracksRoutes.isNotEmpty;
+    return _wayPointFeatures.isNotEmpty || _tracksRoutesFeatures.isNotEmpty;
   }
 
   String? getAbsolutePath() {
@@ -233,6 +268,25 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
     return json;
   }
 
+  List<HU.Feature> getInRoi(
+      {JTS.Geometry? roiGeom, JTS.Envelope? roiEnvelope}) {
+    if (roiEnvelope != null || roiGeom != null) {
+      if (roiEnvelope == null) {
+        roiEnvelope = roiGeom!.getEnvelopeInternal();
+      }
+      List<HU.Feature> result = _featureTree!.query(roiEnvelope).cast();
+      if (roiGeom != null) {
+        result.removeWhere((f) => !f.geometry!.intersects(roiGeom));
+      }
+      return result;
+    } else {
+      List<HU.Feature> features = [];
+      features.addAll(_wayPointFeatures);
+      features.addAll(_tracksRoutesFeatures);
+      return features;
+    }
+  }
+
   @override
   Future<List<Widget>> toLayers(BuildContext context) async {
     load(context);
@@ -263,21 +317,31 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
 
     List<Widget> layers = [];
 
-    if (_tracksRoutes.isNotEmpty) {
+    if (_tracksRoutesFeatures.isNotEmpty) {
       List<Polyline> lines = [];
 
       if (_colorTable.isValid() &&
-          _tracksRoutes.isNotEmpty &&
-          _tracksRoutes[0].isNotEmpty &&
-          _tracksRoutes[0][0] is LatLngExt &&
+          _tracksRoutesFeatures.isNotEmpty &&
+          _tracksRoutesFeatures[0].geometry is JTS.Geometry &&
           minLineElev.isFinite &&
           maxLineElev.isFinite) {
-        _tracksRoutes.forEach((linePoints) {
-          EnhancedColorUtility.buildPolylines(lines, linePoints, _colorTable,
-              lineStyle!.strokeWidth, minLineElev, maxLineElev);
+        _tracksRoutesFeatures.forEach((lineFeature) {
+          List<LatLng>? list = lineFeature.geometry
+              ?.getCoordinates()
+              .map((coord) => LatLng(coord.y, coord.x))
+              .toList();
+          if (list != null) {
+            EnhancedColorUtility.buildPolylines(lines, list, _colorTable,
+                lineStyle!.strokeWidth, minLineElev, maxLineElev);
+          }
         });
       } else {
-        _tracksRoutes.forEach((linePoints) {
+        _tracksRoutesFeatures.forEach((lineFeature) {
+          List<LatLng>? linePoints = lineFeature.geometry
+              ?.getCoordinates()
+              .map((coord) => LatLng(coord.y, coord.x))
+              .toList();
+          if (linePoints == null) return;
           lines.add(Polyline(
             points: linePoints,
             strokeWidth: lineStyle!.strokeWidth,
@@ -291,13 +355,15 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
       );
       layers.add(lineLayer);
     }
-    if (_wayPoints.isNotEmpty) {
+    if (_wayPointFeatures.isNotEmpty) {
       var colorExt = ColorExt(pointStyle.fillColorHex);
       var labelcolorExt = ColorExt(textStyle.textColor);
       List<Marker> waypoints = [];
 
-      for (var i = 0; i < _wayPoints.length; i++) {
-        var ll = _wayPoints[i];
+      for (var i = 0; i < _wayPointFeatures.length; i++) {
+        var c = _wayPointFeatures[i].geometry?.getCoordinate();
+        if (c == null) continue;
+        var ll = LatLng(c.y, c.x);
         String? name = _wayPointNames[i];
         if (textStyle.size == 0) {
           name = null;
@@ -318,7 +384,7 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
               MdiIcons.circle,
               colorExt,
               pointsSize,
-              name!,
+              name,
               labelcolorExt,
               colorExt.withAlpha(100),
             ));
@@ -355,14 +421,17 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
   @override
   Future<LatLngBounds?> getBounds(BuildContext? context) async {
     await load(null);
-    return _gpxBounds;
+    if (_gpxBounds == null) {
+      return null;
+    }
+    return LatLngBoundsExt.fromEnvelope(_gpxBounds!);
   }
 
   @override
   void disposeSource() {
-    _wayPoints = [];
+    _wayPointFeatures = [];
     _wayPointNames = [];
-    _tracksRoutes = [];
+    _tracksRoutesFeatures = [];
     _gpxBounds = null;
     _gpx = null;
     _name = null;
@@ -485,7 +554,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
           body: Center(
             child: ListView(
               children: <Widget>[
-                _source._wayPoints.isEmpty
+                _source._wayPointFeatures.isEmpty
                     ? Container()
                     : Padding(
                         padding: SmashUI.defaultPadding(),
@@ -574,7 +643,7 @@ class GpxPropertiesWidgetState extends State<GpxPropertiesWidget> {
                           ),
                         ),
                       ),
-                _source._tracksRoutes.isEmpty
+                _source._tracksRoutesFeatures.isEmpty
                     ? Container()
                     : Padding(
                         padding: SmashUI.defaultPadding(),
