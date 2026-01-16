@@ -206,6 +206,11 @@ class GpPreferences {
     await _preferences!.setStringList(key, value);
   }
 
+  void setStringListSync(String key, List<String> value) {
+    _checkPreferencesOrThrow();
+    _preferences!.setStringList(key, value);
+  }
+
   /// Get a boolean from the preferences.
   ///
   /// The method takes the preferences [key] and an optional [defaultValue]
