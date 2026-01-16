@@ -26,7 +26,7 @@ import 'package:flutter_tags_x/flutter_tags_x.dart';
 import 'package:camera/camera.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path_provider_ex/path_provider_ex.dart';
+import 'package:external_path/external_path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4dart;
 import 'package:smashlibs/com/hydrologis/flutterlibs/utils/fence.dart';

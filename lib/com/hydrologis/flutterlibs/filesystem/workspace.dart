@@ -6,19 +6,19 @@ part of smashlibs;
  */
 
 /// The name of the app, used to handle project folders and similar.
-const MAPS_FOLDER = "maps";
-const CONFIG_FOLDER = "config";
-const FORMS_FOLDER = "forms";
-const PROJECTS_FOLDER = "projects";
-const EXPORT_FOLDER = "export";
-const GSS_FOLDER = "gss";
+const MAPS_FOLDER = 'maps';
+const CONFIG_FOLDER = 'config';
+const FORMS_FOLDER = 'forms';
+const PROJECTS_FOLDER = 'projects';
+const EXPORT_FOLDER = 'export';
+const GSS_FOLDER = 'gss';
 
-const IOS_DOCUMENTSFOLDER = "Documents";
+const IOS_DOCUMENTSFOLDER = 'Documents';
 
 /// Application workspace utilities.
 class Workspace {
   static String APP_NAME =
-      "smash"; // change this if you are customizing the app
+      'smash'; // change this if you are customizing the app
   static late String _rootFolder;
 
   static bool _isDesktop = false;
@@ -38,7 +38,7 @@ class Workspace {
     if (_isDesktop) {
       return absolutePath;
     }
-    var relativePath = absolutePath.replaceFirst(_rootFolder, "");
+    var relativePath = absolutePath.replaceFirst(_rootFolder, '');
     return relativePath;
   }
 
@@ -74,7 +74,7 @@ class Workspace {
     }
     if (dir == null) {
       throw Exception(
-          "Could not define rootfolder on device. Impossible to continue.");
+          'Could not define rootfolder on device. Impossible to continue.');
     }
     return dir;
   }
@@ -85,7 +85,7 @@ class Workspace {
   ///
   /// Data in here are not visible to the user and might be deleted at anytime.
   static Future<Directory> getCacheFolder() async {
-    Directory tempDir = await getTemporaryDirectory();
+    var tempDir = await getTemporaryDirectory();
     return tempDir;
   }
 
@@ -108,7 +108,7 @@ class Workspace {
     applicationFolderPath = HU.FileUtilities.joinPaths(_rootFolder, APP_NAME);
     // }
     // }
-    Directory configFolder = Directory(applicationFolderPath);
+    var configFolder = Directory(applicationFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
     }
@@ -123,7 +123,7 @@ class Workspace {
   static Future<Directory> getSafeApplicationFolder() async {
     var dir = await getApplicationDocumentsDirectory();
     var applicationFolderPath = HU.FileUtilities.joinPaths(dir.path, APP_NAME);
-    Directory configFolder = Directory(applicationFolderPath);
+    var configFolder = Directory(applicationFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
     }
@@ -137,7 +137,7 @@ class Workspace {
     var applicationFolder = await getApplicationFolder();
     var projectsFolderPath =
         HU.FileUtilities.joinPaths(applicationFolder.path, PROJECTS_FOLDER);
-    Directory configFolder = Directory(projectsFolderPath);
+    var configFolder = Directory(projectsFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
     }
@@ -151,7 +151,7 @@ class Workspace {
     var applicationFolder = await getApplicationFolder();
     var configFolderPath =
         HU.FileUtilities.joinPaths(applicationFolder.path, CONFIG_FOLDER);
-    Directory configFolder = Directory(configFolderPath);
+    var configFolder = Directory(configFolderPath);
     if (!configFolder.existsSync()) {
       configFolder.createSync();
     }
@@ -165,7 +165,7 @@ class Workspace {
     var applicationFolder = await getApplicationFolder();
     var formsFolderPath =
         HU.FileUtilities.joinPaths(applicationFolder.path, FORMS_FOLDER);
-    Directory formsFolder = Directory(formsFolderPath);
+    var formsFolder = Directory(formsFolderPath);
     if (!formsFolder.existsSync()) {
       formsFolder.createSync();
     }
@@ -179,7 +179,7 @@ class Workspace {
     var applicationFolder = await getApplicationFolder();
     var mapsFolderPath =
         HU.FileUtilities.joinPaths(applicationFolder.path, MAPS_FOLDER);
-    Directory mapsFolder = Directory(mapsFolderPath);
+    var mapsFolder = Directory(mapsFolderPath);
     if (!mapsFolder.existsSync()) {
       mapsFolder.createSync();
     }
@@ -193,7 +193,7 @@ class Workspace {
     var applicationFolder = await getApplicationFolder();
     var mapsFolderPath =
         HU.FileUtilities.joinPaths(applicationFolder.path, EXPORT_FOLDER);
-    Directory mapsFolder = Directory(mapsFolderPath);
+    var mapsFolder = Directory(mapsFolderPath);
     if (!mapsFolder.existsSync()) {
       mapsFolder.createSync();
     }
@@ -208,8 +208,8 @@ class Workspace {
   ///
   /// Returns the file of the folder to use..
   static Future<Directory?> _getAndroidStorageFolder() async {
-    var storageInfo = await PathProviderEx.getStorageInfo();
-    var internalStorage = _getAndroidInternalStorage(storageInfo);
+    // var storageInfo = await PathProviderEx.getStorageInfo();
+    var internalStorage = await _getAndroidInternalStorage();
     if (internalStorage != null && internalStorage.isNotEmpty) {
       return Directory(internalStorage[0]);
     } else {
@@ -224,18 +224,27 @@ class Workspace {
 
   /// Get all the available storage folders.
   static Future<List<String>> getStorageFolders() async {
-    List<String> storageFolders = [];
+    var storageFolders = <String>[];
     if (Platform.isAndroid) {
-      var storageInfo = await PathProviderEx.getStorageInfo();
-      // var internalStorage = _getAndroidInternalStorage(storageInfo);
-      if (storageInfo.isNotEmpty) {
-        for (var storage in storageInfo) {
-          String rootDir = storage.rootDir;
-          if (!storageFolders.contains(rootDir)) {
-            storageFolders.add(rootDir);
+      var externalStorageDirectories =
+          await ExternalPath.getExternalStorageDirectories();
+      if (externalStorageDirectories != null) {
+        for (var dir in externalStorageDirectories) {
+          if (!storageFolders.contains(dir)) {
+            storageFolders.add(dir);
           }
         }
       }
+      // var storageInfo = await PathProviderEx.getStorageInfo();
+      // var internalStorage = _getAndroidInternalStorage(storageInfo);
+      // if (storageInfo.isNotEmpty) {
+      //   for (var storage in storageInfo) {
+      //     String rootDir = storage.rootDir;
+      //     if (!storageFolders.contains(rootDir)) {
+      //       storageFolders.add(rootDir);
+      //     }
+      //   }
+      // }
       var directory = await getExternalStorageDirectory();
       if (directory != null) {
         if (!storageFolders.contains(directory.path)) {
@@ -249,16 +258,14 @@ class Workspace {
     return storageFolders;
   }
 
-  static List<String>? _getAndroidInternalStorage(
-      List<StorageInfo> storageInfo) {
-    String? rootDir;
-    String? appFilesDir;
-    if (storageInfo.isNotEmpty) {
-      rootDir = storageInfo[0].rootDir;
-      // test if the folder is writable
-      var testFile =
-          new File(HU.FileUtilities.joinPaths(rootDir, "smash_test_tmp.txt"));
-      bool canWrite = true;
+  static Future<List<String>?> _getAndroidInternalStorage() async {
+    var externalStorageDirectories =
+        await ExternalPath.getExternalStorageDirectories();
+    if (externalStorageDirectories != null &&
+        externalStorageDirectories.isNotEmpty) {
+      var testFile = File(HU.FileUtilities.joinPaths(
+          externalStorageDirectories[0], 'smash_test_tmp.txt'));
+      var canWrite = true;
       try {
         testFile.writeAsStringSync('', mode: FileMode.write, flush: true);
       } on FileSystemException {
@@ -269,12 +276,35 @@ class Workspace {
         }
       }
       if (!canWrite) {
-        rootDir = storageInfo[0].appFilesDir;
+        return null;
       }
-      appFilesDir = storageInfo[0].appFilesDir;
+      return [externalStorageDirectories[0]];
     }
-    if (rootDir == null || appFilesDir == null) return null;
-    return [rootDir, appFilesDir];
+    return null;
+    // String? rootDir;
+    // String? appFilesDir;
+    // if (storageInfo.isNotEmpty) {
+    //   rootDir = storageInfo[0].rootDir;
+    //   // test if the folder is writable
+    //   var testFile =
+    //       new File(HU.FileUtilities.joinPaths(rootDir, 'smash_test_tmp.txt'));
+    //   bool canWrite = true;
+    //   try {
+    //     testFile.writeAsStringSync('', mode: FileMode.write, flush: true);
+    //   } on FileSystemException {
+    //     canWrite = false;
+    //   } finally {
+    //     if (testFile.existsSync()) {
+    //       testFile.deleteSync();
+    //     }
+    //   }
+    //   if (!canWrite) {
+    //     rootDir = storageInfo[0].appFilesDir;
+    //   }
+    //   appFilesDir = storageInfo[0].appFilesDir;
+    // }
+    // if (rootDir == null || appFilesDir == null) return null;
+    // return [rootDir, appFilesDir];
   }
 
   /// Return the last used folder from the preferences.
@@ -285,7 +315,7 @@ class Workspace {
   /// changes.
   static Future<String> getLastUsedFolder() async {
     String? lastFolder = await GpPreferences()
-        .getString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, "");
+        .getString(SmashPreferencesKeys.KEY_LAST_USED_FOLDER, '');
     if (lastFolder!.length == 0) {
       lastFolder = _rootFolder;
     } else {}

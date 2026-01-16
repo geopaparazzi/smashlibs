@@ -126,11 +126,12 @@ dependencies:
   # BSD
   path_provider: ^2.0.15
   
-  # MIT (possible substitute external_path)
-  path_provider_ex: #^1.0.1
-    git:
-      url: https://github.com/atrope/flutter_path_provider_ex.git
-      ref: feature/nullsafemigration
+  # MIT (possible substitute external_path
+  external_path: ^2.2.0 
+  # path_provider_ex: #^1.0.1
+  #   git:
+  #     url: https://github.com/atrope/flutter_path_provider_ex.git
+  #     ref: feature/nullsafemigration
   # MIT
   proj4dart: ^2.1.0
   # MIT
