@@ -17,3 +17,18 @@ const EXPERIMENTAL_HIDE_COLOR_RASTER__ENABLED = true;
 //     // return tileProvider;
 //   }
 // }
+
+class SmashSlider extends Slider {
+  SmashSlider({
+    super.key,
+    required super.value,
+    required super.onChanged,
+    super.onChangeStart,
+    super.onChangeEnd,
+    super.min = 0.0,
+    super.max = 1.0,
+    super.divisions,
+    super.activeColor,
+    super.thumbColor,
+  });
+}

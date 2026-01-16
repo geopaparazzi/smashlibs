@@ -106,6 +106,9 @@ abstract class ProjectDb {
   /// Updates the [color] and [width] of a log of id [logId].
   int? updateGpsLogStyle(int logId, String color, double width);
 
+  /// Updates the [keywords] of a log of id [logId].
+  int? updateGpsLogKeywords(int logId, String keywords);
+
   /// Updates the [isVisible] of a log of id [logId].
   int? updateGpsLogVisibility(bool isVisible, [int logId]);
 

@@ -104,6 +104,8 @@ class SmashPreferencesKeys {
   static const TAPAREASIZES = [10, 20, 30, 40, 50, 100, 200, 500];
   static const List<String> LOGVIEWMODES = ["hide", "solid", "transparent"];
   static const List<String> NOTESVIEWMODES = ["icon+label", "icon", "hide"];
+
+  static const String KEY_GPS_LOG_TAGS = 'smash_pref_keywords';
 }
 
 class CameraResolutions {
