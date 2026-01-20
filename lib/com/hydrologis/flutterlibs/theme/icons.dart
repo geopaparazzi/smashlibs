@@ -202,7 +202,14 @@ class IconsWidgetState extends State<IconsWidget> {
               IconButton(
                 icon: Icon(Icons.check_box_outline_blank),
                 tooltip: "Unselect and view all icons",
-                onPressed: () {
+                onPressed: () async {
+                  var doClear = await SmashDialogs.showConfirmDialog(
+                      context,
+                      "Clear selection",
+                      "Do you want to clear the current selection?");
+                  if (doClear == null || !doClear) {
+                    return;
+                  }
                   setState(() {
                     chosenIconsList.clear();
                     _visualizeList.clear();
