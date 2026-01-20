@@ -172,6 +172,7 @@ class IconsWidgetState extends State<IconsWidget> {
   List<List<dynamic>> _completeList = [];
   List<List<dynamic>> _visualizeList = [];
   List<String> chosenIconsList = [];
+  bool _showOnlyChosen = false;
 
   @override
   void initState() {
@@ -210,20 +211,31 @@ class IconsWidgetState extends State<IconsWidget> {
                 },
               ),
               IconButton(
-                icon: Icon(Icons.check_box),
-                tooltip: "Show only selected",
+                icon: Icon(Icons.check_box,
+                    color: _showOnlyChosen
+                        ? SmashColors.mainSelection
+                        : SmashColors.mainBackground),
+                tooltip: _showOnlyChosen ? "Show all" : "Show only selected",
                 onPressed: () {
                   setState(() {
-                    _visualizeList.clear();
-                    _visualizeList.addAll(_completeList.where((item) {
-                      return chosenIconsList.contains(item[0]);
-                    }).toList());
+                    if (_showOnlyChosen) {
+                      // show all
+                      _visualizeList.clear();
+                      _visualizeList.addAll(_completeList);
+                    } else {
+                      // show only chosen
+                      _visualizeList.clear();
+                      _visualizeList.addAll(_completeList.where((item) {
+                        return chosenIconsList.contains(item[0]);
+                      }).toList());
+                    }
+                    _showOnlyChosen = !_showOnlyChosen;
                   });
                 },
               ),
               IconButton(
                 icon: Icon(Icons.playlist_add_check),
-                tooltip: "Select only default",
+                tooltip: "Add default icons",
                 onPressed: () {
                   setState(() {
                     chosenIconsList.addAll(DEFAULT_NOTES_ICONDATA);
