@@ -112,6 +112,7 @@ part 'com/hydrologis/flutterlibs/utils/notifier.dart';
 part 'com/hydrologis/flutterlibs/utils/share.dart';
 part 'com/hydrologis/flutterlibs/utils/validators.dart';
 part 'com/hydrologis/flutterlibs/utils/cache.dart';
+part 'com/hydrologis/flutterlibs/utils/tags.dart';
 part 'com/hydrologis/flutterlibs/projectdb/project_db.dart';
 part 'com/hydrologis/flutterlibs/projectdb/images.dart';
 part 'com/hydrologis/flutterlibs/projectdb/logs.dart';
