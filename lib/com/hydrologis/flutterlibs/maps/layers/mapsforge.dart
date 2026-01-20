@@ -146,9 +146,9 @@ class MapsforgeTileProvider extends TileProvider {
       }
     }
     SymbolCache symbolCache;
-    renderThemeName =
-        GpPreferences().getStringSync("KEY_MAPSFORGE_THEME", "defaultrender") ??
-            "defaultrender";
+    renderThemeName = GpPreferences().getStringSync(
+            "KEY_MAPSFORGE_THEME_${_mapsforgeFile.path}", "defaultrender") ??
+        "defaultrender";
     if (themeContent == null) {
       if (renderThemeName != "elevate") {
         themeContent =
