@@ -113,12 +113,15 @@ class SmashDialogs {
   /// Show an error dialog, adding an optional [title] and a [prompt] for the user.
   static Future<void> showErrorDialog(BuildContext context, String prompt,
       {String title = "Error"}) async {
-    var htmlPattern = "<!DOCTYPE html>";
+    final htmlRegExp = RegExp(
+      r'<!DOCTYPE\s+html[^>]*>|<html[^>]*>',
+      caseSensitive: false,
+    );
+    final match = htmlRegExp.firstMatch(prompt);
     Widget widget = SmashUI.normalText(prompt);
-    var indexOf = prompt.indexOf(htmlPattern);
-    if (indexOf >= 0) {
+    if (match != null) {
       // try to render in html
-      var html = prompt.substring(indexOf);
+      var html = prompt.substring(match.start);
       widget = HtmlWidget(
         html,
         renderMode: RenderMode.column,
