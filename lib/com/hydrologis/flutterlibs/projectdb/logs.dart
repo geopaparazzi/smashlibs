@@ -24,6 +24,10 @@ final String TABLE_GPSLOG_PROPERTIES = "gpslogsproperties";
  */
 final String LOGS_COLUMN_ID = "_id";
 /*
+ * the id of the parent log, to support log hierarchies.
+ */
+final String LOGS_COLUMN_PARENTID = "parentlogid";
+/*
  * the start UTC timestamp.
  */
 final String LOGS_COLUMN_STARTTS = "startts";
@@ -110,6 +114,10 @@ final String LOGSDATA_COLUMN_LAT_FILTERED = "filtered_lat";
  * the accuracy of the point.
  */
 final String LOGSDATA_COLUMN_ACCURACY_FILTERED = "filtered_accuracy";
+/*
+ * the parent log id for logs, to support log hierarchies.
+ */
+final String LOGS_COLUMN_PARENTLOGID = "parentlogid";
 
 class Log {
   int? id;
@@ -118,6 +126,7 @@ class Log {
   double? lengthm;
   String? text;
   int? isDirty;
+  int? parentLogId;
 
   Map<String, dynamic> toMap() {
     var map = {
@@ -128,6 +137,7 @@ class Log {
           ? HU.TimeUtilities.ISO8601_TS_FORMATTER.format(new DateTime.now())
           : text,
       LOGS_COLUMN_ISDIRTY: isDirty,
+      LOGS_COLUMN_PARENTLOGID: parentLogId,
     };
     if (id != null) {
       map[LOGS_COLUMN_ID] = id;
