@@ -71,6 +71,8 @@ abstract class ProjectDb {
 
   Log? getLogById(int logId);
 
+  List<Log> getChildLogs(int parentId);
+
   List<LogDataPoint> getLogDataPoints(int logId);
 
   LogProperty? getLogProperties(int logId);
