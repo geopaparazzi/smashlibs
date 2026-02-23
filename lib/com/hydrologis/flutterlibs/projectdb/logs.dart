@@ -144,6 +144,21 @@ class Log {
     }
     return map;
   }
+
+  LogProperty? getLogProperty(ProjectDb projectDb) {
+    return projectDb.getLogProperties(id!);
+  }
+
+  List<List<LogDataPoint>> getLogData(ProjectDb projectDb) {
+    List<LogDataPoint> logDataPoints = projectDb.getLogDataPoints(id!);
+    var childLogs = projectDb.getChildLogs(id!);
+    List<List<LogDataPoint>> allData = [];
+    allData.add(logDataPoints);
+    for (var child in childLogs) {
+      allData.add(projectDb.getLogDataPoints(child.id!));
+    }
+    return allData;
+  }
 }
 
 class LogProperty {
