@@ -1,10 +1,9 @@
 part of smashlibs;
 /*
- * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
+ * Copyright (c) 2019-2026. Antonello Andrea (https://g-ant.eu). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
-
 
 /// A simple websocket service client class
 ///
@@ -279,46 +278,48 @@ class MercatorUtils {
 
   static JTS.Coordinate convert3857To4326(JTS.Coordinate coordinate3857) {
     List<double> latLon = metersToLatLon(coordinate3857.x, coordinate3857.y);
-    return  JTS.Coordinate(latLon[1], latLon[0]);
+    return JTS.Coordinate(latLon[1], latLon[0]);
   }
 
   static JTS.Coordinate convert4326To3857(JTS.Coordinate coordinate4326) {
     List<double> xy = latLonToMeters(coordinate4326.y, coordinate4326.x);
-    return  JTS.Coordinate(xy[0], xy[1]);
+    return JTS.Coordinate(xy[0], xy[1]);
   }
 
   static JTS.Envelope convert3857To4326Env(JTS.Envelope envelope3857) {
     JTS.Coordinate ll3857 =
-         JTS.Coordinate(envelope3857.getMinX(), envelope3857.getMinY());
+        JTS.Coordinate(envelope3857.getMinX(), envelope3857.getMinY());
     JTS.Coordinate ur3857 =
-         JTS.Coordinate(envelope3857.getMaxX(), envelope3857.getMaxY());
+        JTS.Coordinate(envelope3857.getMaxX(), envelope3857.getMaxY());
 
     JTS.Coordinate ll4326 = convert3857To4326(ll3857);
     JTS.Coordinate ur4326 = convert3857To4326(ur3857);
 
-    JTS.Envelope env4326 =  JTS.Envelope.fromCoordinates(ll4326, ur4326);
+    JTS.Envelope env4326 = JTS.Envelope.fromCoordinates(ll4326, ur4326);
     return env4326;
   }
 
   static JTS.Envelope convert4326To3857Env(JTS.Envelope envelope4326) {
     JTS.Coordinate ll4326 =
-         JTS.Coordinate(envelope4326.getMinX(), envelope4326.getMinY());
+        JTS.Coordinate(envelope4326.getMinX(), envelope4326.getMinY());
     JTS.Coordinate ur4326 =
-         JTS.Coordinate(envelope4326.getMaxX(), envelope4326.getMaxY());
+        JTS.Coordinate(envelope4326.getMaxX(), envelope4326.getMaxY());
 
     JTS.Coordinate ll3857 = convert4326To3857(ll4326);
     JTS.Coordinate ur3857 = convert4326To3857(ur4326);
 
-    JTS.Envelope env3857 =  JTS.Envelope.fromCoordinates(ll3857, ur3857);
+    JTS.Envelope env3857 = JTS.Envelope.fromCoordinates(ll3857, ur3857);
     return env3857;
   }
 
-  static List<int> getTileNumberFrom3857Coord(JTS.Coordinate coord3857, int zoom) {
+  static List<int> getTileNumberFrom3857Coord(
+      JTS.Coordinate coord3857, int zoom) {
     JTS.Coordinate coord4326 = convert3857To4326(coord3857);
     return getTileNumber(coord4326.y, coord4326.x, zoom);
   }
 
-  static List<int> getTileNumberFrom4326Coord(JTS.Coordinate coord4326, int zoom) {
+  static List<int> getTileNumberFrom4326Coord(
+      JTS.Coordinate coord4326, int zoom) {
     return getTileNumber(coord4326.y, coord4326.x, zoom);
   }
 
@@ -335,7 +336,7 @@ class MercatorUtils {
     double south = tile2lat(y + 1, zoom);
     double west = tile2lon(x, zoom);
     double east = tile2lon(x + 1, zoom);
-    JTS.Envelope env =  JTS.Envelope(west, east, south, north);
+    JTS.Envelope env = JTS.Envelope(west, east, south, north);
     return env;
   }
 
@@ -347,13 +348,15 @@ class MercatorUtils {
   /// @return the JTS.Envelope.
   static JTS.Envelope tileBounds3857(final int x, final int y, final int zoom) {
     JTS.Envelope env4326 = tileBounds4326(x, y, zoom);
-    JTS.Coordinate ll4326 =  JTS.Coordinate(env4326.getMinX(), env4326.getMinY());
-    JTS.Coordinate ur4326 =  JTS.Coordinate(env4326.getMaxX(), env4326.getMaxY());
+    JTS.Coordinate ll4326 =
+        JTS.Coordinate(env4326.getMinX(), env4326.getMinY());
+    JTS.Coordinate ur4326 =
+        JTS.Coordinate(env4326.getMaxX(), env4326.getMaxY());
 
     JTS.Coordinate ll3857transf = MercatorUtils.convert4326To3857(ll4326);
     JTS.Coordinate ur3857transf = MercatorUtils.convert4326To3857(ur4326);
 
-    return  JTS.Envelope.fromCoordinates(ll3857transf, ur3857transf);
+    return JTS.Envelope.fromCoordinates(ll3857transf, ur3857transf);
   }
 
   /// Get the tiles that fit into a given tile at lower zoomlevel.
@@ -397,5 +400,3 @@ class MercatorUtils {
     return radianToDeg(atan(sinh(n)));
   }
 }
-
-
