@@ -602,6 +602,15 @@ Tuple2<ListTile, bool>? getWidget(
       }
     case TYPE_STRINGCOMBO:
       {
+        if (itemReadonly) {
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
@@ -612,6 +621,15 @@ Tuple2<ListTile, bool>? getWidget(
       }
     case TYPE_INTCOMBO:
       {
+        if (itemReadonly) {
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
@@ -622,8 +640,7 @@ Tuple2<ListTile, bool>? getWidget(
       }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
+        if (itemReadonly) {
           return Tuple2(
               ListTile(
                 leading: icon,
@@ -642,8 +659,7 @@ Tuple2<ListTile, bool>? getWidget(
       }
     case TYPE_CONNECTEDSTRINGCOMBO:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
+        if (itemReadonly) {
           var finalString = "";
           if (valueString != finalString) {
             var split = valueString.split("#");
@@ -667,6 +683,24 @@ Tuple2<ListTile, bool>? getWidget(
       }
     case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO:
       {
+        if (itemReadonly) {
+          var finalString = "";
+          if (valueString != finalString) {
+            var split = valueString.split("#");
+            if (split.length > 1) {
+              finalString = "${split[0]} -> ${split[1]}";
+            } else {
+              finalString = valueString;
+            }
+          }
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, finalString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
@@ -682,8 +716,7 @@ Tuple2<ListTile, bool>? getWidget(
 //        break;
     case TYPE_STRINGMULTIPLECHOICE:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
+        if (itemReadonly) {
           // ! TODO
           return Tuple2(
               ListTile(
@@ -703,6 +736,15 @@ Tuple2<ListTile, bool>? getWidget(
       }
     case TYPE_INTMULTIPLECHOICE:
       {
+        if (itemReadonly) {
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
@@ -797,4 +839,3 @@ Tuple2<ListTile, bool>? getWidget(
 
   return null;
 }
-
