@@ -21,6 +21,9 @@ class _ImageGridEntry {
 }
 
 class ImageGridWidgetState extends State<ImageGridWidget> {
+  static const bool _showAllImagesInReadonly =
+      String.fromEnvironment("IMAGEGRID_SHOW_ALL", defaultValue: "true") ==
+          "true";
   Set<String> _selected = {};
 
   @override
@@ -37,13 +40,20 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
     List<_ImageGridEntry> entries = _getEntries();
 
     Set<String> selectedFromValue = _parseSelected(widget._formItem.value);
+    if (widget._isReadOnly && !_showAllImagesInReadonly) {
+      entries = entries
+          .where((entry) => selectedFromValue.contains(entry.id))
+          .toList();
+    }
     if (!_setEquals(selectedFromValue, _selected)) {
       _selected = selectedFromValue;
     }
 
     if (entries.isEmpty) {
-      return SmashUI.normalText("No images configured.",
-          color: SmashColors.disabledText);
+      var msg = widget._isReadOnly && !_showAllImagesInReadonly
+          ? "No selected images."
+          : "No images configured.";
+      return SmashUI.normalText(msg, color: SmashColors.disabledText);
     }
 
     List<Widget> header = [];

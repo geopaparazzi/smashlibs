@@ -135,6 +135,7 @@ abstract class AFormWidget {
       TYPE_BOOLEAN,
       TYPE_STRINGCOMBO,
       TYPE_INTCOMBO,
+      TYPE_DEPENDENTCOMBO,
       TYPE_AUTOCOMPLETESTRINGCOMBO,
       TYPE_CONNECTEDSTRINGCOMBO,
       TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO,
@@ -195,6 +196,9 @@ abstract class AFormWidget {
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_STRINGCOMBO:
         return StringComboWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_DEPENDENTCOMBO:
+        return DependentComboFormWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_INTCOMBO:
         return IntComboWidget(

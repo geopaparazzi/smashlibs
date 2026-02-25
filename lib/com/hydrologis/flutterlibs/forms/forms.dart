@@ -41,6 +41,7 @@ const String TYPE_BOOLEAN = "boolean";
 /// Type for a {@link Spinner}.
 const String TYPE_STRINGCOMBO = "stringcombo";
 const String TYPE_INTCOMBO = "intcombo";
+const String TYPE_DEPENDENTCOMBO = "dependentcombo";
 
 /// Type for wheel sliders.
 const String TYPE_INTWHEELSLIDER = "intwheelslider";
@@ -134,6 +135,8 @@ const String TAG_VALUE = "value";
 const String TAG_ICON = "icon";
 const String TAG_IS_RENDER_LABEL = "islabel";
 const String TAG_VALUES = "values";
+const String TAG_DEPENDS_ON = "depends_on";
+const String TAG_VALUES_BY_PARENT = "values_by_parent";
 const String TAG_ITEMS = "items";
 const String TAG_ITEMNAME = "itemname";
 const String TAG_ITEM = "item";

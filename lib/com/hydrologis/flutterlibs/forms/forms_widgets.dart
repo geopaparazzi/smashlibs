@@ -638,6 +638,16 @@ Tuple2<ListTile, bool>? getWidget(
             ),
             false);
       }
+    case TYPE_DEPENDENTCOMBO:
+      {
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: DependentComboWidget(ValueKey(widgetKey), formItem, label,
+                  presentationMode, constraints, formHelper),
+            ),
+            false);
+      }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
       {
         if (itemReadonly) {
