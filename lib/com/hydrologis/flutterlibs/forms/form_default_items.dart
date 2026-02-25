@@ -394,6 +394,35 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "type": "$TYPE_CONNECTEDSTRINGCOMBO"
     }"""
   },
+  TYPE_DEPENDENTCOMBO: {
+    TYPE_DEPENDENTCOMBO: """
+    {
+      "key": "fuel_macrotype",
+      "label": "Fuel macrotype",
+      "depends_on": "fuel_group",
+      "values_by_parent": {
+        "Prati": [
+          {
+            "item": "Prateria discontinua"
+          },
+          {
+            "item": "Prateria continua"
+          }
+        ],
+        "Arbusteti": [
+          {
+            "item": "Arbusteti subalpini"
+          },
+          {
+            "item": "Arbusteti temperati"
+          }
+        ]
+      },
+      "value": "",
+      "type": "$TYPE_DEPENDENTCOMBO",
+      "mandatory": "yes"
+    }"""
+  },
   TYPE_AUTOCOMPLETESTRINGCOMBO: {
     TYPE_AUTOCOMPLETESTRINGCOMBO: """
     {
