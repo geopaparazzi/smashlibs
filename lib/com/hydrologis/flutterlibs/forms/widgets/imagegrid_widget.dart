@@ -40,6 +40,14 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
     List<_ImageGridEntry> entries = _getEntries();
 
     Set<String> selectedFromValue = _parseSelected(widget._formItem.value);
+    if (widget._isReadOnly && selectedFromValue.isEmpty) {
+      return _buildReadonlyMessage(prompt, "Not selected.");
+    }
+
+    Set<String> missingSelectedIds = selectedFromValue
+        .where((id) => !entries.any((entry) => entry.id == id))
+        .toSet();
+
     if (widget._isReadOnly && !_showAllImagesInReadonly) {
       entries = entries
           .where((entry) => selectedFromValue.contains(entry.id))
@@ -50,10 +58,10 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
     }
 
     if (entries.isEmpty) {
-      var msg = widget._isReadOnly && !_showAllImagesInReadonly
-          ? "No selected images."
-          : "No images configured.";
-      return SmashUI.normalText(msg, color: SmashColors.disabledText);
+      var msg = missingSelectedIds.isNotEmpty
+          ? "Selected value not found in definition: ${missingSelectedIds.join(", ")}"
+          : (widget._isReadOnly ? "Not selected." : "No images configured.");
+      return _buildReadonlyMessage(prompt, msg);
     }
 
     List<Widget> header = [];
@@ -78,6 +86,14 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
             mainAxisSize: MainAxisSize.min,
             children: header,
           ),
+        if (widget._isReadOnly && missingSelectedIds.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6.0),
+            child: SmashUI.normalText(
+              "Selected value not found in definition: ${missingSelectedIds.join(", ")}",
+              color: SmashColors.mainDanger,
+            ),
+          ),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -94,6 +110,33 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
             return _buildGridItem(entry, selected, multi);
           },
         ),
+      ],
+    );
+  }
+
+  Widget _buildReadonlyMessage(String prompt, String message) {
+    List<Widget> header = [];
+    if (widget._label.isNotEmpty) {
+      header.add(SmashUI.normalText(widget._label,
+          color: SmashColors.mainDecorationsDarker, bold: true));
+    }
+    if (prompt.isNotEmpty) {
+      header.add(Padding(
+        padding: const EdgeInsets.only(top: 4.0, bottom: 6.0),
+        child: SmashUI.normalText(prompt, color: SmashColors.mainTextColor),
+      ));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (header.isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: header,
+          ),
+        SmashUI.normalText(message, color: SmashColors.disabledText),
       ],
     );
   }

@@ -60,6 +60,7 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
 
     Set<String> selectedFromValue = _parseSelected(widget._formItem.value);
     List<_ImageGridEntry> entries = _getEntriesForParent(parentValue);
+    Set<String> missingSelectedIds = {};
 
     // Read-only fallback:
     // if parent value is missing/inconsistent but a child value exists, try to
@@ -70,8 +71,14 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
 
     if (selectedFromValue.isNotEmpty &&
         !selectedFromValue.every((id) => entries.any((entry) => entry.id == id))) {
-      _resetValue(multi);
-      selectedFromValue = {};
+      missingSelectedIds = selectedFromValue
+          .where((id) => !entries.any((entry) => entry.id == id))
+          .toSet();
+      if (!widget._isReadOnly) {
+        _resetValue(multi);
+        selectedFromValue = {};
+        missingSelectedIds = {};
+      }
     }
 
     if (widget._isReadOnly && !_showAllImagesInReadonly) {
@@ -110,9 +117,15 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
     }
 
     Widget body;
-    if (!hasParent) {
+    if (widget._isReadOnly && selectedFromValue.isEmpty) {
+      body = SmashUI.normalText("Not selected.", color: SmashColors.disabledText);
+    } else if (!hasParent) {
       body = SmashUI.normalText(_getDisabledHint(parentKey),
           color: SmashColors.disabledText);
+    } else if (missingSelectedIds.isNotEmpty) {
+      body = SmashUI.normalText(
+          "Selected value not found in definition: ${missingSelectedIds.join(", ")}",
+          color: SmashColors.mainDanger);
     } else if (!hasItems) {
       body = SmashUI.normalText("No images available for selected parent.",
           color: SmashColors.disabledText);
