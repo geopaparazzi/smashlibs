@@ -145,6 +145,7 @@ abstract class AFormWidget {
       TYPE_IMAGELIB,
       TYPE_SKETCH,
       TYPE_IMAGEGRID,
+      TYPE_DEPENDENTIMAGEGRID,
       TYPE_POINT,
       // TYPE_MULTIPOINT,
       TYPE_LINESTRING,
@@ -235,6 +236,9 @@ abstract class AFormWidget {
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_IMAGEGRID:
         return ImageGridFormWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_DEPENDENTIMAGEGRID:
+        return DependentImageGridFormWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
 //      case TYPE_MAP:
 //        if (value.length() <= 0) {

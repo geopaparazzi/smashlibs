@@ -804,6 +804,22 @@ Tuple2<ListTile, bool>? getWidget(
             ),
             false);
       }
+    case TYPE_DEPENDENTIMAGEGRID:
+      {
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: DependentImageGridWidget(
+                  label,
+                  ValueKey(widgetKey),
+                  formItem,
+                  itemReadonly,
+                  presentationMode,
+                  constraints,
+                  formHelper),
+            ),
+            false);
+      }
 //      case TYPE_MAP:
 //        if (value.length() <= 0) {
 //          // need to read image

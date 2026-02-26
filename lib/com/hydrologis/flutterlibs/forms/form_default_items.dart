@@ -669,6 +669,30 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "type": "$TYPE_IMAGEGRID"
     }"""
   },
+  TYPE_DEPENDENTIMAGEGRID: {
+    "a dependent image grid": """
+    {
+      "key": "level2_key",
+      "type": "$TYPE_DEPENDENTIMAGEGRID",
+      "label": "Level 2",
+      "prompt": "Choose a type based on level 1",
+      "depends_on": "level1_key",
+      "disabled_hint": "Select level 1 first",
+      "columns": 3,
+      "multi": false,
+      "images_by_parent": {
+        "Parent A": [
+          { "id": "A1", "url": "https://example.org/images/a1.png" },
+          { "id": "A2", "url": "https://example.org/images/a2.png" }
+        ],
+        "Parent B": [
+          { "id": "B1", "url": "https://example.org/images/b1.png" }
+        ]
+      },
+      "value": "",
+      "mandatory": "yes"
+    }"""
+  },
   TYPE_POINT: {
     "an existing point with style": """
     {

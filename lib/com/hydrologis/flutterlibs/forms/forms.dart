@@ -42,6 +42,7 @@ const String TYPE_BOOLEAN = "boolean";
 const String TYPE_STRINGCOMBO = "stringcombo";
 const String TYPE_INTCOMBO = "intcombo";
 const String TYPE_DEPENDENTCOMBO = "dependentcombo";
+const String TYPE_DEPENDENTIMAGEGRID = "dependentimagegrid";
 
 /// Type for wheel sliders.
 const String TYPE_INTWHEELSLIDER = "intwheelslider";
@@ -137,6 +138,7 @@ const String TAG_IS_RENDER_LABEL = "islabel";
 const String TAG_VALUES = "values";
 const String TAG_DEPENDS_ON = "depends_on";
 const String TAG_VALUES_BY_PARENT = "values_by_parent";
+const String TAG_IMAGES_BY_PARENT = "images_by_parent";
 const String TAG_ITEMS = "items";
 const String TAG_ITEMNAME = "itemname";
 const String TAG_ITEM = "item";
@@ -153,6 +155,7 @@ const String TAG_PROMPT = "prompt";
 const String TAG_COLUMNS = "columns";
 const String TAG_MULTI = "multi";
 const String TAG_IMAGES = "images";
+const String TAG_DISABLED_HINT = "disabled_hint";
 
 const IMAGE_ID_SEPARATOR = ";";
 
