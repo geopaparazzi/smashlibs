@@ -384,8 +384,19 @@ class MandatoryConstraint implements IConstraint {
     if (value == null) {
       _isValid = false;
     } else {
-      String string = value.toString();
-      if (string.isEmpty) {
+      if (value is Iterable) {
+        _isValid = value.isNotEmpty;
+        return;
+      }
+      if (value is Map) {
+        _isValid = value.isNotEmpty;
+        return;
+      }
+      String string = value.toString().trim();
+      if (string.isEmpty ||
+          string.toLowerCase() == "null" ||
+          string == "[]" ||
+          string == "{}") {
         _isValid = false;
       } else {
         _isValid = true;

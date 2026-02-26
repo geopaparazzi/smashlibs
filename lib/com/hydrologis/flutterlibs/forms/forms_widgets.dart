@@ -326,10 +326,63 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
   }
 
   Future<bool> _onWillPop() async {
-    // TODO check if something changed would be really good
+    String? validationError = _validateSectionForSave();
+    if (validationError != null) {
+      await SmashDialogs.showWarningDialog(
+          context,
+          "Can't save this form yet.\n\n$validationError\n\nPlease fill required fields and retry.",
+          title: "Mandatory fields");
+      return false;
+    }
+
     await widget.formHelper.onSaveFunction(context);
     Navigator.of(context).pop();
     return true;
+  }
+
+  String? _validateSectionForSave() {
+    var section = widget.formHelper.getSection();
+    if (section == null) {
+      return null;
+    }
+
+    for (var form in section.getForms()) {
+      for (var item in form.getFormItems()) {
+        Constraints constraints = Constraints();
+        item.handleConstraints(constraints);
+        if (constraints.constraints.isEmpty) {
+          continue;
+        }
+
+        bool isMandatory =
+            FormUtilities.isTrue(item.getMapItem(CONSTRAINT_MANDATORY));
+        Object? value = item.value;
+        bool isValid;
+        if (isMandatory) {
+          isValid = constraints.isValid(value);
+        } else {
+          if (value == null) {
+            isValid = true;
+          } else {
+            String asString = value.toString().trim();
+            if (asString.isEmpty || asString.toLowerCase() == "null") {
+              isValid = true;
+            } else {
+              isValid = constraints.isValid(value);
+            }
+          }
+        }
+
+        if (!isValid) {
+          String itemLabel = item.label.trim().isNotEmpty ? item.label : item.key;
+          String formName = form.formName ?? "-";
+          String details = constraints.getDescription(context);
+          return "Form: $formName\nField: $itemLabel ${details.isNotEmpty ? details : ""}";
+        }
+      }
+    }
+
+    return null;
   }
 }
 
