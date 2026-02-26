@@ -58,8 +58,15 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
     }
     _lastParentValue = parentValue;
 
-    List<_ImageGridEntry> entries = _getEntriesForParent(parentValue);
     Set<String> selectedFromValue = _parseSelected(widget._formItem.value);
+    List<_ImageGridEntry> entries = _getEntriesForParent(parentValue);
+
+    // Read-only fallback:
+    // if parent value is missing/inconsistent but a child value exists, try to
+    // resolve the matching parent bucket by selected ids.
+    if (widget._isReadOnly && entries.isEmpty && selectedFromValue.isNotEmpty) {
+      entries = _findEntriesBySelectedIds(selectedFromValue);
+    }
 
     if (selectedFromValue.isNotEmpty &&
         !selectedFromValue.every((id) => entries.any((entry) => entry.id == id))) {
@@ -77,7 +84,7 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
       _selected = selectedFromValue;
     }
 
-    bool hasParent = parentValue.isNotEmpty;
+    bool hasParent = parentValue.isNotEmpty || (widget._isReadOnly && entries.isNotEmpty);
     bool hasItems = entries.isNotEmpty;
     bool isEnabled = !widget._isReadOnly && hasParent && hasItems;
 
@@ -361,23 +368,65 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
       return [];
     }
 
-    var entriesRaw = raw[parentValue];
-    if (entriesRaw is! List) {
+    dynamic entriesRaw = raw[parentValue];
+
+    // Fallback for values that differ only by leading/trailing spaces.
+    if (entriesRaw == null) {
+      for (var key in raw.keys) {
+        if (key.toString().trim() == parentValue.trim()) {
+          entriesRaw = raw[key];
+          break;
+        }
+      }
+    }
+
+    return _entriesFromDynamic(entriesRaw);
+  }
+
+  List<_ImageGridEntry> _entriesFromDynamic(dynamic entriesRaw) {
+    List<dynamic>? list;
+    if (entriesRaw is List) {
+      list = entriesRaw;
+    } else if (entriesRaw is Map && entriesRaw[TAG_ITEMS] is List) {
+      // Support optional wrapped format: { "items": [ ... ] }
+      list = entriesRaw[TAG_ITEMS] as List;
+    }
+
+    if (list == null) {
       return [];
     }
 
     List<_ImageGridEntry> entries = [];
-    for (int i = 0; i < entriesRaw.length; i++) {
-      var item = entriesRaw[i];
+    for (int i = 0; i < list.length; i++) {
+      var item = list[i];
       if (item is Map) {
-        var idObj = item["id"];
+        var idObj = item["id"] ?? item[TAG_ITEM];
         var id = idObj?.toString() ?? i.toString();
-        var url = item["url"]?.toString();
+        var url = item["url"]?.toString() ?? item[TAG_URL]?.toString();
         var base64 = item["base64"]?.toString();
         entries.add(_ImageGridEntry(id, url: url, base64: base64));
       }
     }
     return entries;
+  }
+
+  List<_ImageGridEntry> _findEntriesBySelectedIds(Set<String> selectedIds) {
+    var raw = widget._formItem.getMapItem(TAG_IMAGES_BY_PARENT);
+    if (raw is! Map) {
+      return [];
+    }
+    for (var value in raw.values) {
+      var entries = _entriesFromDynamic(value);
+      if (entries.isEmpty) {
+        continue;
+      }
+      bool allContained =
+          selectedIds.every((selectedId) => entries.any((e) => e.id == selectedId));
+      if (allContained) {
+        return entries;
+      }
+    }
+    return [];
   }
 
   Set<String> _parseSelected(dynamic value) {

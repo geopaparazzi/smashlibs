@@ -106,12 +106,16 @@ abstract class AFormWidget {
     } else {
       field = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          SmashUI.normalText(label,
-              color: pm.labelTextColor, bold: pm.doLabelBold),
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0),
+          Flexible(
+            flex: 2,
+            child: SmashUI.normalText(label,
+                color: pm.labelTextColor, bold: pm.doLabelBold),
+          ),
+          SizedBox(width: 12.0),
+          Expanded(
+            flex: 3,
             child: SmashUI.normalText(value,
                 color: pm.valueTextColor, bold: pm.doValueBold),
           ),
