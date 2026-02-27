@@ -263,7 +263,8 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
   }
 
   Widget _buildImage(_ImageGridEntry entry) {
-    if (entry.base64 != null && entry.base64!.isNotEmpty) {
+    String? url = entry.url;
+    if (entry.base64 != null && entry.base64!.trim().isNotEmpty) {
       String data = entry.base64!;
       if (data.startsWith("data:")) {
         int idx = data.indexOf(",");
@@ -275,13 +276,13 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
         var bytes = base64Decode(data);
         return Image.memory(bytes, fit: BoxFit.fitWidth);
       } catch (e) {
-        return _buildBrokenImage();
+        // Fall back to URL when base64 is malformed instead of failing hard.
       }
     }
-    if (entry.url != null && entry.url!.isNotEmpty) {
-      var url = _resolveImageUrl(entry.url!);
+    if (url != null && url.trim().isNotEmpty) {
+      var resolvedUrl = _resolveImageUrl(url);
       return Image.network(
-        url,
+        resolvedUrl,
         fit: BoxFit.fitWidth,
         errorBuilder: (context, error, stackTrace) => _buildBrokenImage(),
       );
