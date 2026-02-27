@@ -14,10 +14,11 @@ class ImageGridWidget extends StatefulWidget {
 
 class _ImageGridEntry {
   final String id;
+  final String label;
   final String? url;
   final String? base64;
 
-  _ImageGridEntry(this.id, {this.url, this.base64});
+  _ImageGridEntry(this.id, {required this.label, this.url, this.base64});
 }
 
 class ImageGridWidgetState extends State<ImageGridWidget> {
@@ -30,6 +31,9 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
   void initState() {
     super.initState();
     _selected = _parseSelected(widget._formItem.value);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncFormState(widget._formItem.value?.toString() ?? "");
+    });
   }
 
   @override
@@ -94,22 +98,30 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
               color: SmashColors.mainDanger,
             ),
           ),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: entries.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-            childAspectRatio: 1.0,
-          ),
-          itemBuilder: (context, index) {
-            var entry = entries[index];
-            bool selected = _selected.contains(entry.id);
-            return _buildGridItem(entry, selected, multi);
-          },
-        ),
+        LayoutBuilder(builder: (context, constraints) {
+          const spacing = 8.0;
+          int safeColumns = columns <= 0 ? 1 : columns;
+          double availableWidth = constraints.maxWidth;
+          if (!availableWidth.isFinite || availableWidth <= 0) {
+            availableWidth = MediaQuery.of(context).size.width;
+          }
+          double itemWidth =
+              (availableWidth - (safeColumns - 1) * spacing) / safeColumns;
+          if (itemWidth <= 0) {
+            itemWidth = availableWidth;
+          }
+          return Wrap(
+            spacing: spacing,
+            runSpacing: spacing,
+            children: entries.map((entry) {
+              bool selected = _selected.contains(entry.id);
+              return SizedBox(
+                width: itemWidth,
+                child: _buildGridItem(entry, selected, multi),
+              );
+            }).toList(),
+          );
+        }),
       ],
     );
   }
@@ -142,7 +154,8 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
   }
 
   Widget _buildGridItem(_ImageGridEntry entry, bool selected, bool multi) {
-    return GestureDetector(
+    String labelPosition = _getLabelPosition();
+    Widget imageTile = GestureDetector(
       onTap: widget._isReadOnly
           ? null
           : () {
@@ -200,6 +213,29 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
         ],
       ),
     );
+
+    bool hasLabel = entry.label.trim().isNotEmpty;
+    if (!hasLabel) {
+      return imageTile;
+    }
+
+    Widget labelWidget = Padding(
+      padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),
+      child: SmashUI.normalText(entry.label, color: SmashColors.mainTextColor),
+    );
+
+    if (labelPosition == "above") {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [labelWidget, imageTile],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [imageTile, labelWidget],
+    );
   }
 
   Widget _buildImage(_ImageGridEntry entry) {
@@ -213,7 +249,7 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
       }
       try {
         var bytes = base64Decode(data);
-        return Image.memory(bytes, fit: BoxFit.cover);
+        return Image.memory(bytes, fit: BoxFit.fitWidth);
       } catch (e) {
         return _buildBrokenImage();
       }
@@ -222,7 +258,7 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
       var url = _resolveImageUrl(entry.url!);
       return Image.network(
         url,
-        fit: BoxFit.cover,
+        fit: BoxFit.fitWidth,
         errorBuilder: (context, error, stackTrace) => _buildBrokenImage(),
       );
     }
@@ -241,6 +277,7 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
   void _updateValue() {
     if (_selected.isEmpty) {
       widget._formItem.setValue("");
+      _syncFormState("");
       return;
     }
     List<String> ordered = [];
@@ -252,7 +289,22 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
     if (ordered.isEmpty) {
       ordered = _selected.toList();
     }
-    widget._formItem.setValue(ordered.join(IMAGE_ID_SEPARATOR));
+    String newValue = ordered.join(IMAGE_ID_SEPARATOR);
+    widget._formItem.setValue(newValue);
+    _syncFormState(newValue);
+  }
+
+  void _syncFormState(String value) {
+    if (!widget._formItem.key.isNotEmpty) {
+      return;
+    }
+    FormUrlItemsState urlState =
+        Provider.of<FormUrlItemsState>(context, listen: false);
+    if (value.trim().isEmpty) {
+      urlState.removeFormUrlItem(widget._formItem.key);
+    } else {
+      urlState.setFormUrlItem(widget._formItem.key, value);
+    }
   }
 
   String _getPrompt() {
@@ -274,6 +326,18 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
     return FormUtilities.isTrue(multi);
   }
 
+  String _getLabelPosition() {
+    var raw = widget._formItem.getMapItem("label_position")?.toString().trim();
+    if (raw == null || raw.isEmpty) {
+      return "below";
+    }
+    raw = raw.toLowerCase();
+    if (raw == "above") {
+      return "above";
+    }
+    return "below";
+  }
+
   String _resolveImageUrl(String url) {
     if (!kIsWeb) {
       return url;
@@ -282,7 +346,7 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
     if (uri == null || !uri.hasScheme) {
       return url;
     }
-    if (uri.host == Uri.base.host) {
+    if (uri.host == Uri.base.host && uri.scheme == Uri.base.scheme) {
       return url;
     }
     var proxyBase = Uri.base.resolve("/api/imageproxy/");
@@ -300,9 +364,10 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
       if (item is Map) {
         var idObj = item["id"];
         var id = idObj?.toString() ?? i.toString();
+        var label = item["label"]?.toString() ?? id;
         var url = item["url"]?.toString();
         var base64 = item["base64"]?.toString();
-        entries.add(_ImageGridEntry(id, url: url, base64: base64));
+        entries.add(_ImageGridEntry(id, label: label, url: url, base64: base64));
       }
     }
     return entries;

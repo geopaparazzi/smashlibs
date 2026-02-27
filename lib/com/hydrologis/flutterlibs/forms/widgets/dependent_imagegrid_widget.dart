@@ -108,7 +108,9 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
     }
 
     bool mandatoryUnmet = isMandatory && hasParent && hasItems && _selected.isEmpty;
-    if (mandatoryUnmet && !widget._isReadOnly) {
+    if (mandatoryUnmet &&
+        !widget._isReadOnly &&
+        !widget._presentationMode.isReadOnly) {
       header.add(Padding(
         padding: const EdgeInsets.only(top: 2.0, bottom: 6.0),
         child: SmashUI.normalText(widget._constraints.getDescription(context),
@@ -130,22 +132,30 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
       body = SmashUI.normalText("No images available for selected parent.",
           color: SmashColors.disabledText);
     } else {
-      body = GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: entries.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: columns,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
-          childAspectRatio: 1.0,
-        ),
-        itemBuilder: (context, index) {
-          var entry = entries[index];
-          bool selected = _selected.contains(entry.id);
-          return _buildGridItem(entry, selected, multi, isEnabled);
-        },
-      );
+      body = LayoutBuilder(builder: (context, constraints) {
+        const spacing = 8.0;
+        int safeColumns = columns <= 0 ? 1 : columns;
+        double availableWidth = constraints.maxWidth;
+        if (!availableWidth.isFinite || availableWidth <= 0) {
+          availableWidth = MediaQuery.of(context).size.width;
+        }
+        double itemWidth =
+            (availableWidth - (safeColumns - 1) * spacing) / safeColumns;
+        if (itemWidth <= 0) {
+          itemWidth = availableWidth;
+        }
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: entries.map((entry) {
+            bool selected = _selected.contains(entry.id);
+            return SizedBox(
+              width: itemWidth,
+              child: _buildGridItem(entry, selected, multi, isEnabled),
+            );
+          }).toList(),
+        );
+      });
     }
 
     return Column(
@@ -165,7 +175,8 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
 
   Widget _buildGridItem(
       _ImageGridEntry entry, bool selected, bool multi, bool isEnabled) {
-    return GestureDetector(
+    String labelPosition = _getLabelPosition();
+    Widget imageTile = GestureDetector(
       onTap: !isEnabled
           ? null
           : () {
@@ -221,10 +232,33 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
                     color: SmashColors.mainBackground,
                   ),
                 ),
-              ),
+            ),
           ],
         ),
       ),
+    );
+
+    bool hasLabel = entry.label.trim().isNotEmpty;
+    if (!hasLabel) {
+      return imageTile;
+    }
+
+    Widget labelWidget = Padding(
+      padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),
+      child: SmashUI.normalText(entry.label, color: SmashColors.mainTextColor),
+    );
+
+    if (labelPosition == "above") {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [labelWidget, imageTile],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [imageTile, labelWidget],
     );
   }
 
@@ -239,7 +273,7 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
       }
       try {
         var bytes = base64Decode(data);
-        return Image.memory(bytes, fit: BoxFit.cover);
+        return Image.memory(bytes, fit: BoxFit.fitWidth);
       } catch (e) {
         return _buildBrokenImage();
       }
@@ -248,7 +282,7 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
       var url = _resolveImageUrl(entry.url!);
       return Image.network(
         url,
-        fit: BoxFit.cover,
+        fit: BoxFit.fitWidth,
         errorBuilder: (context, error, stackTrace) => _buildBrokenImage(),
       );
     }
@@ -322,6 +356,18 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
     return FormUtilities.isTrue(multi);
   }
 
+  String _getLabelPosition() {
+    var raw = widget._formItem.getMapItem("label_position")?.toString().trim();
+    if (raw == null || raw.isEmpty) {
+      return "below";
+    }
+    raw = raw.toLowerCase();
+    if (raw == "above") {
+      return "above";
+    }
+    return "below";
+  }
+
   String _getDisabledHint(String parentKey) {
     var rawHint = widget._formItem.getMapItem(TAG_DISABLED_HINT)?.toString();
     if (rawHint != null && rawHint.trim().isNotEmpty) {
@@ -341,7 +387,7 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
     if (uri == null || !uri.hasScheme) {
       return url;
     }
-    if (uri.host == Uri.base.host) {
+    if (uri.host == Uri.base.host && uri.scheme == Uri.base.scheme) {
       return url;
     }
     var proxyBase = Uri.base.resolve("/api/imageproxy/");
@@ -415,9 +461,10 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
       if (item is Map) {
         var idObj = item["id"] ?? item[TAG_ITEM];
         var id = idObj?.toString() ?? i.toString();
+        var label = item["label"]?.toString() ?? id;
         var url = item["url"]?.toString() ?? item[TAG_URL]?.toString();
         var base64 = item["base64"]?.toString();
-        entries.add(_ImageGridEntry(id, url: url, base64: base64));
+        entries.add(_ImageGridEntry(id, label: label, url: url, base64: base64));
       }
     }
     return entries;
