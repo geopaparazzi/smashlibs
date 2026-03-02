@@ -25,6 +25,9 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
   static const bool _showAllImagesInReadonly =
       String.fromEnvironment("IMAGEGRID_SHOW_ALL", defaultValue: "true") ==
           "true";
+  static const bool _debugEnabled =
+      String.fromEnvironment("IMAGEGRID_DEBUG", defaultValue: "false") ==
+          "true";
   Set<String> _selected = {};
 
   @override
@@ -90,6 +93,9 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
             mainAxisSize: MainAxisSize.min,
             children: header,
           ),
+        if (_debugEnabled)
+          _buildDebugPanel(selectedFromValue, entries,
+              missingSelectedIds: missingSelectedIds),
         if (widget._isReadOnly && missingSelectedIds.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(bottom: 6.0),
@@ -123,6 +129,40 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
           );
         }),
       ],
+    );
+  }
+
+  Widget _buildDebugPanel(Set<String> selectedFromValue,
+      List<_ImageGridEntry> entries,
+      {Set<String>? missingSelectedIds}) {
+    List<_ImageGridEntry> matchedEntries = entries
+        .where((entry) => selectedFromValue.contains(entry.id))
+        .toList();
+    String lines = [
+      "IMAGEGRID_DEBUG",
+      "type=imagegrid",
+      "key=${widget._formItem.key}",
+      "value=${widget._formItem.value}",
+      "selected=${selectedFromValue.join(",")}",
+      "entries=${entries.length}",
+      "entry_ids=${entries.map((e) => e.id).join(",")}",
+      "matched=${matchedEntries.length}",
+      "matched_ids=${matchedEntries.map((e) => e.id).join(",")}",
+      if (missingSelectedIds != null && missingSelectedIds.isNotEmpty)
+        "missing=${missingSelectedIds.join(",")}",
+      for (var entry in matchedEntries)
+        "entry[id=${entry.id};label=${entry.label};url=${entry.url ?? ""};base64_len=${entry.base64?.length ?? 0}]",
+    ].join("\n");
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.all(8.0),
+      color: const Color(0x101976D2),
+      child: SelectableText(
+        lines,
+        style: const TextStyle(fontSize: 11.0, color: Colors.black87),
+      ),
     );
   }
 

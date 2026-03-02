@@ -26,6 +26,9 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
   static const bool _showAllImagesInReadonly =
       String.fromEnvironment("IMAGEGRID_SHOW_ALL", defaultValue: "true") ==
           "true";
+  static const bool _debugEnabled =
+      String.fromEnvironment("IMAGEGRID_DEBUG", defaultValue: "false") ==
+          "true";
   Set<String> _selected = {};
   String? _lastParentValue;
 
@@ -86,6 +89,10 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
           .where((entry) => selectedFromValue.contains(entry.id))
           .toList();
     }
+
+    List<_ImageGridEntry> matchedEntries = entries
+        .where((entry) => selectedFromValue.contains(entry.id))
+        .toList();
 
     if (!_setEquals(selectedFromValue, _selected)) {
       _selected = selectedFromValue;
@@ -168,8 +175,50 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
             mainAxisSize: MainAxisSize.min,
             children: header,
           ),
+        if (_debugEnabled)
+          _buildDebugPanel(
+              parentKey, parentValue, selectedFromValue, entries, matchedEntries,
+              missingSelectedIds: missingSelectedIds),
         body,
       ],
+    );
+  }
+
+  Widget _buildDebugPanel(
+    String parentKey,
+    String parentValue,
+    Set<String> selectedFromValue,
+    List<_ImageGridEntry> entries,
+    List<_ImageGridEntry> matchedEntries, {
+    Set<String>? missingSelectedIds,
+  }) {
+    String lines = [
+      "IMAGEGRID_DEBUG",
+      "type=dependentimagegrid",
+      "key=${widget._formItem.key}",
+      "value=${widget._formItem.value}",
+      "parent_key=$parentKey",
+      "parent_value=$parentValue",
+      "selected=${selectedFromValue.join(",")}",
+      "entries=${entries.length}",
+      "entry_ids=${entries.map((e) => e.id).join(",")}",
+      "matched=${matchedEntries.length}",
+      "matched_ids=${matchedEntries.map((e) => e.id).join(",")}",
+      if (missingSelectedIds != null && missingSelectedIds.isNotEmpty)
+        "missing=${missingSelectedIds.join(",")}",
+      for (var entry in matchedEntries)
+        "entry[id=${entry.id};label=${entry.label};url=${entry.url ?? ""};base64_len=${entry.base64?.length ?? 0}]",
+    ].join("\n");
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.all(8.0),
+      color: const Color(0x10FF9800),
+      child: SelectableText(
+        lines,
+        style: const TextStyle(fontSize: 11.0, color: Colors.black87),
+      ),
     );
   }
 
