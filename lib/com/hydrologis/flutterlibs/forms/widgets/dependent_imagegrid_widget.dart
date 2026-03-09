@@ -40,9 +40,10 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FormUrlItemsState>(builder: (context, urlItemState, child) {
-      return _buildForState(context, urlItemState);
-    });
+    final urlItemState =
+        Provider.of<FormUrlItemsState?>(context, listen: true) ??
+            FormUrlItemsState();
+    return _buildForState(context, urlItemState);
   }
 
   Widget _buildForState(BuildContext context, FormUrlItemsState urlItemState) {
@@ -378,8 +379,11 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
     if (!widget._formItem.key.isNotEmpty) {
       return;
     }
-    FormUrlItemsState urlState =
-        Provider.of<FormUrlItemsState>(context, listen: false);
+    FormUrlItemsState? urlState =
+        Provider.of<FormUrlItemsState?>(context, listen: false);
+    if (urlState == null) {
+      return;
+    }
     if (value.trim().isEmpty) {
       urlState.removeFormUrlItem(widget._formItem.key);
     } else {

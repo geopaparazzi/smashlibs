@@ -339,8 +339,11 @@ class ImageGridWidgetState extends State<ImageGridWidget> {
     if (!widget._formItem.key.isNotEmpty) {
       return;
     }
-    FormUrlItemsState urlState =
-        Provider.of<FormUrlItemsState>(context, listen: false);
+    FormUrlItemsState? urlState =
+        Provider.of<FormUrlItemsState?>(context, listen: false);
+    if (urlState == null) {
+      return;
+    }
     if (value.trim().isEmpty) {
       urlState.removeFormUrlItem(widget._formItem.key);
     } else {
