@@ -226,6 +226,7 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
   Widget _buildGridItem(
       _ImageGridEntry entry, bool selected, bool multi, bool isEnabled) {
     String labelPosition = _getLabelPosition();
+    final double tileOpacity = (!isEnabled && !widget._isReadOnly) ? 0.6 : 1.0;
     Widget imageTile = GestureDetector(
       onTap: !isEnabled
           ? null
@@ -248,7 +249,7 @@ class _DependentImageGridState extends State<DependentImageGridWidget> {
               });
             },
       child: Opacity(
-        opacity: isEnabled ? 1.0 : 0.6,
+        opacity: tileOpacity,
         child: Stack(
           children: [
             Container(
