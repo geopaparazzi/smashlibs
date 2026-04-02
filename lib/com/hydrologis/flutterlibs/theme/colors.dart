@@ -1,6 +1,6 @@
 part of smashlibs;
 /*
- * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
+ * Copyright (c) 2019-2026. Antonello Andrea (https://g-ant.eu). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
@@ -169,6 +169,10 @@ MaterialColor toMaterialColor(Color color) {
 class ColorExt extends Color {
   static int _getColorFromHex(String hexOrNamedColor) {
     if (hexOrNamedColor.startsWith("#")) {
+      // make sure it is not in the format with colortable, in case split
+      if (hexOrNamedColor.contains("@")) {
+        hexOrNamedColor = hexOrNamedColor.split("@").first;
+      }
       hexOrNamedColor = hexOrNamedColor.toUpperCase().replaceAll("#", "");
       if (hexOrNamedColor.length == 6) {
         hexOrNamedColor = "FF" + hexOrNamedColor;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020. Antonello Andrea (www.hydrologis.com). All rights reserved.
+ * Copyright (c) 2019-2026. Antonello Andrea (https://g-ant.eu). All rights reserved.
  * Use of this source code is governed by a GPL3 license that can be
  * found in the LICENSE file.
  */
@@ -320,15 +320,19 @@ class GpxSource extends VectorLayerSource implements SldLayerSource {
     if (_tracksRoutesFeatures.isNotEmpty) {
       List<Polyline> lines = [];
 
+      // check if the geometry has elevation, i.e. z is not double.nan
       if (_colorTable.isValid() &&
           _tracksRoutesFeatures.isNotEmpty &&
           _tracksRoutesFeatures[0].geometry is JTS.Geometry &&
+          !(_tracksRoutesFeatures[0].geometry!.getCoordinate()?.z ?? double.nan)
+              .isNaN &&
           minLineElev.isFinite &&
           maxLineElev.isFinite) {
         _tracksRoutesFeatures.forEach((lineFeature) {
           List<LatLng>? list = lineFeature.geometry
               ?.getCoordinates()
-              .map((coord) => LatLng(coord.y, coord.x))
+              .map((coord) =>
+                  LatLngExt(coord.y, coord.x, coord.z, -1, -1, 0, -1))
               .toList();
           if (list != null) {
             EnhancedColorUtility.buildPolylines(lines, list, _colorTable,
