@@ -183,7 +183,7 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget> {
             child: IgnorePointer(
               ignoring: widget._presentationMode.isReadOnly,
               child: DropdownButton<T>(
-                key: Key(key),
+                key: key != null ? Key(key) : null,
                 value: value,
                 isExpanded: true,
                 items: items,
@@ -194,11 +194,15 @@ class ComboboxWidgetState<T> extends State<ComboboxWidget> {
                   setState(() {
                     widget._formItem.setValue(selected);
 
-                    if (widget._isUrlItem && selected != null) {
+                    if (key != null) {
                       FormUrlItemsState urlItemState =
                           Provider.of<FormUrlItemsState>(context,
                               listen: false);
-                      urlItemState.setFormUrlItem(key, selected.toString());
+                      if (selected == null || selected.toString().isEmpty) {
+                        urlItemState.removeFormUrlItem(key);
+                      } else {
+                        urlItemState.setFormUrlItem(key, selected.toString());
+                      }
                     }
                   });
                 },

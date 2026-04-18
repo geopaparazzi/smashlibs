@@ -207,7 +207,7 @@ class AutocompleteStringConnectedComboboxWidgetState
                                     str.split("#")[0] + SEP + selection;
                                 widget._formItem.setValue(result);
 
-                                if (widget._isUrlItem) {
+                                if (widget._isUrlItem && key != null) {
                                   FormUrlItemsState urlItemState =
                                       Provider.of<FormUrlItemsState>(context,
                                           listen: false);

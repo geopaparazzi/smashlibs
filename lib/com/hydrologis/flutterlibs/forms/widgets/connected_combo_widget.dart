@@ -99,7 +99,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
               color: SmashColors.mainDecorationsDarker),
         ),
         Container(
-          key: Key(key),
+          key: key != null ? Key(key) : null,
           decoration: currentMain.trim().isNotEmpty
               ? BoxDecoration(
                   shape: BoxShape.rectangle,
@@ -177,7 +177,7 @@ class ConnectedComboboxWidgetState extends State<ConnectedComboboxWidget> {
                                         str.split("#")[0] + SEP + selected;
                                     widget._formItem.setValue(result);
 
-                                    if (widget._isUrlItem) {
+                                    if (widget._isUrlItem && key != null) {
                                       FormUrlItemsState urlItemState =
                                           Provider.of<FormUrlItemsState>(
                                               context,

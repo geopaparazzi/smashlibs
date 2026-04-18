@@ -193,7 +193,7 @@ class _AutocompleteComboWidgetState<T extends Object>
             child: IgnorePointer(
               ignoring: widget._presentationMode.isReadOnly,
               child: Autocomplete<ItemObject>(
-                key: Key(key),
+            key: key != null ? Key(key) : null,
                 optionsBuilder: (TextEditingValue textEditingValue) {
                   if (textEditingValue.text == '') {
                     var items = <ItemObject>[];
@@ -238,10 +238,10 @@ class _AutocompleteComboWidgetState<T extends Object>
                 onSelected: (ItemObject selection) {
                   widget._formItem.setValue(selection.value);
 
-                  if (widget._isUrlItem) {
-                    FormUrlItemsState urlItemState =
-                        Provider.of<FormUrlItemsState>(context, listen: false);
-                    urlItemState.setFormUrlItem(key, selection.value);
+                if (widget._isUrlItem && key != null) {
+                  FormUrlItemsState urlItemState =
+                      Provider.of<FormUrlItemsState>(context, listen: false);
+                  urlItemState.setFormUrlItem(key, selection.value);
                   }
                 },
               ),

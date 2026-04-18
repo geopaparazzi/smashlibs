@@ -78,46 +78,16 @@ abstract class AFormWidget {
   }
 
   static Widget getSimpleLabelValue(
-      String label, SmashFormItem item, PresentationMode pm,
+      String label, Object? valueOrFormItem, PresentationMode pm,
       {String? forceValue}) {
-    dynamic value = forceValue;
-    if (value == null) {
-      value = item.value;
-      if (value == null) {
-        return Container();
-      } else if (value is List && value.isEmpty) {
-        return Container();
-      }
-      // if value has a label in the map, use it
-      List<String> valueLabels = [];
-      if (item.map["values"] != null &&
-          item.map["values"]?["items"] != null &&
-          item.map["values"]?["items"] is List) {
-        for (var listItem in item.map["values"]?["items"]) {
-          var itemMap = listItem["item"];
-          var itemLabel;
-          var itemValue;
-          if (itemMap is Map) {
-            itemLabel = itemMap["label"];
-            itemValue = itemMap["value"];
-          } else {
-            itemLabel = itemMap;
-            itemValue = itemMap;
-          }
-          if (itemLabel == null || itemValue == null) {
-            continue;
-          }
-          if (itemValue == value ||
-              (value is List && value.contains(itemValue))) {
-            valueLabels.add(itemLabel);
-          }
-        }
-      }
-      if (valueLabels.isNotEmpty) {
-        value = valueLabels.join(", ");
-      }
+    String value;
+    if (forceValue != null) {
+      value = forceValue;
+    } else if (valueOrFormItem is SmashFormItem) {
+      value = valueOrFormItem.value?.toString() ?? "";
+    } else {
+      value = valueOrFormItem?.toString() ?? "";
     }
-
     Widget field;
     if (pm.detailMode == DetailMode.NORMAL) {
       field = Column(
@@ -128,7 +98,7 @@ abstract class AFormWidget {
               color: pm.labelTextColor, bold: pm.doLabelBold),
           Padding(
             padding: const EdgeInsets.only(left: 12.0, top: 8),
-            child: SmashUI.normalText(value.toString(),
+            child: SmashUI.normalText(value,
                 color: pm.valueTextColor, bold: pm.doValueBold),
           ),
         ],
@@ -136,13 +106,17 @@ abstract class AFormWidget {
     } else {
       field = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          SmashUI.normalText(label,
-              color: pm.labelTextColor, bold: pm.doLabelBold),
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: SmashUI.normalText(value.toString(),
+          Flexible(
+            flex: 2,
+            child: SmashUI.normalText(label,
+                color: pm.labelTextColor, bold: pm.doLabelBold),
+          ),
+          SizedBox(width: 12.0),
+          Expanded(
+            flex: 3,
+            child: SmashUI.normalText(value,
                 color: pm.valueTextColor, bold: pm.doValueBold),
           ),
         ],
@@ -157,7 +131,6 @@ abstract class AFormWidget {
       TYPE_STRINGAREA,
       TYPE_DOUBLE,
       TYPE_INTEGER,
-      TYPE_TAPCOUNTER,
       TYPE_LABEL,
       TYPE_LABELWITHLINE,
       TYPE_DYNAMICSTRING,
@@ -166,10 +139,8 @@ abstract class AFormWidget {
       TYPE_BOOLEAN,
       TYPE_STRINGCOMBO,
       TYPE_INTCOMBO,
-      TYPE_STRINGWHEELSLIDER,
-      TYPE_INTWHEELSLIDER,
+      TYPE_DEPENDENTCOMBO,
       TYPE_AUTOCOMPLETESTRINGCOMBO,
-      TYPE_AUTOCOMPLETEINTCOMBO,
       TYPE_CONNECTEDSTRINGCOMBO,
       TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO,
       TYPE_STRINGMULTIPLECHOICE,
@@ -177,6 +148,8 @@ abstract class AFormWidget {
       TYPE_PICTURES,
       TYPE_IMAGELIB,
       TYPE_SKETCH,
+      TYPE_IMAGEGRID,
+      TYPE_DEPENDENTIMAGEGRID,
       TYPE_POINT,
       // TYPE_MULTIPOINT,
       TYPE_LINESTRING,
@@ -204,9 +177,6 @@ abstract class AFormWidget {
       case TYPE_INTEGER:
         return IntegerWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_TAPCOUNTER:
-        return TapcounterFormWidget(
-            context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_STRING:
         return StringWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
@@ -232,19 +202,13 @@ abstract class AFormWidget {
       case TYPE_STRINGCOMBO:
         return StringComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_DEPENDENTCOMBO:
+        return DependentComboFormWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_INTCOMBO:
         return IntComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_STRINGWHEELSLIDER:
-        return StringWheelSliderWidget(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_INTWHEELSLIDER:
-        return IntWheelSliderWidget(
-            context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_AUTOCOMPLETESTRINGCOMBO:
-        return AutoCompleteStringComboWidget(
-            context, widgetKey, formItem, presentationMode, formHelper);
-      case TYPE_AUTOCOMPLETEINTCOMBO:
         return AutoCompleteStringComboWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
       case TYPE_CONNECTEDSTRINGCOMBO:
@@ -273,6 +237,12 @@ abstract class AFormWidget {
             fromGallery: true);
       case TYPE_SKETCH:
         return DrawingWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_IMAGEGRID:
+        return ImageGridFormWidget(
+            context, widgetKey, formItem, presentationMode, formHelper);
+      case TYPE_DEPENDENTIMAGEGRID:
+        return DependentImageGridFormWidget(
             context, widgetKey, formItem, presentationMode, formHelper);
 //      case TYPE_MAP:
 //        if (value.length() <= 0) {

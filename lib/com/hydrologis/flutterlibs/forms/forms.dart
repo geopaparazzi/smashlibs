@@ -28,7 +28,6 @@ const String TYPE_DOUBLE = "double";
 
 /// Type for a {@link EditText} containing integer numbers.
 const String TYPE_INTEGER = "integer";
-const String TYPE_TAPCOUNTER = "tapcounter";
 
 /// Type for a {@link Button} containing date.
 const String TYPE_DATE = "date";
@@ -42,9 +41,14 @@ const String TYPE_BOOLEAN = "boolean";
 /// Type for a {@link Spinner}.
 const String TYPE_STRINGCOMBO = "stringcombo";
 const String TYPE_INTCOMBO = "intcombo";
+const String TYPE_DEPENDENTCOMBO = "dependentcombo";
+const String TYPE_DEPENDENTIMAGEGRID = "dependentimagegrid";
 
+/// Type for wheel sliders.
 const String TYPE_INTWHEELSLIDER = "intwheelslider";
 const String TYPE_STRINGWHEELSLIDER = "stringwheelslider";
+const String TYPE_TAPCOUNTER = "tapcounter";
+
 
 /// Type for an autocomplete combo.
 const String TYPE_AUTOCOMPLETESTRINGCOMBO = "autocompletestringcombo";
@@ -90,6 +94,9 @@ const String TYPE_IMAGELIB = "imagelib";
 /// Type for pictures element.
 const String TYPE_SKETCH = "sketch";
 
+/// Type for image grid selection element.
+const String TYPE_IMAGEGRID = "imagegrid";
+
 /// Type for map element.
 const String TYPE_MAP = "map";
 
@@ -129,6 +136,9 @@ const String TAG_VALUE = "value";
 const String TAG_ICON = "icon";
 const String TAG_IS_RENDER_LABEL = "islabel";
 const String TAG_VALUES = "values";
+const String TAG_DEPENDS_ON = "depends_on";
+const String TAG_VALUES_BY_PARENT = "values_by_parent";
+const String TAG_IMAGES_BY_PARENT = "images_by_parent";
 const String TAG_ITEMS = "items";
 const String TAG_ITEMNAME = "itemname";
 const String TAG_ITEM = "item";
@@ -141,14 +151,17 @@ const String TAG_OPACITY = "opacity";
 const String TAG_STYLE = "style";
 const String TAG_URL = "url";
 const String TAG_IS_URL_ITEM = "isurlitem";
+const String TAG_PROMPT = "prompt";
+const String TAG_COLUMNS = "columns";
+const String TAG_MULTI = "multi";
+const String TAG_IMAGES = "images";
+const String TAG_DISABLED_HINT = "disabled_hint";
 
 const IMAGE_ID_SEPARATOR = ";";
 
 const HM_FORMS_TABLE = "hm_forms";
 const FORMS_TABLENAME_FIELD = "tablename";
 const FORMS_FIELD = "forms";
-
-const FORMMEMORY = "FORMMEMORY";
 
 /// Separator for multiple items in the form results.
 const String SEP = "#";
@@ -158,10 +171,6 @@ abstract class AFormhelper {
   // the data used to fill the form and that
   // need to be sent back with the changed data
   late Map<String, dynamic> dataUsed;
-
-  // The form name 2 key names of the forms that
-  // are allowed to be saved and recalled from the cache.
-  Map<String, List<String>>? _cacheDefinitions;
 
   Future<bool> init();
 
@@ -221,6 +230,11 @@ abstract class AFormhelper {
     }
   }
 
+  /// Map of form data used to satisfy url placeholders in combo widgets.
+  Map<String, dynamic> getRequiredFormUrlItems() {
+    return dataUsed;
+  }
+
   /// get the initial data map, changed by the interaction with the form.
   Map<String, dynamic> getFormChangedData() {
     var section = getSection();
@@ -275,167 +289,6 @@ abstract class AFormhelper {
   Widget? getExtraFormBuilderAction(BuildContext context,
       {Function? postAction}) {
     return null;
-  }
-
-  /// Get an optional dictionaty that contains required url items
-  /// to allow a url form to be triggered. The key is the form item key.
-  ///
-  /// Ex. in the case /test/forms/examples/farms/{farm}/fields/{field}/subfields/{subfield}/response.json
-  /// if you want to have the subfields combo to be populated only if also the field
-  /// is supplied, then this should return something like:
-  /// {
-  ///  "farm": 1,
-  ///  "field": 2
-  /// }
-  /// since
-  /// {
-  ///  "farm": 1,
-  /// }
-  /// would allow for subfields of teh hole farm to be loaded (if teh API permits it passing -1)
-  Map<String, dynamic>? getRequiredFormUrlItems() {
-    return null;
-  }
-
-  /// Get a list of keys that should be hidden in the form.
-  List<String>? getHideFormItems() {
-    return null;
-  }
-
-  /// Set the definition sthat concurr to getting items from the previous forms
-  /// to be presented in the actual form.
-  ///
-  /// The key has to be the section name and the value is a list of form item keys.
-  ///
-  /// For example:
-  ///
-  /// ```dart
-  /// var demoCacheDefinitions = {
-  ///   "examples": [
-  ///     "some_text",
-  ///     "a_number",
-  ///     "a_tappable_integer_number",
-  ///     "a_time",
-  ///     "combos_with_item_labels"
-  ///   ]
-  /// };
-  /// helper!.setCacheDefinitions(demoCacheDefinitions);
-  /// ```
-  ///
-  /// For a form that looks like (first part that includes the section name
-  /// and the first of the shown keys):
-  ///
-  ///```json
-  /// [
-  ///  {
-  ///   "sectionname": "examples",
-  ///   "sectiondescription": "examples of supported form widgets",
-  ///   "sectionicon": "bomb",
-  ///   "forms": [
-  ///     {
-  ///       "formname": "text",
-  ///       "formitems": [
-  ///         {
-  ///           "key": "some_text",
-  ///           "value": "example entry",
-  ///           "icon": "font",
-  ///           "type": "string"
-  ///         },
-  ///         {
-  ///          ...
-  ///          ...
-  /// ```
-  void setCacheDefinitions(Map<String, List<String>> cacheDefinitions) {
-    _cacheDefinitions = cacheDefinitions;
-  }
-
-  Future<void> applyPreviousMemoryToForm() async {
-    if (_cacheDefinitions == null || _cacheDefinitions!.isEmpty) {
-      return;
-    }
-    if (!SmashCache().isInitialized) {
-      SMLogger().w("Cache is not initialized, cannot apply definitions.");
-      return;
-    }
-    var section = getSection();
-    if (section != null) {
-      var sectionName = section.sectionName;
-      if (sectionName == null || sectionName.isEmpty) {
-        return;
-      }
-      if (_cacheDefinitions != null &&
-          _cacheDefinitions!.containsKey(sectionName)) {
-        var cacheItemKeys = _cacheDefinitions![sectionName];
-        if (cacheItemKeys != null) {
-          var forms = section.getForms();
-          for (var form in forms) {
-            // check if the form is in the cache definitions
-            String? formName = form.formName;
-            if (formName != null && !formName.isEmpty) {
-              // each cacheDefinition has a list of form item keys to check
-              var formItems = form.getFormItems();
-              for (var formItem in formItems) {
-                String formItemKey = formItem.key;
-                if (cacheItemKeys is List &&
-                    cacheItemKeys.contains(formItemKey)) {
-                  // this item needs to be restored from cache, if it is available
-                  var cachedValue = await SmashCache().get(
-                      sectionName + UNDERSCORE + formItemKey,
-                      cacheName: FORMMEMORY);
-                  if (cachedValue != null) {
-                    // set the cached value
-                    formItem.setValue(cachedValue);
-                    // also update the dataUsed map
-                    // dataUsed[formItemKey] = cachedValue;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  Future<void> storeMemoryFromForm() async {
-    if (_cacheDefinitions == null || _cacheDefinitions!.isEmpty) {
-      return;
-    }
-    if (!SmashCache().isInitialized) {
-      SMLogger().w("Cache is not initialized, cannot store definitions.");
-      return;
-    }
-    var section = getSection();
-    if (section != null) {
-      var sectionName = section.sectionName;
-      if (sectionName == null || sectionName.isEmpty) {
-        return;
-      }
-      if (_cacheDefinitions != null &&
-          _cacheDefinitions!.containsKey(sectionName)) {
-        var cacheItemKeys = _cacheDefinitions![sectionName];
-        if (cacheItemKeys != null) {
-          var forms = section.getForms();
-          for (var form in forms) {
-            String? formName = form.formName;
-            if (formName != null && !formName.isEmpty) {
-              // check if the form is in the cache definitions
-              // each cacheDefinition has a list of form item keys to check
-              var formItems = form.getFormItems();
-              for (var formItem in formItems) {
-                String formItemKey = formItem.key;
-                if (cacheItemKeys is List &&
-                    cacheItemKeys.contains(formItemKey)) {
-                  // this item needs to be stored in cache
-                  await SmashCache().put(
-                      sectionName + UNDERSCORE + formItemKey, formItem.value,
-                      cacheName: FORMMEMORY);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
 }
 
@@ -531,8 +384,19 @@ class MandatoryConstraint implements IConstraint {
     if (value == null) {
       _isValid = false;
     } else {
-      String string = value.toString();
-      if (string.isEmpty) {
+      if (value is Iterable) {
+        _isValid = value.isNotEmpty;
+        return;
+      }
+      if (value is Map) {
+        _isValid = value.isNotEmpty;
+        return;
+      }
+      String string = value.toString().trim();
+      if (string.isEmpty ||
+          string.toLowerCase() == "null" ||
+          string == "[]" ||
+          string == "{}") {
         _isValid = false;
       } else {
         _isValid = true;
@@ -1309,15 +1173,13 @@ class TagsManager {
   /// Utility method to get the combo items of a formitem object.
   ///
   /// @param formItem the json form <b>item</b>.
-  /// @return a copy of the array of items.
+  /// @return the array of items.
   /// @ if something goes wrong.
   static List<dynamic>? getComboItems(Map<String, dynamic> formItem) {
     if (formItem.containsKey(TAG_VALUES)) {
       var valuesObj = formItem[TAG_VALUES];
       if (valuesObj.containsKey(TAG_ITEMS)) {
-        // return a copy of the array
-        return List.from(valuesObj[TAG_ITEMS]);
-        //! TODO make sure this change is ok return valuesObj[TAG_ITEMS];
+        return valuesObj[TAG_ITEMS];
       }
     }
     return null;
@@ -1454,12 +1316,24 @@ class SmashFormItem {
   String? iconStr;
   bool isReadOnly = false;
   bool isGeometric = false;
-  bool isUrlItem = false;
 
   late Map<String, dynamic> map;
 
+  bool get isUrlItem {
+    var url = TagsManager.getComboUrl(map);
+    if (url != null && url.toString().trim().isNotEmpty) {
+      return true;
+    }
+    if (map.containsKey(TAG_URL)) {
+      var raw = map[TAG_URL];
+      return raw != null && raw.toString().trim().isNotEmpty;
+    }
+    return false;
+  }
+
   SmashFormItem(Map<String, dynamic> map) {
     this.map = map;
+
     readData();
   }
 
@@ -1498,16 +1372,6 @@ class SmashFormItem {
         isReadOnly = readonlyObj;
       } else if (readonlyObj is num) {
         isReadOnly = readonlyObj.toDouble() == 1.0;
-      }
-    }
-    if (map.containsKey(TAG_IS_URL_ITEM)) {
-      var isUrlItemObj = map[TAG_IS_URL_ITEM].trim();
-      if (isUrlItemObj is String) {
-        isUrlItem = isUrlItemObj == 'true';
-      } else if (isUrlItemObj is bool) {
-        isUrlItem = isUrlItemObj;
-      } else if (isUrlItemObj is num) {
-        isUrlItem = isUrlItemObj.toDouble() == 1.0;
       }
     }
   }
@@ -1838,11 +1702,6 @@ class ItemObject {
   String label;
   dynamic value;
   ItemObject(this.label, this.value);
-
-  @override
-  String toString() {
-    return label;
-  }
 }
 
 class FormsNetworkSupporter {
@@ -1856,6 +1715,7 @@ class FormsNetworkSupporter {
   var client = http.Client();
 
   Map<String, String> _headers = {};
+  Map<String, String> _urlSubstitutions = {};
 
   void addHeader(String key, String value) {
     _headers[key] = value;
@@ -1865,23 +1725,27 @@ class FormsNetworkSupporter {
     return Map.from(_headers);
   }
 
+  void addUrlSubstitution(String key, String value) {
+    _urlSubstitutions[key] = value;
+  }
+
+  String applyUrlSubstitutions(String url) {
+    for (var entry in _urlSubstitutions.entries) {
+      var key = entry.key;
+      var value = entry.value;
+
+      url = url.replaceFirst("{$key}", value);
+    }
+    return url;
+  }
+
   Future<String?> getJsonString(String url) async {
     if (url.isEmpty) return null;
-
-    String? cachedData =
-        await SmashCache().get(url, cacheName: "forms") as String?;
-    if (cachedData != null) {
-      return cachedData;
-    }
     var uri = Uri.parse(url);
-
     var response =
         await client.get(uri, headers: FormsNetworkSupporter().getHeaders());
-
     if (response.statusCode == 200) {
-      String body = response.body;
-      await SmashCache().put(url, body, cacheName: "forms");
-      return body;
+      return response.body;
     }
     return null;
   }

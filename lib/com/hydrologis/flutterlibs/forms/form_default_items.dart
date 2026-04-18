@@ -394,6 +394,35 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "type": "$TYPE_CONNECTEDSTRINGCOMBO"
     }"""
   },
+  TYPE_DEPENDENTCOMBO: {
+    TYPE_DEPENDENTCOMBO: """
+    {
+      "key": "fuel_macrotype",
+      "label": "Fuel macrotype",
+      "depends_on": "fuel_group",
+      "values_by_parent": {
+        "Prati": [
+          {
+            "item": "Prateria discontinua"
+          },
+          {
+            "item": "Prateria continua"
+          }
+        ],
+        "Arbusteti": [
+          {
+            "item": "Arbusteti subalpini"
+          },
+          {
+            "item": "Arbusteti temperati"
+          }
+        ]
+      },
+      "value": "",
+      "type": "$TYPE_DEPENDENTCOMBO",
+      "mandatory": "yes"
+    }"""
+  },
   TYPE_AUTOCOMPLETESTRINGCOMBO: {
     TYPE_AUTOCOMPLETESTRINGCOMBO: """
     {
@@ -621,6 +650,47 @@ const Map<String, Map<String, String>> DEFAULT_FORM_ITEMS = {
       "label": "A hand drawn sketch",
       "value": "",
       "type": "$TYPE_SKETCH"
+    }"""
+  },
+  TYPE_IMAGEGRID: {
+    "an image grid": """
+    {
+      "key": "imagegrid_key",
+      "label": "Select an image",
+      "prompt": "Which option is correct?",
+      "columns": 3,
+      "multi": false,
+      "images": [
+        { "id": "opt1", "url": "https://example.org/images/opt1.png" },
+        { "id": "opt2", "url": "https://example.org/images/opt2.png" },
+        { "id": "opt3", "base64": "iVBORw0KGgo..." }
+      ],
+      "value": "",
+      "type": "$TYPE_IMAGEGRID"
+    }"""
+  },
+  TYPE_DEPENDENTIMAGEGRID: {
+    "a dependent image grid": """
+    {
+      "key": "level2_key",
+      "type": "$TYPE_DEPENDENTIMAGEGRID",
+      "label": "Level 2",
+      "prompt": "Choose a type based on level 1",
+      "depends_on": "level1_key",
+      "disabled_hint": "Select level 1 first",
+      "columns": 3,
+      "multi": false,
+      "images_by_parent": {
+        "Parent A": [
+          { "id": "A1", "url": "https://example.org/images/a1.png" },
+          { "id": "A2", "url": "https://example.org/images/a2.png" }
+        ],
+        "Parent B": [
+          { "id": "B1", "url": "https://example.org/images/b1.png" }
+        ]
+      },
+      "value": "",
+      "mandatory": "yes"
     }"""
   },
   TYPE_POINT: {

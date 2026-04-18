@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable
-
 part of smashlibs;
 /*
  * Copyright (c) 2019-2026. Antonello Andrea (https://g-ant.eu). All rights reserved.
@@ -257,25 +255,6 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      builder: (context, projectSnap) {
-        if (projectSnap.hasError) {
-          return SmashUI.errorWidget(projectSnap.error.toString());
-        } else if (projectSnap.connectionState == ConnectionState.none ||
-            projectSnap.data == null) {
-          return SmashCircularProgress();
-        }
-
-        Widget widget = projectSnap.data as Widget;
-        return widget;
-      },
-      future: getWidget(context),
-    );
-  }
-
-  Future<Widget> getWidget(BuildContext context) async {
-    await _formHelper.applyPreviousMemoryToForm();
-
     var section = _formHelper.getSection();
     if (section == null) {
       return SmashUI.errorWidget(SLL.of(context).no_section_in_form);
@@ -337,9 +316,7 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
                 leading: IconButton(
                   icon:
                       Icon(Icons.arrow_back, color: SmashColors.mainBackground),
-                  onPressed: () async {
-                    await _onWillPop();
-                  },
+                  onPressed: () => _onWillPop(),
                 ),
               ),
               body: bodyContainer,
@@ -349,11 +326,63 @@ class _MasterDetailPageState extends State<MasterDetailPage> {
   }
 
   Future<bool> _onWillPop() async {
-    // TODO check if something changed would be really good
+    String? validationError = _validateSectionForSave();
+    if (validationError != null) {
+      await SmashDialogs.showWarningDialog(
+          context,
+          "Can't save this form yet.\n\n$validationError\n\nPlease fill required fields and retry.",
+          title: "Mandatory fields");
+      return false;
+    }
+
     await widget.formHelper.onSaveFunction(context);
-    await widget.formHelper.storeMemoryFromForm();
     Navigator.of(context).pop();
     return true;
+  }
+
+  String? _validateSectionForSave() {
+    var section = widget.formHelper.getSection();
+    if (section == null) {
+      return null;
+    }
+
+    for (var form in section.getForms()) {
+      for (var item in form.getFormItems()) {
+        Constraints constraints = Constraints();
+        item.handleConstraints(constraints);
+        if (constraints.constraints.isEmpty) {
+          continue;
+        }
+
+        bool isMandatory =
+            FormUtilities.isTrue(item.getMapItem(CONSTRAINT_MANDATORY));
+        Object? value = item.value;
+        bool isValid;
+        if (isMandatory) {
+          isValid = constraints.isValid(value);
+        } else {
+          if (value == null) {
+            isValid = true;
+          } else {
+            String asString = value.toString().trim();
+            if (asString.isEmpty || asString.toLowerCase() == "null") {
+              isValid = true;
+            } else {
+              isValid = constraints.isValid(value);
+            }
+          }
+        }
+
+        if (!isValid) {
+          String itemLabel = item.label.trim().isNotEmpty ? item.label : item.key;
+          String formName = form.formName ?? "-";
+          String details = constraints.getDescription(context);
+          return "Form: $formName\nField: $itemLabel ${details.isNotEmpty ? details : ""}";
+        }
+      }
+    }
+
+    return null;
   }
 }
 
@@ -366,16 +395,11 @@ Tuple2<ListTile, bool>? getWidget(
   AFormhelper formHelper,
 ) {
   String key = formItem.key;
-  var hideFormItems = formHelper.getHideFormItems();
-  if (hideFormItems != null && hideFormItems.contains(key)) {
-    return null;
-  }
   String type = formItem.type;
   String label = formItem.label;
   dynamic value = formItem.value;
   String? iconStr = formItem.iconStr;
   bool itemReadonly = formItem.isReadOnly;
-  bool isUrlItem = formItem.isUrlItem;
 
   Icon? icon;
   if (iconStr != null) {
@@ -587,7 +611,7 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, formItem, presentationMode),
+                    label, valueString, presentationMode),
               ),
               false);
         }
@@ -607,7 +631,7 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, formItem, presentationMode),
+                    label, valueString, presentationMode),
               ),
               false);
         }
@@ -631,59 +655,74 @@ Tuple2<ListTile, bool>? getWidget(
       }
     case TYPE_STRINGCOMBO:
       {
+        if (itemReadonly) {
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
               title: ComboboxWidget<String>(ValueKey(widgetKey), formItem,
-                  label, presentationMode, constraints, isUrlItem, formHelper),
+                  label, presentationMode, constraints, formItem.isUrlItem, formHelper),
             ),
             false);
       }
     case TYPE_INTCOMBO:
       {
+        if (itemReadonly) {
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
               title: ComboboxWidget<int>(ValueKey(widgetKey), formItem, label,
-                  presentationMode, constraints, isUrlItem, formHelper),
+                  presentationMode, constraints, formItem.isUrlItem, formHelper),
             ),
             false);
       }
-    case TYPE_STRINGWHEELSLIDER:
+    case TYPE_DEPENDENTCOMBO:
       {
         return Tuple2(
             ListTile(
               leading: icon,
-              title: WheelSliderWidget<String>(ValueKey(widgetKey), formItem,
-                  label, presentationMode, constraints, isUrlItem, formHelper),
-            ),
-            false);
-      }
-    case TYPE_INTWHEELSLIDER:
-      {
-        return Tuple2(
-            ListTile(
-              leading: icon,
-              title: WheelSliderWidget<int>(ValueKey(widgetKey), formItem,
-                  label, presentationMode, constraints, isUrlItem, formHelper),
+              title: DependentComboWidget(ValueKey(widgetKey), formItem, label,
+                  presentationMode, constraints, formHelper),
             ),
             false);
       }
     case TYPE_AUTOCOMPLETESTRINGCOMBO:
-    case TYPE_AUTOCOMPLETEINTCOMBO:
       {
+        if (itemReadonly) {
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
-              title: AutocompleteComboWidget(ValueKey(widgetKey), formItem,
-                  label, presentationMode, constraints, isUrlItem, formHelper),
+              title: AutocompleteComboWidget(
+                  ValueKey(widgetKey), formItem, label, presentationMode, constraints, formItem.isUrlItem, formHelper),
             ),
             false);
       }
     case TYPE_CONNECTEDSTRINGCOMBO:
       {
-        if (itemReadonly &&
-            presentationMode.detailMode != DetailMode.DETAILED) {
+        if (itemReadonly) {
           var finalString = "";
           if (valueString != finalString) {
             var split = valueString.split("#");
@@ -693,30 +732,43 @@ Tuple2<ListTile, bool>? getWidget(
               ListTile(
                 leading: icon,
                 title: AFormWidget.getSimpleLabelValue(
-                    label, formItem, presentationMode,
-                    forceValue: finalString),
+                    label, finalString, presentationMode),
               ),
               false);
         }
         return Tuple2(
             ListTile(
               leading: icon,
-              title: ConnectedComboboxWidget(ValueKey(widgetKey), formItem,
-                  label, itemReadonly, isUrlItem),
+              title: ConnectedComboboxWidget(
+                  ValueKey(widgetKey), formItem, label, itemReadonly, formItem.isUrlItem),
             ),
             false);
       }
     case TYPE_AUTOCOMPLETECONNECTEDSTRINGCOMBO:
       {
+        if (itemReadonly) {
+          var finalString = "";
+          if (valueString != finalString) {
+            var split = valueString.split("#");
+            if (split.length > 1) {
+              finalString = "${split[0]} -> ${split[1]}";
+            } else {
+              finalString = valueString;
+            }
+          }
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, finalString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
               title: AutocompleteStringConnectedComboboxWidget(
-                  ValueKey(widgetKey),
-                  formItem,
-                  label,
-                  itemReadonly,
-                  isUrlItem),
+                  ValueKey(widgetKey), formItem, label, itemReadonly, formItem.isUrlItem),
             ),
             false);
       }
@@ -727,43 +779,40 @@ Tuple2<ListTile, bool>? getWidget(
 //        break;
     case TYPE_STRINGMULTIPLECHOICE:
       {
-        // if (itemReadonly &&
-        //     presentationMode.detailMode != DetailMode.DETAILED) {
-        //   // ! TODO
-        //   return Tuple2(
-        //       ListTile(
-        //         leading: icon,
-        //         title: AFormWidget.getSimpleLabelValue(
-        //             label, formItem, presentationMode),
-        //       ),
-        //       false);
-        // }
+        if (itemReadonly) {
+          // ! TODO
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
               title: MultiComboWidget<String>(ValueKey(widgetKey), formItem,
-                  label, itemReadonly, presentationMode, isUrlItem, formHelper),
+                  label, itemReadonly, presentationMode, formItem.isUrlItem, formHelper),
             ),
             false);
       }
     case TYPE_INTMULTIPLECHOICE:
       {
-        // if (itemReadonly &&
-        //     presentationMode.detailMode != DetailMode.DETAILED) {
-        //   // ! TODO
-        //   return Tuple2(
-        //       ListTile(
-        //         leading: icon,
-        //         title: AFormWidget.getSimpleLabelValue(
-        //             label, formItem, presentationMode),
-        //       ),
-        //       false);
-        // }
+        if (itemReadonly) {
+          return Tuple2(
+              ListTile(
+                leading: icon,
+                title: AFormWidget.getSimpleLabelValue(
+                    label, valueString, presentationMode),
+              ),
+              false);
+        }
         return Tuple2(
             ListTile(
               leading: icon,
               title: MultiComboWidget<int>(ValueKey(widgetKey), formItem, label,
-                  itemReadonly, presentationMode, isUrlItem, formHelper),
+                  itemReadonly, presentationMode, formItem.isUrlItem, formHelper),
             ),
             false);
       }
@@ -795,6 +844,32 @@ Tuple2<ListTile, bool>? getWidget(
               leading: icon,
               title: SketchWidget(label, ValueKey(widgetKey), formHelper,
                   formItem, itemReadonly),
+            ),
+            false);
+      }
+    case TYPE_IMAGEGRID:
+      {
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: ImageGridWidget(
+                  label, ValueKey(widgetKey), formItem, itemReadonly),
+            ),
+            false);
+      }
+    case TYPE_DEPENDENTIMAGEGRID:
+      {
+        return Tuple2(
+            ListTile(
+              leading: icon,
+              title: DependentImageGridWidget(
+                  label,
+                  ValueKey(widgetKey),
+                  formItem,
+                  itemReadonly,
+                  presentationMode,
+                  constraints,
+                  formHelper),
             ),
             false);
       }
@@ -834,16 +909,6 @@ Tuple2<ListTile, bool>? getWidget(
                     formItem, itemReadonly)),
           ),
           true);
-    case TYPE_TAPCOUNTER:
-      var tapCounterFormWidgetInstance = TapcounterFormWidget(
-          context, widgetKey, formItem, presentationMode, formHelper);
-
-      return Tuple2(
-          ListTile(
-            leading: icon,
-            title: tapCounterFormWidgetInstance.getWidget(),
-          ),
-          false);
     case TYPE_HIDDEN:
       break;
     default:
