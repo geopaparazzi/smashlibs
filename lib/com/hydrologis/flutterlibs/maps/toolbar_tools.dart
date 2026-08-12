@@ -1032,7 +1032,8 @@ class SmashGeojsonFormHelper extends AFormhelper {
   /// Take a picture for forms
   Future<String?> takePictureForForms(
       BuildContext context, bool fromGallery, List<String> imageSplit) async {
-    // TODO implement
+    SmashDialogs.showWarningDialog(context,
+        "Taking pictures is not supported for GSS and GeoJSON sources.");
 
     // DbImage dbImage = DbImage()
     //   ..timeStamp = DateTime.now().millisecondsSinceEpoch
