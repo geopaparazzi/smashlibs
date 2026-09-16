@@ -393,6 +393,16 @@ class EditableTextField extends StatefulWidget {
   final Color? buttonColor;
   final bool withLabel;
 
+  /// If true, the field is cleared automatically the first time it gets
+  /// focus, rather than requiring the initial [value] to be deleted by
+  /// hand. Intended for cases where [value] is a placeholder-like default
+  /// (eg. a newly created item's default name), decided by the caller who
+  /// knows the value's provenance - this deliberately does NOT compare
+  /// against the current text, since a user may legitimately want to keep
+  /// (or later re-type) content that happens to match that default.
+  /// Only ever applies once per widget lifetime.
+  final bool clearOnFirstFocus;
+
   const EditableTextField(
     this.label,
     this.value,
@@ -405,6 +415,7 @@ class EditableTextField extends StatefulWidget {
     this.withLabel = false,
     this.textColor,
     this.buttonColor,
+    this.clearOnFirstFocus = false,
     super.key,
   });
 
@@ -418,6 +429,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
   late final FocusNode _focus;
   bool _editMode = false;
   String? _lastSavedText;
+  bool _hasAutoCleared = false;
 
   @override
   void initState() {
@@ -458,12 +470,15 @@ class _EditableTextFieldState extends State<EditableTextField> {
   void _enterEdit({bool moveCursorToEnd = true}) {
     setState(() => _editMode = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Only force the cursor to the end when there is no meaningful tap
-      // position to preserve (eg. entering edit mode via the pencil
-      // button). A direct tap on the field itself already placed the
-      // selection correctly (readOnly fields still support tapping to
-      // position the cursor), so don't clobber it in that case.
-      if (moveCursorToEnd) {
+      if (widget.clearOnFirstFocus && !_hasAutoCleared) {
+        _hasAutoCleared = true;
+        _c.clear();
+      } else if (moveCursorToEnd) {
+        // Only force the cursor to the end when there is no meaningful tap
+        // position to preserve (eg. entering edit mode via the pencil
+        // button). A direct tap on the field itself already placed the
+        // selection correctly (readOnly fields still support tapping to
+        // position the cursor), so don't clobber it in that case.
         _c.selection = TextSelection.collapsed(offset: _c.text.length);
       }
       _focus.requestFocus();
