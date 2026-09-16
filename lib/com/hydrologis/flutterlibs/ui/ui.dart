@@ -455,11 +455,17 @@ class _EditableTextFieldState extends State<EditableTextField> {
     super.dispose();
   }
 
-  void _enterEdit() {
+  void _enterEdit({bool moveCursorToEnd = true}) {
     setState(() => _editMode = true);
-    // place cursor at end after the frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _c.selection = TextSelection.collapsed(offset: _c.text.length);
+      // Only force the cursor to the end when there is no meaningful tap
+      // position to preserve (eg. entering edit mode via the pencil
+      // button). A direct tap on the field itself already placed the
+      // selection correctly (readOnly fields still support tapping to
+      // position the cursor), so don't clobber it in that case.
+      if (moveCursorToEnd) {
+        _c.selection = TextSelection.collapsed(offset: _c.text.length);
+      }
       _focus.requestFocus();
     });
   }
@@ -512,11 +518,11 @@ class _EditableTextFieldState extends State<EditableTextField> {
               : IconButton(
                   icon: Icon(MdiIcons.pencil),
                   color: buttonColor,
-                  onPressed: _enterEdit,
+                  onPressed: () => _enterEdit(),
                 ),
         ),
         onTap: () {
-          if (!_editMode) _enterEdit();
+          if (!_editMode) _enterEdit(moveCursorToEnd: false);
         },
         onFieldSubmitted: (_) => _saveIfValid(),
       ),
