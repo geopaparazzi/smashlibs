@@ -118,7 +118,18 @@ class FileBrowser extends StatefulWidget {
 
   final String _startFolder;
 
-  FileBrowser(this._doFolderMode, this._allowedExtensions, this._startFolder);
+  /// When true, the browser lets the user check several files (or
+  /// folders, if [_doFolderMode] is also true) and confirm the selection
+  /// with a "Done" button, returning a `List<String>` through
+  /// [Navigator.pop] instead of the default single `String`.
+  ///
+  /// Defaults to false so existing callers - including other applications
+  /// using this library - keep getting a single `String?` result and don't
+  /// need any changes.
+  final bool doMultiSelect;
+
+  FileBrowser(this._doFolderMode, this._allowedExtensions, this._startFolder,
+      {this.doMultiSelect = false});
 
   @override
   FileBrowserState createState() {
@@ -131,12 +142,67 @@ class FileBrowserState extends State<FileBrowser> {
   bool onlyFiles = false;
   List<String>? allStoragerFolders;
   var rootDir = Workspace.rootFolder;
+  final Set<String> _selectedPaths = {};
 
   List<List<dynamic>> getFiles() {
     List<List<dynamic>> files = HU.FileUtilities.listFiles(currentPath!,
         doOnlyFolder: widget._doFolderMode,
         allowedExtensions: widget._allowedExtensions);
     return files;
+  }
+
+  /// A horizontally scrollable breadcrumb of the current path's folders,
+  /// each tappable to jump straight to that ancestor. Initially scrolled
+  /// so the current (deepest) folder is visible.
+  Widget _buildBreadcrumb(BuildContext context) {
+    var segments = PATH.split(currentPath!);
+    List<Widget> chips = [];
+    String accumulated = segments[0];
+    for (int i = 0; i < segments.length; i++) {
+      if (i > 0) {
+        accumulated = PATH.join(accumulated, segments[i]);
+      }
+      bool isLast = i == segments.length - 1;
+      var label = segments[i].isEmpty ? PATH.separator : segments[i];
+      var pathForSegment = accumulated;
+      chips.add(
+        InkWell(
+          onTap: isLast
+              ? null
+              : () {
+                  setState(() {
+                    currentPath = pathForSegment;
+                  });
+                },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: SmashUI.normalText(
+              label,
+              bold: isLast,
+              color: SmashColors.mainBackground,
+            ),
+          ),
+        ),
+      );
+      if (!isLast) {
+        chips.add(Icon(
+          MdiIcons.chevronRight,
+          size: 16,
+          color: SmashColors.mainBackground,
+        ));
+      }
+    }
+    return Tooltip(
+      message: currentPath,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        reverse: true,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: chips,
+        ),
+      ),
+    );
   }
 
   @override
@@ -146,8 +212,6 @@ class FileBrowserState extends State<FileBrowser> {
     }
     bool removePrefix =
         GpPreferences().getBooleanSync("KEY_FILEBROWSER_DOPREFIX", false);
-    String folderName =
-        ".../" + HU.FileUtilities.nameFromFile(currentPath!, false);
 
     List<List<dynamic>> data = getFiles();
     if (onlyFiles) {
@@ -180,30 +244,7 @@ class FileBrowserState extends State<FileBrowser> {
               ),
               Expanded(
                 flex: 100,
-                child: Tooltip(
-                  message: currentPath,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Padding(
-                      padding: SmashUI.defaultPadding(),
-                      child: SmashUI.titleText(
-                        folderName,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.start,
-                        color: SmashColors.mainBackground,
-                        bold: true,
-                      ),
-                      // (
-                      //     Platform.isIOS
-                      //         ? IOS_DOCUMENTSFOLDER +
-                      //             Workspace.makeRelative(data[0][0])
-                      //         : data[0][0],
-                      //     color: SmashColors.mainDecorations,
-                      //     bold: true,
-                      //     textAlign: TextAlign.left),
-                    ),
-                  ),
-                ),
+                child: _buildBreadcrumb(context),
               ),
             ],
           ),
@@ -247,6 +288,22 @@ class FileBrowserState extends State<FileBrowser> {
             )
           ],
         ),
+        floatingActionButton: widget.doMultiSelect && _selectedPaths.isNotEmpty
+            ? FloatingActionButton(
+                child: badges.Badge(
+                  badgeContent: Text(
+                    "${_selectedPaths.length}",
+                    style: TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                  position: badges.BadgePosition.topEnd(top: -10, end: -10),
+                  child: Icon(MdiIcons.check),
+                ),
+                onPressed: () async {
+                  await Workspace.setLastUsedFolder(currentPath!);
+                  Navigator.pop(context, _selectedPaths.toList());
+                },
+              )
+            : null,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -291,6 +348,7 @@ class FileBrowserState extends State<FileBrowser> {
                   }
                   bool isDir = pathName[2];
                   var fullPath = HU.FileUtilities.joinPaths(parentPath, name);
+                  bool isSelected = _selectedPaths.contains(fullPath);
 
                   IconData iconData = SmashIcons.forPath(fullPath);
                   Widget? trailingWidget;
@@ -302,14 +360,27 @@ class FileBrowserState extends State<FileBrowser> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           IconButton(
-                            icon: Icon(MdiIcons.checkCircleOutline,
-                                color: SmashColors.mainDecorations),
+                            icon: Icon(
+                                isSelected
+                                    ? MdiIcons.checkCircle
+                                    : MdiIcons.checkCircleOutline,
+                                color: isSelected
+                                    ? SmashColors.mainSelection
+                                    : SmashColors.mainDecorations),
                             tooltip: "Select folder",
                             onPressed: () async {
-                              await Workspace.setLastUsedFolder(parentPath);
-                              var resultPath =
-                                  HU.FileUtilities.joinPaths(parentPath, name);
-                              Navigator.pop(context, resultPath);
+                              if (widget.doMultiSelect) {
+                                setState(() {
+                                  if (isSelected) {
+                                    _selectedPaths.remove(fullPath);
+                                  } else {
+                                    _selectedPaths.add(fullPath);
+                                  }
+                                });
+                              } else {
+                                await Workspace.setLastUsedFolder(parentPath);
+                                Navigator.pop(context, fullPath);
+                              }
                             },
                           ),
                           IconButton(
@@ -317,8 +388,7 @@ class FileBrowserState extends State<FileBrowser> {
                             tooltip: "Enter folder",
                             onPressed: () {
                               setState(() {
-                                currentPath = HU.FileUtilities.joinPaths(
-                                    parentPath, name);
+                                currentPath = fullPath;
                               });
                             },
                           )
@@ -327,22 +397,39 @@ class FileBrowserState extends State<FileBrowser> {
                     } else {
                       tapFunction = () {
                         setState(() {
-                          currentPath =
-                              HU.FileUtilities.joinPaths(parentPath, name);
+                          currentPath = fullPath;
                         });
                       };
                     }
                   } else {
                     // if it gets here, then it is sure no folder mode
-                    tapFunction = () async {
-                      await Workspace.setLastUsedFolder(parentPath);
-                      var resultPath =
-                          HU.FileUtilities.joinPaths(parentPath, name);
-                      Navigator.pop(context, resultPath);
-                    };
+                    if (widget.doMultiSelect) {
+                      trailingWidget = Icon(
+                        isSelected
+                            ? MdiIcons.checkboxMarked
+                            : MdiIcons.checkboxBlankOutline,
+                        color: isSelected
+                            ? SmashColors.mainSelection
+                            : SmashColors.mainDecorations,
+                      );
+                      tapFunction = () {
+                        setState(() {
+                          if (isSelected) {
+                            _selectedPaths.remove(fullPath);
+                          } else {
+                            _selectedPaths.add(fullPath);
+                          }
+                        });
+                      };
+                    } else {
+                      tapFunction = () async {
+                        await Workspace.setLastUsedFolder(parentPath);
+                        Navigator.pop(context, fullPath);
+                      };
+                    }
                   }
 
-                  if (trailingWidget != null) {
+                  if (tapFunction == null) {
                     return ListTile(
                       leading: Icon(
                         iconData,
@@ -356,6 +443,7 @@ class FileBrowserState extends State<FileBrowser> {
                     return InkWell(
                       onTap: tapFunction,
                       child: ListTile(
+                        trailing: trailingWidget,
                         leading: Icon(
                           iconData,
                           color: SmashColors.mainDecorations,
