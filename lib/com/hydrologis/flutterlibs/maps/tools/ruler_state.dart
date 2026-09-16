@@ -14,11 +14,22 @@ class RulerState extends ChangeNotifier {
   double? xTapPosition;
   double? yTapPosition;
   double? _lengthMeters;
+  double? _areaSqMeters;
 
   double? get lengthMeters => _lengthMeters;
 
   set lengthMeters(double? newLength) {
     _lengthMeters = newLength;
+    notifyListeners();
+  }
+
+  /// The area of the polygon obtained by closing the drawn path back to its
+  /// start point. Null if there are not enough points yet, or if the
+  /// resulting polygon is not a valid (eg. self-intersecting) geometry.
+  double? get areaSqMeters => _areaSqMeters;
+
+  set areaSqMeters(double? newArea) {
+    _areaSqMeters = newArea;
     notifyListeners();
   }
 

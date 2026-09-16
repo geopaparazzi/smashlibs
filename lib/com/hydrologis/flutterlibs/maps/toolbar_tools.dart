@@ -491,12 +491,29 @@ class _FeatureQueryButtonState extends State<FeatureQueryButton> {
   }
 }
 
+/// Format [sqMeters] to be Km2 or m2.
+String _formatSquareMeters(double sqMeters) {
+  if (sqMeters >= 1000000) {
+    var totalSqKm = sqMeters / 1000000.0;
+    return "${totalSqKm.toStringAsFixed(2)} km²";
+  } else {
+    return "${sqMeters.round()} m²";
+  }
+}
+
 class RulerButton extends StatelessWidget {
   final _iconSize;
   final fgColor;
   final selectionColor;
 
-  RulerButton(this._iconSize, this.fgColor, this.selectionColor, {Key? key})
+  /// If true, the length badge grows towards the start (left) side instead
+  /// of the end (right) side. Use this when the button sits near the right
+  /// edge of the screen, so a long label (eg. "1234.5 km") doesn't overflow
+  /// off screen.
+  final bool badgeGrowsToStart;
+
+  RulerButton(this._iconSize, this.fgColor, this.selectionColor,
+      {this.badgeGrowsToStart = false, Key? key})
       : super(key: key);
 
   @override
@@ -519,10 +536,15 @@ class RulerButton extends StatelessWidget {
           badgeAnimation: badges.BadgeAnimation.slide(
             toAnimate: false,
           ),
-          position: badges.BadgePosition.topStart(
-              top: -_iconSize / 2, start: 0.1 * _iconSize),
+          position: badgeGrowsToStart
+              ? badges.BadgePosition.topEnd(
+                  top: -_iconSize / 2, end: 0.1 * _iconSize)
+              : badges.BadgePosition.topStart(
+                  top: -_iconSize / 2, start: 0.1 * _iconSize),
           badgeContent: Text(
-            HU.StringUtilities.formatMeters(rulerState.lengthMeters!),
+            rulerState.areaSqMeters != null
+                ? "${HU.StringUtilities.formatMeters(rulerState.lengthMeters!)} (${_formatSquareMeters(rulerState.areaSqMeters!)})"
+                : HU.StringUtilities.formatMeters(rulerState.lengthMeters!),
             style: TextStyle(color: Colors.white),
           ),
           child: w,

@@ -28,7 +28,7 @@ class PreferencesState extends ChangeNotifierPlus {
     showZoomButton = GpPreferences().getBooleanSync(
         SmashPreferencesKeys.KEY_SCREEN_TOOLBAR_SHOW_ZOOM, true);
     showEditingButton = GpPreferences().getBooleanSync(
-        SmashPreferencesKeys.KEY_SCREEN_TOOLBAR_SHOW_EDITING, true);
+        SmashPreferencesKeys.KEY_SCREEN_TOOLBAR_SHOW_EDITING, false);
     iconSize = GpPreferences().getDoubleSync(
         SmashPreferencesKeys.KEY_MAPTOOLS_ICON_SIZE, SmashUI.MEDIUM_ICON_SIZE)!;
   }

@@ -22,8 +22,10 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
   double? _x;
   double? _y;
   double? lengthMeters;
+  bool isValidPolygon = false;
 
   List<Offset>? pointsList;
+  List<JTS.Coordinate>? llPointsList;
   late MapCamera map;
 
   @override
@@ -41,6 +43,7 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
               size: Size.infinite,
               painter: LinePainter(
                 pointsList: pointsList!,
+                closeAndFill: isValidPolygon,
               )),
         );
       }
@@ -87,7 +90,10 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
       var tmp = map.unprojectAtZoom(
           Offset(pixelOrigin.dx + p.dx, pixelOrigin.dy + (p.dy)));
       runningPointLL = JTS.Coordinate(tmp.longitude, tmp.latitude);
+      llPointsList = [runningPointLL!];
+      isValidPolygon = false;
       rulerState.lengthMeters = lengthMeters;
+      rulerState.areaSqMeters = null;
       setState(() {});
     }
   }
@@ -105,25 +111,59 @@ class _RulerPluginLayerState extends State<RulerPluginLayer> {
                 .distanceBetweenTwoGeoPoints(runningPointLL!, tmpPointLL);
         rulerState.lengthMeters = lengthMeters;
         runningPointLL = tmpPointLL;
+        llPointsList!.add(tmpPointLL);
+        rulerState.areaSqMeters = _computeAreaIfValid();
         setState(() {});
       }
+    }
+  }
+
+  /// Tries to close the drawn path into a polygon (start to end point) and,
+  /// if the resulting geometry is valid, returns its
+  /// geodesic area in square meters. Returns null otherwise.
+  double? _computeAreaIfValid() {
+    isValidPolygon = false;
+    var coords = llPointsList;
+    if (coords == null || coords.length < 3) {
+      return null;
+    }
+    try {
+      var ringCoords = List<JTS.Coordinate>.from(coords)..add(coords.first);
+      var gf = JTS.GeometryFactory.defaultPrecision();
+      var ring = gf.createLinearRing(ringCoords);
+      var polygon = gf.createPolygon(ring, null);
+      if (!polygon.isValid()) {
+        return null;
+      }
+      isValidPolygon = true;
+      return JTS.Geodesy().area(polygon).toDouble();
+    } catch (e) {
+      // on errors ignore it
+      return null;
     }
   }
 
   void dragEnd(RulerState rulerState) {
     if (rulerState.lengthMeters != null) {
       rulerState.lengthMeters = null;
+      rulerState.areaSqMeters = null;
       setState(() {
         pointsList = null;
+        llPointsList = null;
         lengthMeters = null;
+        isValidPolygon = false;
       });
     }
   }
 }
 
 class LinePainter extends CustomPainter {
-  LinePainter({required this.pointsList});
+  LinePainter({required this.pointsList, this.closeAndFill = false});
   List<Offset> pointsList;
+
+  /// When true, the drawn path is closed back to its start point and
+  /// filled, to indicate that it forms a valid polygon.
+  final bool closeAndFill;
   final Paint paintObject = Paint();
   @override
   void paint(Canvas canvas, Size size) {
@@ -131,18 +171,28 @@ class LinePainter extends CustomPainter {
   }
 
   void _drawPath(Canvas canvas) {
-    ui.Path path = ui.Path();
-    paintObject.color = SmashColors.mainSelectionBorder;
-    paintObject.strokeWidth = 3;
-    paintObject.style = PaintingStyle.fill;
     if (pointsList.length < 2) {
       return;
     }
-    paintObject.style = PaintingStyle.stroke;
+    ui.Path path = ui.Path();
     path.moveTo(pointsList[0].dx, pointsList[0].dy);
-    for (int i = 1; i < pointsList.length - 1; i++) {
+    for (int i = 1; i < pointsList.length; i++) {
       path.lineTo(pointsList[i].dx, pointsList[i].dy);
     }
+
+    if (closeAndFill) {
+      // fill the area of the polygon obtained by closing the path, but
+      // don't stroke the closing segment itself: only what the finger
+      // actually drew is stroked below.
+      ui.Path fillPath = ui.Path.from(path)..close();
+      paintObject.style = PaintingStyle.fill;
+      paintObject.color = SmashColors.mainSelectionBorder.withAlpha(30);
+      canvas.drawPath(fillPath, paintObject);
+    }
+
+    paintObject.style = PaintingStyle.stroke;
+    paintObject.strokeWidth = 3;
+    paintObject.color = SmashColors.mainSelectionBorder;
     canvas.drawPath(path, paintObject);
   }
 
