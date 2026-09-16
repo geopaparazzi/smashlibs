@@ -186,7 +186,7 @@ class GpsState extends ChangeNotifierPlus {
   bool get useFilteredGps {
     if (_useFilteredGps == null) {
       _useFilteredGps = GpPreferences().getBooleanSync(
-          SmashPreferencesKeys.KEY_GPS_USE_FILTER_GENERALLY, false);
+          SmashPreferencesKeys.KEY_GPS_USE_FILTER_GENERALLY, true);
     }
     return _useFilteredGps!;
   }
