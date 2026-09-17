@@ -29,6 +29,8 @@ class LayerManager {
             var fromJson = LayerSource.fromJson(json);
             for (var source in fromJson) {
               SMLogger().d("--> loading: ${source.getName()}");
+              Provider.of<LoadingStatusState>(context, listen: false).status =
+                  source.getName();
               var absolutePath = source.getAbsolutePath();
               var url = source.getUrl();
               bool isFile =
@@ -54,6 +56,7 @@ class LayerManager {
         ];
       }
     } finally {
+      Provider.of<LoadingStatusState>(context, listen: false).status = null;
       SMLogger().d("END: Initializing layer manager.");
     }
   }

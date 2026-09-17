@@ -17,3 +17,22 @@ class ChangeNotifierPlus with ChangeNotifier {
     notifyListeners();
   }
 }
+
+/// Holds a short, human readable status of what is currently being loaded
+/// (eg. "loading <layer name>" during startup), so long-running operations
+/// can show live feedback instead of a silent spinner.
+///
+/// To be registered as a [ChangeNotifierProvider] in the app, and
+/// updated from wherever a [BuildContext] is already available (ex. deep in
+/// [LayerManager.initialize]) via `Provider.of<LoadingStatusState>(context,
+/// listen: false)`.
+class LoadingStatusState extends ChangeNotifierPlus {
+  String? _status;
+
+  String? get status => _status;
+
+  set status(String? newStatus) {
+    _status = newStatus;
+    notifyListenersMsg(newStatus);
+  }
+}
