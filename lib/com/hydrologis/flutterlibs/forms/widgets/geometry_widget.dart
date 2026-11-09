@@ -46,8 +46,11 @@ class GeometryWidgetState extends State<GeometryWidget> {
   @override
   void dispose() {
     if (!widget._isReadOnly) {
-      _geomEditorState?.setEnabledSilently(false);
+      final editorState = _geomEditorState;
+      editorState?.setEnabledSilently(false);
       GeometryEditManager().stopEditing();
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => editorState?.refreshEditLayer());
     }
     super.dispose();
   }
