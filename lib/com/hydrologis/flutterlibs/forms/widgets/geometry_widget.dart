@@ -19,6 +19,38 @@ class GeometryWidgetState extends State<GeometryWidget> {
   late String keyStr;
   double _iconSize = 32;
   SmashMapFormsWidget? sWidget;
+  GeometryEditorState? _geomEditorState;
+  Future<Widget>? _mainWidgetFuture;
+
+  @override
+  void setState(VoidCallback fn) {
+    _mainWidgetFuture = null;
+    super.setState(fn);
+  }
+
+  @override
+  void didUpdateWidget(GeometryWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget._formItem, widget._formItem)) {
+      _mainWidgetFuture = null;
+      sWidget = null;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _geomEditorState = Provider.of<GeometryEditorState>(context, listen: false);
+  }
+
+  @override
+  void dispose() {
+    if (!widget._isReadOnly) {
+      _geomEditorState?.setEnabledSilently(false);
+      GeometryEditManager().stopEditing();
+    }
+    super.dispose();
+  }
 
   Future<Widget> getMapView(BuildContext context) async {
     String value = ""; //$NON-NLS-1$
@@ -155,7 +187,7 @@ class GeometryWidgetState extends State<GeometryWidget> {
         Widget widget = projectSnap.data as Widget;
         return widget;
       },
-      future: getMainWidget(context),
+      future: _mainWidgetFuture ??= getMainWidget(context),
     );
   }
 
